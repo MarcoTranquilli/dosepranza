@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ordini Pranzo di Gruppo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .view { display: none; }
+        .view.active { display: block; }
+        /* Stile per la scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px;}
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 10px;}
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+        .paid-order {
+            opacity: 0.6;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .gemini-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #4f46e5;
+            animation: spin 1s ease infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Contenitore Principale -->
+    <div id="app" class="max-w-4xl mx-auto p-4 md:p-6">
+        <header class="mb-6">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 text-center">Ordini Pranzo di Gruppo 🥪</h1>
+            <p class="text-center text-gray-600 mt-2">Organizza il pranzo con i tuoi colleghi in modo semplice e veloce.</p>
+            <p class="text-center text-gray-600 mt-2"> <b>L'ordine verrà effettuato al massimo per le 11:30 </b></p>
+        </header>
+
+        <!-- Navigazione -->
+        <nav class="flex justify-center bg-white p-2 rounded-xl shadow-md mb-6 sticky top-4 z-10">
+            <button data-view="menu" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold transition-all duration-300">
+                <i class="fas fa-utensils mr-2"></i>Menù
+            </button>
+            <button data-view="my-order" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold transition-all duration-300">
+                <i class="fas fa-shopping-basket mr-2"></i>Il Mio Ordine <span id="cart-count" class="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 inline-flex items-center justify-center ml-1">0</span>
+            </button>
+            <button data-view="all-orders" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold transition-all duration-300">
+                <i class="fas fa-users mr-2"></i>Tutti gli Ordini
+            </button>
+        </nav>
+
+        <main>
+            <!-- Vista Menù -->
+            <div id="menu-view" class="view">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold">Scegli cosa ordinare</h2>
+                    <button id="show-suggestion-modal-btn" class="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition-all shadow-md">
+                        ✨ Chiedi un consiglio
+                    </button>
+                </div>
+                
+                <!-- Filtri Regime Alimentare -->
+                <div id="diet-filters" class="flex items-center justify-center flex-wrap gap-2 mb-6 bg-white p-2 rounded-xl shadow-md">
+                    <!-- I pulsanti di filtro verranno inseriti qui da JS -->
+                </div>
+
+                <div id="menu-items" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Le card del menù verranno inserite qui da JS -->
+                </div>
+
+                <!-- Legenda Allergeni -->
+                <div id="allergen-legend" class="mt-8 bg-white p-4 rounded-xl shadow-md">
+                    <!-- La legenda verrà inserita qui da JS -->
+                </div>
+            </div>
+
+            <!-- Vista Il Mio Ordine -->
+            <div id="my-order-view" class="view">
+                <h2 class="text-2xl font-bold mb-4">Riepilogo del Tuo Ordine</h2>
+                <div id="my-order-content" class="bg-white p-6 rounded-xl shadow-md">
+                    <!-- Il contenuto del mio ordine verrà inserito qui -->
+                </div>
+            </div>
+
+            <!-- Vista Tutti gli Ordini -->
+            <div id="all-orders-view" class="view">
+                 <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
+                    <h2 class="text-2xl font-bold">Riepilogo Ordini di Gruppo</h2>
+                    <button id="copy-summary-btn" class="w-full md:w-auto bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center">
+                        <i class="fas fa-copy mr-2"></i> Copia Riepilogo
+                    </button>
+                </div>
+
+                <!-- Sezione per chi paga -->
+                <div id="payer-section" class="mb-6">
+                    <div id="payer-info-display" class="hidden bg-blue-100 border-l-4 border-blue-500 text-blue-800 p-4 rounded-lg">
+                        <!-- Info su chi paga verranno inserite qui -->
+                    </div>
+                    <div id="become-payer-prompt" class="hidden text-center bg-white p-4 rounded-lg shadow-md">
+                        <p class="mb-2">Sei tu che anticipi il pagamento?</p>
+                        <button id="become-payer-btn" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg">Inserisci i tuoi dati per il rimborso</button>
+                    </div>
+                </div>
+
+                <div id="all-orders-list" class="space-y-4">
+                    <!-- La lista di tutti gli ordini verrà inserita qui -->
+                </div>
+                 <div class="mt-6 bg-white p-4 rounded-xl shadow-lg text-right">
+                    <span class="text-xl font-bold text-gray-800">Totale Complessivo:</span>
+                    <span id="grand-total" class="text-2xl font-bold text-blue-600 ml-2">€0.00</span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal per inserimento nome utente -->
+    <div id="user-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md text-center">
+            <h3 class="text-2xl font-bold mb-4">Benvenuto!</h3>
+            <p class="text-gray-600 mb-6">Per iniziare, inserisci il tuo nome. Verrà mostrato agli altri nel riepilogo.</p>
+            <input type="text" id="username-input" placeholder="Es. Marco Rossi" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+            <button id="save-username-btn" class="w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition-colors">Salva e Continua</button>
+        </div>
+    </div>
+    
+    <!-- Modal per chi paga -->
+    <div id="payer-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md">
+            <h3 class="text-2xl font-bold mb-4">Dati per il rimborso PayPal</h3>
+            <p class="text-gray-600 mb-6">Inserisci la tua email o numero di telefono associato a PayPal. Saranno visibili a tutti per restituirti la quota.</p>
+            <input type="text" id="payer-contact-input" placeholder="Email o Telefono PayPal" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+            <div class="flex gap-4 mt-4">
+                <button id="cancel-payer-btn" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-4 rounded-lg">Annulla</button>
+                <button id="save-payer-btn" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg">Salva</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal per suggerimenti Gemini -->
+    <div id="suggestion-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-2xl font-bold">✨ Consiglio AI</h3>
+                <button id="close-suggestion-modal-btn" class="text-gray-500 hover:text-gray-800">&times;</button>
+            </div>
+            <p class="text-gray-600 mb-4">Dimmi cosa ti piacerebbe mangiare (es. "qualcosa di leggero", "vegetariano", "voglio energia") e ti darò un suggerimento!</p>
+            <textarea id="suggestion-prompt-input" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 transition" rows="2" placeholder="Scrivi qui la tua preferenza..."></textarea>
+            <button id="get-suggestion-btn" class="w-full mt-4 bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center">
+                <i class="fas fa-magic mr-2"></i> Trova suggerimento
+            </button>
+            <div id="suggestion-result" class="mt-6 p-4 bg-gray-100 rounded-lg min-h-[80px]">
+                <!-- Il risultato di Gemini apparirà qui -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white py-2 px-5 rounded-lg shadow-xl transition-opacity duration-300 opacity-0">
+        <p id="toast-message"></p>
+    </div>
+
+
+    <!-- Firebase -->
+    <script type="module">
+        // Importa le funzioni necessarie da Firebase SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, onSnapshot, deleteDoc, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Configurazione di Firebase (verrà iniettata automaticamente)
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "DEMO", authDomain: "DEMO", projectId: "DEMO" };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'lunch-order-app-default';
+
+        // Inizializzazione di Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        // Riferimenti alle collezioni
+        const ordersCollectionRef = collection(db, `artifacts/${appId}/public/data/orders`);
+        const groupInfoDocRef = doc(db, `artifacts/${appId}/public/data/groupInfo`, 'payer');
+
+        // --- DATI E STATO DELL'APPLICAZIONE ---
+        const PRICES = { pietanze: 4.00, panini: 3.50, pizze: 3.50 };
+        const ALLERGENS = { G: { name: "Glutine", icon: "🌾" }, L: { name: "Latticini", icon: "🥛" }, C: { name: "Crostacei", icon: "🦐" }, P: { name: "Pesce", icon: "🐟" }};
+        const DIETS = { onnivoro: { name: "Onnivoro", icon: "🍽️" }, vegetariano: { name: "Vegetariano", icon: "🧀" }, vegano: { name: "Vegano", icon: "🌱" }, pescetariano: { name: "Pescetariano", icon: "🐟" } };
+        const RAW_MENU = {
+            pietanze: [
+                { name: "Pomodori con riso", allergens: [], diet: ["onnivoro", "vegetariano", "vegano"] },
+                { name: "Cous cous vegetale", allergens: ["G"], diet: ["onnivoro", "vegetariano", "vegano"] },
+                { name: "Cous cous gamberi e zucchine", allergens: ["G", "C"], diet: ["onnivoro", "pescetariano"] },
+                { name: "Farro vegetale", allergens: ["G"], diet: ["onnivoro", "vegetariano", "vegano"] },
+                { name: "Farro con salmone", allergens: ["G", "P"], diet: ["onnivoro", "pescetariano"] },
+                { name: "Insalata di pollo", allergens: [], diet: ["onnivoro"] },
+                { name: "Pasta fredda", allergens: ["G"], diet: ["onnivoro", "vegetariano"] },
+                { name: "Riso venere con gamberi e zucchine", allergens: ["C"], diet: ["onnivoro", "pescetariano"] },
+                { name: "Polpette di melanzane", allergens: ["G", "L"], diet: ["onnivoro", "vegetariano"] },
+                { name: "Focaccia pugliese", allergens: ["G"], diet: ["onnivoro", "vegetariano", "vegano"] }
+            ],
+            panini: [
+                { name: "Panino prosciutto crudo e mozzarella", allergens: ["G", "L"], diet: ["onnivoro"] },
+                { name: "Panino caprese", allergens: ["G", "L"], diet: ["onnivoro", "vegetariano"] },
+                { name: "Panino tonno e pomodori", allergens: ["G", "P"], diet: ["onnivoro", "pescetariano"] },
+                { name: "Panino vegetariano", allergens: ["G"], diet: ["onnivoro", "vegetariano"] }
+            ],
+            pizze: [
+                { name: "Pizza ripiena prosciutto e mozzarella", allergens: ["G", "L"], diet: ["onnivoro"] },
+                { name: "Pizza ripiena salsiccia e friarielli", allergens: ["G"], diet: ["onnivoro"] },
+                { name: "Pizza ripiena spinaci e ricotta", allergens: ["G", "L"], diet: ["onnivoro", "vegetariano"] }
+            ]
+        };
+
+        function processMenuData(rawMenu, prices) {
+            let idCounter = 1;
+            const categoryIcons = { pietanze: 'fa-bowl-food', panini: 'fa-bread-slice', pizze: 'fa-pizza-slice' };
+            return Object.entries(rawMenu).flatMap(([category, items]) => 
+                items.map(item => ({
+                    id: idCounter++,
+                    name: item.name,
+                    category: category.charAt(0).toUpperCase() + category.slice(1),
+                    price: prices[category] || 0,
+                    icon: categoryIcons[category] || 'fa-utensils',
+                    diet: item.diet,
+                    allergens: item.allergens
+                }))
+            );
+        }
+
+        const state = {
+            currentUser: null,
+            currentView: 'menu',
+            activeDietFilter: 'all',
+            cart: [],
+            allOrders: [],
+            payerInfo: null,
+            menuData: processMenuData(RAW_MENU, PRICES)
+        };
+
+        // --- ELEMENTI DEL DOM ---
+        const views = document.querySelectorAll('.view');
+        const navBtns = document.querySelectorAll('.nav-btn');
+        const menuItemsContainer = document.getElementById('menu-items');
+        const dietFiltersContainer = document.getElementById('diet-filters');
+        const allergenLegendContainer = document.getElementById('allergen-legend');
+        const cartCountEl = document.getElementById('cart-count');
+        const myOrderContentEl = document.getElementById('my-order-content');
+        const allOrdersListEl = document.getElementById('all-orders-list');
+        const grandTotalEl = document.getElementById('grand-total');
+        const copySummaryBtn = document.getElementById('copy-summary-btn');
+        const userModal = document.getElementById('user-modal');
+        const usernameInput = document.getElementById('username-input');
+        const saveUsernameBtn = document.getElementById('save-username-btn');
+        const payerModal = document.getElementById('payer-modal');
+        const payerContactInput = document.getElementById('payer-contact-input');
+        const payerInfoDisplay = document.getElementById('payer-info-display');
+        const becomePayerPrompt = document.getElementById('become-payer-prompt');
+        const suggestionModal = document.getElementById('suggestion-modal');
+        const suggestionResultEl = document.getElementById('suggestion-result');
+        const toastEl = document.getElementById('toast');
+        const toastMessageEl = document.getElementById('toast-message');
+
+        // --- FUNZIONI DI UTILITY ---
+        function showToast(message, duration = 3000) {
+            toastMessageEl.textContent = message;
+            toastEl.classList.remove('opacity-0');
+            setTimeout(() => { toastEl.classList.add('opacity-0'); }, duration);
+        }
+
+        function navigate(viewName) {
+            state.currentView = viewName;
+            views.forEach(view => view.classList.toggle('active', view.id === `${viewName}-view`));
+            navBtns.forEach(btn => {
+                btn.classList.toggle('bg-blue-500', btn.dataset.view === viewName);
+                btn.classList.toggle('text-white', btn.dataset.view === viewName);
+            });
+            window.scrollTo(0, 0);
+        }
+
+        function formatTimestamp(timestamp) {
+            if (!timestamp || !timestamp.toDate) return '';
+            const date = timestamp.toDate();
+            return date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        // --- FUNZIONI DI RENDER ---
+        function renderFiltersAndLegend() {
+            let filtersHtml = `<button data-diet="all" class="diet-filter-btn flex items-center gap-2 py-2 px-4 rounded-lg font-semibold transition-all duration-300 ${state.activeDietFilter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200'}"><i class="fas fa-utensils"></i><span>Tutti</span></button>`;
+            Object.entries(DIETS).forEach(([key, dietInfo]) => {
+                filtersHtml += `<button data-diet="${key}" class="diet-filter-btn flex items-center gap-2 py-2 px-4 rounded-lg font-semibold transition-all duration-300 ${state.activeDietFilter === key ? 'bg-blue-500 text-white' : 'bg-gray-200'}"><span>${dietInfo.icon}</span><span>${dietInfo.name}</span></button>`;
+            });
+            dietFiltersContainer.innerHTML = filtersHtml;
+
+            let legendHtml = '<p class="font-bold mb-2">Legenda Allergeni:</p><div class="flex flex-wrap gap-x-4 gap-y-2">';
+            Object.values(ALLERGENS).forEach(info => { legendHtml += `<span class="flex items-center text-sm">${info.icon} ${info.name}</span>`; });
+            legendHtml += '</div>';
+            allergenLegendContainer.innerHTML = legendHtml;
+        }
+
+        function renderMenu() {
+            const filteredItems = state.menuData.filter(item => state.activeDietFilter === 'all' || item.diet.includes(state.activeDietFilter));
+            menuItemsContainer.innerHTML = filteredItems.map(item => {
+                const allergenHtml = item.allergens.map(key => `<span title="${ALLERGENS[key].name}">${ALLERGENS[key].icon}</span>`).join('');
+                return `
+                <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow flex flex-col">
+                    <div class="flex-grow">
+                        <div class="flex items-center mb-2">
+                             <i class="fas ${item.icon} text-blue-500 text-xl mr-3 w-6 text-center"></i>
+                             <h3 class="font-bold text-lg">${item.name}</h3>
+                        </div>
+                        <p class="text-gray-600 ml-9">${item.category}</p>
+                    </div>
+                    <div class="flex justify-between items-center mt-4">
+                        <div class="flex gap-3 text-lg">${allergenHtml}</div>
+                        <span class="font-semibold text-lg">€${item.price.toFixed(2)}</span>
+                    </div>
+                    <button data-id="${item.id}" class="add-to-cart-btn w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                       <i class="fas fa-plus"></i> Aggiungi
+                    </button>
+                </div>`;
+            }).join('');
+        }
+        
+        function renderPayerInfo() {
+            if (state.payerInfo) {
+                const paypalIcon = `<svg class="w-6 h-6 inline-block mr-2" viewBox="0 0 24 24" fill="currentColor"><path d="M7.657 20.837c.18.332.473.58.81.718.337.138.71.157.953.157h.034c.414 0 .81-.13 1.125-.39 1.38-1.146 2.003-3.118 2.003-5.634 0-2.035-.525-4.12-1.93-5.26-.334-.278-.737-.417-1.17-.417-.282 0-.68.084-.954.168-.31.093-.586.27-.783.503-.197.234-.302.51-.302.813 0 .225.084.504.253.837.168.333.39.63.664.88.31.28.663.505.953.665.29.16.485.242.485.242.06 0 .09.006.104.01.015.004.02.013.02.013.094.037.164.23.164.48 0 .42-.23.75-.653.93-.424.18-.954.15-1.59-.09-.636-.24-1.11-0.67-1.38-1.28-.11-.25-.26-.59-.44-.99-.18-.4-.41-.8-.69-1.19-.28-.39-.6-.75-1.01-1.07-1.29-1.02-3.15-1.5-5.2-1.5H3.143L3 18.11h3.32c.39 0 .75-.12.98-.37.23-.25.34-.56.34-.92 0-.36-.11-.67-.34-.92-.23-.25-.59-.37-.98-.37H3.81l.16-1.04h2.5c1.6 0 2.9.37 3.9 1.11.28.2.53.43.75.69.22.26.4.55.54.87.14.32.23.68.23 1.07 0 .39-.09.75-.27 1.08-.18.33-.44.63-.78.89-.34.26-.75.49-1.22.68-.47.19-.98.32-1.53.38zM21 8.267c-1.3-.23-2.3-.9-3-2.01-.7-1.11-1-2.4-1-3.85 0-.11-.03-.2-.09-.27-.06-.07-.15-.1-.25-.1H12.9c-.39 0-.75.12-.98.37-.23.25-.34-.56-.34-.92 0 .36.11.67.34.92.23.25.59.37.98.37h3.04c.48 0 .87.13 1.19.4.32.27.53.62.65 1.04.12.42.12.87.01 1.34-.11.47-.32.9-.62 1.28-.3.38-.68.7-1.13.95-.45.25-.96.43-1.53.54-.57.11-1.16.16-1.77.16h-.4l-.25 1.6h.65c.61 0 1.2-.05 1.77-.16.57-.11 1.1-.29 1.57-.54s.89-.57 1.22-.95c.33-.38.59-.82.78-1.32.19-.5.28-1.03.28-1.59 0-.22-.02-.43-.06-.63z"></path></svg>`;
+                payerInfoDisplay.innerHTML = `
+                    <p class="font-bold flex items-center">${paypalIcon} Paga il tuo ordine a ${state.payerInfo.name}:</p>
+                    <a href="https://paypal.me/${state.payerInfo.contact.replace('@', '')}" target="_blank" rel="noopener noreferrer" class="font-semibold text-blue-600 hover:underline break-all">${state.payerInfo.contact}</a>
+                    <p class="text-sm mt-1">Clicca sul contatto per aprire PayPal e rimborsare la tua quota.</p>
+                `;
+                payerInfoDisplay.classList.remove('hidden');
+                becomePayerPrompt.classList.add('hidden');
+            } else {
+                payerInfoDisplay.classList.add('hidden');
+                becomePayerPrompt.classList.remove('hidden');
+            }
+        }
+
+        function renderMyOrder() {
+            cartCountEl.textContent = state.cart.length;
+            if (!state.currentUser || !state.currentUser.name) {
+                myOrderContentEl.innerHTML = `<p class="text-center text-gray-500">Inserisci il tuo nome per creare un ordine.</p>`;
+                return;
+            }
+            const userOrder = state.allOrders.find(order => order.userId === state.currentUser.uid);
+            if (userOrder) {
+                let itemsHtml = userOrder.items.map(item => `<div class="flex justify-between items-center py-2 border-b"><span>${item.name} (x${item.quantity})</span><span class="font-semibold">€${(item.price * item.quantity).toFixed(2)}</span></div>`).join('');
+                myOrderContentEl.innerHTML = `<p class="text-lg font-semibold mb-2">Ciao ${state.currentUser.name}, questo è il tuo ordine confermato:</p><div class="space-y-2 mb-4">${itemsHtml}</div><div class="text-right font-bold text-xl my-4">Totale: €${userOrder.total.toFixed(2)}</div><button id="delete-my-order-btn" data-id="${userOrder.id}" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition-colors"><i class="fas fa-trash-alt mr-2"></i> Cancella il mio ordine</button>`;
+            } else if (state.cart.length > 0) {
+                const cartSummary = {};
+                state.cart.forEach(item => {
+                    if (cartSummary[item.id]) { cartSummary[item.id].quantity++; } 
+                    else { cartSummary[item.id] = { ...item, quantity: 1 }; }
+                });
+                let itemsHtml = Object.values(cartSummary).map(item => `<div class="flex justify-between items-center py-2 border-b"><div><span>${item.name} (x${item.quantity})</span></div><div class="flex items-center gap-2"><span class="font-semibold">€${(item.price * item.quantity).toFixed(2)}</span><button data-id="${item.id}" class="remove-from-cart-btn text-red-500 hover:text-red-700 text-sm"><i class="fas fa-times-circle"></i></button></div></div>`).join('');
+                const total = state.cart.reduce((sum, item) => sum + item.price, 0);
+                myOrderContentEl.innerHTML = `<div class="space-y-2 mb-4">${itemsHtml}</div><textarea id="order-notes" class="w-full p-2 border rounded-lg mt-4" placeholder="Note per la preparazione (es. senza cipolla)"></textarea><div class="text-right font-bold text-xl my-4">Totale: €${total.toFixed(2)}</div><button id="confirm-order-btn" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors"><i class="fas fa-check-circle mr-2"></i> Conferma Ordine</button>`;
+            } else {
+                myOrderContentEl.innerHTML = `<p class="text-center text-gray-500 py-8">Il tuo carrello è vuoto. Aggiungi qualcosa dal menù!</p>`;
+            }
+        }
+
+        function renderAllOrders() {
+            if (state.allOrders.length === 0) {
+                allOrdersListEl.innerHTML = `<div class="text-center bg-white p-8 rounded-xl shadow"><p class="text-gray-500">Nessun ordine ancora. Sii il primo!</p></div>`;
+                grandTotalEl.textContent = '€0.00';
+                document.getElementById('payer-section').classList.add('hidden');
+                return;
+            }
+            document.getElementById('payer-section').classList.remove('hidden');
+            allOrdersListEl.innerHTML = '';
+            let grandTotal = 0;
+            state.allOrders.forEach(order => {
+                grandTotal += order.total;
+                const isPayer = state.payerInfo && state.currentUser.uid === state.payerInfo.userId;
+                const orderCard = document.createElement('div');
+                orderCard.className = `bg-white p-4 rounded-xl shadow-md transition-opacity duration-300 ${order.paid ? 'paid-order' : ''}`;
+                let itemsHtml = order.items.map(item => `<li>${item.quantity}x ${item.name}</li>`).join('');
+                
+                orderCard.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="font-bold text-lg">${order.userName}</p>
+                        <ul class="list-disc list-inside text-gray-700 mt-2">${itemsHtml}</ul>
+                        ${order.notes ? `<p class="text-sm text-gray-500 mt-2"><em>Note: ${order.notes}</em></p>` : ''}
+                    </div>
+                    <div class="text-right">
+                        <p class="font-semibold text-lg">€${order.total.toFixed(2)}</p>
+                        <p class="text-xs text-gray-400 mt-1"><i class="far fa-clock"></i> ${formatTimestamp(order.createdAt)}</p>
+                        ${order.userId === state.currentUser?.uid ? `<button data-id="${order.id}" class="delete-my-order-btn text-red-500 hover:text-red-700 text-xs mt-2">Cancella</button>` : ''}
+                    </div>
+                </div>
+                <div class="border-t mt-3 pt-3 flex justify-end items-center">
+                    <label class="flex items-center ${isPayer ? 'cursor-pointer' : 'cursor-not-allowed'}">
+                        <input type="checkbox" data-order-id="${order.id}" class="paid-checkbox h-5 w-5 rounded text-blue-600 focus:ring-blue-500 border-gray-300" ${order.paid ? 'checked' : ''} ${!isPayer ? 'disabled' : ''}>
+                        <span class="ml-2 text-sm font-medium ${order.paid ? 'text-green-600' : 'text-gray-600'}">${order.paid ? 'Pagato' : 'Da pagare'}</span>
+                        ${order.paid ? '<i class="fas fa-check-circle text-green-600 ml-2"></i>' : ''}
+                    </label>
+                </div>`;
+                allOrdersListEl.appendChild(orderCard);
+            });
+            grandTotalEl.textContent = `€${grandTotal.toFixed(2)}`;
+        }
+        
+        // --- GESTIONE DEGLI EVENTI ---
+        function handleEvents(e) {
+            const buttonTarget = e.target.closest('button');
+            if (buttonTarget) {
+                handleClicks(buttonTarget);
+            }
+
+            const checkboxTarget = e.target.closest('input[type="checkbox"].paid-checkbox');
+            if(checkboxTarget) {
+                handlePaymentStatusChange(checkboxTarget);
+            }
+        }
+
+        function handleClicks(target) {
+            if (target.matches('.diet-filter-btn')) {
+                document.querySelectorAll('.diet-filter-btn').forEach(btn => {
+                    btn.classList.remove('bg-blue-500', 'text-white');
+                    btn.classList.add('bg-gray-200');
+                });
+                target.classList.add('bg-blue-500', 'text-white');
+                target.classList.remove('bg-gray-200');
+                state.activeDietFilter = target.dataset.diet;
+                renderMenu();
+            }
+            else if (target.matches('.nav-btn')) { navigate(target.dataset.view); }
+            else if (target.matches('.add-to-cart-btn')) {
+                const itemId = parseInt(target.dataset.id);
+                const item = state.menuData.find(i => i.id === itemId);
+                if (item) {
+                    state.cart.push(item);
+                    renderMyOrder();
+                    cartCountEl.textContent = state.cart.length;
+                    showToast(`${item.name} aggiunto al carrello!`);
+                }
+            }
+            else if (target.matches('.remove-from-cart-btn')) {
+                const itemId = parseInt(target.dataset.id);
+                const itemIndex = state.cart.findIndex(i => i.id === itemId);
+                if(itemIndex > -1){
+                    const removedItem = state.cart.splice(itemIndex, 1)[0];
+                    renderMyOrder();
+                    showToast(`${removedItem.name} rimosso.`);
+                }
+            }
+            else if (target.id === 'confirm-order-btn') { handleConfirmOrder(); }
+            else if (target.matches('.delete-my-order-btn') || target.id === 'delete-my-order-btn') { handleDeleteOrder(target.dataset.id); }
+            else if (target.id === 'save-username-btn') {
+                const username = usernameInput.value.trim();
+                if (username) {
+                    localStorage.setItem('lunch-order-username', username);
+                    state.currentUser.name = username;
+                    userModal.classList.add('hidden');
+                    renderMyOrder();
+                } else { showToast('Per favore, inserisci un nome.', 2000); }
+            }
+            else if (target.id === 'copy-summary-btn') { handleCopySummary(); }
+            else if (target.id === 'become-payer-btn') { payerModal.classList.remove('hidden'); }
+            else if (target.id === 'cancel-payer-btn') { payerModal.classList.add('hidden'); }
+            else if (target.id === 'save-payer-btn') { handleSetPayer(); }
+            else if (target.id === 'show-suggestion-modal-btn') { suggestionModal.classList.remove('hidden'); }
+            else if (target.id === 'close-suggestion-modal-btn') { suggestionModal.classList.add('hidden'); }
+            else if (target.id === 'get-suggestion-btn') { getMenuSuggestion(); }
+        }
+        
+        // --- LOGICA DI BUSINESS E FIRESTORE ---
+
+        async function getMenuSuggestion() {
+            const promptInput = document.getElementById('suggestion-prompt-input');
+            const userPrompt = promptInput.value.trim();
+            if (!userPrompt) {
+                showToast("Per favore, scrivi cosa ti piacerebbe mangiare.", 2000);
+                return;
+            }
+
+            suggestionResultEl.innerHTML = '<div class="flex justify-center items-center"><div class="gemini-spinner"></div></div>';
+            
+            const fullPrompt = `Sei un assistente AI amichevole per ordinazioni di pranzo. Un utente vuole un suggerimento basato sulla preferenza: '${userPrompt}'.
+            Questo è il menù disponibile, con prezzi e allergeni: ${JSON.stringify(RAW_MENU, null, 2)}.
+            Analizza il menù e suggerisci uno o due piatti, spiegando brevemente perché sono una buona scelta in base alla preferenza dell'utente.
+            Rispondi in italiano in modo amichevole e conciso. Formatta i nomi dei piatti in grassetto.`;
+
+            try {
+                let chatHistory = [{ role: "user", parts: [{ text: fullPrompt }] }];
+                const payload = { contents: chatHistory };
+                const apiKey = ""; 
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    suggestionResultEl.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Basic markdown to HTML
+                } else {
+                    throw new Error("Nessuna risposta valida dall'AI.");
+                }
+            } catch (error) {
+                console.error("Errore chiamata Gemini API:", error);
+                suggestionResultEl.innerHTML = `<p class="text-red-500">Oops! Qualcosa è andato storto. Riprova.</p>`;
+            }
+        }
+
+        async function handlePaymentStatusChange(checkbox) {
+            const orderId = checkbox.dataset.orderId;
+            const isPaid = checkbox.checked;
+            const orderDocRef = doc(db, `artifacts/${appId}/public/data/orders`, orderId);
+            try {
+                await updateDoc(orderDocRef, { paid: isPaid });
+                showToast(`Stato pagamento aggiornato!`, 2000);
+            } catch (error) {
+                console.error("Errore nell'aggiornamento dello stato di pagamento:", error);
+                showToast("Errore nell'aggiornamento.", 3000);
+                checkbox.checked = !isPaid; // Revert on error
+            }
+        }
+
+        async function handleSetPayer() {
+            const contact = payerContactInput.value.trim();
+            if (!contact) {
+                showToast("Per favore, inserisci un contatto valido.", 2000);
+                return;
+            }
+            const payerData = {
+                userId: state.currentUser.uid,
+                name: state.currentUser.name,
+                contact: contact
+            };
+            try {
+                await setDoc(groupInfoDocRef, payerData);
+                payerModal.classList.add('hidden');
+                showToast("Dati salvati! Ora tutti sanno chi rimborsare.", 3000);
+            } catch (error) {
+                console.error("Errore nel salvataggio dei dati di chi paga:", error);
+                showToast("Errore nel salvataggio dei dati.", 3000);
+            }
+        }
+
+        async function handleConfirmOrder() {
+            if (state.cart.length === 0) { showToast("Il carrello è vuoto!", 2000); return; }
+            const cartSummary = {};
+            state.cart.forEach(item => {
+                if (cartSummary[item.id]) { cartSummary[item.id].quantity++; } 
+                else { cartSummary[item.id] = { ...item, quantity: 1 }; }
+            });
+            const orderItems = Object.values(cartSummary);
+            const total = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const notes = document.getElementById('order-notes').value.trim();
+            const orderData = { userId: state.currentUser.uid, userName: state.currentUser.name, items: orderItems, total: total, notes: notes, createdAt: serverTimestamp(), paid: false };
+            try {
+                await setDoc(doc(ordersCollectionRef, state.currentUser.uid), orderData);
+                state.cart = [];
+                showToast("Ordine confermato con successo!", 2000);
+                renderMyOrder();
+                navigate('all-orders');
+            } catch (error) {
+                console.error("Errore dettagliato nella conferma dell'ordine: ", error);
+                showToast(`Errore: ${error.message}`, 4000);
+            }
+        }
+        
+        async function handleDeleteOrder(orderId) {
+            try {
+                await deleteDoc(doc(ordersCollectionRef, orderId));
+                showToast("Ordine cancellato.", 2000);
+            } catch (error) {
+                console.error("Errore nella cancellazione dell'ordine: ", error);
+                showToast("Errore durante la cancellazione.", 3000);
+            }
+        }
+
+        function handleCopySummary() {
+            if (state.allOrders.length === 0) {
+                showToast("Nessun ordine da copiare.", 2000);
+                return;
+            }
+
+            let summaryText = "Ciao! Vorremmo effettuare il seguente ordine per il pranzo di oggi da DOS Design:\n\n";
+            let grandTotal = 0;
+
+            state.allOrders.forEach(order => {
+                summaryText += `*${order.userName}*:\n`;
+                order.items.forEach(item => {
+                    summaryText += `- ${item.quantity}x ${item.name}\n`;
+                });
+                if (order.notes) {
+                    summaryText += `  _(Note: ${order.notes})_\n`;
+                }
+                summaryText += `\n`;
+            });
+
+            summaryText += `====================\n`;
+            summaryText += `*TOTALE COMPLESSIVO: €${state.allOrders.reduce((sum, order) => sum + order.total, 0).toFixed(2)}*\n\n`;
+            summaryText += `L'indirizzo di consegna è *Via Arno, 52*.\n\n`;
+            summaryText += `Per favore, potete confermarci la preparazione e indicarci un orario di consegna previsto? Grazie!`;
+
+            const textarea = document.createElement('textarea');
+            textarea.value = summaryText;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+
+            showToast("Messaggio per WhatsApp copiato!", 3000);
+        }
+
+        // --- INIZIALIZZAZIONE ---
+        function setupAppForUser(user) {
+            state.currentUser = { uid: user.uid };
+            const savedName = localStorage.getItem('lunch-order-username');
+            if (savedName) {
+                state.currentUser.name = savedName;
+                renderMyOrder();
+            } else {
+                userModal.classList.remove('hidden');
+            }
+            onSnapshot(ordersCollectionRef, (snapshot) => {
+                state.allOrders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                state.allOrders.sort((a, b) => (a.createdAt?.toMillis() || 0) - (b.createdAt?.toMillis() || 0));
+                renderAllOrders();
+                renderMyOrder();
+            });
+            onSnapshot(groupInfoDocRef, (doc) => {
+                state.payerInfo = doc.exists() ? doc.data() : null;
+                renderPayerInfo();
+                renderAllOrders(); // Rirenderizza gli ordini per abilitare/disabilitare le checkbox
+            });
+        }
+
+        async function init() {
+            document.body.addEventListener('click', handleEvents);
+            document.body.addEventListener('change', handleEvents);
+
+            renderFiltersAndLegend();
+            renderMenu();
+            navigate('menu');
+
+            onAuthStateChanged(auth, (user) => {
+                if (user && !state.currentUser) { setupAppForUser(user); }
+            });
+
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Errore di autenticazione:", error);
+                showToast("Errore di autenticazione. Ricarica la pagina.", 5000);
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
+
