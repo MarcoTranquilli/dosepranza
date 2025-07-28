@@ -180,12 +180,19 @@
     <script type="module">
         // Importa le funzioni necessarie da Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, onSnapshot, deleteDoc, serverTimestamp, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Configurazione di Firebase (verrà iniettata automaticamente)
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "DEMO", authDomain: "DEMO", projectId: "DEMO" };
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'lunch-order-app-default';
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCQJsNbgaR89gF_1vLe6H4DPboOhQvm9nI",
+            authDomain: "app-ordini-pranzo-alimentari.firebaseapp.com",
+            projectId: "app-ordini-pranzo-alimentari",
+            storageBucket: "app-ordini-pranzo-alimentari.firebasestorage.app",
+            messagingSenderId: "553169964686",
+            appId: "1:553169964686:web:7f8ca6f32a301949e4c3df",
+            measurementId: "G-KVM4C29KZ1"
+        };
 
         // Inizializzazione di Firebase
         const app = initializeApp(firebaseConfig);
@@ -193,8 +200,8 @@
         const db = getFirestore(app);
         
         // Riferimenti alle collezioni
-        const ordersCollectionRef = collection(db, `artifacts/${appId}/public/data/orders`);
-        const payersCollectionRef = collection(db, `artifacts/${appId}/public/data/payers`);
+        const ordersCollectionRef = collection(db, `orders`);
+        const payersCollectionRef = collection(db, `payers`);
 
         // --- DATI E STATO DELL'APPLICAZIONE ---
         const PRICES = { pietanze: 4.00, panini: 3.50, pizze: 3.50 };
@@ -569,7 +576,7 @@
         async function handlePaymentStatusChange(checkbox) {
             const orderId = checkbox.dataset.orderId;
             const isPaid = checkbox.checked;
-            const orderDocRef = doc(db, `artifacts/${appId}/public/data/orders`, orderId);
+            const orderDocRef = doc(db, `orders`, orderId);
             try {
                 await updateDoc(orderDocRef, { paid: isPaid });
                 showToast(`Stato pagamento aggiornato!`, 2000);
@@ -592,7 +599,7 @@
                 contact: contact
             };
             const today = getTodayString();
-            const payerDocRef = doc(db, `artifacts/${appId}/public/data/payers`, today);
+            const payerDocRef = doc(db, `payers`, today);
             try {
                 await setDoc(payerDocRef, payerData);
                 payerModal.classList.add('hidden');
@@ -720,22 +727,15 @@
             navigate('menu');
 
             try {
+                await signInAnonymously(auth);
                 onAuthStateChanged(auth, (user) => {
                     if (user && !state.currentUser) { 
                         setupAppForUser(user); 
                     }
                 });
-
-                if (!auth.currentUser) {
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } else {
-                        await signInAnonymously(auth);
-                    }
-                }
             } catch (error) {
                 console.error("Errore di autenticazione:", error);
-                showToast("Errore di autenticazione. Ricarica la pagina.", 5000);
+                showToast("Errore di autenticazione. Controlla le regole di sicurezza e la configurazione di Firebase.", 5000);
             }
         }
 
