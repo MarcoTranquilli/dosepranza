@@ -547,10 +547,18 @@
             Rispondi in italiano in modo amichevole e conciso. Formatta i nomi dei piatti in grassetto.`;
 
             try {
+                // IMPORTANTE: Per usare l'AI sul tuo sito pubblico, devi creare una API Key
+                // da Google AI Studio (https://makersuite.google.com/) e incollarla qui.
+                const apiKey = "INCOLLA_QUI_LA_TUA_API_KEY";
+                
+                if (apiKey === "INCOLLA_QUI_LA_TUA_API_KEY") {
+                    throw new Error("API Key per Gemini non configurata.");
+                }
+
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                
                 let chatHistory = [{ role: "user", parts: [{ text: fullPrompt }] }];
                 const payload = { contents: chatHistory };
-                const apiKey = ""; 
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
                 
                 const response = await fetch(apiUrl, {
                     method: 'POST',
@@ -565,7 +573,7 @@
                     const text = result.candidates[0].content.parts[0].text;
                     suggestionResultEl.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
                 } else {
-                     throw new Error("Nessuna risposta valida dall'AI. La risposta potrebbe essere stata bloccata.");
+                     throw new Error("Nessuna risposta valida dall'AI. La risposta potrebbe essere stata bloccata per motivi di sicurezza.");
                 }
             } catch (error) {
                 console.error("Errore chiamata Gemini API:", error);
@@ -743,3 +751,19 @@
     </script>
 </body>
 </html>
+```
+
+### Passaggio 2: Come Generare e Inserire la Tua API Key
+
+Ora devi solo generare la tua chiave personale e incollarla nel punto che ti ho indicato.
+
+1.  **Vai su Google AI Studio:** Apri il sito [https://makersuite.google.com/](https://makersuite.google.com/) e accedi con il tuo account Google.
+2.  **Ottieni la API Key:** Clicca sul pulsante **"Get API key"** (Ottieni API key) che trovi nel menu a sinistra.
+3.  **Crea una nuova chiave:** Clicca su **"Create API key in new project"** (Crea API key in un nuovo progetto).
+4.  **Copia la chiave:** Apparirà una finestra con una lunga stringa di testo. Quella è la tua chiave. Clicca sull'icona per copiarla.
+5.  **Incolla la chiave nel codice:** Apri il tuo file `index.html` e trova la riga (attorno alla riga 600):
+    `const apiKey = "INCOLLA_QUI_LA_TUA_API_KEY";`
+    Sostituisci `"INCOLLA_QUI_LA_TUA_API_KEY"` con la chiave che hai appena copiato.
+6.  **Salva e aggiorna su GitHub:** Salva le modifiche al file `index.html` e caricalo di nuovo sul tuo repository GitHub.
+
+Dopo aver fatto questo, attendi qualche minuto che GitHub aggiorni il sito, e vedrai che sia l'autenticazione che il suggeritore AI funzioneranno perfettamen
