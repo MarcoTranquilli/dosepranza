@@ -664,14 +664,7 @@
         // --- INIZIALIZZAZIONE ---
         function setupAppForUser(user) {
             state.currentUser = { uid: user.uid };
-            const savedName = localStorage.getItem('lunch-order-username');
-            if (savedName && savedName.trim() !== '') {
-                state.currentUser.name = savedName;
-                renderMyOrder();
-            } else {
-                userModal.classList.remove('hidden');
-            }
-
+            
             // Listener per il pagatore di oggi
             const today = getTodayString();
             const todayPayerDocRef = doc(payersCollectionRef, today);
@@ -709,6 +702,13 @@
                 renderPastUnpaidOrders();
                 renderMyOrder();
             });
+
+            const savedName = localStorage.getItem('lunch-order-username');
+            if (savedName && savedName.trim() !== '') {
+                state.currentUser.name = savedName;
+            } else {
+                userModal.classList.remove('hidden');
+            }
         }
 
         async function init() {
@@ -719,15 +719,19 @@
             renderMenu();
             navigate('menu');
 
-            onAuthStateChanged(auth, (user) => {
-                if (user && !state.currentUser) { setupAppForUser(user); }
-            });
-
             try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
+                onAuthStateChanged(auth, (user) => {
+                    if (user && !state.currentUser) { 
+                        setupAppForUser(user); 
+                    }
+                });
+
+                if (!auth.currentUser) {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
                 }
             } catch (error) {
                 console.error("Errore di autenticazione:", error);
