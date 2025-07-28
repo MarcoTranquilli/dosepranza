@@ -93,19 +93,27 @@
             <!-- Vista Tutti gli Ordini -->
             <div id="all-orders-view" class="view">
                  <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-                    <h2 class="text-2xl font-bold">Riepilogo Ordini di Gruppo</h2>
+                    <h2 class="text-2xl font-bold">Riepilogo Ordini di Oggi</h2>
                     <button id="copy-summary-btn" class="w-full md:w-auto bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center">
                         <i class="fas fa-copy mr-2"></i> Copia Riepilogo
                     </button>
                 </div>
+                
+                <!-- Sezione Pagamenti Sospesi -->
+                <div id="past-due-section" class="mb-6 hidden">
+                    <h3 class="text-xl font-bold text-red-600 mb-2 border-b-2 border-red-200 pb-2">Pagamenti in Sospeso (Giorni Precedenti)</h3>
+                    <div id="past-due-list" class="space-y-4 mt-4">
+                        <!-- Ordini passati non pagati verranno inseriti qui -->
+                    </div>
+                </div>
 
-                <!-- Sezione per chi paga -->
+                <!-- Sezione per chi paga oggi -->
                 <div id="payer-section" class="mb-6">
                     <div id="payer-info-display" class="hidden bg-blue-100 border-l-4 border-blue-500 text-blue-800 p-4 rounded-lg">
                         <!-- Info su chi paga verranno inserite qui -->
                     </div>
                     <div id="become-payer-prompt" class="hidden text-center bg-white p-4 rounded-lg shadow-md">
-                        <p class="mb-2">Sei tu che anticipi il pagamento?</p>
+                        <p class="mb-2">Sei tu che anticipi il pagamento di oggi?</p>
                         <button id="become-payer-btn" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg">Inserisci i tuoi dati per il rimborso</button>
                     </div>
                 </div>
@@ -114,7 +122,7 @@
                     <!-- La lista di tutti gli ordini verrà inserita qui -->
                 </div>
                  <div class="mt-6 bg-white p-4 rounded-xl shadow-lg text-right">
-                    <span class="text-xl font-bold text-gray-800">Totale Complessivo:</span>
+                    <span class="text-xl font-bold text-gray-800">Totale Complessivo di Oggi:</span>
                     <span id="grand-total" class="text-2xl font-bold text-blue-600 ml-2">€0.00</span>
                 </div>
             </div>
@@ -173,7 +181,7 @@
         // Importa le funzioni necessarie da Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, onSnapshot, deleteDoc, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, onSnapshot, deleteDoc, serverTimestamp, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Configurazione di Firebase (verrà iniettata automaticamente)
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "DEMO", authDomain: "DEMO", projectId: "DEMO" };
@@ -186,7 +194,7 @@
         
         // Riferimenti alle collezioni
         const ordersCollectionRef = collection(db, `artifacts/${appId}/public/data/orders`);
-        const groupInfoDocRef = doc(db, `artifacts/${appId}/public/data/groupInfo`, 'payer');
+        const payersCollectionRef = collection(db, `artifacts/${appId}/public/data/payers`);
 
         // --- DATI E STATO DELL'APPLICAZIONE ---
         const PRICES = { pietanze: 4.00, panini: 3.50, pizze: 3.50 };
@@ -239,8 +247,10 @@
             currentView: 'menu',
             activeDietFilter: 'all',
             cart: [],
-            allOrders: [],
-            payerInfo: null,
+            allOrders: [], // Solo ordini di oggi
+            pastUnpaidOrders: [],
+            pastPayers: {}, // { 'YYYY-MM-DD': payerInfo }
+            payerInfo: null, // Solo pagatore di oggi
             menuData: processMenuData(RAW_MENU, PRICES)
         };
 
@@ -264,10 +274,14 @@
         const becomePayerPrompt = document.getElementById('become-payer-prompt');
         const suggestionModal = document.getElementById('suggestion-modal');
         const suggestionResultEl = document.getElementById('suggestion-result');
+        const pastDueSection = document.getElementById('past-due-section');
+        const pastDueList = document.getElementById('past-due-list');
         const toastEl = document.getElementById('toast');
         const toastMessageEl = document.getElementById('toast-message');
 
         // --- FUNZIONI DI UTILITY ---
+        const getTodayString = () => new Date().toISOString().split('T')[0];
+
         function showToast(message, duration = 3000) {
             toastMessageEl.textContent = message;
             toastEl.classList.remove('opacity-0');
@@ -370,7 +384,7 @@
 
         function renderAllOrders() {
             if (state.allOrders.length === 0) {
-                allOrdersListEl.innerHTML = `<div class="text-center bg-white p-8 rounded-xl shadow"><p class="text-gray-500">Nessun ordine ancora. Sii il primo!</p></div>`;
+                allOrdersListEl.innerHTML = `<div class="text-center bg-white p-8 rounded-xl shadow"><p class="text-gray-500">Nessun ordine per oggi. Sii il primo!</p></div>`;
                 grandTotalEl.textContent = '€0.00';
                 document.getElementById('payer-section').classList.add('hidden');
                 return;
@@ -409,18 +423,48 @@
             });
             grandTotalEl.textContent = `€${grandTotal.toFixed(2)}`;
         }
+
+        function renderPastUnpaidOrders() {
+            if (state.pastUnpaidOrders.length === 0) {
+                pastDueSection.classList.add('hidden');
+                return;
+            }
+            pastDueSection.classList.remove('hidden');
+            
+            const groupedByDate = state.pastUnpaidOrders.reduce((acc, order) => {
+                const date = order.createdAt.toDate().toISOString().split('T')[0];
+                if (!acc[date]) acc[date] = [];
+                acc[date].push(order);
+                return acc;
+            }, {});
+
+            pastDueList.innerHTML = Object.entries(groupedByDate).map(([date, orders]) => {
+                const payer = state.pastPayers[date];
+                const payerHtml = payer 
+                    ? `<p class="text-sm font-semibold">Da rimborsare a: <a href="https://paypal.me/${payer.contact.replace('@', '')}" target="_blank" class="text-blue-600 hover:underline">${payer.name} (${payer.contact})</a></p>`
+                    : '<p class="text-sm text-gray-500">Dati di chi ha pagato non disponibili per questa data.</p>';
+                
+                const ordersHtml = orders.map(order => `
+                    <div class="ml-4 mt-2 flex justify-between items-center">
+                        <span>${order.userName} - €${order.total.toFixed(2)}</span>
+                        <span class="text-xs text-gray-400">${order.createdAt.toDate().toLocaleDateString('it-IT')}</span>
+                    </div>`).join('');
+
+                return `<div class="bg-red-50 border border-red-200 p-4 rounded-lg">
+                            <h4 class="font-bold">${new Date(date+'T12:00:00').toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' })}</h4>
+                            ${payerHtml}
+                            <div class="mt-2 space-y-1">${ordersHtml}</div>
+                        </div>`;
+            }).join('');
+        }
         
         // --- GESTIONE DEGLI EVENTI ---
         function handleEvents(e) {
             const buttonTarget = e.target.closest('button');
-            if (buttonTarget) {
-                handleClicks(buttonTarget);
-            }
-
+            if (buttonTarget) handleClicks(buttonTarget);
+            
             const checkboxTarget = e.target.closest('input[type="checkbox"].paid-checkbox');
-            if(checkboxTarget) {
-                handlePaymentStatusChange(checkboxTarget);
-            }
+            if(checkboxTarget) handlePaymentStatusChange(checkboxTarget);
         }
 
         function handleClicks(target) {
@@ -475,7 +519,6 @@
         }
         
         // --- LOGICA DI BUSINESS E FIRESTORE ---
-
         async function getMenuSuggestion() {
             const promptInput = document.getElementById('suggestion-prompt-input');
             const userPrompt = promptInput.value.trim();
@@ -486,8 +529,13 @@
 
             suggestionResultEl.innerHTML = '<div class="flex justify-center items-center"><div class="gemini-spinner"></div></div>';
             
+            const menuForAI = Object.entries(RAW_MENU).map(([category, items]) => {
+                const itemStrings = items.map(item => `- ${item.name} (dieta: ${item.diet.join(', ')}, allergeni: ${item.allergens.join(', ') || 'nessuno'})`).join('\n');
+                return `${category.toUpperCase()}:\n${itemStrings}`;
+            }).join('\n\n');
+
             const fullPrompt = `Sei un assistente AI amichevole per ordinazioni di pranzo. Un utente vuole un suggerimento basato sulla preferenza: '${userPrompt}'.
-            Questo è il menù disponibile, con prezzi e allergeni: ${JSON.stringify(RAW_MENU, null, 2)}.
+            Questo è il menù disponibile:\n${menuForAI}\n
             Analizza il menù e suggerisci uno o due piatti, spiegando brevemente perché sono una buona scelta in base alla preferenza dell'utente.
             Rispondi in italiano in modo amichevole e conciso. Formatta i nomi dei piatti in grassetto.`;
 
@@ -503,23 +551,18 @@
                     body: JSON.stringify(payload)
                 });
 
-                if (!response.ok) {
-                    throw new Error(`API Error: ${response.statusText}`);
-                }
-
+                if (!response.ok) throw new Error(`API Error: ${response.statusText}`);
                 const result = await response.json();
                 
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
+                if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
                     const text = result.candidates[0].content.parts[0].text;
-                    suggestionResultEl.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Basic markdown to HTML
+                    suggestionResultEl.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
                 } else {
-                    throw new Error("Nessuna risposta valida dall'AI.");
+                     throw new Error("Nessuna risposta valida dall'AI. La risposta potrebbe essere stata bloccata.");
                 }
             } catch (error) {
                 console.error("Errore chiamata Gemini API:", error);
-                suggestionResultEl.innerHTML = `<p class="text-red-500">Oops! Qualcosa è andato storto. Riprova.</p>`;
+                suggestionResultEl.innerHTML = `<p class="text-red-500">Oops! Qualcosa è andato storto. Riprova. Dettagli: ${error.message}</p>`;
             }
         }
 
@@ -548,8 +591,10 @@
                 name: state.currentUser.name,
                 contact: contact
             };
+            const today = getTodayString();
+            const payerDocRef = doc(db, `artifacts/${appId}/public/data/payers`, today);
             try {
-                await setDoc(groupInfoDocRef, payerData);
+                await setDoc(payerDocRef, payerData);
                 payerModal.classList.add('hidden');
                 showToast("Dati salvati! Ora tutti sanno chi rimborsare.", 3000);
             } catch (error) {
@@ -596,33 +641,23 @@
                 showToast("Nessun ordine da copiare.", 2000);
                 return;
             }
-
             let summaryText = "Ciao! Vorremmo effettuare il seguente ordine per il pranzo di oggi da DOS Design:\n\n";
-            let grandTotal = 0;
-
             state.allOrders.forEach(order => {
                 summaryText += `*${order.userName}*:\n`;
-                order.items.forEach(item => {
-                    summaryText += `- ${item.quantity}x ${item.name}\n`;
-                });
-                if (order.notes) {
-                    summaryText += `  _(Note: ${order.notes})_\n`;
-                }
+                order.items.forEach(item => { summaryText += `- ${item.quantity}x ${item.name}\n`; });
+                if (order.notes) { summaryText += `  _(Note: ${order.notes})_\n`; }
                 summaryText += `\n`;
             });
-
             summaryText += `====================\n`;
             summaryText += `*TOTALE COMPLESSIVO: €${state.allOrders.reduce((sum, order) => sum + order.total, 0).toFixed(2)}*\n\n`;
             summaryText += `L'indirizzo di consegna è *Via Arno, 52*.\n\n`;
             summaryText += `Per favore, potete confermarci la preparazione e indicarci un orario di consegna previsto? Grazie!`;
-
             const textarea = document.createElement('textarea');
             textarea.value = summaryText;
             document.body.appendChild(textarea);
             textarea.select();
             document.execCommand('copy');
             document.body.removeChild(textarea);
-
             showToast("Messaggio per WhatsApp copiato!", 3000);
         }
 
@@ -630,22 +665,49 @@
         function setupAppForUser(user) {
             state.currentUser = { uid: user.uid };
             const savedName = localStorage.getItem('lunch-order-username');
-            if (savedName) {
+            if (savedName && savedName.trim() !== '') {
                 state.currentUser.name = savedName;
                 renderMyOrder();
             } else {
                 userModal.classList.remove('hidden');
             }
-            onSnapshot(ordersCollectionRef, (snapshot) => {
-                state.allOrders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                state.allOrders.sort((a, b) => (a.createdAt?.toMillis() || 0) - (b.createdAt?.toMillis() || 0));
-                renderAllOrders();
-                renderMyOrder();
-            });
-            onSnapshot(groupInfoDocRef, (doc) => {
+
+            // Listener per il pagatore di oggi
+            const today = getTodayString();
+            const todayPayerDocRef = doc(payersCollectionRef, today);
+            onSnapshot(todayPayerDocRef, (doc) => {
                 state.payerInfo = doc.exists() ? doc.data() : null;
                 renderPayerInfo();
-                renderAllOrders(); // Rirenderizza gli ordini per abilitare/disabilitare le checkbox
+                renderAllOrders();
+            });
+
+            // Listener per tutti gli ordini
+            onSnapshot(ordersCollectionRef, async (snapshot) => {
+                const allOrders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                
+                const todayStart = new Date();
+                todayStart.setHours(0, 0, 0, 0);
+
+                state.allOrders = allOrders.filter(order => order.createdAt && order.createdAt.toDate() >= todayStart);
+                const pastOrders = allOrders.filter(order => order.createdAt && order.createdAt.toDate() < todayStart);
+                state.pastUnpaidOrders = pastOrders.filter(order => !order.paid);
+
+                const pastPayerDates = [...new Set(state.pastUnpaidOrders.map(o => o.createdAt.toDate().toISOString().split('T')[0]))];
+                if (pastPayerDates.length > 0) {
+                    const payerPromises = pastPayerDates.map(date => getDoc(doc(payersCollectionRef, date)));
+                    const payerDocs = await Promise.all(payerPromises);
+                    
+                    state.pastPayers = {};
+                    payerDocs.forEach(docSnap => {
+                        if (docSnap.exists()) {
+                            state.pastPayers[docSnap.id] = docSnap.data();
+                        }
+                    });
+                }
+
+                renderAllOrders();
+                renderPastUnpaidOrders();
+                renderMyOrder();
             });
         }
 
@@ -677,4 +739,3 @@
     </script>
 </body>
 </html>
-
