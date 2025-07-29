@@ -87,6 +87,9 @@
                     </button>
                 </div>
                 
+                <!-- Banner Stato Consegna -->
+                <div id="delivery-status-banner" class="mb-6 p-4 rounded-lg text-center font-semibold hidden"></div>
+
                 <!-- Sezione Pagamenti Sospesi -->
                 <div id="past-due-section" class="mb-6 hidden">
                     <h3 class="text-xl font-bold text-red-600 mb-2 border-b-2 border-red-200 pb-2">Pagamenti in Sospeso (Giorni Precedenti)</h3>
@@ -377,10 +380,16 @@
             // Render info per tutti
             if (state.payerInfo) {
                 const paypalIcon = `<svg class="w-6 h-6 inline-block mr-2" viewBox="0 0 24 24" fill="currentColor"><path d="M7.657 20.837c.18.332.473.58.81.718.337.138.71.157.953.157h.034c.414 0 .81-.13 1.125-.39 1.38-1.146 2.003-3.118 2.003-5.634 0-2.035-.525-4.12-1.93-5.26-.334-.278-.737-.417-1.17-.417-.282 0-.68.084-.954.168-.31.093-.586.27-.783.503-.197.234-.302.51-.302.813 0 .225.084.504.253.837.168.333.39.63.664.88.31.28.663.505.953.665.29.16.485.242.485.242.06 0 .09.006.104.01.015.004.02.013.02.013.094.037.164.23.164.48 0 .42-.23.75-.653.93-.424.18-.954.15-1.59-.09-.636-.24-1.11-0.67-1.38-1.28-.11-.25-.26-.59-.44-.99-.18-.4-.41-.8-.69-1.19-.28-.39-.6-.75-1.01-1.07-1.29-1.02-3.15-1.5-5.2-1.5H3.143L3 18.11h3.32c.39 0 .75-.12.98-.37.23-.25.34-.56.34-.92 0-.36-.11-.67-.34-.92-.23-.25-.59-.37-.98-.37H3.81l.16-1.04h2.5c1.6 0 2.9.37 3.9 1.11.28.2.53.43.75.69.22.26.4.55.54.87.14.32.23.68.23 1.07 0 .39-.09.75-.27 1.08-.18.33-.44.63-.78.89-.34.26-.75.49-1.22.68-.47.19-.98.32-1.53.38zM21 8.267c-1.3-.23-2.3-.9-3-2.01-.7-1.11-1-2.4-1-3.85 0-.11-.03-.2-.09-.27-.06-.07-.15-.1-.25-.1H12.9c-.39 0-.75.12-.98.37-.23.25-.34-.56-.34-.92 0 .36.11.67.34.92.23.25.59.37.98.37h3.04c.48 0 .87.13 1.19.4.32.27.53.62.65 1.04.12.42.12.87.01 1.34-.11.47-.32.9-.62 1.28-.3.38-.68.7-1.13.95-.45.25-.96.43-1.53.54-.57.11-1.16.16-1.77.16h-.4l-.25 1.6h.65c.61 0 1.2-.05 1.77-.16.57-.11 1.1-.29 1.57-.54s.89-.57 1.22-.95c.33-.38.59-.82.78-1.32.19-.5.28-1.03.28-1.59 0-.22-.02-.43-.06-.63z"></path></svg>`;
+                const editButtonHtml = isPayer ? `<button id="edit-payer-btn" class="ml-auto text-blue-600 hover:text-blue-800"><i class="fas fa-pencil-alt"></i></button>` : '';
                 payerInfoDisplay.innerHTML = `
-                    <p class="font-bold flex items-center">${paypalIcon} Paga il tuo ordine a ${state.payerInfo.name}:</p>
-                    <a href="https://paypal.me/${state.payerInfo.contact.replace('@', '')}" target="_blank" rel="noopener noreferrer" class="font-semibold text-blue-600 hover:underline break-all">${state.payerInfo.contact}</a>
-                    <p class="text-sm mt-1">Clicca sul contatto per aprire PayPal e rimborsare la tua quota.</p>
+                    <div class="flex items-start">
+                        <div>
+                            <p class="font-bold flex items-center">${paypalIcon} Paga il tuo ordine a ${state.payerInfo.name}:</p>
+                            <a href="https://paypal.me/${state.payerInfo.contact.replace('@', '')}" target="_blank" rel="noopener noreferrer" class="font-semibold text-blue-600 hover:underline break-all">${state.payerInfo.contact}</a>
+                            <p class="text-sm mt-1">Clicca sul contatto per aprire PayPal e rimborsare la tua quota.</p>
+                        </div>
+                        ${editButtonHtml}
+                    </div>
                 `;
                 payerInfoDisplay.classList.remove('hidden');
                 becomePayerPrompt.classList.add('hidden');
@@ -504,14 +513,19 @@
 
             pastDueList.innerHTML = Object.entries(groupedByDate).map(([date, orders]) => {
                 const payer = state.pastPayers[date];
+                const isPastPayer = payer && state.currentUser.uid === payer.userId;
+
                 const payerHtml = payer 
                     ? `<p class="text-sm font-semibold">Da rimborsare a: <a href="https://paypal.me/${payer.contact.replace('@', '')}" target="_blank" class="text-blue-600 hover:underline">${payer.name} (${payer.contact})</a></p>`
                     : '<p class="text-sm text-gray-500">Dati di chi ha pagato non disponibili per questa data.</p>';
                 
                 const ordersHtml = orders.map(order => `
-                    <div class="ml-4 mt-2 flex justify-between items-center">
+                    <div class="ml-4 mt-2 flex justify-between items-center ${order.paid ? 'paid-order' : ''}">
                         <span>${order.userName} - €${order.total.toFixed(2)}</span>
-                        <span class="text-xs text-gray-400">${order.createdAt.toDate().toLocaleDateString('it-IT')}</span>
+                        <label class="flex items-center ${isPastPayer ? 'cursor-pointer' : 'cursor-not-allowed'}">
+                            <input type="checkbox" data-order-id="${order.id}" class="paid-checkbox h-5 w-5 rounded text-blue-600" ${order.paid ? 'checked' : ''} ${!isPastPayer ? 'disabled' : ''}>
+                            <span class="ml-2 text-sm ${order.paid ? 'text-green-600' : 'text-gray-600'}">${order.paid ? 'Pagato' : ''}</span>
+                        </label>
                     </div>`).join('');
 
                 return `<div class="bg-red-50 border border-red-200 p-4 rounded-lg">
@@ -587,6 +601,10 @@
             else if (target.id === 'become-payer-btn') { payerModal.classList.remove('hidden'); }
             else if (target.id === 'cancel-payer-btn') { payerModal.classList.add('hidden'); }
             else if (target.id === 'save-payer-btn') { handleSetPayer(); }
+            else if (target.id === 'edit-payer-btn') {
+                payerContactInput.value = state.payerInfo.contact;
+                payerModal.classList.remove('hidden');
+            }
             else if (target.id === 'save-delivery-notes-btn') { handleSaveDeliveryNotes(); }
             else if (target.id === 'mark-delivered-btn') { handleMarkAsDelivered(); }
         }
@@ -647,7 +665,7 @@
             const today = getTodayString();
             const payerDocRef = doc(db, `payers`, today);
             try {
-                await setDoc(payerDocRef, payerData);
+                await setDoc(payerDocRef, payerData, { merge: true }); // Use merge to update if exists
                 payerModal.classList.add('hidden');
                 showToast("Dati salvati! Ora tutti sanno chi rimborsare.", 3000);
             } catch (error) {
