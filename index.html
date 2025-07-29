@@ -50,6 +50,11 @@
             <div id="menu-view" class="view">
                 <h2 class="text-2xl font-bold mb-4">Scegli cosa ordinare</h2>
                 
+                <!-- Filtri Categoria -->
+                <div id="category-filters" class="flex items-center justify-center flex-wrap gap-2 mb-4">
+                    <!-- I pulsanti di filtro categoria verranno inseriti qui da JS -->
+                </div>
+
                 <!-- Filtri Regime Alimentare -->
                 <div id="diet-filters" class="flex items-center justify-center flex-wrap gap-2 mb-6 bg-white p-2 rounded-xl shadow-md">
                     <!-- I pulsanti di filtro verranno inseriti qui da JS -->
@@ -252,6 +257,7 @@
         const state = {
             currentUser: null,
             currentView: 'menu',
+            activeCategoryFilter: 'all',
             activeDietFilter: 'all',
             cart: [],
             allOrders: [], // Solo ordini di oggi
@@ -265,6 +271,7 @@
         const views = document.querySelectorAll('.view');
         const navBtns = document.querySelectorAll('.nav-btn');
         const menuItemsContainer = document.getElementById('menu-items');
+        const categoryFiltersContainer = document.getElementById('category-filters');
         const dietFiltersContainer = document.getElementById('diet-filters');
         const allergenLegendContainer = document.getElementById('allergen-legend');
         const cartCountEl = document.getElementById('cart-count');
@@ -313,13 +320,23 @@
         }
 
         // --- FUNZIONI DI RENDER ---
-        function renderFiltersAndLegend() {
-            let filtersHtml = `<button data-diet="all" class="diet-filter-btn flex items-center gap-2 py-2 px-4 rounded-lg font-semibold transition-all duration-300 ${state.activeDietFilter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200'}"><i class="fas fa-utensils"></i><span>Tutti</span></button>`;
-            Object.entries(DIETS).forEach(([key, dietInfo]) => {
-                filtersHtml += `<button data-diet="${key}" class="diet-filter-btn flex items-center gap-2 py-2 px-4 rounded-lg font-semibold transition-all duration-300 ${state.activeDietFilter === key ? 'bg-blue-500 text-white' : 'bg-gray-200'}"><span>${dietInfo.icon}</span><span>${dietInfo.name}</span></button>`;
+        function renderFilters() {
+            // Render filtri categoria
+            let categoryFiltersHtml = `<button data-category="all" class="category-filter-btn py-2 px-4 rounded-full font-semibold transition-all duration-300 ${state.activeCategoryFilter === 'all' ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700'}">Tutte</button>`;
+            Object.keys(RAW_MENU).forEach(category => {
+                const categoryName = category.charAt(0).toUpperCase() + category.slice(1);
+                categoryFiltersHtml += `<button data-category="${category}" class="category-filter-btn py-2 px-4 rounded-full font-semibold transition-all duration-300 ${state.activeCategoryFilter === category ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700'}">${categoryName}</button>`;
             });
-            dietFiltersContainer.innerHTML = filtersHtml;
+            categoryFiltersContainer.innerHTML = categoryFiltersHtml;
 
+            // Render filtri dieta
+            let dietFiltersHtml = `<button data-diet="all" class="diet-filter-btn flex items-center gap-2 py-2 px-4 rounded-lg font-semibold transition-all duration-300 ${state.activeDietFilter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200'}"><i class="fas fa-utensils"></i><span>Tutti</span></button>`;
+            Object.entries(DIETS).forEach(([key, dietInfo]) => {
+                dietFiltersHtml += `<button data-diet="${key}" class="diet-filter-btn flex items-center gap-2 py-2 px-4 rounded-lg font-semibold transition-all duration-300 ${state.activeDietFilter === key ? 'bg-blue-500 text-white' : 'bg-gray-200'}"><span>${dietInfo.icon}</span><span>${dietInfo.name}</span></button>`;
+            });
+            dietFiltersContainer.innerHTML = dietFiltersHtml;
+
+            // Render legenda
             let legendHtml = '<p class="font-bold mb-2">Legenda Allergeni:</p><div class="flex flex-wrap gap-x-4 gap-y-2">';
             Object.values(ALLERGENS).forEach(info => { legendHtml += `<span class="flex items-center text-sm">${info.icon} ${info.name}</span>`; });
             legendHtml += '</div>';
@@ -327,7 +344,11 @@
         }
 
         function renderMenu() {
-            const filteredItems = state.menuData.filter(item => state.activeDietFilter === 'all' || item.diet.includes(state.activeDietFilter));
+            const filteredItems = state.menuData.filter(item => {
+                const categoryMatch = state.activeCategoryFilter === 'all' || item.category.toLowerCase() === state.activeCategoryFilter;
+                const dietMatch = state.activeDietFilter === 'all' || item.diet.includes(state.activeDietFilter);
+                return categoryMatch && dietMatch;
+            });
             menuItemsContainer.innerHTML = filteredItems.map(item => {
                 const allergenHtml = item.allergens.map(key => `<span title="${ALLERGENS[key].name}">${ALLERGENS[key].icon}</span>`).join('');
                 return `
@@ -511,7 +532,17 @@
         }
 
         function handleClicks(target) {
-            if (target.matches('.diet-filter-btn')) {
+            if (target.matches('.category-filter-btn')) {
+                document.querySelectorAll('.category-filter-btn').forEach(btn => {
+                    btn.classList.remove('bg-indigo-600', 'text-white');
+                    btn.classList.add('bg-gray-200', 'text-gray-700');
+                });
+                target.classList.add('bg-indigo-600', 'text-white');
+                target.classList.remove('bg-gray-200', 'text-gray-700');
+                state.activeCategoryFilter = target.dataset.category;
+                renderMenu();
+            }
+            else if (target.matches('.diet-filter-btn')) {
                 document.querySelectorAll('.diet-filter-btn').forEach(btn => {
                     btn.classList.remove('bg-blue-500', 'text-white');
                     btn.classList.add('bg-gray-200');
@@ -737,7 +768,7 @@
             document.body.addEventListener('click', handleEvents);
             document.body.addEventListener('change', handleEvents);
 
-            renderFiltersAndLegend();
+            renderFilters();
             renderMenu();
             navigate('menu');
 
