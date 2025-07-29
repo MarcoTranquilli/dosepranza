@@ -82,9 +82,6 @@
                     </button>
                 </div>
                 
-                <!-- Banner Stato Consegna -->
-                <div id="delivery-status-banner" class="mb-6 p-4 rounded-lg text-center font-semibold hidden"></div>
-
                 <!-- Sezione Pagamenti Sospesi -->
                 <div id="past-due-section" class="mb-6 hidden">
                     <h3 class="text-xl font-bold text-red-600 mb-2 border-b-2 border-red-200 pb-2">Pagamenti in Sospeso (Giorni Precedenti)</h3>
@@ -182,38 +179,63 @@
         const payersCollectionRef = collection(db, `payers`);
 
         // --- DATI E STATO DELL'APPLICAZIONE ---
-        const PRICES = { pietanze: 4.00, panini: 3.50, pizze: 3.50 };
+        const PRICES = { gastronomia: 4.00, verdure: 4.00, panini: 3.50, pizze: 3.50 };
         const ALLERGENS = { G: { name: "Glutine", icon: "🌾" }, L: { name: "Latticini", icon: "🥛" }, C: { name: "Crostacei", icon: "🦐" }, P: { name: "Pesce", icon: "🐟" }};
         const DIETS = { onnivoro: { name: "Onnivoro", icon: "🍽️" }, vegetariano: { name: "Vegetariano", icon: "🧀" }, vegano: { name: "Vegano", icon: "🌱" }, pescetariano: { name: "Pescetariano", icon: "🐟" } };
         const RAW_MENU = {
-            pietanze: [
-                { name: "Pomodori con riso", allergens: [], diet: ["onnivoro", "vegetariano", "vegano"] },
-                { name: "Cous cous vegetale", allergens: ["G"], diet: ["onnivoro", "vegetariano", "vegano"] },
-                { name: "Cous cous gamberi e zucchine", allergens: ["G", "C"], diet: ["onnivoro", "pescetariano"] },
-                { name: "Farro vegetale", allergens: ["G"], diet: ["onnivoro", "vegetariano", "vegano"] },
-                { name: "Farro con salmone", allergens: ["G", "P"], diet: ["onnivoro", "pescetariano"] },
+            gastronomia: [
+                { name: "Cous cous vegetale con pollo", allergens: ["G"], diet: ["onnivoro"] },
+                { name: "Cous cous vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"] },
+                { name: "Farro vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"] },
+                { name: "Farro vegetale con salmone", allergens: ["G", "P"], diet: ["pescetariano"] },
+                { name: "Riso Venere con gamberi e zucchine", allergens: ["C"], diet: ["pescetariano"] },
+                { name: "Insalata di riso", allergens: [], diet: ["onnivoro"] },
+                { name: "Pasta fredda con tonno pomodori e olive", allergens: ["G", "P"], diet: ["pescetariano"] },
+                { name: "Pasta fredda pesto primo sale pomodori olive", allergens: ["G", "L"], diet: ["vegetariano"] },
                 { name: "Insalata di pollo", allergens: [], diet: ["onnivoro"] },
-                { name: "Pasta fredda", allergens: ["G"], diet: ["onnivoro", "vegetariano"] },
-                { name: "Riso venere con gamberi e zucchine", allergens: ["C"], diet: ["onnivoro", "pescetariano"] },
-                { name: "Polpette di melanzane", allergens: ["G", "L"], diet: ["onnivoro", "vegetariano"] },
-                { name: "Focaccia pugliese", allergens: ["G"], diet: ["onnivoro", "vegetariano", "vegano"] }
+                { name: "Riso integrale bresaola limone e rughetta", allergens: [], diet: ["onnivoro"] },
+                { name: "Pomodori con riso e patate (a peso)", allergens: [], diet: ["vegetariano", "vegano"] }
+            ],
+            verdure: [
+                { name: "Melanzane (a peso)", allergens: [], diet: ["vegetariano", "vegano"] },
+                { name: "Zucchine (a peso)", allergens: [], diet: ["vegetariano", "vegano"] },
+                { name: "Peperoni (a peso)", allergens: [], diet: ["vegetariano", "vegano"] },
+                { name: "Cicoria (a peso)", allergens: [], diet: ["vegetariano", "vegano"] },
+                { name: "Broccoletti (a peso)", allergens: [], diet: ["vegetariano", "vegano"] },
+                { name: "Broccoli (a peso)", allergens: [], diet: ["vegetariano", "vegano"] },
+                { name: "Scarola con olive (a peso)", allergens: [], diet: ["vegetariano", "vegano"] }
             ],
             panini: [
-                { name: "Panino prosciutto crudo e mozzarella", allergens: ["G", "L"], diet: ["onnivoro"] },
-                { name: "Panino caprese", allergens: ["G", "L"], diet: ["onnivoro", "vegetariano"] },
-                { name: "Panino tonno e pomodori", allergens: ["G", "P"], diet: ["onnivoro", "pescetariano"] },
-                { name: "Panino vegetariano", allergens: ["G"], diet: ["onnivoro", "vegetariano"] }
+                { name: "Crudo pomodoro mozzarella", allergens: ["G", "L"], diet: ["onnivoro"] },
+                { name: "Crudo stracchino rughetta", allergens: ["G", "L"], diet: ["onnivoro"] },
+                { name: "Cotto arrosto scamorza e verdura", allergens: ["G", "L"], diet: ["onnivoro"] },
+                { name: "Capocollo pecorino e pomodori secchi", allergens: ["G", "L"], diet: ["onnivoro"] },
+                { name: "Salame pecorino e pomodori secchi", allergens: ["G", "L"], diet: ["onnivoro"] },
+                { name: "Speck Brie e pomodori secchi", allergens: ["G", "L"], diet: ["onnivoro"] },
+                { name: "Porchetta", allergens: ["G"], diet: ["onnivoro"] },
+                { name: "Vegetariano melanzane zucchine e peperoni", allergens: ["G"], diet: ["vegetariano", "vegano"] },
+                { name: "Pane 5 cereali con tacchino e verdura", allergens: ["G"], diet: ["onnivoro"] },
+                { name: "Pane integrale bresaola parmigiano e rughetta", allergens: ["G", "L"], diet: ["onnivoro"] },
+                { name: "Pane arabo bresaola primo sale e rughetta", allergens: ["G", "L"], diet: ["onnivoro"] },
+                { name: "Pane ai cereali con salmone e formaggio", allergens: ["G", "L", "P"], diet: ["pescetariano"] },
+                { name: "Tonno e pomodoro", allergens: ["G", "P"], diet: ["pescetariano"] },
+                { name: "Tonno e carciofini", allergens: ["G", "P"], diet: ["pescetariano"] }
             ],
             pizze: [
-                { name: "Pizza ripiena prosciutto e mozzarella", allergens: ["G", "L"], diet: ["onnivoro"] },
-                { name: "Pizza ripiena salsiccia e friarielli", allergens: ["G"], diet: ["onnivoro"] },
-                { name: "Pizza ripiena spinaci e ricotta", allergens: ["G", "L"], diet: ["onnivoro", "vegetariano"] }
+                { name: "Crudo e mozzarella", allergens: ["G", "L"], diet: ["onnivoro"] },
+                { name: "Speck stracchino e rughetta", allergens: ["G", "L"], diet: ["onnivoro"] },
+                { name: "Cotto arrosto e melanzane", allergens: ["G", "L"], diet: ["onnivoro"] },
+                { name: "Mortadella e stracciatella", allergens: ["G", "L"], diet: ["onnivoro"] },
+                { name: "Frittata e zucchine", allergens: ["G", "L"], diet: ["vegetariano"] },
+                { name: "Pizza 5 cereali bresaola e formaggio", allergens: ["G", "L"], diet: ["onnivoro"] },
+                { name: "Pizza 5 cereali con insalata di pollo", allergens: ["G"], diet: ["onnivoro"] },
+                { name: "Focaccia “genovese” cotto e stracchino", allergens: ["G", "L"], diet: ["onnivoro"] }
             ]
         };
 
         function processMenuData(rawMenu, prices) {
             let idCounter = 1;
-            const categoryIcons = { pietanze: 'fa-bowl-food', panini: 'fa-bread-slice', pizze: 'fa-pizza-slice' };
+            const categoryIcons = { gastronomia: 'fa-bowl-food', verdure: 'fa-carrot', panini: 'fa-bread-slice', pizze: 'fa-pizza-slice' };
             return Object.entries(rawMenu).flatMap(([category, items]) => 
                 items.map(item => ({
                     id: idCounter++,
