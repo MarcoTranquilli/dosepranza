@@ -187,7 +187,7 @@
         const payersCollectionRef = collection(db, `payers`);
 
         // --- DATI E STATO DELL'APPLICAZIONE ---
-        const PRICES = { gastronomia: 4.00, verdure: 4.00, panini: 3.50, pizze: 3.50 };
+        const PRICES = { gastronomia: 4.00, verdure: 4.00, panini: 3.50, pizze: 3.50, fritti: 1.50 };
         const ALLERGENS = { G: { name: "Glutine", icon: "🌾" }, L: { name: "Latticini", icon: "🥛" }, C: { name: "Crostacei", icon: "🦐" }, P: { name: "Pesce", icon: "🐟" }};
         const DIETS = { onnivoro: { name: "Onnivoro", icon: "🍽️" }, vegetariano: { name: "Vegetariano", icon: "🧀" }, vegano: { name: "Vegano", icon: "🌱" }, pescetariano: { name: "Pescetariano", icon: "🐟" } };
         const RAW_MENU = {
@@ -202,7 +202,12 @@
                 { name: "Pasta fredda pesto primo sale pomodori olive", allergens: ["G", "L"], diet: ["vegetariano"] },
                 { name: "Insalata di pollo", allergens: [], diet: ["onnivoro"] },
                 { name: "Riso integrale bresaola limone e rughetta", allergens: [], diet: ["onnivoro"] },
-                { name: "Pomodori con riso e patate (a peso)", allergens: [], diet: ["vegetariano", "vegano"] }
+                { name: "Pomodori con riso e patate (a peso)", allergens: [], diet: ["vegetariano", "vegano"] },
+                { name: "Macedonia", allergens: [], diet: ["vegetariano", "vegano"] }
+            ],
+            fritti: [
+                { name: "Supplì", allergens: ["G", "L"], diet: ["vegetariano"] },
+                { name: "Polpetta di melanzane", allergens: ["G", "L"], diet: ["vegetariano"] }
             ],
             verdure: [
                 { name: "Melanzane (a peso)", allergens: [], diet: ["vegetariano", "vegano"] },
@@ -243,7 +248,7 @@
 
         function processMenuData(rawMenu, prices) {
             let idCounter = 1;
-            const categoryIcons = { gastronomia: 'fa-bowl-food', verdure: 'fa-carrot', panini: 'fa-bread-slice', pizze: 'fa-pizza-slice' };
+            const categoryIcons = { gastronomia: 'fa-bowl-food', fritti: 'fa-stroopwafel', verdure: 'fa-carrot', panini: 'fa-bread-slice', pizze: 'fa-pizza-slice' };
             return Object.entries(rawMenu).flatMap(([category, items]) => 
                 items.map(item => ({
                     id: idCounter++,
