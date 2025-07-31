@@ -29,7 +29,7 @@
         <header class="mb-6">
             <h1 class="text-3xl md:text-4xl font-bold text-gray-900 text-center">Ordini Pranzo di Gruppo 🥪</h1>
             <p class="text-center text-gray-600 mt-2">Organizza il pranzo con i tuoi colleghi in modo semplice e veloce.</p>
-            <p class="text-center text-gray-600 mt-2"> <b>L'ordine verrà effettuato al massimo per le 11:30 </b></p>
+            <p class="text-center text-red-600 font-bold mt-2">Attenzione: L'ordine e il pagamento devono essere completati entro le 11:30.</p>
         </header>
 
         <!-- Navigazione -->
@@ -48,7 +48,7 @@
         <main>
             <!-- Vista Menù -->
             <div id="menu-view" class="view">
-                <h2 class="text-2xl font-bold mb-4">Scegli cosa ordinare</h2>
+                <h2 id="menu-title" class="text-2xl font-bold mb-4">Scegli cosa ordinare</h2>
                 
                 <!-- Filtri Categoria -->
                 <div id="category-filters" class="flex items-center justify-center flex-wrap gap-2 mb-4">
@@ -83,40 +83,13 @@
                  <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
                     <h2 class="text-2xl font-bold">Riepilogo Ordini di Oggi</h2>
                     <button id="copy-summary-btn" class="w-full md:w-auto bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center">
-                        <i class="fas fa-copy mr-2"></i> Copia Riepilogo
+                        <i class="fas fa-copy mr-2"></i> Copia Riepilogo per Ristoratore
                     </button>
                 </div>
-                
-                <!-- Banner Stato Consegna -->
-                <div id="delivery-status-banner" class="mb-6 p-4 rounded-lg text-center font-semibold hidden"></div>
 
-                <!-- Sezione Pagamenti Sospesi -->
-                <div id="past-due-section" class="mb-6 hidden">
-                    <h3 class="text-xl font-bold text-red-600 mb-2 border-b-2 border-red-200 pb-2">Pagamenti in Sospeso (Giorni Precedenti)</h3>
-                    <div id="past-due-list" class="space-y-4 mt-4">
-                        <!-- Ordini passati non pagati verranno inseriti qui -->
-                    </div>
-                </div>
-
-                <!-- Sezione per chi paga oggi -->
-                <div id="payer-section" class="mb-6">
-                    <div id="payer-info-display" class="hidden bg-blue-100 border-l-4 border-blue-500 text-blue-800 p-4 rounded-lg">
-                        <!-- Info su chi paga verranno inserite qui -->
-                    </div>
-                    <div id="become-payer-prompt" class="hidden text-center bg-white p-4 rounded-lg shadow-md">
-                        <p class="mb-2">Sei tu che anticipi il pagamento di oggi?</p>
-                        <button id="become-payer-btn" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg">Inserisci i tuoi dati per il rimborso</button>
-                    </div>
-                </div>
-
-                <!-- Sezione Gestione Consegna (solo per chi paga) -->
-                <div id="delivery-management-section" class="mb-6 bg-white p-4 rounded-lg shadow-md hidden">
-                    <h3 class="text-lg font-bold mb-3">Gestione Consegna</h3>
-                    <textarea id="delivery-notes-input" class="w-full p-2 border rounded-lg" placeholder="Aggiungi una nota per i colleghi (es. dove si trova il cibo, se manca qualcosa, ecc.)"></textarea>
-                    <div class="flex gap-4 mt-3">
-                        <button id="save-delivery-notes-btn" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">Salva Nota</button>
-                        <button id="mark-delivered-btn" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">Segna come Consegnato</button>
-                    </div>
+                <!-- Sezione Istruzioni Pagamento -->
+                <div id="payment-instructions" class="mb-6 bg-blue-100 border-l-4 border-blue-500 text-blue-800 p-4 rounded-lg hidden">
+                    <!-- Istruzioni di pagamento verranno inserite qui -->
                 </div>
 
                 <div id="all-orders-list" class="space-y-4">
@@ -134,27 +107,24 @@
     <div id="user-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
         <div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md text-center">
             <h3 class="text-2xl font-bold mb-4">Benvenuto!</h3>
-            <p class="text-gray-600 mb-6">Per iniziare, inserisci il tuo nome. Verrà mostrato agli altri nel riepilogo.</p>
+            <p class="text-gray-600 mb-6">Per iniziare, inserisci il tuo nome. Verrà mostrato agli altri nel riepilogo. <br><b class="text-red-600">Importante:</b> Usa lo stesso nome che utilizzerai per il pagamento su Satispay.</p>
             <input type="text" id="username-input" placeholder="Es. Marco Rossi" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
             <button id="save-username-btn" class="w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition-colors">Salva e Continua</button>
         </div>
     </div>
-    
-    <!-- Modal per chi paga -->
-    <div id="payer-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
-        <div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md">
-            <h3 class="text-2xl font-bold mb-4">Dati per il rimborso PayPal</h3>
-            <p class="text-gray-600 mb-6">Inserisci la tua email o numero di telefono associato a PayPal. Saranno visibili a tutti per restituirti la quota.</p>
-            <input type="text" id="payer-contact-input" placeholder="Email o Telefono PayPal" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-            <div class="flex gap-4 mt-4">
-                <button id="cancel-payer-btn" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-4 rounded-lg">Annulla</button>
-                <button id="save-payer-btn" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg">Salva</button>
-            </div>
+
+    <!-- Modal per QR Code Satispay -->
+    <div id="qr-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md text-center relative">
+            <button id="close-qr-modal-btn" class="absolute top-2 right-4 text-2xl text-gray-500 hover:text-gray-800">&times;</button>
+            <h3 class="text-2xl font-bold mb-4">Paga con Satispay</h3>
+            <p class="text-gray-600 mb-4">Inquadra questo QR code con la tua app Satispay per pagare il tuo ordine.</p>
+            <img id="qr-code-image" src="" alt="QR Code Satispay" class="mx-auto rounded-lg shadow-md w-full max-w-xs">
         </div>
     </div>
 
     <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white py-2 px-5 rounded-lg shadow-xl transition-opacity duration-300 opacity-0">
+    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 bg-gray-800 text-white py-3 px-6 rounded-full shadow-xl transition-all duration-300 opacity-0 z-50">
         <p id="toast-message"></p>
     </div>
 
@@ -164,7 +134,7 @@
         // Importa le funzioni necessarie da Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, onSnapshot, deleteDoc, serverTimestamp, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, onSnapshot, deleteDoc, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Your web app's Firebase configuration
         const firebaseConfig = {
@@ -184,9 +154,16 @@
         
         // Riferimenti alle collezioni
         const ordersCollectionRef = collection(db, `orders`);
-        const payersCollectionRef = collection(db, `payers`);
 
         // --- DATI E STATO DELL'APPLICAZIONE ---
+        
+        const QR_CODE_IMAGE_URL = "https://i.imgur.com/KCFwG0O.jpeg"; 
+
+        const MERCHANT_INFO = {
+            name: "Alimentari Russo",
+            paymentMethod: "Satispay"
+        };
+
         const PRICES = { gastronomia: 4.00, verdure: 4.00, panini: 3.50, pizze: 3.50, fritti: 1.50 };
         const ALLERGENS = { G: { name: "Glutine", icon: "🌾" }, L: { name: "Latticini", icon: "🥛" }, C: { name: "Crostacei", icon: "🦐" }, P: { name: "Pesce", icon: "🐟" }};
         const DIETS = { onnivoro: { name: "Onnivoro", icon: "🍽️" }, vegetariano: { name: "Vegetariano", icon: "🧀" }, vegano: { name: "Vegano", icon: "🌱" }, pescetariano: { name: "Pescetariano", icon: "🐟" } };
@@ -268,16 +245,15 @@
             activeCategoryFilter: 'all',
             activeDietFilter: 'all',
             cart: [],
-            allOrders: [], // Solo ordini di oggi
-            pastUnpaidOrders: [],
-            pastPayers: {}, // { 'YYYY-MM-DD': payerInfo }
-            payerInfo: null, // Solo pagatore di oggi
+            selectingAlternativeFor: null, // ID dell'item nel carrello per cui si sceglie l'alternativa
+            allOrders: [],
             menuData: processMenuData(RAW_MENU, PRICES)
         };
 
         // --- ELEMENTI DEL DOM ---
         const views = document.querySelectorAll('.view');
         const navBtns = document.querySelectorAll('.nav-btn');
+        const menuTitle = document.getElementById('menu-title');
         const menuItemsContainer = document.getElementById('menu-items');
         const categoryFiltersContainer = document.getElementById('category-filters');
         const dietFiltersContainer = document.getElementById('diet-filters');
@@ -290,21 +266,13 @@
         const userModal = document.getElementById('user-modal');
         const usernameInput = document.getElementById('username-input');
         const saveUsernameBtn = document.getElementById('save-username-btn');
-        const payerModal = document.getElementById('payer-modal');
-        const payerContactInput = document.getElementById('payer-contact-input');
-        const payerInfoDisplay = document.getElementById('payer-info-display');
-        const becomePayerPrompt = document.getElementById('become-payer-prompt');
-        const deliveryStatusBanner = document.getElementById('delivery-status-banner');
-        const deliveryManagementSection = document.getElementById('delivery-management-section');
-        const deliveryNotesInput = document.getElementById('delivery-notes-input');
-        const pastDueSection = document.getElementById('past-due-section');
-        const pastDueList = document.getElementById('past-due-list');
+        const paymentInstructions = document.getElementById('payment-instructions');
+        const qrModal = document.getElementById('qr-modal');
+        const qrCodeImage = document.getElementById('qr-code-image');
         const toastEl = document.getElementById('toast');
         const toastMessageEl = document.getElementById('toast-message');
 
         // --- FUNZIONI DI UTILITY ---
-        const getTodayString = () => new Date().toISOString().split('T')[0];
-
         function showToast(message, duration = 3000) {
             toastMessageEl.textContent = message;
             toastEl.classList.remove('opacity-0');
@@ -352,13 +320,31 @@
         }
 
         function renderMenu() {
+            const isSelectingAlternative = state.selectingAlternativeFor !== null;
+            menuTitle.textContent = isSelectingAlternative ? "Scegli un'alternativa" : "Scegli cosa ordinare";
+
             const filteredItems = state.menuData.filter(item => {
                 const categoryMatch = state.activeCategoryFilter === 'all' || item.category.toLowerCase() === state.activeCategoryFilter;
                 const dietMatch = state.activeDietFilter === 'all' || item.diet.includes(state.activeDietFilter);
                 return categoryMatch && dietMatch;
             });
+
+            if (filteredItems.length === 0) {
+                menuItemsContainer.innerHTML = `<div class="col-span-full text-center p-8 bg-white rounded-xl shadow-md"><p class="text-gray-500">Nessun piatto trovato con i filtri selezionati. Prova a cambiare la tua ricerca!</p></div>`;
+                return;
+            }
+
             menuItemsContainer.innerHTML = filteredItems.map(item => {
                 const allergenHtml = item.allergens.map(key => `<span title="${ALLERGENS[key].name}">${ALLERGENS[key].icon}</span>`).join('');
+                
+                const buttonHtml = isSelectingAlternative
+                    ? `<button data-id="${item.id}" class="select-as-alternative-btn w-full mt-4 bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                       <i class="fas fa-check"></i> Seleziona
+                    </button>`
+                    : `<button data-id="${item.id}" class="add-to-cart-btn w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                       <i class="fas fa-plus"></i> Aggiungi
+                    </button>`;
+
                 return `
                 <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow flex flex-col">
                     <div class="flex-grow">
@@ -372,67 +358,24 @@
                         <div class="flex gap-3 text-lg">${allergenHtml}</div>
                         <span class="font-semibold text-lg">€${item.price.toFixed(2)}</span>
                     </div>
-                    <button data-id="${item.id}" class="add-to-cart-btn w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">
-                       <i class="fas fa-plus"></i> Aggiungi
-                    </button>
+                    ${buttonHtml}
                 </div>`;
             }).join('');
         }
         
-        function renderPayerAndDeliveryInfo() {
-            const isPayer = state.payerInfo && state.currentUser.uid === state.payerInfo.userId;
-            
-            // Render info per tutti
-            if (state.payerInfo) {
-                const paypalIcon = `<svg class="w-6 h-6 inline-block mr-2" viewBox="0 0 24 24" fill="currentColor"><path d="M7.657 20.837c.18.332.473.58.81.718.337.138.71.157.953.157h.034c.414 0 .81-.13 1.125-.39 1.38-1.146 2.003-3.118 2.003-5.634 0-2.035-.525-4.12-1.93-5.26-.334-.278-.737-.417-1.17-.417-.282 0-.68.084-.954.168-.31.093-.586.27-.783.503-.197.234-.302.51-.302.813 0 .225.084.504.253.837.168.333.39.63.664.88.31.28.663.505.953.665.29.16.485.242.485.242.06 0 .09.006.104.01.015.004.02.013.02.013.094.037.164.23.164.48 0 .42-.23.75-.653.93-.424.18-.954.15-1.59-.09-.636-.24-1.11-0.67-1.38-1.28-.11-.25-.26-.59-.44-.99-.18-.4-.41-.8-.69-1.19-.28-.39-.6-.75-1.01-1.07-1.29-1.02-3.15-1.5-5.2-1.5H3.143L3 18.11h3.32c.39 0 .75-.12.98-.37.23-.25.34-.56.34-.92 0-.36-.11-.67-.34-.92-.23-.25-.59-.37-.98-.37H3.81l.16-1.04h2.5c1.6 0 2.9.37 3.9 1.11.28.2.53.43.75.69.22.26.4.55.54.87.14.32.23.68.23 1.07 0 .39-.09.75-.27 1.08-.18.33-.44.63-.78.89-.34.26-.75.49-1.22.68-.47.19-.98.32-1.53.38zM21 8.267c-1.3-.23-2.3-.9-3-2.01-.7-1.11-1-2.4-1-3.85 0-.11-.03-.2-.09-.27-.06-.07-.15-.1-.25-.1H12.9c-.39 0-.75.12-.98.37-.23.25-.34-.56-.34-.92 0 .36.11.67.34.92.23.25.59.37.98.37h3.04c.48 0 .87.13 1.19.4.32.27.53.62.65 1.04.12.42.12.87.01 1.34-.11.47-.32.9-.62 1.28-.3.38-.68.7-1.13.95-.45.25-.96.43-1.53.54-.57.11-1.16.16-1.77.16h-.4l-.25 1.6h.65c.61 0 1.2-.05 1.77-.16.57-.11 1.1-.29 1.57-.54s.89-.57 1.22-.95c.33-.38.59-.82.78-1.32.19-.5.28-1.03.28-1.59 0-.22-.02-.43-.06-.63z"></path></svg>`;
-                const editButtonHtml = isPayer ? `<button id="edit-payer-btn" class="ml-auto text-blue-600 hover:text-blue-800"><i class="fas fa-pencil-alt"></i></button>` : '';
-                payerInfoDisplay.innerHTML = `
-                    <div class="flex items-start">
-                        <div>
-                            <p class="font-bold flex items-center">${paypalIcon} Paga il tuo ordine a ${state.payerInfo.name}:</p>
-                            <a href="https://paypal.me/${state.payerInfo.contact.replace('@', '')}" target="_blank" rel="noopener noreferrer" class="font-semibold text-blue-600 hover:underline break-all">${state.payerInfo.contact}</a>
-                            <p class="text-sm mt-1">Clicca sul contatto per aprire PayPal e rimborsare la tua quota.</p>
-                        </div>
-                        ${editButtonHtml}
-                    </div>
+        function renderPaymentInstructions() {
+            if (state.allOrders.length > 0) {
+                paymentInstructions.innerHTML = `
+                    <p class="font-bold">Come pagare:</p>
+                    <p>1. Paga la tua quota direttamente a <span class="font-semibold">${MERCHANT_INFO.name}</span>.</p>
+                    <button id="show-qr-btn" class="mt-2 bg-red-500 text-white font-bold py-2 px-4 rounded-lg inline-flex items-center"><svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor"><path d="M7.657 20.837c.18.332.473.58.81.718.337.138.71.157.953.157h.034c.414 0 .81-.13 1.125-.39 1.38-1.146 2.003-3.118 2.003-5.634 0-2.035-.525-4.12-1.93-5.26-.334-.278-.737-.417-1.17-.417-.282 0-.68.084-.954.168-.31.093-.586.27-.783.503-.197.234-.302.51-.302.813 0 .225.084.504.253.837.168.333.39.63.664.88.31.28.663.505.953.665.29.16.485.242.485.242.06 0 .09.006.104.01.015.004.02.013.02.013.094.037.164.23.164.48 0 .42-.23.75-.653.93-.424.18-.954.15-1.59-.09-.636-.24-1.11-0.67-1.38-1.28-.11-.25-.26-.59-.44-.99-.18-.4-.41-.8-.69-1.19-.28-.39-.6-.75-1.01-1.07-1.29-1.02-3.15-1.5-5.2-1.5H3.143L3 18.11h3.32c.39 0 .75-.12.98-.37.23-.25.34-.56.34-.92 0-.36-.11-.67-.34-.92-.23-.25-.59-.37-.98-.37H3.81l.16-1.04h2.5c1.6 0 2.9.37 3.9 1.11.28.2.53.43.75.69.22.26.4.55.54.87.14.32.23.68.23 1.07 0 .39-.09.75-.27 1.08-.18.33-.44.63-.78.89-.34.26-.75.49-1.22.68-.47.19-.98.32-1.53.38zM21 8.267c-1.3-.23-2.3-.9-3-2.01-.7-1.11-1-2.4-1-3.85 0-.11-.03-.2-.09-.27-.06-.07-.15-.1-.25-.1H12.9c-.39 0-.75.12-.98.37-.23.25-.34-.56-.34-.92 0 .36.11.67.34.92.23.25.59.37.98.37h3.04c.48 0 .87.13 1.19.4.32.27.53.62.65 1.04.12.42.12.87.01 1.34-.11.47-.32.9-.62 1.28-.3.38-.68.7-1.13.95-.45.25-.96.43-1.53.54-.57.11-1.16.16-1.77.16h-.4l-.25 1.6h.65c.61 0 1.2-.05 1.77-.16.57-.11 1.1-.29 1.57-.54s.89-.57 1.22-.95c.33-.38.59-.82.78-1.32.19-.5.28-1.03.28-1.59 0-.22-.02-.43-.06-.63z"></path></svg> Paga con Satispay</button>
+                    <p>2. Dopo aver pagato, <span class="font-bold">spunta la casella "Pagato"</span> accanto al tuo nome.</p>
+                    <p class="text-sm mt-2 text-red-700"><b>Importante:</b> Assicurati di effettuare il pagamento Satispay usando lo stesso nome che hai inserito nell'app per permettere al ristoratore di associare l'ordine.</p>
+                    <p class="text-sm mt-2 text-red-700">Ricorda: solo gli ordini pagati entro le 11:30 verranno inviati!</p>
                 `;
-                payerInfoDisplay.classList.remove('hidden');
-                becomePayerPrompt.classList.add('hidden');
+                paymentInstructions.classList.remove('hidden');
             } else {
-                payerInfoDisplay.classList.add('hidden');
-                becomePayerPrompt.classList.remove('hidden');
-            }
-
-            // Render banner consegna
-            if (state.payerInfo?.deliveryStatus === 'delivered') {
-                deliveryStatusBanner.innerHTML = `
-                    <p><i class="fas fa-check-circle mr-2"></i>Ordine consegnato!</p>
-                    ${state.payerInfo.deliveryNotes ? `<p class="text-sm font-normal mt-1">${state.payerInfo.deliveryNotes}</p>` : ''}
-                `;
-                deliveryStatusBanner.className = 'mb-6 p-4 rounded-lg text-center font-semibold bg-green-100 text-green-800';
-                deliveryStatusBanner.classList.remove('hidden');
-            } else if (state.allOrders.length > 0) {
-                deliveryStatusBanner.innerHTML = `<i class="fas fa-truck mr-2"></i>Ordine in attesa di consegna`;
-                deliveryStatusBanner.className = 'mb-6 p-4 rounded-lg text-center font-semibold bg-yellow-100 text-yellow-800';
-                deliveryStatusBanner.classList.remove('hidden');
-            } else {
-                deliveryStatusBanner.classList.add('hidden');
-            }
-
-            // Render sezione gestione per il pagatore
-            if (isPayer) {
-                deliveryManagementSection.classList.remove('hidden');
-                deliveryNotesInput.value = state.payerInfo.deliveryNotes || '';
-                const markDeliveredBtn = document.getElementById('mark-delivered-btn');
-                if (state.payerInfo.deliveryStatus === 'delivered') {
-                    markDeliveredBtn.disabled = true;
-                    markDeliveredBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                } else {
-                    markDeliveredBtn.disabled = false;
-                    markDeliveredBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                }
-            } else {
-                deliveryManagementSection.classList.add('hidden');
+                paymentInstructions.classList.add('hidden');
             }
         }
 
@@ -447,52 +390,83 @@
                 let itemsHtml = userOrder.items.map(item => `<div class="flex justify-between items-center py-2 border-b"><span>${item.name} (x${item.quantity})</span><span class="font-semibold">€${(item.price * item.quantity).toFixed(2)}</span></div>`).join('');
                 myOrderContentEl.innerHTML = `<p class="text-lg font-semibold mb-2">Ciao ${state.currentUser.name}, questo è il tuo ordine confermato:</p><div class="space-y-2 mb-4">${itemsHtml}</div><div class="text-right font-bold text-xl my-4">Totale: €${userOrder.total.toFixed(2)}</div><button id="delete-my-order-btn" data-id="${userOrder.id}" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition-colors"><i class="fas fa-trash-alt mr-2"></i> Cancella il mio ordine</button>`;
             } else if (state.cart.length > 0) {
-                const cartSummary = {};
-                state.cart.forEach(item => {
-                    if (cartSummary[item.id]) { cartSummary[item.id].quantity++; } 
-                    else { cartSummary[item.id] = { ...item, quantity: 1 }; }
-                });
-                let itemsHtml = Object.values(cartSummary).map(item => `<div class="flex justify-between items-center py-2 border-b"><div><span>${item.name} (x${item.quantity})</span></div><div class="flex items-center gap-2"><span class="font-semibold">€${(item.price * item.quantity).toFixed(2)}</span><button data-id="${item.id}" class="remove-from-cart-btn text-red-500 hover:text-red-700 text-sm"><i class="fas fa-times-circle"></i></button></div></div>`).join('');
+                let itemsHtml = state.cart.map(item => `
+                    <div class="py-2 border-b">
+                        <div class="flex justify-between items-center">
+                            <span>${item.name}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="font-semibold">€${item.price.toFixed(2)}</span>
+                                <button data-cart-item-id="${item.cartItemId}" class="remove-from-cart-btn text-red-500 hover:text-red-700 text-sm"><i class="fas fa-times-circle"></i></button>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <p class="text-xs text-gray-500">Alternativa: <span class="font-semibold">${item.alternativeChoice || 'Nessuna'}</span></p>
+                            <button data-cart-item-id="${item.cartItemId}" class="select-alternative-btn text-xs text-blue-600 hover:underline mt-1">${item.alternativeChoice ? 'Modifica' : 'Scegli'} alternativa</button>
+                        </div>
+                    </div>
+                `).join('');
+
                 const total = state.cart.reduce((sum, item) => sum + item.price, 0);
-                myOrderContentEl.innerHTML = `<div class="space-y-2 mb-4">${itemsHtml}</div><textarea id="order-notes" class="w-full p-2 border rounded-lg mt-4" placeholder="Note per la preparazione (es. senza cipolla)"></textarea><div class="text-right font-bold text-xl my-4">Totale: €${total.toFixed(2)}</div><button id="confirm-order-btn" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors"><i class="fas fa-check-circle mr-2"></i> Conferma Ordine</button>`;
+                myOrderContentEl.innerHTML = `
+                    <div class="space-y-2 mb-4">${itemsHtml}</div>
+                    <textarea id="order-notes" class="w-full p-2 border rounded-lg mt-4" placeholder="Note generali per la preparazione (es. senza cipolla)"></textarea>
+                    <div class="mt-4">
+                        <p class="font-semibold mb-2">Metodo di Pagamento:</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="paymentMethod" value="Satispay" class="mr-2" checked> Satispay</label>
+                            <label class="flex items-center"><input type="radio" name="paymentMethod" value="Contanti" class="mr-2"> Contanti</label>
+                        </div>
+                    </div>
+                    <div class="text-right font-bold text-xl my-4">Totale: €${total.toFixed(2)}</div>
+                    <button id="confirm-order-btn" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors">
+                        <i class="fas fa-check-circle mr-2"></i> Conferma Ordine
+                    </button>
+                    <p class="text-xs text-gray-500 text-center mt-2">Cliccando, il tuo ordine verrà aggiunto alla lista condivisa e non sarà più modificabile.</p>
+                `;
             } else {
                 myOrderContentEl.innerHTML = `<p class="text-center text-gray-500 py-8">Il tuo carrello è vuoto. Aggiungi qualcosa dal menù!</p>`;
             }
         }
 
         function renderAllOrders() {
+            renderPaymentInstructions();
             if (state.allOrders.length === 0) {
                 allOrdersListEl.innerHTML = `<div class="text-center bg-white p-8 rounded-xl shadow"><p class="text-gray-500">Nessun ordine per oggi. Sii il primo!</p></div>`;
                 grandTotalEl.textContent = '€0.00';
-                document.getElementById('payer-section').classList.add('hidden');
                 return;
             }
-            document.getElementById('payer-section').classList.remove('hidden');
+
             allOrdersListEl.innerHTML = '';
             let grandTotal = 0;
             state.allOrders.forEach(order => {
                 grandTotal += order.total;
-                const isPayer = state.payerInfo && state.currentUser.uid === state.payerInfo.userId;
+                const isMyOrder = state.currentUser.uid === order.userId;
                 const orderCard = document.createElement('div');
                 orderCard.className = `bg-white p-4 rounded-xl shadow-md transition-opacity duration-300 ${order.paid ? 'paid-order' : ''}`;
-                let itemsHtml = order.items.map(item => `<li>${item.quantity}x ${item.name}</li>`).join('');
+                let itemsHtml = order.items.map(item => `
+                    <li>
+                        ${item.quantity}x ${item.name}
+                        ${item.alternativeChoice ? `<span class="text-xs text-gray-500 block ml-4">↳ Alt: ${item.alternativeChoice}</span>` : ''}
+                    </li>`).join('');
                 
                 orderCard.innerHTML = `
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="font-bold text-lg">${order.userName}</p>
+                        <p class="font-bold text-lg flex items-center">${order.userName} 
+                            <span class="ml-2 text-xs font-semibold py-0.5 px-2 rounded-full ${order.paymentMethod === 'Satispay' ? 'bg-blue-200 text-blue-800' : 'bg-green-200 text-green-800'}">${order.paymentMethod}</span>
+                        </p>
                         <ul class="list-disc list-inside text-gray-700 mt-2">${itemsHtml}</ul>
                         ${order.notes ? `<p class="text-sm text-gray-500 mt-2"><em>Note: ${order.notes}</em></p>` : ''}
                     </div>
                     <div class="text-right">
                         <p class="font-semibold text-lg">€${order.total.toFixed(2)}</p>
                         <p class="text-xs text-gray-400 mt-1"><i class="far fa-clock"></i> ${formatTimestamp(order.createdAt)}</p>
-                        ${order.userId === state.currentUser?.uid ? `<button data-id="${order.id}" class="delete-my-order-btn text-red-500 hover:text-red-700 text-xs mt-2">Cancella</button>` : ''}
+                        ${isMyOrder ? `<button data-id="${order.id}" class="delete-my-order-btn text-red-500 hover:text-red-700 text-xs mt-2">Cancella</button>` : ''}
                     </div>
                 </div>
                 <div class="border-t mt-3 pt-3 flex justify-end items-center">
-                    <label class="flex items-center ${isPayer ? 'cursor-pointer' : 'cursor-not-allowed'}">
-                        <input type="checkbox" data-order-id="${order.id}" class="paid-checkbox h-5 w-5 rounded text-blue-600 focus:ring-blue-500 border-gray-300" ${order.paid ? 'checked' : ''} ${!isPayer ? 'disabled' : ''}>
+                    <label class="flex items-center ${isMyOrder ? 'cursor-pointer' : 'cursor-not-allowed'}">
+                        <input type="checkbox" data-order-id="${order.id}" class="paid-checkbox h-5 w-5 rounded text-blue-600 focus:ring-blue-500 border-gray-300" ${order.paid ? 'checked' : ''} ${!isMyOrder ? 'disabled' : ''}>
                         <span class="ml-2 text-sm font-medium ${order.paid ? 'text-green-600' : 'text-gray-600'}">${order.paid ? 'Pagato' : 'Da pagare'}</span>
                         ${order.paid ? '<i class="fas fa-check-circle text-green-600 ml-2"></i>' : ''}
                     </label>
@@ -500,45 +474,6 @@
                 allOrdersListEl.appendChild(orderCard);
             });
             grandTotalEl.textContent = `€${grandTotal.toFixed(2)}`;
-        }
-
-        function renderPastUnpaidOrders() {
-            if (state.pastUnpaidOrders.length === 0) {
-                pastDueSection.classList.add('hidden');
-                return;
-            }
-            pastDueSection.classList.remove('hidden');
-            
-            const groupedByDate = state.pastUnpaidOrders.reduce((acc, order) => {
-                const date = order.createdAt.toDate().toISOString().split('T')[0];
-                if (!acc[date]) acc[date] = [];
-                acc[date].push(order);
-                return acc;
-            }, {});
-
-            pastDueList.innerHTML = Object.entries(groupedByDate).map(([date, orders]) => {
-                const payer = state.pastPayers[date];
-                const isPastPayer = payer && state.currentUser.uid === payer.userId;
-
-                const payerHtml = payer 
-                    ? `<p class="text-sm font-semibold">Da rimborsare a: <a href="https://paypal.me/${payer.contact.replace('@', '')}" target="_blank" class="text-blue-600 hover:underline">${payer.name} (${payer.contact})</a></p>`
-                    : '<p class="text-sm text-gray-500">Dati di chi ha pagato non disponibili per questa data.</p>';
-                
-                const ordersHtml = orders.map(order => `
-                    <div class="ml-4 mt-2 flex justify-between items-center ${order.paid ? 'paid-order' : ''}">
-                        <span>${order.userName} - €${order.total.toFixed(2)}</span>
-                        <label class="flex items-center ${isPastPayer ? 'cursor-pointer' : 'cursor-not-allowed'}">
-                            <input type="checkbox" data-order-id="${order.id}" class="paid-checkbox h-5 w-5 rounded text-blue-600" ${order.paid ? 'checked' : ''} ${!isPastPayer ? 'disabled' : ''}>
-                            <span class="ml-2 text-sm ${order.paid ? 'text-green-600' : 'text-gray-600'}">${order.paid ? 'Pagato' : ''}</span>
-                        </label>
-                    </div>`).join('');
-
-                return `<div class="bg-red-50 border border-red-200 p-4 rounded-lg">
-                            <h4 class="font-bold">${new Date(date+'T12:00:00').toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' })}</h4>
-                            ${payerHtml}
-                            <div class="mt-2 space-y-1">${ordersHtml}</div>
-                        </div>`;
-            }).join('');
         }
         
         // --- GESTIONE DEGLI EVENTI ---
@@ -576,15 +511,32 @@
                 const itemId = parseInt(target.dataset.id);
                 const item = state.menuData.find(i => i.id === itemId);
                 if (item) {
-                    state.cart.push(item);
+                    state.cart.push({ ...item, cartItemId: crypto.randomUUID(), alternativeChoice: '' });
                     renderMyOrder();
                     cartCountEl.textContent = state.cart.length;
                     showToast(`${item.name} aggiunto al carrello!`);
                 }
             }
-            else if (target.matches('.remove-from-cart-btn')) {
+            else if (target.matches('.select-as-alternative-btn')) {
                 const itemId = parseInt(target.dataset.id);
-                const itemIndex = state.cart.findIndex(i => i.id === itemId);
+                const item = state.menuData.find(i => i.id === itemId);
+                const cartItem = state.cart.find(ci => ci.cartItemId === state.selectingAlternativeFor);
+                if (item && cartItem) {
+                    cartItem.alternativeChoice = item.name;
+                    state.selectingAlternativeFor = null;
+                    renderMenu();
+                    navigate('my-order');
+                    renderMyOrder();
+                }
+            }
+            else if (target.matches('.select-alternative-btn')) {
+                state.selectingAlternativeFor = target.dataset.cartItemId;
+                navigate('menu');
+                renderMenu();
+            }
+            else if (target.matches('.remove-from-cart-btn')) {
+                const cartItemId = target.dataset.cartItemId;
+                const itemIndex = state.cart.findIndex(i => i.cartItemId === cartItemId);
                 if(itemIndex > -1){
                     const removedItem = state.cart.splice(itemIndex, 1)[0];
                     renderMyOrder();
@@ -603,43 +555,16 @@
                 } else { showToast('Per favore, inserisci un nome.', 2000); }
             }
             else if (target.id === 'copy-summary-btn') { handleCopySummary(); }
-            else if (target.id === 'become-payer-btn') { payerModal.classList.remove('hidden'); }
-            else if (target.id === 'cancel-payer-btn') { payerModal.classList.add('hidden'); }
-            else if (target.id === 'save-payer-btn') { handleSetPayer(); }
-            else if (target.id === 'edit-payer-btn') {
-                payerContactInput.value = state.payerInfo.contact;
-                payerModal.classList.remove('hidden');
+            else if (target.id === 'show-qr-btn') {
+                qrCodeImage.src = QR_CODE_IMAGE_URL;
+                qrModal.classList.remove('hidden');
             }
-            else if (target.id === 'save-delivery-notes-btn') { handleSaveDeliveryNotes(); }
-            else if (target.id === 'mark-delivered-btn') { handleMarkAsDelivered(); }
+            else if (target.id === 'close-qr-modal-btn') {
+                qrModal.classList.add('hidden');
+            }
         }
         
         // --- LOGICA DI BUSINESS E FIRESTORE ---
-        async function handleSaveDeliveryNotes() {
-            const notes = deliveryNotesInput.value.trim();
-            const today = getTodayString();
-            const payerDocRef = doc(db, `payers`, today);
-            try {
-                await updateDoc(payerDocRef, { deliveryNotes: notes });
-                showToast(`Nota di consegna salvata!`, 2000);
-            } catch (error) {
-                console.error("Errore nel salvataggio della nota:", error);
-                showToast("Errore nel salvataggio della nota.", 3000);
-            }
-        }
-
-        async function handleMarkAsDelivered() {
-            const today = getTodayString();
-            const payerDocRef = doc(db, `payers`, today);
-            try {
-                await updateDoc(payerDocRef, { deliveryStatus: 'delivered' });
-                showToast(`Ordine segnato come consegnato!`, 2000);
-            } catch (error) {
-                console.error("Errore nell'aggiornamento dello stato di consegna:", error);
-                showToast("Errore nell'aggiornamento dello stato.", 3000);
-            }
-        }
-
         async function handlePaymentStatusChange(checkbox) {
             const orderId = checkbox.dataset.orderId;
             const isPaid = checkbox.checked;
@@ -654,42 +579,28 @@
             }
         }
 
-        async function handleSetPayer() {
-            const contact = payerContactInput.value.trim();
-            if (!contact) {
-                showToast("Per favore, inserisci un contatto valido.", 2000);
-                return;
-            }
-            const payerData = {
-                userId: state.currentUser.uid,
-                name: state.currentUser.name,
-                contact: contact,
-                deliveryStatus: 'pending',
-                deliveryNotes: ''
-            };
-            const today = getTodayString();
-            const payerDocRef = doc(db, `payers`, today);
-            try {
-                await setDoc(payerDocRef, payerData, { merge: true }); // Use merge to update if exists
-                payerModal.classList.add('hidden');
-                showToast("Dati salvati! Ora tutti sanno chi rimborsare.", 3000);
-            } catch (error) {
-                console.error("Errore nel salvataggio dei dati di chi paga:", error);
-                showToast("Errore nel salvataggio dei dati.", 3000);
-            }
-        }
-
         async function handleConfirmOrder() {
             if (state.cart.length === 0) { showToast("Il carrello è vuoto!", 2000); return; }
-            const cartSummary = {};
-            state.cart.forEach(item => {
-                if (cartSummary[item.id]) { cartSummary[item.id].quantity++; } 
-                else { cartSummary[item.id] = { ...item, quantity: 1 }; }
-            });
-            const orderItems = Object.values(cartSummary);
+            
+            const groupedCart = state.cart.reduce((acc, item) => {
+                if (!acc[item.id]) {
+                    acc[item.id] = { ...item, quantity: 0 };
+                }
+                acc[item.id].quantity++;
+                // L'alternativa è legata al tipo di prodotto, non alla singola istanza
+                if (item.alternativeChoice) {
+                    acc[item.id].alternativeChoice = item.alternativeChoice;
+                }
+                return acc;
+            }, {});
+
+            const orderItems = Object.values(groupedCart);
             const total = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
             const notes = document.getElementById('order-notes').value.trim();
-            const orderData = { userId: state.currentUser.uid, userName: state.currentUser.name, items: orderItems, total: total, notes: notes, createdAt: serverTimestamp(), paid: false };
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+
+            const orderData = { userId: state.currentUser.uid, userName: state.currentUser.name, items: orderItems, total: total, notes: notes, createdAt: serverTimestamp(), paid: false, paymentMethod: paymentMethod };
+            
             try {
                 await setDoc(doc(ordersCollectionRef, state.currentUser.uid), orderData);
                 state.cart = [];
@@ -713,21 +624,51 @@
         }
 
         function handleCopySummary() {
-            if (state.allOrders.length === 0) {
-                showToast("Nessun ordine da copiare.", 2000);
+            const paidOrders = state.allOrders.filter(order => order.paid && order.paymentMethod === 'Satispay');
+            const cashOrders = state.allOrders.filter(order => order.paymentMethod === 'Contanti');
+
+            if (paidOrders.length === 0 && cashOrders.length === 0) {
+                showToast("Nessun ordine da inviare.", 3000);
                 return;
             }
-            let summaryText = "Ciao! Vorremmo effettuare il seguente ordine per il pranzo di oggi da DOS Design:\n\n";
-            state.allOrders.forEach(order => {
-                summaryText += `*${order.userName}*:\n`;
-                order.items.forEach(item => { summaryText += `- ${item.quantity}x ${item.name}\n`; });
-                if (order.notes) { summaryText += `  _(Note: ${order.notes})_\n`; }
-                summaryText += `\n`;
-            });
+
+            let summaryText = `Ciao! Vorremmo effettuare il seguente ordine per il pranzo di oggi da DOS Design.\n\n`;
+
+            if (paidOrders.length > 0) {
+                summaryText += `--- PAGATI CON SATISPAY ---\n`;
+                paidOrders.forEach(order => {
+                    summaryText += `*${order.userName}*:\n`;
+                    order.items.forEach(item => {
+                        summaryText += `- ${item.quantity}x ${item.name}\n`;
+                        if (item.alternativeChoice) {
+                            summaryText += `  _(Alt: ${item.alternativeChoice})_\n`;
+                        }
+                    });
+                    if (order.notes) { summaryText += `  _(Note: ${order.notes})_\n`; }
+                    summaryText += `\n`;
+                });
+            }
+
+            if (cashOrders.length > 0) {
+                summaryText += `--- DA PAGARE IN CONTANTI ALLA CONSEGNA ---\n`;
+                cashOrders.forEach(order => {
+                    summaryText += `*${order.userName}*:\n`;
+                    order.items.forEach(item => {
+                        summaryText += `- ${item.quantity}x ${item.name}\n`;
+                        if (item.alternativeChoice) {
+                            summaryText += `  _(Alt: ${item.alternativeChoice})_\n`;
+                        }
+                    });
+                    if (order.notes) { summaryText += `  _(Note: ${order.notes})_\n`; }
+                    summaryText += `\n`;
+                });
+            }
+
             summaryText += `====================\n`;
             summaryText += `*TOTALE COMPLESSIVO: €${state.allOrders.reduce((sum, order) => sum + order.total, 0).toFixed(2)}*\n\n`;
             summaryText += `L'indirizzo di consegna è *Via Arno, 52*.\n\n`;
             summaryText += `Per favore, potete confermarci la preparazione e indicarci un orario di consegna previsto? Grazie!`;
+            
             const textarea = document.createElement('textarea');
             textarea.value = summaryText;
             document.body.appendChild(textarea);
@@ -741,16 +682,6 @@
         function setupAppForUser(user) {
             state.currentUser = { uid: user.uid };
             
-            // Listener per il pagatore di oggi
-            const today = getTodayString();
-            const todayPayerDocRef = doc(payersCollectionRef, today);
-            onSnapshot(todayPayerDocRef, (doc) => {
-                state.payerInfo = doc.exists() ? doc.data() : null;
-                renderPayerAndDeliveryInfo();
-                renderAllOrders();
-            });
-
-            // Listener per tutti gli ordini
             onSnapshot(ordersCollectionRef, async (snapshot) => {
                 const allOrders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 
@@ -758,24 +689,8 @@
                 todayStart.setHours(0, 0, 0, 0);
 
                 state.allOrders = allOrders.filter(order => order.createdAt && order.createdAt.toDate() >= todayStart);
-                const pastOrders = allOrders.filter(order => order.createdAt && order.createdAt.toDate() < todayStart);
-                state.pastUnpaidOrders = pastOrders.filter(order => !order.paid);
-
-                const pastPayerDates = [...new Set(state.pastUnpaidOrders.map(o => o.createdAt.toDate().toISOString().split('T')[0]))];
-                if (pastPayerDates.length > 0) {
-                    const payerPromises = pastPayerDates.map(date => getDoc(doc(payersCollectionRef, date)));
-                    const payerDocs = await Promise.all(payerPromises);
-                    
-                    state.pastPayers = {};
-                    payerDocs.forEach(docSnap => {
-                        if (docSnap.exists()) {
-                            state.pastPayers[docSnap.id] = docSnap.data();
-                        }
-                    });
-                }
-
+                
                 renderAllOrders();
-                renderPastUnpaidOrders();
                 renderMyOrder();
             });
 
