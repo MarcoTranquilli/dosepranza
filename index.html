@@ -120,6 +120,9 @@
             <h3 class="text-2xl font-bold mb-4">Paga con Satispay</h3>
             <p class="text-gray-600 mb-4">Inquadra questo QR code con la tua app Satispay per pagare il tuo ordine.</p>
             <img id="qr-code-image" src="" alt="QR Code Satispay" class="mx-auto rounded-lg shadow-md w-full max-w-xs">
+            <div class="mt-4 text-sm text-gray-600">
+                <p>Non hai Satispay? <a href="https://www.satispay.com/it-it/privati/" target="_blank" class="text-blue-600 hover:underline">Scarica l'app</a> e ricevi un bonus di 5€ con il codice <span class="font-bold">WEB</span>.</p>
+            </div>
         </div>
     </div>
 
@@ -134,7 +137,7 @@
         // Importa le funzioni necessarie da Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, onSnapshot, deleteDoc, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, onSnapshot, deleteDoc, serverTimestamp, updateDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Your web app's Firebase configuration
         const firebaseConfig = {
@@ -164,68 +167,70 @@
             paymentMethod: "Satispay"
         };
 
-        const PRICES = { gastronomia: 4.00, verdure: 4.00, panini: 3.50, pizze: 3.50, fritti: 1.50 };
+        const PRICES = { gastronomia: 4.00, verdure: 4.00, panini: 3.50, pizze: 3.50, fritti: 1.50, dessert: 3.00 };
         const ALLERGENS = { G: { name: "Glutine", icon: "🌾" }, L: { name: "Latticini", icon: "🥛" }, C: { name: "Crostacei", icon: "🦐" }, P: { name: "Pesce", icon: "🐟" }};
-        const DIETS = { onnivoro: { name: "Onnivoro", icon: "🍽️" }, vegetariano: { name: "Vegetariano", icon: "🧀" }, vegano: { name: "Vegano", icon: "🌱" }, pescetariano: { name: "Pescetariano", icon: "🐟" } };
+        const DIETS = { vegetariano: { name: "Vegetariano", icon: "🧀" }, vegano: { name: "Vegano", icon: "🌱" }, pescetariano: { name: "Pescetariano", icon: "🐟" } };
         const RAW_MENU = {
             gastronomia: [
-                { name: "Cous cous vegetale con pollo", allergens: ["G"], diet: ["onnivoro"] },
-                { name: "Cous cous vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"] },
-                { name: "Farro vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"] },
-                { name: "Farro vegetale con salmone", allergens: ["G", "P"], diet: ["pescetariano"] },
-                { name: "Riso Venere con gamberi e zucchine", allergens: ["C"], diet: ["pescetariano"] },
-                { name: "Insalata di riso", allergens: [], diet: ["onnivoro"] },
-                { name: "Pasta fredda con tonno pomodori e olive", allergens: ["G", "P"], diet: ["pescetariano"] },
-                { name: "Pasta fredda pesto primo sale pomodori olive", allergens: ["G", "L"], diet: ["vegetariano"] },
-                { name: "Insalata di pollo", allergens: [], diet: ["onnivoro"] },
-                { name: "Riso integrale bresaola limone e rughetta", allergens: [], diet: ["onnivoro"] },
-                { name: "Pomodori con riso e patate (a peso)", allergens: [], diet: ["vegetariano", "vegano"] },
-                { name: "Macedonia", allergens: [], diet: ["vegetariano", "vegano"] }
+                { name: "Cous cous vegetale con pollo", allergens: ["G"], diet: ["onnivoro"], calories: 450 },
+                { name: "Cous cous vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 350 },
+                { name: "Farro vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 380 },
+                { name: "Farro vegetale con salmone", allergens: ["G", "P"], diet: ["pescetariano"], calories: 480 },
+                { name: "Riso Venere con gamberi e zucchine", allergens: ["C"], diet: ["pescetariano"], calories: 420 },
+                { name: "Insalata di riso", allergens: [], diet: ["onnivoro"], calories: 400 },
+                { name: "Pasta fredda con tonno pomodori e olive", allergens: ["G", "P"], diet: ["pescetariano"], calories: 450 },
+                { name: "Pasta fredda pesto primo sale pomodori olive", allergens: ["G", "L"], diet: ["vegetariano"], calories: 500 },
+                { name: "Insalata di pollo", allergens: [], diet: ["onnivoro"], calories: 350 },
+                { name: "Riso integrale bresaola limone e rughetta", allergens: [], diet: ["onnivoro"], calories: 380 },
+                { name: "Pomodori con riso e patate (a peso)", allergens: [], diet: ["vegetariano", "vegano"], calories: 300 }
+            ],
+            dessert: [
+                 { name: "Macedonia", allergens: [], diet: ["vegetariano", "vegano"], calories: 120 }
             ],
             fritti: [
-                { name: "Supplì", allergens: ["G", "L"], diet: ["vegetariano"] },
-                { name: "Polpetta di melanzane", allergens: ["G", "L"], diet: ["vegetariano"] }
+                { name: "Supplì", allergens: ["G", "L"], diet: ["vegetariano"], calories: 250 },
+                { name: "Polpetta di melanzane", allergens: ["G", "L"], diet: ["vegetariano"], calories: 180 }
             ],
             verdure: [
-                { name: "Melanzane (a peso)", allergens: [], diet: ["vegetariano", "vegano"] },
-                { name: "Zucchine (a peso)", allergens: [], diet: ["vegetariano", "vegano"] },
-                { name: "Peperoni (a peso)", allergens: [], diet: ["vegetariano", "vegano"] },
-                { name: "Cicoria (a peso)", allergens: [], diet: ["vegetariano", "vegano"] },
-                { name: "Broccoletti (a peso)", allergens: [], diet: ["vegetariano", "vegano"] },
-                { name: "Broccoli (a peso)", allergens: [], diet: ["vegetariano", "vegano"] },
-                { name: "Scarola con olive (a peso)", allergens: [], diet: ["vegetariano", "vegano"] }
+                { name: "Melanzane (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 180 },
+                { name: "Zucchine (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 160 },
+                { name: "Peperoni (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 160 },
+                { name: "Cicoria (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 140 },
+                { name: "Broccoletti (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 150 },
+                { name: "Broccoli (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 150 },
+                { name: "Scarola con olive (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 130 }
             ],
             panini: [
-                { name: "Crudo pomodoro mozzarella", allergens: ["G", "L"], diet: ["onnivoro"] },
-                { name: "Crudo stracchino rughetta", allergens: ["G", "L"], diet: ["onnivoro"] },
-                { name: "Cotto arrosto scamorza e verdura", allergens: ["G", "L"], diet: ["onnivoro"] },
-                { name: "Capocollo pecorino e pomodori secchi", allergens: ["G", "L"], diet: ["onnivoro"] },
-                { name: "Salame pecorino e pomodori secchi", allergens: ["G", "L"], diet: ["onnivoro"] },
-                { name: "Speck Brie e pomodori secchi", allergens: ["G", "L"], diet: ["onnivoro"] },
-                { name: "Porchetta", allergens: ["G"], diet: ["onnivoro"] },
-                { name: "Vegetariano melanzane zucchine e peperoni", allergens: ["G"], diet: ["vegetariano", "vegano"] },
-                { name: "Pane 5 cereali con tacchino e verdura", allergens: ["G"], diet: ["onnivoro"] },
-                { name: "Pane integrale bresaola parmigiano e rughetta", allergens: ["G", "L"], diet: ["onnivoro"] },
-                { name: "Pane arabo bresaola primo sale e rughetta", allergens: ["G", "L"], diet: ["onnivoro"] },
-                { name: "Pane ai cereali con salmone e formaggio", allergens: ["G", "L", "P"], diet: ["pescetariano"] },
-                { name: "Tonno e pomodoro", allergens: ["G", "P"], diet: ["pescetariano"] },
-                { name: "Tonno e carciofini", allergens: ["G", "P"], diet: ["pescetariano"] }
+                { name: "Crudo pomodoro mozzarella", allergens: ["G", "L"], diet: ["onnivoro"], calories: 550 },
+                { name: "Crudo stracchino rughetta", allergens: ["G", "L"], diet: ["onnivoro"], calories: 580 },
+                { name: "Cotto arrosto scamorza e verdura", allergens: ["G", "L"], diet: ["onnivoro"], calories: 520 },
+                { name: "Capocollo pecorino e pomodori secchi", allergens: ["G", "L"], diet: ["onnivoro"], calories: 600 },
+                { name: "Salame pecorino e pomodori secchi", allergens: ["G", "L"], diet: ["onnivoro"], calories: 620 },
+                { name: "Speck Brie e pomodori secchi", allergens: ["G", "L"], diet: ["onnivoro"], calories: 610 },
+                { name: "Porchetta", allergens: ["G"], diet: ["onnivoro"], calories: 650 },
+                { name: "Vegetariano melanzane zucchine e peperoni", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 450 },
+                { name: "Pane 5 cereali con tacchino e verdura", allergens: ["G"], diet: ["onnivoro"], calories: 480 },
+                { name: "Pane integrale bresaola parmigiano e rughetta", allergens: ["G", "L"], diet: ["onnivoro"], calories: 500 },
+                { name: "Pane arabo bresaola primo sale e rughetta", allergens: ["G", "L"], diet: ["onnivoro"], calories: 470 },
+                { name: "Pane ai cereali con salmone e formaggio", allergens: ["G", "L", "P"], diet: ["pescetariano"], calories: 530 },
+                { name: "Tonno e pomodoro", allergens: ["G", "P"], diet: ["pescetariano"], calories: 490 },
+                { name: "Tonno e carciofini", allergens: ["G", "P"], diet: ["pescetariano"], calories: 510 }
             ],
             pizze: [
-                { name: "Crudo e mozzarella", allergens: ["G", "L"], diet: ["onnivoro"] },
-                { name: "Speck stracchino e rughetta", allergens: ["G", "L"], diet: ["onnivoro"] },
-                { name: "Cotto arrosto e melanzane", allergens: ["G", "L"], diet: ["onnivoro"] },
-                { name: "Mortadella e stracciatella", allergens: ["G", "L"], diet: ["onnivoro"] },
-                { name: "Frittata e zucchine", allergens: ["G", "L"], diet: ["vegetariano"] },
-                { name: "Pizza 5 cereali bresaola e formaggio", allergens: ["G", "L"], diet: ["onnivoro"] },
-                { name: "Pizza 5 cereali con insalata di pollo", allergens: ["G"], diet: ["onnivoro"] },
-                { name: "Focaccia “genovese” cotto e stracchino", allergens: ["G", "L"], diet: ["onnivoro"] }
+                { name: "Crudo e mozzarella", allergens: ["G", "L"], diet: ["onnivoro"], calories: 600 },
+                { name: "Speck stracchino e rughetta", allergens: ["G", "L"], diet: ["onnivoro"], calories: 650 },
+                { name: "Cotto arrosto e melanzane", allergens: ["G", "L"], diet: ["onnivoro"], calories: 580 },
+                { name: "Mortadella e stracciatella", allergens: ["G", "L"], diet: ["onnivoro"], calories: 700 },
+                { name: "Frittata e zucchine", allergens: ["G", "L"], diet: ["vegetariano"], calories: 550 },
+                { name: "Pizza 5 cereali bresaola e formaggio", allergens: ["G", "L"], diet: ["onnivoro"], calories: 580 },
+                { name: "Pizza 5 cereali con insalata di pollo", allergens: ["G"], diet: ["onnivoro"], calories: 560 },
+                { name: "Focaccia “genovese” cotto e stracchino", allergens: ["G", "L"], diet: ["onnivoro"], calories: 620 }
             ]
         };
 
         function processMenuData(rawMenu, prices) {
             let idCounter = 1;
-            const categoryIcons = { gastronomia: 'fa-bowl-food', fritti: 'fa-stroopwafel', verdure: 'fa-carrot', panini: 'fa-bread-slice', pizze: 'fa-pizza-slice' };
+            const categoryIcons = { gastronomia: 'fa-bowl-food', fritti: 'fa-stroopwafel', verdure: 'fa-carrot', panini: 'fa-bread-slice', pizze: 'fa-pizza-slice', dessert: 'fa-ice-cream' };
             return Object.entries(rawMenu).flatMap(([category, items]) => 
                 items.map(item => ({
                     id: idCounter++,
@@ -234,7 +239,8 @@
                     price: prices[category] || 0,
                     icon: categoryIcons[category] || 'fa-utensils',
                     diet: item.diet,
-                    allergens: item.allergens
+                    allergens: item.allergens,
+                    calories: item.calories
                 }))
             );
         }
@@ -245,7 +251,7 @@
             activeCategoryFilter: 'all',
             activeDietFilter: 'all',
             cart: [],
-            selectingAlternativeFor: null, // ID dell'item nel carrello per cui si sceglie l'alternativa
+            selectingAlternativeFor: null, 
             allOrders: [],
             menuData: processMenuData(RAW_MENU, PRICES)
         };
@@ -294,6 +300,11 @@
             const date = timestamp.toDate();
             return date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
         }
+        
+        const isOrderTimeBlocked = () => {
+            const now = new Date();
+            return now.getHours() > 11 || (now.getHours() === 11 && now.getMinutes() >= 30);
+        };
 
         // --- FUNZIONI DI RENDER ---
         function renderFilters() {
@@ -306,7 +317,7 @@
             categoryFiltersContainer.innerHTML = categoryFiltersHtml;
 
             // Render filtri dieta
-            let dietFiltersHtml = `<button data-diet="all" class="diet-filter-btn flex items-center gap-2 py-2 px-4 rounded-lg font-semibold transition-all duration-300 ${state.activeDietFilter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200'}"><i class="fas fa-utensils"></i><span>Tutti</span></button>`;
+            let dietFiltersHtml = `<button data-diet="all" class="diet-filter-btn flex items-center gap-2 py-2 px-4 rounded-lg font-semibold transition-all duration-300 ${state.activeDietFilter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200'}">🍽️<span>Tutti</span></button>`;
             Object.entries(DIETS).forEach(([key, dietInfo]) => {
                 dietFiltersHtml += `<button data-diet="${key}" class="diet-filter-btn flex items-center gap-2 py-2 px-4 rounded-lg font-semibold transition-all duration-300 ${state.activeDietFilter === key ? 'bg-blue-500 text-white' : 'bg-gray-200'}"><span>${dietInfo.icon}</span><span>${dietInfo.name}</span></button>`;
             });
@@ -325,7 +336,7 @@
 
             const filteredItems = state.menuData.filter(item => {
                 const categoryMatch = state.activeCategoryFilter === 'all' || item.category.toLowerCase() === state.activeCategoryFilter;
-                const dietMatch = state.activeDietFilter === 'all' || item.diet.includes(state.activeDietFilter);
+                const dietMatch = state.activeDietFilter === 'all' || item.diet.includes(state.activeDietFilter) || item.diet.includes('onnivoro');
                 return categoryMatch && dietMatch;
             });
 
@@ -358,6 +369,7 @@
                         <div class="flex gap-3 text-lg">${allergenHtml}</div>
                         <span class="font-semibold text-lg">€${item.price.toFixed(2)}</span>
                     </div>
+                    <p class="text-xs text-gray-500 text-right mt-1">~${item.calories} kcal (stima)</p>
                     ${buttonHtml}
                 </div>`;
             }).join('');
@@ -407,6 +419,9 @@
                 `).join('');
 
                 const total = state.cart.reduce((sum, item) => sum + item.price, 0);
+                const totalCalories = state.cart.reduce((sum, item) => sum + (item.calories || 0), 0);
+                const orderBlocked = isOrderTimeBlocked();
+
                 myOrderContentEl.innerHTML = `
                     <div class="space-y-2 mb-4">${itemsHtml}</div>
                     <textarea id="order-notes" class="w-full p-2 border rounded-lg mt-4" placeholder="Note generali per la preparazione (es. senza cipolla)"></textarea>
@@ -414,14 +429,20 @@
                         <p class="font-semibold mb-2">Metodo di Pagamento:</p>
                         <div class="flex gap-4">
                             <label class="flex items-center"><input type="radio" name="paymentMethod" value="Satispay" class="mr-2" checked> Satispay</label>
-                            <label class="flex items-center"><input type="radio" name="paymentMethod" value="Contanti" class="mr-2"> Contanti</label>
+                            <label class="flex items-center"><input type="radio" name="paymentMethod" value="Contanti/Carta alla consegna" class="mr-2"> Contanti/Carta alla consegna</label>
                         </div>
                     </div>
-                    <div class="text-right font-bold text-xl my-4">Totale: €${total.toFixed(2)}</div>
-                    <button id="confirm-order-btn" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors">
+                    <div class="text-right font-bold text-xl my-4">
+                        <span>Totale: €${total.toFixed(2)}</span>
+                        <span class="text-sm font-normal text-gray-500">(~${totalCalories} kcal)</span>
+                    </div>
+                    <button id="confirm-order-btn" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors ${orderBlocked ? 'opacity-50 cursor-not-allowed' : ''}" ${orderBlocked ? 'disabled' : ''}>
                         <i class="fas fa-check-circle mr-2"></i> Conferma Ordine
                     </button>
-                    <p class="text-xs text-gray-500 text-center mt-2">Cliccando, il tuo ordine verrà aggiunto alla lista condivisa e non sarà più modificabile.</p>
+                    ${orderBlocked 
+                        ? `<p class="text-xs text-red-600 text-center mt-2">Le ordinazioni sono chiuse dopo le 11:30.</p>`
+                        : `<p class="text-xs text-gray-500 text-center mt-2">Cliccando, il tuo ordine verrà aggiunto alla lista condivisa e non sarà più modificabile.</p>`
+                    }
                 `;
             } else {
                 myOrderContentEl.innerHTML = `<p class="text-center text-gray-500 py-8">Il tuo carrello è vuoto. Aggiungi qualcosa dal menù!</p>`;
@@ -625,7 +646,7 @@
 
         function handleCopySummary() {
             const paidOrders = state.allOrders.filter(order => order.paid && order.paymentMethod === 'Satispay');
-            const cashOrders = state.allOrders.filter(order => order.paymentMethod === 'Contanti');
+            const cashOrders = state.allOrders.filter(order => order.paymentMethod === 'Contanti/Carta alla consegna');
 
             if (paidOrders.length === 0 && cashOrders.length === 0) {
                 showToast("Nessun ordine da inviare.", 3000);
@@ -650,7 +671,7 @@
             }
 
             if (cashOrders.length > 0) {
-                summaryText += `--- DA PAGARE IN CONTANTI ALLA CONSEGNA ---\n`;
+                summaryText += `--- DA PAGARE IN CONTANTI/CARTA ALLA CONSEGNA ---\n`;
                 cashOrders.forEach(order => {
                     summaryText += `*${order.userName}*:\n`;
                     order.items.forEach(item => {
@@ -679,6 +700,25 @@
         }
 
         // --- INIZIALIZZAZIONE ---
+        async function deleteAllOrders() {
+            // Rimosso il confirm() che causa problemi in alcuni ambienti
+            console.log("Inizio cancellazione di tutti gli ordini...");
+            try {
+                const querySnapshot = await getDocs(ordersCollectionRef);
+                const deletePromises = [];
+                querySnapshot.forEach((doc) => {
+                    deletePromises.push(deleteDoc(doc.ref));
+                });
+                await Promise.all(deletePromises);
+                showToast("Tutti gli ordini sono stati cancellati.", 3000);
+            } catch (error) {
+                console.error("Errore durante la cancellazione degli ordini:", error);
+                showToast("Errore durante la cancellazione.", 3000);
+            }
+        }
+        window.deleteAllOrders = deleteAllOrders;
+
+
         function setupAppForUser(user) {
             state.currentUser = { uid: user.uid };
             
