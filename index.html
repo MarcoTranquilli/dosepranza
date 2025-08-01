@@ -126,6 +126,24 @@
         </div>
     </div>
 
+    <!-- Modal Info Calorie -->
+    <div id="calorie-info-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md relative">
+            <button id="close-calorie-info-btn" class="absolute top-2 right-4 text-2xl text-gray-500 hover:text-gray-800">&times;</button>
+            <h3 class="text-2xl font-bold mb-4">Informazioni sulla Stima delle Calorie</h3>
+            <div class="text-gray-600 text-sm space-y-2">
+                <p>Le calorie mostrate sono una **stima indicativa** per darti un'idea generale del profilo nutrizionale di ogni piatto.</p>
+                <p>La stima si basa su:</p>
+                <ul class="list-disc list-inside pl-4">
+                    <li>**Ingredienti Principali:** Analisi dei componenti base di ogni ricetta.</li>
+                    <li>**Porzioni Standard:** Calcolo basato su quantità tipiche da ristorazione (es. 80-100g di pasta, 100-120g di proteine).</li>
+                    <li>**Metodi di Cottura:** Abbiamo considerato l'impatto calorico di cotture come la grigliatura sott'olio o la ripassatura in padella per le verdure.</li>
+                </ul>
+                <p class="mt-4 font-semibold">Il valore reale può variare leggermente in base alle preparazioni del giorno.</p>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notification -->
     <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 bg-gray-800 text-white py-3 px-6 rounded-full shadow-xl transition-all duration-300 opacity-0 z-50">
         <p id="toast-message"></p>
@@ -275,6 +293,7 @@
         const paymentInstructions = document.getElementById('payment-instructions');
         const qrModal = document.getElementById('qr-modal');
         const qrCodeImage = document.getElementById('qr-code-image');
+        const calorieInfoModal = document.getElementById('calorie-info-modal');
         const toastEl = document.getElementById('toast');
         const toastMessageEl = document.getElementById('toast-message');
 
@@ -369,7 +388,10 @@
                         <div class="flex gap-3 text-lg">${allergenHtml}</div>
                         <span class="font-semibold text-lg">€${item.price.toFixed(2)}</span>
                     </div>
-                    <p class="text-xs text-gray-500 text-right mt-1">~${item.calories} kcal (stima)</p>
+                    <p class="text-xs text-gray-500 text-right mt-1 flex items-center justify-end">
+                        ~${item.calories} kcal (stima)
+                        <button class="show-calorie-info-btn ml-1 text-blue-500 hover:text-blue-700 text-base"><i class="fas fa-info-circle"></i></button>
+                    </p>
                     ${buttonHtml}
                 </div>`;
             }).join('');
@@ -434,7 +456,10 @@
                     </div>
                     <div class="text-right font-bold text-xl my-4">
                         <span>Totale: €${total.toFixed(2)}</span>
-                        <span class="text-sm font-normal text-gray-500">(~${totalCalories} kcal)</span>
+                        <span class="text-sm font-normal text-gray-500 flex items-center justify-end">
+                            (~${totalCalories} kcal)
+                            <button class="show-calorie-info-btn ml-1 text-blue-500 hover:text-blue-700 text-base"><i class="fas fa-info-circle"></i></button>
+                        </span>
                     </div>
                     <button id="confirm-order-btn" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors ${orderBlocked ? 'opacity-50 cursor-not-allowed' : ''}" ${orderBlocked ? 'disabled' : ''}>
                         <i class="fas fa-check-circle mr-2"></i> Conferma Ordine
@@ -583,6 +608,12 @@
             else if (target.id === 'close-qr-modal-btn') {
                 qrModal.classList.add('hidden');
             }
+            else if (target.matches('.show-calorie-info-btn')) {
+                calorieInfoModal.classList.remove('hidden');
+            }
+            else if (target.id === 'close-calorie-info-btn') {
+                calorieInfoModal.classList.add('hidden');
+            }
         }
         
         // --- LOGICA DI BUSINESS E FIRESTORE ---
@@ -701,7 +732,6 @@
 
         // --- INIZIALIZZAZIONE ---
         async function deleteAllOrders() {
-            // Rimosso il confirm() che causa problemi in alcuni ambienti
             console.log("Inizio cancellazione di tutti gli ordini...");
             try {
                 const querySnapshot = await getDocs(ordersCollectionRef);
@@ -767,3 +797,4 @@
     </script>
 </body>
 </html>
+
