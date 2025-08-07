@@ -24,7 +24,6 @@
 </head>
 <body class="bg-gray-50 text-gray-800">
 
-    <!-- Contenitore Principale -->
     <div id="app" class="max-w-4xl mx-auto p-4 md:p-6">
         <header class="mb-6">
             <h1 class="text-3xl md:text-4xl font-bold text-gray-900 text-center">Ordini Pranzo di Gruppo 🥪</h1>
@@ -32,7 +31,11 @@
             <p class="text-center text-red-600 font-bold mt-2">Attenzione: L'ordine e il pagamento devono essere completati entro le 11:30.</p>
         </header>
 
-        <!-- Navigazione -->
+        <div id="suspension-banner" class="bg-yellow-50 p-4 rounded-xl shadow-md mb-6 hidden border border-yellow-200">
+            <p class="font-bold text-yellow-900 text-lg">Avviso Chiusura</p>
+            <p class="text-yellow-800 mt-1">Il servizio è sospeso per ferie. Ci rivediamo dopo il <span class="font-bold">31 agosto</span>!</p>
+        </div>
+
         <nav class="flex justify-center bg-white p-2 rounded-xl shadow-md mb-6 sticky top-4 z-10">
             <button data-view="menu" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold transition-all duration-300">
                 <i class="fas fa-utensils mr-2"></i>Menù
@@ -46,39 +49,28 @@
         </nav>
 
         <main>
-            <!-- Vista Menù -->
             <div id="menu-view" class="view">
                 <h2 id="menu-title" class="text-2xl font-bold mb-4">Scegli cosa ordinare</h2>
                 
-                <!-- Filtri Categoria -->
                 <div id="category-filters" class="flex items-center justify-center flex-wrap gap-2 mb-4">
-                    <!-- I pulsanti di filtro categoria verranno inseriti qui da JS -->
-                </div>
+                    </div>
 
-                <!-- Filtri Regime Alimentare -->
                 <div id="diet-filters" class="flex items-center justify-center flex-wrap gap-2 mb-6 bg-white p-2 rounded-xl shadow-md">
-                    <!-- I pulsanti di filtro verranno inseriti qui da JS -->
-                </div>
+                    </div>
 
                 <div id="menu-items" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- Le card del menù verranno inserite qui da JS -->
-                </div>
+                    </div>
 
-                <!-- Legenda Allergeni -->
                 <div id="allergen-legend" class="mt-8 bg-white p-4 rounded-xl shadow-md">
-                    <!-- La legenda verrà inserita qui da JS -->
-                </div>
+                    </div>
             </div>
 
-            <!-- Vista Il Mio Ordine -->
             <div id="my-order-view" class="view">
                 <h2 class="text-2xl font-bold mb-4">Riepilogo del Tuo Ordine</h2>
                 <div id="my-order-content" class="bg-white p-6 rounded-xl shadow-md">
-                    <!-- Il contenuto del mio ordine verrà inserito qui -->
-                </div>
+                    </div>
             </div>
 
-            <!-- Vista Tutti gli Ordini -->
             <div id="all-orders-view" class="view">
                  <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
                     <h2 class="text-2xl font-bold">Riepilogo Ordini di Oggi</h2>
@@ -87,14 +79,11 @@
                     </button>
                 </div>
 
-                <!-- Sezione Istruzioni Pagamento -->
                 <div id="payment-instructions" class="mb-6 bg-blue-100 border-l-4 border-blue-500 text-blue-800 p-4 rounded-lg hidden">
-                    <!-- Istruzioni di pagamento verranno inserite qui -->
-                </div>
+                    </div>
 
                 <div id="all-orders-list" class="space-y-4">
-                    <!-- La lista di tutti gli ordini verrà inserita qui -->
-                </div>
+                    </div>
                  <div class="mt-6 bg-white p-4 rounded-xl shadow-lg text-right">
                     <span class="text-xl font-bold text-gray-800">Totale Complessivo di Oggi:</span>
                     <span id="grand-total" class="text-2xl font-bold text-blue-600 ml-2">€0.00</span>
@@ -103,7 +92,6 @@
         </main>
     </div>
 
-    <!-- Modal per inserimento nome utente -->
     <div id="user-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
         <div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md text-center">
             <h3 class="text-2xl font-bold mb-4">Benvenuto!</h3>
@@ -113,7 +101,6 @@
         </div>
     </div>
 
-    <!-- Modal per QR Code Satispay -->
     <div id="qr-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
         <div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md text-center relative">
             <button id="close-qr-modal-btn" class="absolute top-2 right-4 text-2xl text-gray-500 hover:text-gray-800">&times;</button>
@@ -126,7 +113,6 @@
         </div>
     </div>
 
-    <!-- Modal Info Calorie -->
     <div id="calorie-info-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
         <div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md relative">
             <button id="close-calorie-info-btn" class="absolute top-2 right-4 text-2xl text-gray-500 hover:text-gray-800">&times;</button>
@@ -144,13 +130,11 @@
         </div>
     </div>
 
-    <!-- Toast Notification -->
     <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 bg-gray-800 text-white py-3 px-6 rounded-full shadow-xl transition-all duration-300 opacity-0 z-50">
         <p id="toast-message"></p>
     </div>
 
 
-    <!-- Firebase -->
     <script type="module">
         // Importa le funzioni necessarie da Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -172,7 +156,10 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        
+
+        // --- CONFIGURAZIONE SERVIZIO (MODIFICATO) ---
+        const SERVICE_ACTIVE = false; // Imposta su 'false' per sospendere il servizio
+
         // Riferimenti alle collezioni
         const ordersCollectionRef = collection(db, `orders`);
 
@@ -367,20 +354,21 @@
             menuItemsContainer.innerHTML = filteredItems.map(item => {
                 const allergenHtml = item.allergens.map(key => `<span title="${ALLERGENS[key].name}">${ALLERGENS[key].icon}</span>`).join('');
                 
+                // --- (MODIFICATO) --- Disabilita i pulsanti se il servizio è sospeso
                 const buttonHtml = isSelectingAlternative
-                    ? `<button data-id="${item.id}" class="select-as-alternative-btn w-full mt-4 bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">
-                       <i class="fas fa-check"></i> Seleziona
+                    ? `<button data-id="${item.id}" class="select-as-alternative-btn w-full mt-4 bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-lg transition-colors ${!SERVICE_ACTIVE ? 'opacity-50 cursor-not-allowed' : ''}" ${!SERVICE_ACTIVE ? 'disabled' : ''}>
+                        <i class="fas fa-check"></i> Seleziona
                     </button>`
-                    : `<button data-id="${item.id}" class="add-to-cart-btn w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">
-                       <i class="fas fa-plus"></i> Aggiungi
+                    : `<button data-id="${item.id}" class="add-to-cart-btn w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors ${!SERVICE_ACTIVE ? 'opacity-50 cursor-not-allowed' : ''}" ${!SERVICE_ACTIVE ? 'disabled' : ''}>
+                        <i class="fas fa-plus"></i> Aggiungi
                     </button>`;
 
                 return `
                 <div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow flex flex-col">
                     <div class="flex-grow">
                         <div class="flex items-center mb-2">
-                             <i class="fas ${item.icon} text-blue-500 text-xl mr-3 w-6 text-center"></i>
-                             <h3 class="font-bold text-lg">${item.name}</h3>
+                            <i class="fas ${item.icon} text-blue-500 text-xl mr-3 w-6 text-center"></i>
+                            <h3 class="font-bold text-lg">${item.name}</h3>
                         </div>
                         <p class="text-gray-600 ml-9">${item.category}</p>
                     </div>
@@ -442,7 +430,8 @@
 
                 const total = state.cart.reduce((sum, item) => sum + item.price, 0);
                 const totalCalories = state.cart.reduce((sum, item) => sum + (item.calories || 0), 0);
-                const orderBlocked = isOrderTimeBlocked();
+                // --- (MODIFICATO) --- Controlla anche se il servizio è attivo
+                const orderBlocked = isOrderTimeBlocked() || !SERVICE_ACTIVE;
 
                 myOrderContentEl.innerHTML = `
                     <div class="space-y-2 mb-4">${itemsHtml}</div>
@@ -464,9 +453,11 @@
                     <button id="confirm-order-btn" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors ${orderBlocked ? 'opacity-50 cursor-not-allowed' : ''}" ${orderBlocked ? 'disabled' : ''}>
                         <i class="fas fa-check-circle mr-2"></i> Conferma Ordine
                     </button>
-                    ${orderBlocked 
-                        ? `<p class="text-xs text-red-600 text-center mt-2">Le ordinazioni sono chiuse dopo le 11:30.</p>`
-                        : `<p class="text-xs text-gray-500 text-center mt-2">Cliccando, il tuo ordine verrà aggiunto alla lista condivisa e non sarà più modificabile.</p>`
+                    ${!SERVICE_ACTIVE // --- (MODIFICATO) --- Mostra il messaggio corretto se il servizio è sospeso
+                        ? `<p class="text-xs text-red-600 text-center mt-2">Il servizio è sospeso per ferie. Le ordinazioni riprenderanno dopo il 31 agosto.</p>`
+                        : isOrderTimeBlocked() 
+                            ? `<p class="text-xs text-red-600 text-center mt-2">Le ordinazioni sono chiuse dopo le 11:30.</p>`
+                            : `<p class="text-xs text-gray-500 text-center mt-2">Cliccando, il tuo ordine verrà aggiunto alla lista condivisa e non sarà più modificabile.</p>`
                     }
                 `;
             } else {
@@ -773,6 +764,14 @@
         }
 
         async function init() {
+            // --- (MODIFICATO) --- Se il servizio è sospeso, mostra il banner e disabilita le azioni
+            if (!SERVICE_ACTIVE) {
+                document.getElementById('suspension-banner').classList.remove('hidden');
+                const copyBtn = document.getElementById('copy-summary-btn');
+                copyBtn.disabled = true;
+                copyBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+
             document.body.addEventListener('click', handleEvents);
             document.body.addEventListener('change', handleEvents);
 
@@ -797,4 +796,3 @@
     </script>
 </body>
 </html>
-
