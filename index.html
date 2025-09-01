@@ -5,264 +5,418 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>dosemagna</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { font-family: 'Inter', sans-serif; }
         .view { display: none; }
         .view.active { display: block; }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px;}
-        ::-webkit-scrollbar-thumb { background: #888; border-radius: 10px;}
-        ::-webkit-scrollbar-thumb:hover { background: #555; }
         .paid-order { opacity: 0.6; transition: opacity 0.3s ease-in-out; }
+        #favorites-section .overflow-x-auto::-webkit-scrollbar { height: 6px; }
+        #favorites-section .overflow-x-auto::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        #favorites-section .overflow-x-auto::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+        #favorites-section .overflow-x-auto::-webkit-scrollbar-thumb:hover { background: #aaa; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
 
     <div id="app" class="max-w-4xl mx-auto p-4 md:p-6">
-        <header class="mb-6">
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 text-center">dosemagna 🥪</h1>
-            <p class="text-center text-gray-600 mt-2 italic">“Il pranzo di quartiere, genuino e a portata di click.”</p>
-            <p class="text-center text-red-600 font-bold mt-4">Attenzione: L'ordine e il pagamento devono essere completati entro le 11:30.</p>
+        <header class="mb-6 flex flex-col items-center">
+            <img src="https://i.postimg.cc/Nf321BV0/dosemagna-logo-neutro.png" alt="Dosemagna Logo" class="w-64 md:w-80 mx-auto">
+            <p class="text-center text-gray-500 -mt-2 md:-mt-4 italic">“Dal pizzicarolo alla scrivania”</p>
+            <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 rounded-md my-4 w-full" role="alert">
+                <p class="font-bold">Attenzione: L'ordine e il pagamento con Satispay devono essere completati entro le 11:30.</p>
+                <p>La consegna è stimata intorno alle 12:30.</p>
+            </div>
         </header>
 
         <nav class="flex justify-center bg-white p-2 rounded-xl shadow-md mb-6 sticky top-4 z-10">
-            <button data-view="menu" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold transition-all duration-300"><i class="fas fa-utensils mr-2"></i>Menù</button>
-            <button data-view="my-order" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold transition-all duration-300"><i class="fas fa-shopping-basket mr-2"></i>Il Mio Ordine <span id="cart-count" class="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 inline-flex items-center justify-center ml-1">0</span></button>
-            <button data-view="all-orders" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold transition-all duration-300"><i class="fas fa-users mr-2"></i>Tutti gli Ordini</button>
+            <button data-view="menu" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold"><i class="fas fa-utensils mr-2"></i>Menù</button>
+            <button data-view="my-order" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold"><i class="fas fa-shopping-basket mr-2"></i>Il Mio Ordine <span id="cart-count" class="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 inline-flex items-center justify-center ml-1">0</span></button>
+            <button data-view="all-orders" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold"><i class="fas fa-users mr-2"></i>Tutti gli Ordini</button>
         </nav>
 
         <main>
             <div id="menu-view" class="view">
-                <h2 id="menu-title" class="text-2xl font-bold mb-4">Scegli cosa ordinare</h2>
+                <h2 class="text-3xl font-extrabold mb-4">Scegli cosa ordinare</h2>
                 
-                <div class="flex flex-col sm:flex-row gap-3 mb-4">
-                    <select id="category-select" class="w-full p-3 border border-gray-300 rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-indigo-500"></select>
-                    <select id="diet-select" class="w-full p-3 border border-gray-300 rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-indigo-500"></select>
+                <div id="favorites-section" class="mb-8"></div>
+                
+                <div class="flex flex-col sm:flex-row gap-3 mb-4 items-center">
+                    <div class="relative w-full sm:flex-grow">
+                        <input type="search" id="search-input" placeholder="Cerca un piatto..." class="w-full p-3 pl-10 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    </div>
+                    <select id="category-select" class="w-full sm:w-auto p-3 border border-gray-300 rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-indigo-500"></select>
+                    <select id="diet-select" class="w-full sm:w-auto p-3 border border-gray-300 rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-indigo-500"></select>
                 </div>
                 
                 <div class="flex justify-between items-center mb-4">
                     <div id="filter-counter-container" class="text-sm text-gray-600"></div>
-                    <button id="toggle-calories" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center text-sm">
-                        <i class="fas fa-toggle-off mr-2"></i>
-                        <span id="toggle-calories-text">Mostra Calorie</span>
-                    </button>
+                    <div class="flex gap-2">
+                        <button id="show-allergens-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg flex items-center text-sm"><i class="fas fa-info-circle mr-2"></i> Mostra Allergeni</button>
+                        <button id="toggle-calories" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg flex items-center text-sm">
+                            <i class="fas fa-toggle-off mr-2"></i>
+                            <span id="toggle-calories-text">Mostra Calorie</span>
+                        </button>
+                    </div>
                 </div>
 
                 <div id="menu-items" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-                <div id="allergen-legend" class="mt-8 bg-white p-4 rounded-xl shadow-md"></div>
             </div>
 
             <div id="my-order-view" class="view">
-                <h2 class="text-2xl font-bold mb-4">Riepilogo del Tuo Ordine</h2>
+                <h2 class="text-3xl font-extrabold mb-4">Riepilogo del Tuo Ordine</h2>
                 <div id="my-order-content" class="bg-white p-6 rounded-xl shadow-md"></div>
             </div>
 
             <div id="all-orders-view" class="view">
                  <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-                    <h2 class="text-2xl font-bold">Riepilogo Ordini di Oggi</h2>
-                    <div class="flex flex-wrap gap-2">
-                        <button id="copy-summary-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center"><i class="fas fa-copy mr-2"></i> Copia Riepilogo</button>
-                        <button id="download-history-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center hidden"><i class="fas fa-database mr-2"></i> Scarica Storico</button>
-                    </div>
+                    <h2 class="text-3xl font-extrabold">Riepilogo Ordini di Oggi</h2>
+                    <button id="copy-summary-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg"><i class="fas fa-copy mr-2"></i> Copia Riepilogo</button>
                 </div>
-                <div id="payment-instructions" class="mb-6 bg-blue-100 border-l-4 border-blue-500 text-blue-800 p-4 rounded-lg hidden"></div>
                 <div id="all-orders-list" class="space-y-4"></div>
                  <div class="mt-6 bg-white p-4 rounded-xl shadow-lg text-right">
-                    <span class="text-xl font-bold text-gray-800">Totale Complessivo di Oggi:</span>
+                    <span class="text-xl font-bold text-gray-800">Totale Complessivo:</span>
                     <span id="grand-total" class="text-2xl font-bold text-blue-600 ml-2">€0.00</span>
                 </div>
             </div>
         </main>
     </div>
 
-    <div id="user-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden"><div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md text-center"><h3 class="text-2xl font-bold mb-4">Benvenuto!</h3><p class="text-gray-600 mb-6">Per iniziare, inserisci il tuo nome. <br><b class="text-red-600">Importante:</b> Usa lo stesso nome per il pagamento su Satispay.</p><input type="text" id="username-input" placeholder="Es. Marco Rossi" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition"><button id="save-username-btn" class="w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition-colors">Salva e Continua</button></div></div>
-    <div id="qr-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden"><div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md text-center relative"><button id="close-qr-modal-btn" class="absolute top-2 right-4 text-2xl text-gray-500 hover:text-gray-800">&times;</button><h3 class="text-2xl font-bold mb-4">Paga con Satispay</h3><p class="text-gray-600 mb-4">Inquadra questo QR code per pagare.</p><img id="qr-code-image" src="" alt="QR Code Satispay" class="mx-auto rounded-lg shadow-md w-full max-w-xs"></div></div>
-    <div id="calorie-info-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden"><div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md relative"><button id="close-calorie-info-btn" class="absolute top-2 right-4 text-2xl text-gray-500 hover:text-gray-800">&times;</button><h3 class="text-2xl font-bold mb-4">Info Calorie</h3><div class="text-gray-600 text-sm space-y-2"><p>I valori stimati si basano su valori medi dei prodotti presenti nel mercato e disponibili pubblicamente. Ovviamente, in base alla composizione specifica dei singoli prodotti, non essendo industriali, sono unici ed è possibile effettuare solo stime indicative.</p></div></div></div>
-    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 bg-gray-800 text-white py-3 px-6 rounded-full shadow-xl transition-all duration-300 opacity-0 z-50"><p id="toast-message"></p></div>
+    <div id="user-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden"><div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md text-center"><h3 class="text-2xl font-bold mb-4">Benvenuto!</h3><p class="text-gray-600 mb-6">Per iniziare, inserisci il tuo nome.</p><input type="text" id="username-input" placeholder="Es. Marco Rossi" class="w-full p-3 border rounded-lg"><button id="save-username-btn" class="w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg">Salva</button></div></div>
+    <div id="allergen-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden"><div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md relative"><button id="close-allergen-modal-btn" class="absolute top-2 right-4 text-2xl text-gray-500 hover:text-gray-800">&times;</button><h3 class="text-2xl font-bold mb-4">Legenda Allergeni</h3><div id="allergen-modal-content" class="text-gray-600 text-sm space-y-2"></div></div></div>
+    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 bg-gray-800 text-white py-3 px-6 rounded-full shadow-xl z-50 opacity-0 transition-opacity"><p id="toast-message"></p></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, onSnapshot, deleteDoc, serverTimestamp, updateDoc, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyCQJsNbgaR89gF_1vLe6H4DPboOhQvm9nI", authDomain: "app-ordini-pranzo-alimentari.firebaseapp.com", projectId: "app-ordini-pranzo-alimentari", storageBucket: "app-ordini-pranzo-alimentari.appspot.com", messagingSenderId: "553169964686", appId: "1:553169964686:web:7f8ca6f32a301949e4c3df" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-
-        const SERVICE_ACTIVE = true;
-        const ADMIN_EMAIL = "marco.tranquilli@dos.design";
-        const SATISPAY_URL = "https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0";
-        const QR_CODE_IMAGE_URL = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(SATISPAY_URL)}`;
-        const MERCHANT_INFO = { name: "Alimentari Russo" };
         const ordersCollectionRef = collection(db, "orders");
-        const PRICES = { gastronomia: 4.00, verdure: 4.00, panini: 3.50, pizze: 3.50, fritti: 1.50, dessert: 3.00 };
-        const ALLERGENS = { G: { name: "Glutine", icon: "🌾" }, L: { name: "Latticini", icon: "🥛" }, C: { name: "Crostacei", icon: "🦐" }, P: { name: "Pesce", icon: "🐟" }};
-        const DIETS = { vegetariano: { name: "Vegetariano", icon: "🧀" }, vegano: { name: "Vegano", icon: "🌱" }, "carne/pesce": { name: "Carne/🐟Pesce", icon: "🥩" } };
-        const RAW_MENU = { gastronomia: [ { name: "Cous cous vegetale con pollo", allergens: ["G"], diet: ["carne/pesce"], calories: 450 }, { name: "Cous cous vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 350 }, { name: "Farro vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 380 }, { name: "Farro vegetale con salmone", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 480 }, { name: "Riso Venere con gamberi e zucchine", allergens: ["C"], diet: ["carne/pesce"], calories: 420 }, { name: "Insalata di riso", allergens: [], diet: ["carne/pesce"], calories: 400 }, { name: "Pasta fredda con tonno pomodori e olive", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 450 }, { name: "Pasta fredda pesto primo sale pomodori olive", allergens: ["G", "L"], diet: ["vegetariano"], calories: 500 }, { name: "Insalata di pollo", allergens: [], diet: ["carne/pesce"], calories: 350 }, { name: "Riso integrale bresaola limone e rughetta", allergens: [], diet: ["carne/pesce"], calories: 380 }, { name: "Pomodori con riso e patate (a peso)", allergens: [], diet: ["vegetariano", "vegano"], calories: 300 } ], dessert: [ { name: "Macedonia", allergens: [], diet: ["vegetariano", "vegano"], calories: 120 } ], fritti: [ { name: "Supplì", allergens: ["G", "L"], diet: ["vegetariano"], calories: 250 }, { name: "Polpetta di melanzane", allergens: ["G", "L"], diet: ["vegetariano"], calories: 180 } ], verdure: [ { name: "Melanzane (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 180 }, { name: "Zucchine (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 160 }, { name: "Peperoni (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 160 }, { name: "Cicoria (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 140 }, { name: "Broccoletti (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 150 }, { name: "Broccoli (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 150 }, { name: "Scarola con olive (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 130 } ], panini: [ { name: "Crudo pomodoro mozzarella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 550 }, { name: "Crudo stracchino rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580 }, { name: "Cotto arrosto scamorza e verdura", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 520 }, { name: "Capocollo pecorino e pomodori secchi", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 600 }, { name: "Salame pecorino e pomodori secchi", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 620 }, { name: "Speck Brie e pomodori secchi", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 610 }, { name: "Porchetta", allergens: ["G"], diet: ["carne/pesce"], calories: 650 }, { name: "Vegetariano melanzane zucchine e peperoni", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 450 }, { name: "Pane 5 cereali con tacchino e verdura", allergens: ["G"], diet: ["carne/pesce"], calories: 480 }, { name: "Pane integrale bresaola parmigiano e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 500 }, { name: "Pane arabo bresaola primo sale e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 470 }, { name: "Pane ai cereali con salmone e formaggio", allergens: ["G", "L", "P"], diet: ["carne/pesce"], calories: 530 }, { name: "Tonno e pomodoro", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 490 }, { name: "Tonno e carciofini", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 510 } ], pizze: [ { name: "Crudo e mozzarella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 600 }, { name: "Speck stracchino e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 650 }, { name: "Cotto arrosto e melanzane", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580 }, { name: "Mortadella e stracciatella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 700 }, { name: "Frittata e zucchine", allergens: ["G", "L"], diet: ["vegetariano"], calories: 550 }, { name: "Pizza 5 cereali bresaola e formaggio", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580 }, { name: "Pizza 5 cereali con insalata di pollo", allergens: ["G"], diet: ["carne/pesce"], calories: 560 }, { name: "Focaccia “genovese” cotto e stracchino", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 620 } ] };
         
-        const state = { currentUser: null, firestoreListener: null, currentView: 'menu', activeCategoryFilter: 'all', activeDietFilter: 'all', cart: [], selectingAlternativeFor: null, allOrders: [], menuData: processMenuData(RAW_MENU, PRICES), caloriesVisible: false };
-        const dom = { 
-            views: document.querySelectorAll('.view'), navBtns: document.querySelectorAll('.nav-btn'), menuTitle: document.getElementById('menu-title'), 
-            menuItemsContainer: document.getElementById('menu-items'), 
-            allergenLegendContainer: document.getElementById('allergen-legend'), cartCountEl: document.getElementById('cart-count'), 
-            myOrderContentEl: document.getElementById('my-order-content'), allOrdersListEl: document.getElementById('all-orders-list'), 
-            grandTotalEl: document.getElementById('grand-total'), copySummaryBtn: document.getElementById('copy-summary-btn'), 
-            downloadHistoryBtn: document.getElementById('download-history-btn'), userModal: document.getElementById('user-modal'), 
-            usernameInput: document.getElementById('username-input'), saveUsernameBtn: document.getElementById('save-username-btn'), 
-            paymentInstructions: document.getElementById('payment-instructions'), qrModal: document.getElementById('qr-modal'), 
-            qrCodeImage: document.getElementById('qr-code-image'), calorieInfoModal: document.getElementById('calorie-info-modal'), 
-            toastEl: document.getElementById('toast'), toastMessageEl: document.getElementById('toast-message'), 
-            toggleCaloriesBtn: document.getElementById('toggle-calories'), toggleCaloriesText: document.getElementById('toggle-calories-text'),
-            categorySelect: document.getElementById('category-select'), dietSelect: document.getElementById('diet-select'),
-            filterCounterContainer: document.getElementById('filter-counter-container')
+        const PRICES = { gastronomia: 4.00, verdure: 4.00, panini: 3.50, pizze: 3.50, fritti: 1.50, dessert: 3.00 };
+        const ALLERGENS = { G: { name: "Glutine", icon: "fa-wheat-awn" }, L: { name: "Latticini", icon: "fa-cheese" }, C: { name: "Crostacei", icon: "fa-shrimp" }, P: { name: "Pesce", icon: "fa-fish-fins" }};
+        const DIETS = { vegetariano: { name: "Vegetariano", icon: "🧀" }, vegano: { name: "Vegano", icon: "🌱" }, "carne/pesce": { name: "Carne/🐟Pesce", icon: "🥩" } };
+        
+        const BREAD_OPTIONS = {
+            Panini: ["Pane classico", "Pane ai cereali", "Focaccia"],
+            Pizze: ["Pizza classica", "Pizza 5 cereali"]
         };
+
+        const RAW_MENU = {
+            gastronomia: [ { name: "Cous cous vegetale con pollo", allergens: ["G"], diet: ["carne/pesce"], calories: 450, ingredients: ["Cous cous", "Verdure miste", "Pollo"] }, { name: "Cous cous vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 350, ingredients: ["Cous cous", "Verdure miste"] }, { name: "Farro vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 380, ingredients: ["Farro", "Verdure miste"] }, { name: "Farro vegetale con salmone", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 480, ingredients: ["Farro", "Verdure miste", "Salmone"] }, { name: "Riso Venere con gamberi e zucchine", allergens: ["C"], diet: ["carne/pesce"], calories: 420, ingredients: ["Riso Venere", "Gamberi", "Zucchine"] }, { name: "Insalata di riso", allergens: [], diet: ["carne/pesce"], calories: 400, ingredients: ["Riso", "Wurstel", "Uova", "Verdure sott'olio"] }, { name: "Pasta fredda con tonno pomodori e olive", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 450, ingredients: ["Pasta", "Tonno", "Pomodorini", "Olive"] }, { name: "Pasta fredda pesto primo sale pomodori olive", allergens: ["G", "L"], diet: ["vegetariano"], calories: 500, ingredients: ["Pasta", "Pesto", "Formaggio primo sale", "Pomodorini"] }, { name: "Insalata di pollo", allergens: [], diet: ["carne/pesce"], calories: 350, ingredients: ["Pollo", "Insalata", "Mais", "Pomodorini"] }, { name: "Riso integrale bresaola limone e rughetta", allergens: [], diet: ["carne/pesce"], calories: 380, ingredients: ["Riso integrale", "Bresaola", "Rucola", "Succo di limone"] }, { name: "Pomodori con riso e patate (a peso)", allergens: [], diet: ["vegetariano", "vegano"], calories: 300, ingredients: ["Pomodori", "Riso", "Patate"] } ],
+            dessert: [ { name: "Macedonia", allergens: [], diet: ["vegetariano", "vegano"], calories: 120, ingredients: ["Frutta fresca di stagione"] } ],
+            fritti: [ { name: "Supplì", allergens: ["G", "L"], diet: ["vegetariano"], calories: 250, ingredients: ["Riso", "Pomodoro", "Mozzarella", "Pangrattato"] }, { name: "Polpetta di melanzane", allergens: ["G", "L"], diet: ["vegetariano"], calories: 180, ingredients: ["Melanzane", "Parmigiano", "Uova", "Pangrattato"] } ],
+            verdure: [ { name: "Melanzane (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 180, ingredients: ["Melanzane grigliate"] }, { name: "Zucchine (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 160, ingredients: ["Zucchine grigliate"] }, { name: "Peperoni (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 160, ingredients: ["Peperoni arrostiti"] }, { name: "Cicoria (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 140, ingredients: ["Cicoria ripassata"] }, { name: "Broccoletti (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 150, ingredients: ["Broccoletti ripassati"] }, { name: "Broccoli (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 150, ingredients: ["Broccoli al vapore"] }, { name: "Scarola con olive (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 130, ingredients: ["Scarola", "Olive di Gaeta"] } ],
+            panini: [ { name: "Crudo pomodoro mozzarella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 550, ingredients: ["Prosciutto crudo", "Pomodoro", "Mozzarella"] }, { name: "Crudo stracchino rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580, ingredients: ["Prosciutto crudo", "Stracchino", "Rucola"] }, { name: "Cotto arrosto scamorza e verdura", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 520, ingredients: ["Prosciutto cotto", "Scamorza", "Verdura di stagione"] }, { name: "Capocollo pecorino e pomodori secchi", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 600, ingredients: ["Capocollo", "Pecorino", "Pomodori secchi"] }, { name: "Salame pecorino e pomodori secchi", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 620, ingredients: ["Salame", "Pecorino", "Pomodori secchi"] }, { name: "Speck Brie e pomodori secchi", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 610, ingredients: ["Speck", "Brie", "Pomodori secchi"] }, { name: "Porchetta", allergens: ["G"], diet: ["carne/pesce"], calories: 650, ingredients: ["Porchetta di Ariccia"] }, { name: "Vegetariano melanzane zucchine e peperoni", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 450, ingredients: ["Melanzane", "Zucchine", "Peperoni grigliati"] }, { name: "Tacchino e verdura", allergens: ["G"], diet: ["carne/pesce"], calories: 480, ingredients: ["Tacchino arrosto", "Verdura di stagione"] }, { name: "Bresaola parmigiano e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 500, ingredients: ["Bresaola", "Parmigiano a scaglie", "Rucola"] }, { name: "Bresaola primo sale e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 470, ingredients: ["Bresaola", "Primo sale", "Rucola"] }, { name: "Salmone e formaggio", allergens: ["G", "L", "P"], diet: ["carne/pesce"], calories: 530, ingredients: ["Salmone affumicato", "Formaggio spalmabile"] }, { name: "Tonno e pomodoro", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 490, ingredients: ["Tonno", "Pomodoro a fette"] }, { name: "Tonno e carciofini", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 510, ingredients: ["Tonno", "Carciofini sott'olio"] } ],
+            pizze: [ { name: "Crudo e mozzarella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 600, ingredients: ["Prosciutto crudo", "Mozzarella"] }, { name: "Speck stracchino e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 650, ingredients: ["Speck", "Stracchino", "Rucola"] }, { name: "Cotto arrosto e melanzane", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580, ingredients: ["Prosciutto cotto", "Melanzane"] }, { name: "Mortadella e stracciatella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 700, ingredients: ["Mortadella", "Stracciatella"] }, { name: "Frittata e zucchine", allergens: ["G", "L"], diet: ["vegetariano"], calories: 550, ingredients: ["Frittata", "Zucchine"] }, { name: "Bresaola e formaggio", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580, ingredients: ["Bresaola", "Formaggio"] }, { name: "Insalata di pollo", allergens: ["G"], diet: ["carne/pesce"], calories: 560, ingredients: ["Insalata di pollo"] }, { name: "Cotto e stracchino", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 620, ingredients: ["Prosciutto cotto", "Stracchino"] } ]
+        };
+        
+        const state = { currentUser: null, currentView: 'menu', activeCategoryFilter: 'all', activeDietFilter: 'all', searchTerm: '', cart: [], allOrders: [], menuData: processMenuData(RAW_MENU, PRICES), caloriesVisible: false };
+        const dom = { };
         
         function processMenuData(rawMenu, prices) { let id = 1; const icons = { gastronomia: 'fa-bowl-food', fritti: 'fa-stroopwafel', verdure: 'fa-carrot', panini: 'fa-bread-slice', pizze: 'fa-pizza-slice', dessert: 'fa-ice-cream' }; return Object.entries(rawMenu).flatMap(([cat, items]) => items.map(item => ({ id: id++, name: item.name, category: cat.charAt(0).toUpperCase() + cat.slice(1), price: prices[cat] || 0, icon: icons[cat] || 'fa-utensils', ...item }))) }
         function showToast(message, duration = 3000) { dom.toastMessageEl.textContent = message; dom.toastEl.classList.remove('opacity-0'); setTimeout(() => dom.toastEl.classList.add('opacity-0'), duration); }
-        function navigate(viewName) { state.currentView = viewName; dom.views.forEach(v => v.classList.toggle('active', v.id === `${viewName}-view`)); dom.navBtns.forEach(b => { b.classList.toggle('bg-blue-500', b.dataset.view === viewName); b.classList.toggle('text-white', b.dataset.view === viewName); }); window.scrollTo(0, 0); }
-        const isOrderTimeBlocked = () => { const now = new Date(); return now.getHours() > 11 || (now.getHours() === 11 && now.getMinutes() >= 30); };
+        function navigate(viewName) { state.currentView = viewName; dom.views.forEach(v => v.classList.toggle('active', v.id === `${viewName}-view`)); dom.navBtns.forEach(b => { b.classList.toggle('bg-blue-500', b.dataset.view === viewName); b.classList.toggle('text-white', b.dataset.view === viewName); }); }
         
         function updateFilterCounter() {
-            let count = 0;
-            if (state.activeCategoryFilter !== 'all') count++;
-            if (state.activeDietFilter !== 'all') count++;
-            
-            if (count > 0) {
-                dom.filterCounterContainer.innerHTML = `<i class="fas fa-filter text-indigo-500"></i> ${count} ${count === 1 ? 'filtro applicato' : 'filtri applicati'}`;
-            } else {
-                dom.filterCounterContainer.innerHTML = '';
-            }
+            let count = 0; if (state.activeCategoryFilter !== 'all') count++; if (state.activeDietFilter !== 'all') count++; if(state.searchTerm) count++;
+            dom.filterCounterContainer.innerHTML = count > 0 ? `<i class="fas fa-filter text-indigo-500"></i> ${count} ${count === 1 ? 'filtro applicato' : 'filtri applicati'}` : '';
         }
 
         function renderFilters() {
-            // Select Categoria
-            let catSelectHtml = `<option value="all">Tutte le Categorie</option>`;
-            Object.keys(RAW_MENU).forEach(cat => { catSelectHtml += `<option value="${cat}" ${state.activeCategoryFilter === cat ? 'selected' : ''}>${cat.charAt(0).toUpperCase() + cat.slice(1)}</option>`; });
-            dom.categorySelect.innerHTML = catSelectHtml;
-            
-            // Select Dieta
-            let dietSelectHtml = `<option value="all">Tutti i Regimi</option>`;
-            Object.entries(DIETS).forEach(([key, info]) => { dietSelectHtml += `<option value="${key}" ${state.activeDietFilter === key ? 'selected' : ''}>${info.icon} ${info.name}</option>`; });
-            dom.dietSelect.innerHTML = dietSelectHtml;
-
-            // Legenda
-            let legendHtml = '<p class="font-bold mb-2">Legenda Allergeni:</p><div class="flex flex-wrap gap-x-4 gap-y-2">';
-            Object.values(ALLERGENS).forEach(info => { legendHtml += `<span class="flex items-center text-sm">${info.icon} ${info.name}</span>`; });
-            legendHtml += '</div>';
-            dom.allergenLegendContainer.innerHTML = legendHtml;
-
-            updateFilterCounter();
+            let catSelectHtml = `<option value="all">Tutte le Categorie</option>`; Object.keys(RAW_MENU).forEach(cat => { catSelectHtml += `<option value="${cat}">${cat.charAt(0).toUpperCase() + cat.slice(1)}</option>`; }); dom.categorySelect.innerHTML = catSelectHtml;
+            let dietSelectHtml = `<option value="all">Tutti i Regimi</option>`; Object.entries(DIETS).forEach(([key, info]) => { dietSelectHtml += `<option value="${key}">${info.icon} ${info.name}</option>`; }); dom.dietSelect.innerHTML = dietSelectHtml;
+            let legendHtml = ''; Object.values(ALLERGENS).forEach(info => { legendHtml += `<p class="flex items-center text-base mb-1"><i class="fas ${info.icon} mr-2 text-gray-600"></i> ${info.name}</p>`; }); dom.allergenModalContent.innerHTML = legendHtml;
         }
 
         function renderMenu() {
-            dom.menuTitle.textContent = state.selectingAlternativeFor ? "Scegli un'alternativa" : "Scegli cosa ordinare";
-            const filtered = state.menuData.filter(item => (state.activeCategoryFilter === 'all' || item.category.toLowerCase() === state.activeCategoryFilter) && (state.activeDietFilter === 'all' || item.diet.includes(state.activeDietFilter) || item.diet.includes('onnivoro')));
-            if (filtered.length === 0) { dom.menuItemsContainer.innerHTML = `<div class="text-center p-8 bg-white rounded-xl shadow-md col-span-full"><p class="text-gray-500">Nessun piatto trovato con i filtri selezionati.</p></div>`; return; }
-            dom.menuItemsContainer.innerHTML = filtered.map(item => {
-                const allergenHtml = item.allergens.map(key => `<span title="${ALLERGENS[key].name}">${ALLERGENS[key].icon}</span>`).join('');
-                const btnHtml = state.selectingAlternativeFor ? `<button data-id="${item.id}" class="select-as-alternative-btn w-full mt-4 bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-lg transition-colors"><i class="fas fa-check"></i> Seleziona</button>` : `<button data-id="${item.id}" class="add-to-cart-btn w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors"><i class="fas fa-plus"></i> Aggiungi</button>`;
-                return `<div class="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-shadow flex flex-col"><div class="flex-grow"><div class="flex items-center mb-2"><i class="fas ${item.icon} text-blue-500 text-xl mr-3 w-6 text-center"></i><h3 class="font-bold text-lg">${item.name}</h3></div><p class="text-gray-600 ml-9">${item.category}</p></div><div class="flex justify-between items-center mt-4"><div class="flex gap-3 text-lg">${allergenHtml}</div><span class="font-semibold text-lg">€${item.price.toFixed(2)}</span></div><p class="calorie-info text-xs text-gray-500 text-right mt-1 flex items-center justify-end" style="display: ${state.caloriesVisible ? 'flex' : 'none'};">~${item.calories} kcal <button class="show-calorie-info-btn ml-1 text-blue-500 hover:text-blue-700 text-base"><i class="fas fa-info-circle"></i></button></p>${btnHtml}</div>`;
-            }).join('');
+            const term = state.searchTerm.toLowerCase();
+            const filtered = state.menuData.filter(item => (item.name.toLowerCase().includes(term)) && (state.activeCategoryFilter === 'all' || item.category.toLowerCase() === state.activeCategoryFilter) && (state.activeDietFilter === 'all' || item.diet.includes(state.activeDietFilter)));
+            
+            if (filtered.length === 0) {
+                 dom.menuItemsContainer.innerHTML = `<div class="text-center p-8 col-span-full bg-white rounded-xl shadow"><p class="text-gray-500">Nessun piatto trovato.</p></div>`;
+                 return;
+            }
+
+            let currentCategory = '';
+            let menuHtml = '';
+            const sortedItems = filtered.sort((a, b) => a.category.localeCompare(b.category));
+
+            sortedItems.forEach(item => {
+                if (item.category !== currentCategory) {
+                    currentCategory = item.category;
+                    menuHtml += `<div class="col-span-full mt-6 mb-2"><h3 class="text-2xl font-bold text-gray-800 border-b-2 border-blue-200 pb-2">${currentCategory}</h3></div>`;
+                }
+                
+                const allergenHtml = item.allergens.map(key => `<i class="fas ${ALLERGENS[key].icon}" title="${ALLERGENS[key].name}"></i>`).join(' ');
+                
+                menuHtml += `
+                <div class="bg-white p-4 rounded-xl shadow-md flex flex-col">
+                    <div class="flex-grow">
+                        <div class="flex items-start mb-2">
+                            <i class="fas ${item.icon} text-blue-500 text-xl mr-3 w-6 text-center pt-1"></i>
+                            <div>
+                                <h3 class="font-bold text-lg">${item.name}</h3>
+                                <p class="text-gray-500 text-sm">${item.category}</p>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-600 ml-9 mt-1"><span class="font-semibold">Ingredienti:</span> ${item.ingredients ? item.ingredients.join(', ') : 'Non specificati'}</p>
+                    </div>
+                    <div class="flex justify-between items-center mt-4">
+                        <div class="flex gap-3 text-lg items-center">${allergenHtml}</div>
+                        <span class="font-semibold text-lg">€${item.price.toFixed(2)}</span>
+                    </div>
+                    <p class="calorie-info text-xs text-gray-500 text-right mt-1" style="display: ${state.caloriesVisible ? 'flex' : 'none'}; justify-content: flex-end; align-items: center;">
+                        ~${item.calories} kcal <i class="fas fa-question-circle text-blue-500 ml-1 cursor-pointer calorie-info-icon"></i>
+                    </p>
+                    <button data-id="${item.id}" class="add-to-cart-btn w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg"><i class="fas fa-plus mr-2"></i> Aggiungi</button>
+                </div>`;
+            });
+            dom.menuItemsContainer.innerHTML = menuHtml;
         }
-        function renderPaymentInstructions() { if (state.allOrders.length > 0) { dom.paymentInstructions.innerHTML = `<p class="font-bold">Come pagare:</p><p>1. Paga la tua quota a <span class="font-semibold">${MERCHANT_INFO.name}</span>.</p><div class="flex flex-wrap gap-2 mt-2"><a href="${SATISPAY_URL}" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg inline-flex items-center transition-colors"><i class="fab fa-satispay mr-2"></i> Paga (App)</a><button id="show-qr-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg inline-flex items-center transition-colors"><i class="fas fa-qrcode mr-2"></i> Mostra QR</button></div><p class="mt-3">2. Dopo aver pagato, <span class="font-bold">spunta la casella "Pagato"</span>.</p><p class="text-sm mt-2 text-red-700"><b>Importante:</b> Usa lo stesso nome dell'ordine quando paghi.</p>`; dom.paymentInstructions.classList.remove('hidden'); } else { dom.paymentInstructions.classList.add('hidden'); } }
-        function renderMyOrder() { dom.cartCountEl.textContent = state.cart.length; if (!state.currentUser || !state.currentUser.name) { dom.myOrderContentEl.innerHTML = `<p class="text-center text-gray-500">Inserisci il tuo nome per ordinare.</p>`; return; } const userOrder = state.allOrders.find(o => o.userId === state.currentUser.uid && !o.paid); if (userOrder) { let html = userOrder.items.map(item => `<div class="flex justify-between items-center py-2 border-b"><span>${item.name} (x${item.quantity})</span><span class="font-semibold">€${(item.price * item.quantity).toFixed(2)}</span></div>`).join(''); dom.myOrderContentEl.innerHTML = `<p class="text-lg font-semibold mb-2">Ciao ${state.currentUser.name}, questo è il tuo ordine:</p><div class="space-y-2 mb-4">${html}</div><div class="text-right font-bold text-xl my-4">Totale: €${userOrder.total.toFixed(2)}</div><button id="delete-my-order-btn" data-id="${userOrder.id}" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition-colors"><i class="fas fa-trash-alt mr-2"></i> Cancella ordine</button>`; } else if (state.cart.length > 0) { let html = state.cart.map(item => `<div class="py-2 border-b"><div class="flex justify-between items-center"><span>${item.name}</span><div class="flex items-center gap-2"><span class="font-semibold">€${item.price.toFixed(2)}</span><button data-cart-item-id="${item.cartItemId}" class="remove-from-cart-btn text-red-500 hover:text-red-700 text-sm"><i class="fas fa-times-circle"></i></button></div></div><div class="mt-2"><p class="text-xs text-gray-500">Alternativa: <span class="font-semibold">${item.alternativeChoice || 'Nessuna'}</span></p><button data-cart-item-id="${item.cartItemId}" class="select-alternative-btn text-xs text-blue-600 hover:underline mt-1">${item.alternativeChoice ? 'Modifica' : 'Scegli'}</button></div></div>`).join(''); const total = state.cart.reduce((s, i) => s + i.price, 0); const calories = state.cart.reduce((s, i) => s + (i.calories || 0), 0); const blocked = isOrderTimeBlocked() || !SERVICE_ACTIVE; dom.myOrderContentEl.innerHTML = `<div class="space-y-2 mb-4">${html}</div><textarea id="order-notes" class="w-full p-2 border rounded-lg mt-4" placeholder="Note per la preparazione..."></textarea><div class="mt-4"><p class="font-semibold mb-2">Pagamento:</p><div class="flex gap-4"><label class="flex items-center"><input type="radio" name="paymentMethod" value="Satispay" class="mr-2" checked> Satispay</label><label class="flex items-center"><input type="radio" name="paymentMethod" value="Contanti/Carta" class="mr-2"> Contanti/Carta</label></div></div><div class="text-right font-bold text-xl my-4"><span>Totale: €${total.toFixed(2)}</span><span class="calorie-info text-sm font-normal text-gray-500 flex items-center justify-end" style="display: ${state.caloriesVisible ? 'flex' : 'none'};">(~${calories} kcal)<button class="show-calorie-info-btn ml-1 text-blue-500 hover:text-blue-700 text-base"><i class="fas fa-info-circle"></i></button></span></div><button id="confirm-order-btn" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors ${blocked ? 'opacity-50 cursor-not-allowed' : ''}" ${blocked ? 'disabled' : ''}><i class="fas fa-check-circle mr-2"></i> Conferma Ordine</button>${!SERVICE_ACTIVE ? `<p class="text-xs text-red-600 text-center mt-2">Il servizio è sospeso.</p>` : isOrderTimeBlocked() ? `<p class="text-xs text-red-600 text-center mt-2">Ordini chiusi.</p>` : `<p class="text-xs text-gray-500 text-center mt-2">L'ordine sarà aggiunto alla lista.</p>`}`; } else { dom.myOrderContentEl.innerHTML = `<p class="text-center text-gray-500 py-8">Il tuo carrello è vuoto.</p>`; } }
-        function renderAllOrders() { renderPaymentInstructions(); if (state.allOrders.length === 0) { dom.allOrdersListEl.innerHTML = `<div class="text-center bg-white p-8 rounded-xl shadow"><p class="text-gray-500">Nessun ordine per oggi.</p></div>`; dom.grandTotalEl.textContent = '€0.00'; return; } dom.allOrdersListEl.innerHTML = ''; let grandTotal = 0; state.allOrders.forEach(order => { grandTotal += order.total; const isMyOrder = state.currentUser.uid === order.userId; const card = document.createElement('div'); card.className = `bg-white p-4 rounded-xl shadow-md transition-opacity duration-300 ${order.paid ? 'paid-order' : ''}`; let html = order.items.map(i => `<li>${i.quantity}x ${i.name}${i.alternativeChoice ? `<span class="text-xs text-gray-500 block ml-4">↳ Alt: ${i.alternativeChoice}</span>` : ''}</li>`).join(''); card.innerHTML = `<div class="flex justify-between items-start"><div><p class="font-bold text-lg flex items-center">${order.userName}<span class="ml-2 text-xs font-semibold py-0.5 px-2 rounded-full ${order.paymentMethod === 'Satispay' ? 'bg-blue-200 text-blue-800' : 'bg-green-200 text-green-800'}">${order.paymentMethod}</span></p><ul class="list-disc list-inside text-gray-700 mt-2">${html}</ul>${order.notes ? `<p class="text-sm text-gray-500 mt-2"><em>Note: ${order.notes}</em></p>` : ''}</div><div class="text-right"><p class="font-semibold text-lg">€${order.total.toFixed(2)}</p><p class="text-xs text-gray-400 mt-1"><i class="far fa-clock"></i> ${order.createdAt ? new Date(order.createdAt.seconds * 1000).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : ''}</p>${isMyOrder && !order.paid ? `<button data-id="${order.id}" class="delete-my-order-btn text-red-500 hover:text-red-700 text-xs mt-2">Cancella</button>` : ''}</div></div><div class="border-t mt-3 pt-3 flex justify-end items-center"><label class="flex items-center ${isMyOrder ? 'cursor-pointer' : 'cursor-not-allowed'}"><input type="checkbox" data-order-id="${order.id}" class="paid-checkbox h-5 w-5 rounded text-blue-600 focus:ring-blue-500" ${order.paid ? 'checked' : ''} ${!isMyOrder ? 'disabled' : ''}><span class="ml-2 text-sm font-medium ${order.paid ? 'text-green-600' : 'text-gray-600'}">${order.paid ? 'Pagato' : 'Da pagare'}</span>${order.paid ? '<i class="fas fa-check-circle text-green-600 ml-2"></i>' : ''}</label></div>`; dom.allOrdersListEl.appendChild(card); }); dom.grandTotalEl.textContent = `€${grandTotal.toFixed(2)}`; }
+
+        function renderFavorites() {
+            const favoritesContainer = document.getElementById('favorites-section');
+            if (!state.allOrders || state.allOrders.length === 0) { favoritesContainer.innerHTML = ''; return; }
+            const itemCounts = state.allOrders.flatMap(order => order.items.map(item => item.name.split(' (')[0])).reduce((acc, name) => { acc[name] = (acc[name] || 0) + 1; return acc; }, {});
+            const sortedFavorites = Object.entries(itemCounts).sort(([, a], [, b]) => b - a).slice(0, 5).map(([name]) => state.menuData.find(item => item.name === name)).filter(Boolean); 
+            if (sortedFavorites.length === 0) { favoritesContainer.innerHTML = ''; return; }
+            const favoritesHtml = sortedFavorites.map(item => `<button data-id="${item.id}" class="add-to-cart-btn flex-shrink-0 bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition-shadow text-left w-40"><p class="font-semibold text-sm truncate">${item.name}</p><p class="text-xs text-gray-500">€${item.price.toFixed(2)}</p></button>`).join('');
+            favoritesContainer.innerHTML = `<h3 class="text-2xl font-bold mb-3"><i class="fas fa-star text-yellow-400 mr-2"></i>I Più Ordinati</h3><div class="flex gap-3 overflow-x-auto pb-3">${favoritesHtml}</div>`;
+        }
         
-        // ... (resto delle funzioni di utility e business logic sono omesse per brevità) ...
+        function renderMyOrder() {
+            const totalItems = state.cart.reduce((sum, item) => sum + item.quantity, 0);
+            dom.cartCountEl.textContent = totalItems;
+            if (state.cart.length === 0) {
+                dom.myOrderContentEl.innerHTML = `<p class="text-center text-gray-500 py-8">Il tuo carrello è vuoto.</p>`;
+                return;
+            }
+            const total = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const itemsHtml = state.cart.map(item => {
+                let breadSelectorHtml = '';
+                if (BREAD_OPTIONS[item.category]) {
+                    const optionsHtml = BREAD_OPTIONS[item.category].map(opt => `<option value="${opt}" ${item.selectedType === opt ? 'selected' : ''}>${opt}</option>`).join('');
+                    breadSelectorHtml = `<select data-id="${item.cartId}" class="cart-bread-select mt-2 w-full p-2 border border-gray-300 rounded-md text-sm">${optionsHtml}</select>`;
+                }
+                return `
+                <div class="py-3 border-b">
+                    <div class="flex justify-between items-start">
+                        <div><p class="font-semibold">${item.name}</p><p class="text-sm text-gray-600">€${item.price.toFixed(2)}</p></div>
+                        <div class="flex items-center gap-3">
+                            <button data-id="${item.cartId}" data-action="decrease" class="cart-qty-btn bg-gray-200 rounded-full h-8 w-8">-</button>
+                            <span class="font-bold text-lg">${item.quantity}</span>
+                            <button data-id="${item.cartId}" data-action="increase" class="cart-qty-btn bg-gray-200 rounded-full h-8 w-8">+</button>
+                            <button data-id="${item.cartId}" class="cart-remove-btn text-red-500 text-lg flex-shrink-0 ml-4"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </div>
+                    ${breadSelectorHtml}
+                </div>`;
+            }).join('');
+
+            dom.myOrderContentEl.innerHTML = `
+                <div class="space-y-2 mb-4">${itemsHtml}</div>
+                <div class="mt-6">
+                    <label for="alternative-input" class="block mb-2 font-semibold text-gray-700">Alternativa (se un prodotto è esaurito):</label>
+                    <input type="text" id="alternative-input" placeholder="Es. un supplì o un'altra verdura" class="w-full p-3 border border-gray-300 rounded-lg">
+                </div>
+                <div class="text-right font-bold text-2xl my-4">Totale: €${total.toFixed(2)}</div>
+                <button id="confirm-order-btn" class="w-full mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg"><i class="fas fa-check-circle mr-2"></i>Conferma e Invia Ordine</button>
+            `;
+        }
+
+        function renderAllOrders() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todaysOrders = state.allOrders.filter(order => order.createdAt && order.createdAt.toDate() >= today).sort((a, b) => a.createdAt - b.createdAt);
+            
+            if (todaysOrders.length === 0) {
+                dom.allOrdersListEl.innerHTML = `<div class="text-center p-8 bg-white rounded-xl shadow"><p class="text-gray-500">Nessun ordine per oggi.</p></div>`;
+                dom.grandTotalEl.textContent = '€0.00';
+                return;
+            }
+            
+            let grandTotal = 0;
+            const ordersHtml = todaysOrders.map(order => {
+                grandTotal += order.total;
+                const itemsHtml = order.items.map(item => `<li class="flex justify-between items-center text-sm"><span>${item.quantity} x ${item.name} ${item.selectedType ? `(${item.selectedType})` : ''}</span><span class="font-medium">€${(item.price * item.quantity).toFixed(2)}</span></li>`).join('');
+                const alternativeHtml = order.alternative ? `<p class="text-xs text-gray-500 mt-2 pl-4 border-l-2 border-orange-300"><b>Alternativa:</b> ${order.alternative}</p>` : '';
+                return `
+                    <div id="order-${order.id}" class="bg-white p-4 rounded-xl shadow-md ${order.paid ? 'paid-order' : ''}">
+                        <div class="flex justify-between items-center border-b pb-2 mb-2">
+                            <h4 class="font-bold text-lg">${order.user}</h4>
+                            <span class="font-bold text-blue-600 text-lg">€${order.total.toFixed(2)}</span>
+                        </div>
+                        <ul class="space-y-1">${itemsHtml}</ul>
+                        ${alternativeHtml}
+                        <div class="text-right mt-3">
+                             <label class="flex items-center justify-end text-sm cursor-pointer">
+                                <input type="checkbox" data-id="${order.id}" class="toggle-paid-btn" ${order.paid ? 'checked' : ''}>
+                                <span class="ml-2 ${order.paid ? 'text-green-600 font-semibold' : 'text-gray-600'}">Pagato con Satispay</span>
+                            </label>
+                        </div>
+                    </div>`;
+            }).join('');
+            dom.allOrdersListEl.innerHTML = ordersHtml;
+            dom.grandTotalEl.textContent = `€${grandTotal.toFixed(2)}`;
+        }
         
+        function handleCartSelectChange(selectElement) {
+            const cartId = parseInt(selectElement.dataset.id);
+            const newType = selectElement.value;
+            const itemInCart = state.cart.find(i => i.cartId === cartId);
+            if (itemInCart) itemInCart.selectedType = newType;
+        }
+
+        async function handlePaidToggle(checkbox) {
+            const orderId = checkbox.dataset.id;
+            const isPaid = checkbox.checked;
+            if (!orderId) return;
+            const orderRef = doc(db, "orders", orderId);
+            try {
+                await updateDoc(orderRef, { paid: isPaid });
+                showToast(`Stato pagamento aggiornato.`);
+            } catch (error) {
+                console.error("Errore aggiornamento pagamento: ", error);
+                showToast("Errore durante l'aggiornamento.", 4000);
+                checkbox.checked = !isPaid;
+            }
+        }
+
         function handleEvents(event) {
-            const buttonTarget = event.target.closest('button');
-            if (buttonTarget) handleClicks(buttonTarget);
-            
-            const checkboxTarget = event.target.closest('input[type="checkbox"].paid-checkbox');
-            if(checkboxTarget) handlePaymentStatusChange(checkboxTarget);
-            
-            const selectTarget = event.target.closest('select');
-            if(selectTarget) handleSelectChange(selectTarget);
+            const target = event.target;
+            if (event.type === 'click' && target.matches('.calorie-info-icon')) {
+                showToast('Le calorie sono stime indicative e possono variare.');
+            } else if (event.type === 'click' && target.closest('button')) {
+                handleClicks(target.closest('button'));
+            } else if (event.type === 'change' && target.matches('.cart-bread-select')) {
+                handleCartSelectChange(target);
+            } else if (event.type === 'change' && target.matches('.toggle-paid-btn')) {
+                handlePaidToggle(target);
+            } else if (event.type === 'change' && target.matches('select')) {
+                handleSelectChange(target);
+            } else if (event.type === 'input' && target.id === 'search-input') {
+                state.searchTerm = target.value;
+                updateFilterCounter();
+                renderMenu();
+            }
         }
 
         function handleSelectChange(target) {
-            if (target.id === 'category-select') {
-                state.activeCategoryFilter = target.value;
-            } else if (target.id === 'diet-select') {
-                state.activeDietFilter = target.value;
-            }
+            if (target.id === 'category-select') state.activeCategoryFilter = target.value;
+            else if (target.id === 'diet-select') state.activeDietFilter = target.value;
             updateFilterCounter();
             renderMenu();
         }
         
-        function handleClicks(target) {
-            // Rimosso il codice per i pulsanti filtro
-            if (target.matches('.nav-btn')) navigate(target.dataset.view);
-            else if (target.matches('.add-to-cart-btn')) { const item = state.menuData.find(i => i.id === parseInt(target.dataset.id)); if (item) { state.cart.push({ ...item, cartItemId: crypto.randomUUID(), alternativeChoice: '' }); renderMyOrder(); dom.cartCountEl.textContent = state.cart.length; showToast(`${item.name} aggiunto!`); } }
-            else if (target.matches('.select-as-alternative-btn')) { const item = state.menuData.find(i => i.id === parseInt(target.dataset.id)); const cartItem = state.cart.find(ci => ci.cartItemId === state.selectingAlternativeFor); if (item && cartItem) { cartItem.alternativeChoice = item.name; state.selectingAlternativeFor = null; renderMenu(); navigate('my-order'); renderMyOrder(); } }
-            else if (target.matches('.select-alternative-btn')) { state.selectingAlternativeFor = target.dataset.cartItemId; navigate('menu'); renderMenu(); }
-            else if (target.matches('.remove-from-cart-btn')) { const idx = state.cart.findIndex(i => i.cartItemId === target.dataset.cartItemId); if (idx > -1) { const removed = state.cart.splice(idx, 1)[0]; renderMyOrder(); showToast(`${removed.name} rimosso.`); } }
-            else if (target.id === 'confirm-order-btn') handleConfirmOrder();
-            else if (target.matches('.delete-my-order-btn')) handleDeleteOrder(target.dataset.id);
-            else if (target.id === 'save-username-btn') { const name = dom.usernameInput.value.trim(); if (name) { localStorage.setItem('lunch-order-username', name); state.currentUser.name = name; dom.userModal.classList.add('hidden'); renderMyOrder(); } else showToast('Inserisci un nome.'); }
-            else if (target.id === 'copy-summary-btn') handleCopySummary();
-            else if (target.id === 'download-history-btn') exportOrderHistoryToCSV();
-            else if (target.id === 'show-qr-btn') { dom.qrCodeImage.src = QR_CODE_IMAGE_URL; dom.qrModal.classList.remove('hidden'); }
-            else if (target.id === 'close-qr-modal-btn') dom.qrModal.classList.add('hidden');
-            else if (target.matches('.show-calorie-info-btn')) dom.calorieInfoModal.classList.remove('hidden');
-            else if (target.id === 'close-calorie-info-btn') dom.calorieInfoModal.classList.add('hidden');
-            else if (target.id === 'toggle-calories') { 
-                state.caloriesVisible = !state.caloriesVisible;
-                const icon = target.querySelector('i');
-                if (state.caloriesVisible) {
-                    dom.toggleCaloriesText.textContent = 'Nascondi Calorie';
-                    icon.classList.remove('fa-toggle-off');
-                    icon.classList.add('fa-toggle-on');
+        async function handleClicks(button) {
+            if (button.matches('.nav-btn')) {
+                navigate(button.dataset.view);
+            }
+            else if (button.matches('.add-to-cart-btn')) { 
+                const item = state.menuData.find(i => i.id === parseInt(button.dataset.id));
+                if (!item) return;
+                const existingItem = state.cart.find(i => i.id === item.id);
+                if (existingItem) {
+                    existingItem.quantity++;
                 } else {
-                    dom.toggleCaloriesText.textContent = 'Mostra Calorie';
-                    icon.classList.remove('fa-toggle-on');
-                    icon.classList.add('fa-toggle-off');
+                    let defaultType = (item.category === 'Panini') ? 'Pane classico' : (item.category === 'Pizze') ? 'Pizza classica' : null;
+                    state.cart.push({ ...item, cartId: Date.now(), quantity: 1, selectedType: defaultType });
                 }
-                renderMenu();
                 renderMyOrder();
+                showToast(`${item.name} aggiunto!`);
+            }
+            else if (button.matches('.cart-qty-btn')) {
+                const cartId = parseInt(button.dataset.id);
+                const itemInCart = state.cart.find(i => i.cartId === cartId);
+                if (itemInCart) {
+                    if (button.dataset.action === 'increase') itemInCart.quantity++;
+                    else if (button.dataset.action === 'decrease' && itemInCart.quantity > 1) itemInCart.quantity--;
+                    else state.cart = state.cart.filter(i => i.cartId !== cartId);
+                }
+                renderMyOrder();
+            }
+            else if (button.matches('.cart-remove-btn')) {
+                state.cart = state.cart.filter(i => i.cartId !== parseInt(button.dataset.id));
+                renderMyOrder();
+            }
+            else if (button.id === 'save-username-btn') { 
+                const name = dom.usernameInput.value.trim();
+                if (name) {
+                    localStorage.setItem('dosemagna-username', name);
+                    state.currentUser.name = name;
+                    dom.userModal.classList.add('hidden');
+                }
+            }
+            else if (button.id === 'toggle-calories') { 
+                state.caloriesVisible = !state.caloriesVisible;
+                button.querySelector('span').textContent = state.caloriesVisible ? 'Nascondi Calorie' : 'Mostra Calorie';
+                button.querySelector('i').className = `fas ${state.caloriesVisible ? 'fa-toggle-on' : 'fa-toggle-off'} mr-2`;
+                renderMenu();
+            }
+            else if (button.id === 'show-allergens-btn') {
+                dom.allergenModal.classList.remove('hidden');
+            }
+            else if (button.id === 'close-allergen-modal-btn') {
+                dom.allergenModal.classList.add('hidden');
+            }
+            else if (button.id === 'confirm-order-btn') {
+                if (state.cart.length === 0) { showToast("Il tuo carrello è vuoto."); return; }
+                if (!state.currentUser || !state.currentUser.name) { showToast("Per favore, inserisci prima il tuo nome."); dom.userModal.classList.remove('hidden'); return; }
+                
+                const alternative = document.getElementById('alternative-input').value.trim();
+                const total = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                const itemsToSave = state.cart.map(item => ({ name: item.name, quantity: item.quantity, price: item.price, selectedType: item.selectedType || null }));
+                
+                try {
+                    await addDoc(ordersCollectionRef, { user: state.currentUser.name, uid: state.currentUser.uid, items: itemsToSave, total: total, alternative: alternative, createdAt: serverTimestamp(), paid: false });
+                    showToast("Ordine confermato con successo!");
+                    state.cart = [];
+                    renderMyOrder();
+                    navigate('all-orders');
+                } catch (error) {
+                    console.error("Errore nell'invio dell'ordine: ", error);
+                    showToast("Si è verificato un errore. Riprova.", 4000);
+                }
             }
         }
 
         function init() {
+            Object.assign(dom, {
+                views: document.querySelectorAll('.view'), navBtns: document.querySelectorAll('.nav-btn'),
+                menuItemsContainer: document.getElementById('menu-items'), cartCountEl: document.getElementById('cart-count'),
+                myOrderContentEl: document.getElementById('my-order-content'), allOrdersListEl: document.getElementById('all-orders-list'),
+                grandTotalEl: document.getElementById('grand-total'), userModal: document.getElementById('user-modal'),
+                usernameInput: document.getElementById('username-input'), toastEl: document.getElementById('toast'),
+                toastMessageEl: document.getElementById('toast-message'), categorySelect: document.getElementById('category-select'),
+                dietSelect: document.getElementById('diet-select'), filterCounterContainer: document.getElementById('filter-counter-container'),
+                allergenModal: document.getElementById('allergen-modal'), allergenModalContent: document.getElementById('allergen-modal-content'),
+            });
             document.body.addEventListener('click', handleEvents);
             document.body.addEventListener('change', handleEvents);
+            document.body.addEventListener('input', handleEvents);
             renderFilters();
             renderMenu();
             navigate('menu');
         }
-
+        
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                const isNewUser = !state.currentUser || state.currentUser.uid !== user.uid;
-                if (isNewUser) {
-                    state.currentUser = { uid: user.uid, isAnonymous: user.isAnonymous, email: user.email };
-                    if (user.email === ADMIN_EMAIL) {
-                        dom.downloadHistoryBtn.classList.remove('hidden');
-                        dom.userModal.classList.add('hidden');
-                        document.getElementById('favorites-container').classList.add('hidden');
-                        document.getElementById('popular-container').classList.add('hidden');
-                    } else {
-                        dom.downloadHistoryBtn.classList.add('hidden');
-                        const savedName = localStorage.getItem('lunch-order-username');
-                        if (savedName) { state.currentUser.name = savedName; } else { dom.userModal.classList.add('hidden'); }
-                        fetchAndRenderUserFavorites();
-                    }
-                    if (state.firestoreListener) state.firestoreListener();
-                    state.firestoreListener = onSnapshot(ordersCollectionRef, (snapshot) => {
-                        const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
-                        state.allOrders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter(o => o.createdAt && o.createdAt.toDate() >= todayStart);
-                        renderAllOrders();
-                        renderMyOrder();
-                        if (state.currentUser && !state.currentUser.email) { renderPopularItems(); }
-                    }, (error) => { console.error("Errore Firestore:", error); showToast("Errore di connessione al db."); });
-                }
-            } else {
-                signInAnonymously(auth).catch(e => console.error("Accesso anonimo fallito", e));
-            }
+                state.currentUser = { uid: user.uid, name: localStorage.getItem('dosemagna-username') };
+                if (!state.currentUser.name) dom.userModal.classList.remove('hidden');
+                
+                onSnapshot(ordersCollectionRef, snapshot => {
+                    state.allOrders = snapshot.docs.map(doc => ({...doc.data(), id: doc.id}));
+                    if(state.currentView === 'all-orders') renderAllOrders();
+                    renderFavorites();
+                });
+            } else { signInAnonymously(auth); }
         });
         
         init();
