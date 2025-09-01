@@ -16,6 +16,10 @@
         #favorites-section .overflow-x-auto::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
         #favorites-section .overflow-x-auto::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
         #favorites-section .overflow-x-auto::-webkit-scrollbar-thumb:hover { background: #aaa; }
+        .payment-radio:checked + label {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -25,7 +29,7 @@
             <img src="https://i.postimg.cc/Nf321BV0/dosemagna-logo-neutro.png" alt="Dosemagna Logo" class="w-64 md:w-80 mx-auto">
             <p class="text-center text-gray-500 -mt-2 md:-mt-4 italic">“Dal pizzicarolo alla scrivania”</p>
             <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 rounded-md my-4 w-full" role="alert">
-                <p class="font-bold">Attenzione: L'ordine e il pagamento con Satispay devono essere completati entro le 11:30.</p>
+                <p class="font-bold">Attenzione: L'ordine deve essere completato entro le 11:30.</p>
                 <p>La consegna è stimata intorno alle 12:30.</p>
             </div>
         </header>
@@ -75,6 +79,18 @@
                     <h2 class="text-3xl font-extrabold">Riepilogo Ordini di Oggi</h2>
                     <button id="copy-summary-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg"><i class="fas fa-copy mr-2"></i> Copia Riepilogo</button>
                 </div>
+                <div id="satispay-details" class="bg-white p-4 rounded-xl shadow-md mb-6 flex flex-col md:flex-row items-center gap-4">
+                    <div class="flex-shrink-0">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" alt="QR Code Satispay" class="rounded-lg">
+                    </div>
+                    <div class="text-center md:text-left">
+                        <h3 class="text-xl font-bold text-gray-800">Paga con Satispay</h3>
+                        <p class="text-gray-600">Inquadra il QR Code o usa il link per pagare l'importo del tuo ordine a <strong>Alimentari Russo</strong>.</p>
+                        <a href="https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" target="_blank" class="mt-2 inline-block bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">
+                            <i class="fas fa-external-link-alt mr-2"></i>Vai a Satispay
+                        </a>
+                    </div>
+                </div>
                 <div id="all-orders-list" class="space-y-4"></div>
                  <div class="mt-6 bg-white p-4 rounded-xl shadow-lg text-right">
                     <span class="text-xl font-bold text-gray-800">Totale Complessivo:</span>
@@ -102,6 +118,11 @@
         const PRICES = { gastronomia: 4.00, verdure: 4.00, panini: 3.50, pizze: 3.50, fritti: 1.50, dessert: 3.00 };
         const ALLERGENS = { G: { name: "Glutine", icon: "fa-wheat-awn" }, L: { name: "Latticini", icon: "fa-cheese" }, C: { name: "Crostacei", icon: "fa-shrimp" }, P: { name: "Pesce", icon: "fa-fish-fins" }};
         const DIETS = { vegetariano: { name: "Vegetariano", icon: "🧀" }, vegano: { name: "Vegano", icon: "🌱" }, "carne/pesce": { name: "Carne/🐟Pesce", icon: "🥩" } };
+        const PAYMENT_METHODS = { 
+            Satispay: { name: "Satispay", icon: "fa-mobile-alt" },
+            Contanti: { name: "Contanti alla consegna", icon: "fa-money-bill-wave" },
+            "Buoni Pasto": { name: "Buoni pasto alla consegna", icon: "fa-ticket-alt" }
+        };
         
         const BREAD_OPTIONS = {
             Panini: ["Pane classico", "Pane ai cereali", "Focaccia"],
@@ -220,13 +241,29 @@
                 </div>`;
             }).join('');
 
+            const paymentOptionsHtml = Object.entries(PAYMENT_METHODS).map(([key, {name, icon}], index) => `
+                <div class="flex-1">
+                    <input type="radio" id="payment-${key}" name="payment-method" value="${key}" class="hidden payment-radio" ${index === 0 ? 'checked' : ''}>
+                    <label for="payment-${key}" class="block border-2 border-gray-200 rounded-lg p-3 text-center cursor-pointer transition-all hover:border-blue-400">
+                        <i class="fas ${icon} text-2xl text-blue-500"></i>
+                        <span class="block text-sm font-semibold mt-2">${name}</span>
+                    </label>
+                </div>
+            `).join('');
+
             dom.myOrderContentEl.innerHTML = `
                 <div class="space-y-2 mb-4">${itemsHtml}</div>
                 <div class="mt-6">
                     <label for="alternative-input" class="block mb-2 font-semibold text-gray-700">Alternativa (se un prodotto è esaurito):</label>
                     <input type="text" id="alternative-input" placeholder="Es. un supplì o un'altra verdura" class="w-full p-3 border border-gray-300 rounded-lg">
                 </div>
-                <div class="text-right font-bold text-2xl my-4">Totale: €${total.toFixed(2)}</div>
+                
+                <div class="mt-6">
+                    <h4 class="block mb-2 font-semibold text-gray-700">Metodo di Pagamento</h4>
+                    <div class="flex gap-3 mt-2">${paymentOptionsHtml}</div>
+                </div>
+
+                <div class="text-right font-bold text-2xl mt-6">Totale: €${total.toFixed(2)}</div>
                 <button id="confirm-order-btn" class="w-full mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg"><i class="fas fa-check-circle mr-2"></i>Conferma e Invia Ordine</button>
             `;
         }
@@ -234,8 +271,11 @@
         function renderAllOrders() {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            const todaysOrders = state.allOrders.filter(order => order.createdAt && order.createdAt.toDate() >= today).sort((a, b) => a.createdAt - b.createdAt);
+            const todaysOrders = state.allOrders.filter(order => order.createdAt && order.createdAt.toDate() >= today).sort((a, b) => a.user.localeCompare(b.user));
             
+            const now = new Date();
+            const isBeforeCutoff = now.getHours() < 11 || (now.getHours() === 11 && now.getMinutes() < 30);
+
             if (todaysOrders.length === 0) {
                 dom.allOrdersListEl.innerHTML = `<div class="text-center p-8 bg-white rounded-xl shadow"><p class="text-gray-500">Nessun ordine per oggi.</p></div>`;
                 dom.grandTotalEl.textContent = '€0.00';
@@ -247,11 +287,23 @@
                 grandTotal += order.total;
                 const itemsHtml = order.items.map(item => `<li class="flex justify-between items-center text-sm"><span>${item.quantity} x ${item.name} ${item.selectedType ? `(${item.selectedType})` : ''}</span><span class="font-medium">€${(item.price * item.quantity).toFixed(2)}</span></li>`).join('');
                 const alternativeHtml = order.alternative ? `<p class="text-xs text-gray-500 mt-2 pl-4 border-l-2 border-orange-300"><b>Alternativa:</b> ${order.alternative}</p>` : '';
+                const paymentInfo = PAYMENT_METHODS[order.paymentMethod] || { name: order.paymentMethod, icon: 'fa-credit-card' };
+                
+                const deleteButtonHtml = isBeforeCutoff
+                    ? `<button data-id="${order.id}" class="delete-order-btn text-red-500 hover:text-red-700 ml-2 text-sm" title="Elimina ordine"><i class="fas fa-trash-alt"></i></button>`
+                    : `<button class="text-gray-300 ml-2 text-sm cursor-not-allowed" disabled title="Eliminazione bloccata dopo le 11:30"><i class="fas fa-trash-alt"></i></button>`;
+
                 return `
                     <div id="order-${order.id}" class="bg-white p-4 rounded-xl shadow-md ${order.paid ? 'paid-order' : ''}">
-                        <div class="flex justify-between items-center border-b pb-2 mb-2">
-                            <h4 class="font-bold text-lg">${order.user}</h4>
-                            <span class="font-bold text-blue-600 text-lg">€${order.total.toFixed(2)}</span>
+                        <div class="flex justify-between items-start border-b pb-2 mb-2">
+                            <div>
+                                <h4 class="font-bold text-lg">${order.user}</h4>
+                                <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full"><i class="fas ${paymentInfo.icon} mr-2"></i>${paymentInfo.name}</span>
+                            </div>
+                            <div class="text-right flex items-center">
+                                <span class="font-bold text-blue-600 text-lg">€${order.total.toFixed(2)}</span>
+                                ${deleteButtonHtml}
+                            </div>
                         </div>
                         <ul class="space-y-1">${itemsHtml}</ul>
                         ${alternativeHtml}
@@ -291,10 +343,12 @@
 
         function handleEvents(event) {
             const target = event.target;
+            const button = target.closest('button');
+
             if (event.type === 'click' && target.matches('.calorie-info-icon')) {
                 showToast('Le calorie sono stime indicative e possono variare.');
-            } else if (event.type === 'click' && target.closest('button')) {
-                handleClicks(target.closest('button'));
+            } else if (event.type === 'click' && button) {
+                handleClicks(button);
             } else if (event.type === 'change' && target.matches('.cart-bread-select')) {
                 handleCartSelectChange(target);
             } else if (event.type === 'change' && target.matches('.toggle-paid-btn')) {
@@ -346,6 +400,23 @@
                 state.cart = state.cart.filter(i => i.cartId !== parseInt(button.dataset.id));
                 renderMyOrder();
             }
+            else if (button.matches('.delete-order-btn')) {
+                const now = new Date();
+                if (now.getHours() > 11 || (now.getHours() === 11 && now.getMinutes() >= 30)) {
+                    showToast("Non è più possibile eliminare gli ordini dopo le 11:30.");
+                    return;
+                }
+                const orderId = button.dataset.id;
+                if (confirm('Sei sicuro di voler eliminare questo ordine? L\'azione è irreversibile.')) {
+                    try {
+                        await deleteDoc(doc(db, "orders", orderId));
+                        showToast("Ordine eliminato con successo.");
+                    } catch (error) {
+                        console.error("Errore eliminazione ordine:", error);
+                        showToast("Impossibile eliminare l'ordine.");
+                    }
+                }
+            }
             else if (button.id === 'save-username-btn') { 
                 const name = dom.usernameInput.value.trim();
                 if (name) {
@@ -371,11 +442,25 @@
                 if (!state.currentUser || !state.currentUser.name) { showToast("Per favore, inserisci prima il tuo nome."); dom.userModal.classList.remove('hidden'); return; }
                 
                 const alternative = document.getElementById('alternative-input').value.trim();
+                const paymentMethod = document.querySelector('input[name="payment-method"]:checked')?.value;
+                if (!paymentMethod) { showToast("Seleziona un metodo di pagamento."); return; }
+
                 const total = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
                 const itemsToSave = state.cart.map(item => ({ name: item.name, quantity: item.quantity, price: item.price, selectedType: item.selectedType || null }));
                 
+                const orderData = { 
+                    user: state.currentUser.name, 
+                    uid: state.currentUser.uid, 
+                    items: itemsToSave, 
+                    total, 
+                    alternative, 
+                    paymentMethod,
+                    createdAt: serverTimestamp(), 
+                    paid: false 
+                };
+
                 try {
-                    await addDoc(ordersCollectionRef, { user: state.currentUser.name, uid: state.currentUser.uid, items: itemsToSave, total: total, alternative: alternative, createdAt: serverTimestamp(), paid: false });
+                    await addDoc(ordersCollectionRef, orderData);
                     showToast("Ordine confermato con successo!");
                     state.cart = [];
                     renderMyOrder();
@@ -383,6 +468,61 @@
                 } catch (error) {
                     console.error("Errore nell'invio dell'ordine: ", error);
                     showToast("Si è verificato un errore. Riprova.", 4000);
+                }
+            }
+            else if (button.id === 'copy-summary-btn') {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const todaysOrders = state.allOrders.filter(order => order.createdAt && order.createdAt.toDate() >= today);
+
+                if (todaysOrders.length === 0) {
+                    showToast("Nessun ordine da copiare per oggi.");
+                    return;
+                }
+
+                const aggregatedItems = {};
+                todaysOrders.forEach(order => {
+                    order.items.forEach(item => {
+                        const itemName = item.selectedType ? `${item.name} (${item.selectedType})` : item.name;
+                        aggregatedItems[itemName] = (aggregatedItems[itemName] || 0) + item.quantity;
+                    });
+                });
+
+                let kitchenSummary = "--- RIEPILOGO PER LA CUCINA ---\n";
+                Object.entries(aggregatedItems)
+                    .sort((a, b) => a[0].localeCompare(b[0]))
+                    .forEach(([name, quantity]) => {
+                        kitchenSummary += `${quantity} x ${name}\n`;
+                    });
+
+                let deliverySummary = "\n--- RIEPILogo PER LA CONSEGNA ---\n";
+                let grandTotal = 0;
+                todaysOrders
+                    .sort((a,b) => a.user.localeCompare(b.user))
+                    .forEach(order => {
+                    deliverySummary += `\n👤 ${order.user} - Totale: €${order.total.toFixed(2)} (${order.paymentMethod})\n`;
+                    order.items.forEach(item => {
+                        const itemName = item.selectedType ? `${item.name} (${item.selectedType})` : item.name;
+                        deliverySummary += `  - ${item.quantity} x ${itemName}\n`;
+                    });
+                    if (order.alternative) {
+                        deliverySummary += `  💡 Alternativa: ${order.alternative}\n`;
+                    }
+                    grandTotal += order.total;
+                });
+
+                const fullSummary = `🥡 Riepilogo Ordini Dosemagna - ${today.toLocaleDateString('it-IT')} 🥡\n\n` +
+                    kitchenSummary +
+                    deliverySummary +
+                    `\n-----------------------------------\n` +
+                    `💰 TOTALE COMPLESSIVO: €${grandTotal.toFixed(2)}`;
+
+                try {
+                    navigator.clipboard.writeText(fullSummary);
+                    showToast("Riepilogo ordini copiato negli appunti!");
+                } catch (err) {
+                    console.error('Errore nel copiare il testo: ', err);
+                    showToast("Errore durante la copia.", 4000);
                 }
             }
         }
@@ -415,6 +555,8 @@
                     state.allOrders = snapshot.docs.map(doc => ({...doc.data(), id: doc.id}));
                     if(state.currentView === 'all-orders') renderAllOrders();
                     renderFavorites();
+                }, error => {
+                    console.error("Errore con lo snapshot di Firestore:", error);
                 });
             } else { signInAnonymously(auth); }
         });
