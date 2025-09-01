@@ -27,7 +27,7 @@
     <div id="app" class="max-w-4xl mx-auto p-4 md:p-6">
         <header class="mb-6 flex flex-col items-center">
             <img src="https://i.postimg.cc/Nf321BV0/dosemagna-logo-neutro.png" alt="Dosemagna Logo" class="w-64 md:w-80 mx-auto">
-            <p class="text-center text-gray-500 -mt-2 md:-mt-4 italic">“Dal pizzicarolo alla scrivania”</p>
+            <p class="text-center text-gray-500 -mt-2 md:-mt-4 italic">“dalla pizzicheria alla scrivania”</p>
             <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 rounded-md my-4 w-full" role="alert">
                 <p class="font-bold">Attenzione: L'ordine deve essere completato entro le 11:30.</p>
                 <p>La consegna è stimata intorno alle 12:30.</p>
@@ -121,7 +121,7 @@
         const PAYMENT_METHODS = { 
             Satispay: { name: "Satispay", icon: "fa-mobile-alt" },
             Contanti: { name: "Contanti alla consegna", icon: "fa-money-bill-wave" },
-            "Buoni Pasto": { name: "Buoni pasto alla consegna", icon: "fa-ticket-alt" }
+            // "Buoni Pasto": { name: "Buoni pasto alla consegna", icon: "fa-ticket-alt" } // Disattivato temporaneamente
         };
         
         const BREAD_OPTIONS = {
@@ -293,6 +293,13 @@
                     ? `<button data-id="${order.id}" class="delete-order-btn text-red-500 hover:text-red-700 ml-2 text-sm" title="Elimina ordine"><i class="fas fa-trash-alt"></i></button>`
                     : `<button class="text-gray-300 ml-2 text-sm cursor-not-allowed" disabled title="Eliminazione bloccata dopo le 11:30"><i class="fas fa-trash-alt"></i></button>`;
 
+                const paymentStatusHtml = `
+                    <div data-id="${order.id}" class="toggle-paid-btn mt-3 cursor-pointer inline-block rounded-full px-3 py-1 text-xs font-semibold ${order.paid ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}" title="Clicca per cambiare stato">
+                        <i class="fas ${order.paid ? 'fa-check-circle' : 'fa-hourglass-half'} mr-1"></i>
+                        Stato: ${order.paid ? 'Pagato' : 'Da Pagare'}
+                    </div>
+                `;
+
                 return `
                     <div id="order-${order.id}" class="bg-white p-4 rounded-xl shadow-md ${order.paid ? 'paid-order' : ''}">
                         <div class="flex justify-between items-start border-b pb-2 mb-2">
@@ -307,11 +314,8 @@
                         </div>
                         <ul class="space-y-1">${itemsHtml}</ul>
                         ${alternativeHtml}
-                        <div class="text-right mt-3">
-                             <label class="flex items-center justify-end text-sm cursor-pointer">
-                                <input type="checkbox" data-id="${order.id}" class="toggle-paid-btn" ${order.paid ? 'checked' : ''}>
-                                <span class="ml-2 ${order.paid ? 'text-green-600 font-semibold' : 'text-gray-600'}">Pagato con Satispay</span>
-                            </label>
+                        <div class="text-right">
+                            ${paymentStatusHtml}
                         </div>
                     </div>`;
             }).join('');
@@ -319,40 +323,36 @@
             dom.grandTotalEl.textContent = `€${grandTotal.toFixed(2)}`;
         }
         
-        function handleCartSelectChange(selectElement) {
-            const cartId = parseInt(selectElement.dataset.id);
-            const newType = selectElement.value;
-            const itemInCart = state.cart.find(i => i.cartId === cartId);
-            if (itemInCart) itemInCart.selectedType = newType;
-        }
-
-        async function handlePaidToggle(checkbox) {
-            const orderId = checkbox.dataset.id;
-            const isPaid = checkbox.checked;
+        async function handlePaidToggle(statusElement) {
+            const orderId = statusElement.dataset.id;
             if (!orderId) return;
+            
+            const order = state.allOrders.find(o => o.id === orderId);
+            if (!order) return;
+
+            const newPaidStatus = !order.paid; 
+
             const orderRef = doc(db, "orders", orderId);
             try {
-                await updateDoc(orderRef, { paid: isPaid });
-                showToast(`Stato pagamento aggiornato.`);
+                await updateDoc(orderRef, { paid: newPaidStatus });
+                showToast(`Stato aggiornato a: ${newPaidStatus ? 'Pagato' : 'Da Pagare'}.`);
             } catch (error) {
                 console.error("Errore aggiornamento pagamento: ", error);
                 showToast("Errore durante l'aggiornamento.", 4000);
-                checkbox.checked = !isPaid;
             }
         }
 
         function handleEvents(event) {
             const target = event.target;
             const button = target.closest('button');
+            const statusToggle = target.closest('.toggle-paid-btn');
 
-            if (event.type === 'click' && target.matches('.calorie-info-icon')) {
-                showToast('Le calorie sono stime indicative e possono variare.');
+            if (event.type === 'click' && statusToggle) {
+                handlePaidToggle(statusToggle);
             } else if (event.type === 'click' && button) {
                 handleClicks(button);
             } else if (event.type === 'change' && target.matches('.cart-bread-select')) {
                 handleCartSelectChange(target);
-            } else if (event.type === 'change' && target.matches('.toggle-paid-btn')) {
-                handlePaidToggle(target);
             } else if (event.type === 'change' && target.matches('select')) {
                 handleSelectChange(target);
             } else if (event.type === 'input' && target.id === 'search-input') {
@@ -495,7 +495,7 @@
                         kitchenSummary += `${quantity} x ${name}\n`;
                     });
 
-                let deliverySummary = "\n--- RIEPILogo PER LA CONSEGNA ---\n";
+                let deliverySummary = "\n--- RIEPILOGO PER LA CONSEGNA ---\n";
                 let grandTotal = 0;
                 todaysOrders
                     .sort((a,b) => a.user.localeCompare(b.user))
