@@ -402,7 +402,11 @@
             } else if (event.type === 'click' && button) {
                 handleClicks(button);
             } else if (event.type === 'change' && target.matches('.cart-bread-select')) {
-                 // Function defined in original script, assuming it exists
+                const cartId = parseInt(target.dataset.id);
+                const itemInCart = state.cart.find(i => i.cartId === cartId);
+                if (itemInCart) {
+                    itemInCart.selectedType = target.value;
+                }
             } else if (event.type === 'change' && target.matches('select')) {
                 handleSelectChange(target);
             } else if (event.type === 'input' && target.id === 'search-input') {
@@ -426,11 +430,11 @@
             else if (button.matches('.add-to-cart-btn')) { 
                 const item = state.menuData.find(i => i.id === parseInt(button.dataset.id));
                 if (!item) return;
-                const existingItem = state.cart.find(i => i.id === item.id);
-                if (existingItem) {
+                const existingItem = state.cart.find(i => i.id === item.id && !i.selectedType); // Only increment if no bread type is selected
+                if (existingItem && !BREAD_OPTIONS[item.category]) {
                     existingItem.quantity++;
                 } else {
-                    let defaultType = (item.category === 'Panini') ? 'Pane classico' : (item.category === 'Pizze') ? 'Pizza classica' : null;
+                    let defaultType = (BREAD_OPTIONS[item.category]) ? BREAD_OPTIONS[item.category][0] : null;
                     state.cart.push({ ...item, cartId: Date.now(), quantity: 1, selectedType: defaultType });
                 }
                 renderMyOrder();
@@ -530,7 +534,45 @@
                 }
             }
             else if (button.id === 'copy-summary-btn') {
-                // ... (existing summary copy logic)
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const todaysOrders = state.allOrders.filter(order => order.createdAt && order.createdAt.toDate() >= today);
+
+                if (todaysOrders.length === 0) {
+                    showToast("Nessun ordine da copiare per oggi.");
+                    return;
+                }
+
+                const summaryItems = {};
+                let grandTotal = 0;
+                todaysOrders.forEach(order => {
+                    grandTotal += order.total;
+                    order.items.forEach(item => {
+                        const itemName = item.name + (item.selectedType ? ` (${item.selectedType})` : '');
+                        if (summaryItems[itemName]) {
+                            summaryItems[itemName] += item.quantity;
+                        } else {
+                            summaryItems[itemName] = item.quantity;
+                        }
+                    });
+                });
+
+                let summaryText = "Riepilogo Ordini di Oggi:\n\n";
+                for (const [name, quantity] of Object.entries(summaryItems)) {
+                    summaryText += `- ${quantity}x ${name}\n`;
+                }
+                
+                summaryText += `\n-------------------\n`;
+                summaryText += `TOTALE COMPLESSIVO: €${grandTotal.toFixed(2)}`;
+
+                navigator.clipboard.writeText(summaryText)
+                    .then(() => {
+                        showToast("Riepilogo ordini copiato negli appunti!");
+                    })
+                    .catch(err => {
+                        console.error('Errore durante la copia:', err);
+                        showToast("Errore: impossibile copiare il testo.");
+                    });
             }
             else if (button.id === 'export-history-btn') {
                 showToast("Esportazione in corso...");
@@ -663,4 +705,3 @@
     </script>
 </body>
 </html>
-
