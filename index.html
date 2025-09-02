@@ -1,761 +1,745 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="it">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2575.7">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dosepranza</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            light: '#e8b39a',
+                            DEFAULT: '#D6804F',
+                            dark: '#c0673a',
+                            '100': '#fef4ef',
+                            '800': '#8c502f'
+                        },
+                        secondary: {
+                            light: '#a1bb96',
+                            DEFAULT: '#709460',
+                            dark: '#5a794d',
+                            '100': '#eef4ec',
+                            '800': '#415738'
+                        },
+                        background: '#F3F1E7',
+                        'text-main': '#3B3F2F',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        .view { display: none; }
+        .view.active { display: block; }
+        .paid-order { opacity: 0.7; }
+        #favorites-section .overflow-x-auto::-webkit-scrollbar { height: 6px; }
+        #favorites-section .overflow-x-auto::-webkit-scrollbar-track { background: #e0ddd3; border-radius: 10px; }
+        #favorites-section .overflow-x-auto::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+        #favorites-section .overflow-x-auto::-webkit-scrollbar-thumb:hover { background: #aaa; }
+        .payment-radio:checked + label {
+            border-color: #D6804F;
+            box-shadow: 0 0 0 2px rgba(214, 128, 79, 0.4);
+        }
+    </style>
 </head>
-<body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="it"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;dosepranza&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;link rel="preconnect" href="https://fonts.googleapis.com"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;link rel="preconnect" href="https://fonts.gstatic.com" crossorigin&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>tailwind.config = {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>theme: {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>extend: {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>fontFamily: {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>sans: ['Poppins', 'sans-serif'],</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>},</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>colors: {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>primary: {</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>light: '#e8b39a',</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>DEFAULT: '#D6804F',</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>dark: '#c0673a',</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>'100': '#fef4ef',</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>'800': '#8c502f'</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>},</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>secondary: {</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>light: '#a1bb96',</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>DEFAULT: '#709460',</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>dark: '#5a794d',</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>'100': '#eef4ec',</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>'800': '#415738'</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>},</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>background: '#F3F1E7',</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>'text-main': '#3B3F2F',</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>body { font-family: 'Poppins', sans-serif; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.view { display: none; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.view.active { display: block; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.paid-order { opacity: 0.7; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>#favorites-section .overflow-x-auto::-webkit-scrollbar { height: 6px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>#favorites-section .overflow-x-auto::-webkit-scrollbar-track { background: #e0ddd3; border-radius: 10px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>#favorites-section .overflow-x-auto::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>#favorites-section .overflow-x-auto::-webkit-scrollbar-thumb:hover { background: #aaa; }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>.payment-radio:checked + label {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-color: #D6804F;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 0 0 2px rgba(214, 128, 79, 0.4);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body class="bg-background text-text-main"&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="app" class="max-w-4xl mx-auto p-4 md:p-6"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;header class="mb-6 flex flex-col items-center"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;img src="https://i.postimg.cc/SsN4LYBP/Logo-basic-dosepranza.png" alt="Dosepranza Logo" class="w-64 md:w-80 mx-auto"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="text-center mt-4"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;h1 class="text-5xl md:text-6xl font-extrabold tracking-tight text-text-main"&gt;DOSEPRANZA&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;p class="text-lg md:text-xl text-gray-500 tracking-wider"&gt;Dalla pizzicheria alla scrivania&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="bg-primary-100 border-l-4 border-primary text-primary-800 p-4 rounded-md my-4 w-full" role="alert"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;p class="font-bold"&gt;Attenzione: L'ordine deve essere completato entro le 11:30.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;p&gt;La consegna è stimata intorno alle 12:30.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;p&gt;La consegna è &lt;strong&gt;gratuita&lt;/strong&gt;.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/header&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;nav class="flex justify-center bg-white/70 backdrop-blur-sm p-2 rounded-xl shadow-md mb-6 sticky top-4 z-40"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;button data-view="menu" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold text-text-main transition-all duration-300"&gt;&lt;i class="fas fa-utensils mr-2"&gt;&lt;/i&gt;Menù&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;button data-view="my-order" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold text-text-main transition-all duration-300"&gt;&lt;i class="fas fa-shopping-basket mr-2"&gt;&lt;/i&gt;Il Mio Ordine &lt;span id="cart-count" class="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 inline-flex items-center justify-center ml-1"&gt;0&lt;/span&gt;&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;button data-view="all-orders" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold text-text-main transition-all duration-300"&gt;&lt;i class="fas fa-users mr-2"&gt;&lt;/i&gt;Tutti gli Ordini&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/nav&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;main&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div id="menu-view" class="view"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;h2 class="text-3xl font-extrabold mb-4"&gt;Scegli cosa ordinare&lt;/h2&gt;</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div id="favorites-section" class="mb-8"&gt;&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="flex flex-col sm:flex-row gap-3 mb-4 items-center"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="relative w-full sm:flex-grow"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;input type="search" id="search-input" placeholder="Cerca un piatto..." class="w-full p-3 pl-10 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-primary transition-all duration-300"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"&gt;&lt;/i&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;select id="category-select" class="w-full sm:w-auto p-3 border border-gray-300 rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-primary transition-all duration-300"&gt;&lt;/select&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;select id="diet-select" class="w-full sm:w-auto p-3 border border-gray-300 rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-primary transition-all duration-300"&gt;&lt;/select&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="flex justify-between items-center mb-4"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div id="filter-counter-container" class="text-sm"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="flex gap-2"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;button id="show-allergens-btn" class="bg-gray-200 hover:bg-gray-300 text-text-main font-bold py-2 px-4 rounded-lg flex items-center text-sm transition-all duration-300"&gt;&lt;i class="fas fa-info-circle mr-2"&gt;&lt;/i&gt; Mostra Allergeni&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;button id="toggle-calories" class="bg-gray-200 hover:bg-gray-300 text-text-main font-bold py-2 px-4 rounded-lg flex items-center text-sm transition-all duration-300"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;i class="fas fa-toggle-off mr-2"&gt;&lt;/i&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;span id="toggle-calories-text"&gt;Mostra Calorie&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div id="menu-items" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div id="my-order-view" class="view"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;h2 class="text-3xl font-extrabold mb-4"&gt;Riepilogo del Tuo Ordine&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div id="my-order-content" class="bg-white p-6 rounded-xl shadow-md"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div id="all-orders-view" class="view"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                 </span>&lt;div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;h2 class="text-3xl font-extrabold"&gt;Riepilogo Ordini di Oggi&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="flex gap-2"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;button id="export-history-btn" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg hidden transition-all duration-300"&gt;&lt;i class="fas fa-download mr-2"&gt;&lt;/i&gt; Esporta Storico&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;button id="copy-summary-btn" class="bg-secondary hover:bg-secondary-dark text-white font-bold py-2 px-4 rounded-lg transition-all duration-300"&gt;&lt;i class="fas fa-copy mr-2"&gt;&lt;/i&gt; Copia Riepilogo&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div id="satispay-details" class="bg-white p-4 rounded-xl shadow-md mb-6 flex flex-col md:flex-row items-center gap-4"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="flex-shrink-0"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&amp;data=https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" alt="QR Code Satispay" class="rounded-lg"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="text-center md:text-left"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;h3 class="text-xl font-bold"&gt;Paga con Satispay&lt;/h3&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;p class="text-text-main/80"&gt;Inquadra il QR Code o usa il link per pagare l'importo del tuo ordine a &lt;strong&gt;Alimentari Russo&lt;/strong&gt;.&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;a href="https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" target="_blank" class="mt-2 inline-block bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg transition-all duration-300"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;i class="fas fa-external-link-alt mr-2"&gt;&lt;/i&gt;Vai a Satispay</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/a&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div id="all-orders-list" class="space-y-4"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                 </span>&lt;div class="mt-6 bg-white p-4 rounded-xl shadow-lg text-right"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;span class="text-xl font-bold"&gt;Totale Complessivo:&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;span id="grand-total" class="text-2xl font-bold text-primary ml-2"&gt;€0.00&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/main&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="user-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden"&gt;&lt;div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md text-center"&gt;&lt;h3 class="text-2xl font-bold mb-4"&gt;Benvenuto!&lt;/h3&gt;&lt;p class="text-gray-600 mb-6"&gt;Per iniziare, inserisci il tuo nome e cognome. È importante per la gestione dei pagamenti e per eventuali comunicazioni.&lt;/p&gt;&lt;input type="text" id="username-input" placeholder="Es. Marco Rossi" class="w-full p-3 border rounded-lg"&gt;&lt;button id="save-username-btn" class="w-full mt-4 bg-primary hover:bg-primary-dark text-white font-bold py-3 px-4 rounded-lg transition-all duration-300"&gt;Salva&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="allergen-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden"&gt;&lt;div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md relative"&gt;&lt;button id="close-allergen-modal-btn" class="absolute top-2 right-4 text-2xl text-gray-500 hover:text-gray-800"&gt;&amp;times;&lt;/button&gt;&lt;h3 class="text-2xl font-bold mb-4"&gt;Legenda Allergeni&lt;/h3&gt;&lt;div id="allergen-modal-content" class="text-gray-600 text-sm space-y-2"&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 bg-text-main text-white py-3 px-6 rounded-full shadow-xl z-50 opacity-0 transition-opacity"&gt;&lt;p id="toast-message"&gt;&lt;/p&gt;&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script type="module"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";</p>
-<p class="p1"><span class="Apple-converted-space">        </span>import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";</p>
-<p class="p1"><span class="Apple-converted-space">        </span>import { getFirestore, collection, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, deleteDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const firebaseConfig = { apiKey: "AIzaSyCQJsNbgaR89gF_1vLe6H4DPboOhQvm9nI", authDomain: "app-ordini-pranzo-alimentari.firebaseapp.com", projectId: "app-ordini-pranzo-alimentari", storageBucket: "app-ordini-pranzo-alimentari.appspot.com", messagingSenderId: "553169964686", appId: "1:553169964686:web:7f8ca6f32a301949e4c3df" };</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const app = initializeApp(firebaseConfig);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const auth = getAuth(app);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const db = getFirestore(app);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const ordersCollectionRef = collection(db, "orders");</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const PRICES = { gastronomia: 4.00, verdure: 4.00, panini: 3.50, pizze: 3.50, fritti: 1.50, dessert: 3.00 };</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const ALLERGENS = { G: { name: "Glutine", icon: "fa-wheat-awn" }, L: { name: "Latticini", icon: "fa-cheese" }, C: { name: "Crostacei", icon: "fa-shrimp" }, P: { name: "Pesce", icon: "fa-fish-fins" }};</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const DIETS = { vegetariano: { name: "Vegetariano", icon: "🧀" }, vegano: { name: "Vegano", icon: "🌱" }, "carne/pesce": { name: "Carne/🐟Pesce", icon: "🥩" } };</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const PAYMENT_METHODS = {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>Satispay: { name: "Satispay", icon: "fa-mobile-alt" },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>Contanti: { name: "Contanti", icon: "fa-money-bill-wave", note: "Pagamento alla consegna." },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>CarteBancomat: { name: "Carte e bancomat", icon: "fa-credit-card", note: "Pagamento alla consegna." },</p>
-<p class="p1"><span class="Apple-converted-space">            </span>Edenred: { name: "Buoni Pasto Edenred", icon: "fa-ticket-alt", note: "È richiesto il saldo in negozio entro fine settimana." }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>};</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const CATEGORY_ORDER = ["Panini", "Pizze", "Gastronomia", "Verdure", "Fritti", "Dessert"];</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const BREAD_OPTIONS = {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>Panini: ["Pane classico", "Pane ai cereali", "Focaccia"],</p>
-<p class="p1"><span class="Apple-converted-space">            </span>Pizze: ["Pizza classica", "Pizza 5 cereali"]</p>
-<p class="p1"><span class="Apple-converted-space">        </span>};</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const RAW_MENU = {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>panini: [ { name: "Crudo pomodoro mozzarella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 550, ingredients: ["Prosciutto crudo", "Pomodoro", "Mozzarella"] }, { name: "Crudo stracchino rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580, ingredients: ["Prosciutto crudo", "Stracchino", "Rucola"] }, { name: "Cotto arrosto scamorza e verdura", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 520, ingredients: ["Prosciutto cotto", "Scamorza", "Verdura di stagione"] }, { name: "Capocollo pecorino e pomodori secchi", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 600, ingredients: ["Capocollo", "Pecorino", "Pomodori secchi"] }, { name: "Salame pecorino e pomodori secchi", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 620, ingredients: ["Salame", "Pecorino", "Pomodori secchi"] }, { name: "Speck Brie e pomodori secchi", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 610, ingredients: ["Speck", "Brie", "Pomodori secchi"] }, { name: "Porchetta", allergens: ["G"], diet: ["carne/pesce"], calories: 650, ingredients: ["Porchetta di Ariccia"] }, { name: "Vegetariano melanzane zucchine e peperoni", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 450, ingredients: ["Melanzane", "Zucchine", "Peperoni grigliati"] }, { name: "Tacchino e verdura", allergens: ["G"], diet: ["carne/pesce"], calories: 480, ingredients: ["Tacchino arrosto", "Verdura di stagione"] }, { name: "Bresaola parmigiano e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 500, ingredients: ["Bresaola", "Parmigiano a scaglie", "Rucola"] }, { name: "Bresaola primo sale e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 470, ingredients: ["Bresaola", "Primo sale", "Rucola"] }, { name: "Salmone e formaggio", allergens: ["G", "L", "P"], diet: ["carne/pesce"], calories: 530, ingredients: ["Salmone affumicato", "Formaggio spalmabile"] }, { name: "Tonno e pomodoro", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 490, ingredients: ["Tonno", "Pomodoro a fette"] }, { name: "Tonno e carciofini", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 510, ingredients: ["Tonno", "Carciofini sott'olio"] } ],</p>
-<p class="p1"><span class="Apple-converted-space">            </span>pizze: [ { name: "Crudo e mozzarella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 600, ingredients: ["Prosciutto crudo", "Mozzarella"] }, { name: "Speck stracchino e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 650, ingredients: ["Speck", "Stracchino", "Rucola"] }, { name: "Cotto arrosto e melanzane", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580, ingredients: ["Prosciutto cotto", "Melanzane"] }, { name: "Mortadella e stracciatella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 700, ingredients: ["Mortadella", "Stracciatella"] }, { name: "Frittata e zucchine", allergens: ["G", "L"], diet: ["vegetariano"], calories: 550, ingredients: ["Frittata", "Zucchine"] }, { name: "Bresaola e formaggio", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580, ingredients: ["Bresaola", "Formaggio"] }, { name: "Insalata di pollo", allergens: ["G"], diet: ["carne/pesce"], calories: 560, ingredients: ["Insalata di pollo"] }, { name: "Cotto e stracchino", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 620, ingredients: ["Prosciutto cotto", "Stracchino"] } ],</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gastronomia: [ { name: "Cous cous vegetale con pollo", allergens: ["G"], diet: ["carne/pesce"], calories: 450, ingredients: ["Cous cous", "Verdure miste", "Pollo"] }, { name: "Cous cous vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 350, ingredients: ["Cous cous", "Verdure miste"] }, { name: "Farro vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 380, ingredients: ["Farro", "Verdure miste"] }, { name: "Farro vegetale con salmone", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 480, ingredients: ["Farro", "Verdure miste", "Salmone"] }, { name: "Riso Venere con gamberi e zucchine", allergens: ["C"], diet: ["carne/pesce"], calories: 420, ingredients: ["Riso Venere", "Gamberi", "Zucchine"] }, { name: "Insalata di riso", allergens: [], diet: ["carne/pesce"], calories: 400, ingredients: ["Riso", "Wurstel", "Uova", "Verdure sott'olio"] }, { name: "Pasta fredda con tonno pomodori e olive", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 450, ingredients: ["Pasta", "Tonno", "Pomodorini", "Olive"] }, { name: "Pasta fredda pesto primo sale pomodori olive", allergens: ["G", "L"], diet: ["vegetariano"], calories: 500, ingredients: ["Pasta", "Pesto", "Formaggio primo sale", "Pomodorini"] }, { name: "Insalata di pollo", allergens: [], diet: ["carne/pesce"], calories: 350, ingredients: ["Pollo", "Insalata", "Mais", "Pomodorini"] }, { name: "Riso integrale bresaola limone e rughetta", allergens: [], diet: ["carne/pesce"], calories: 380, ingredients: ["Riso integrale", "Bresaola", "Rucola", "Succo di limone"] }, { name: "Pomodori con riso e patate (a peso)", allergens: [], diet: ["vegetariano", "vegano"], calories: 300, ingredients: ["Pomodori", "Riso", "Patate"] } ],</p>
-<p class="p1"><span class="Apple-converted-space">            </span>verdure: [ { name: "Melanzane (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 180, ingredients: ["Melanzane grigliate"] }, { name: "Zucchine (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 160, ingredients: ["Zucchine grigliate"] }, { name: "Peperoni (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 160, ingredients: ["Peperoni arrostiti"] }, { name: "Cicoria (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 140, ingredients: ["Cicoria ripassata"] }, { name: "Broccoletti (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 150, ingredients: ["Broccoletti ripassati"] }, { name: "Broccoli (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 150, ingredients: ["Broccoli al vapore"] }, { name: "Scarola con olive (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 130, ingredients: ["Scarola", "Olive di Gaeta"] } ],</p>
-<p class="p1"><span class="Apple-converted-space">            </span>fritti: [ { name: "Supplì", allergens: ["G", "L"], diet: ["vegetariano"], calories: 250, ingredients: ["Riso", "Pomodoro", "Mozzarella", "Pangrattato"] }, { name: "Polpetta di melanzane", allergens: ["G", "L"], diet: ["vegetariano"], calories: 180, ingredients: ["Melanzane", "Parmigiano", "Uova", "Pangrattato"] } ],</p>
-<p class="p1"><span class="Apple-converted-space">            </span>dessert: [ { name: "Macedonia", allergens: [], diet: ["vegetariano", "vegano"], calories: 120, ingredients: ["Frutta fresca di stagione"] } ]</p>
-<p class="p1"><span class="Apple-converted-space">        </span>};</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const state = { currentUser: null, currentView: 'menu', activeCategoryFilter: 'all', activeDietFilter: 'all', searchTerm: '', cart: [], allOrders: [], menuData: processMenuData(RAW_MENU, PRICES), caloriesVisible: false };</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const dom = { };</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function processMenuData(rawMenu, prices) { let id = 1; const icons = { gastronomia: 'fa-bowl-food', fritti: 'fa-stroopwafel', verdure: 'fa-carrot', panini: 'fa-bread-slice', pizze: 'fa-pizza-slice', dessert: 'fa-ice-cream' }; return Object.entries(rawMenu).flatMap(([cat, items]) =&gt; items.map(item =&gt; ({ id: id++, name: item.name, category: cat.charAt(0).toUpperCase() + cat.slice(1), price: prices[cat] || 0, icon: icons[cat] || 'fa-utensils', ...item }))) }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>function showToast(message, duration = 3000) { dom.toastMessageEl.textContent = message; dom.toastEl.classList.remove('opacity-0'); setTimeout(() =&gt; dom.toastEl.classList.add('opacity-0'), duration); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>function navigate(viewName) { state.currentView = viewName; dom.views.forEach(v =&gt; v.classList.toggle('active', v.id === `${viewName}-view`)); dom.navBtns.forEach(b =&gt; { b.classList.toggle('bg-primary', b.dataset.view === viewName); b.classList.toggle('text-white', b.dataset.view === viewName); }); }</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function updateFilterCounter() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>let count = 0; if (state.activeCategoryFilter !== 'all') count++; if (state.activeDietFilter !== 'all') count++; if(state.searchTerm) count++;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>dom.filterCounterContainer.innerHTML = count &gt; 0 ? `&lt;i class="fas fa-filter text-primary"&gt;&lt;/i&gt; ${count} ${count === 1 ? 'filtro applicato' : 'filtri applicati'}` : '';</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function renderFilters() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>let catSelectHtml = `&lt;option value="all"&gt;Tutte le Categorie&lt;/option&gt;`;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>Object.keys(RAW_MENU).forEach(cat =&gt; { catSelectHtml += `&lt;option value="${cat}"&gt;${cat.charAt(0).toUpperCase() + cat.slice(1)}&lt;/option&gt;`; });<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>dom.categorySelect.innerHTML = catSelectHtml;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>let dietSelectHtml = `&lt;option value="all"&gt;Tutti i Regimi&lt;/option&gt;`; Object.entries(DIETS).forEach(([key, info]) =&gt; { dietSelectHtml += `&lt;option value="${key}"&gt;${info.icon} ${info.name}&lt;/option&gt;`; }); dom.dietSelect.innerHTML = dietSelectHtml;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>let legendHtml = ''; Object.values(ALLERGENS).forEach(info =&gt; { legendHtml += `&lt;p class="flex items-center text-base mb-1"&gt;&lt;i class="fas ${info.icon} mr-2 text-gray-600"&gt;&lt;/i&gt; ${info.name}&lt;/p&gt;`; }); dom.allergenModalContent.innerHTML = legendHtml;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function renderMenu() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const term = state.searchTerm.toLowerCase();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const filtered = state.menuData.filter(item =&gt; (item.name.toLowerCase().includes(term)) &amp;&amp; (state.activeCategoryFilter === 'all' || item.category.toLowerCase() === state.activeCategoryFilter) &amp;&amp; (state.activeDietFilter === 'all' || item.diet.includes(state.activeDietFilter)));</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (filtered.length === 0) {</p>
-<p class="p1"><span class="Apple-converted-space">                 </span>dom.menuItemsContainer.innerHTML = `&lt;div class="text-center p-8 col-span-full bg-white rounded-xl shadow"&gt;&lt;p class="text-gray-500"&gt;Nessun piatto trovato.&lt;/p&gt;&lt;/div&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">                 </span>return;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>let currentCategory = '';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>let menuHtml = '';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const sortedItems = filtered.sort((a, b) =&gt; CATEGORY_ORDER.indexOf(a.category) - CATEGORY_ORDER.indexOf(b.category));</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>sortedItems.forEach(item =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (item.category !== currentCategory) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>currentCategory = item.category;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>menuHtml += `&lt;div class="col-span-full mt-6 mb-2"&gt;&lt;h3 class="text-2xl font-bold border-b-2 border-primary-light pb-2"&gt;${currentCategory}&lt;/h3&gt;&lt;/div&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>const allergenHtml = item.allergens.map(key =&gt; `&lt;i class="fas ${ALLERGENS[key].icon}" title="${ALLERGENS[key].name}"&gt;&lt;/i&gt;`).join(' ');</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>menuHtml += `</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="bg-white p-4 rounded-xl shadow-md flex flex-col hover:shadow-lg transition-all duration-300"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="flex-grow"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="flex items-start mb-2"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;i class="fas ${item.icon} text-primary text-xl mr-3 w-6 text-center pt-1"&gt;&lt;/i&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>&lt;h3 class="font-bold text-lg"&gt;${item.name}&lt;/h3&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>&lt;p class="text-text-main/70 text-sm"&gt;${item.category}&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;p class="text-xs text-text-main/80 ml-9 mt-1"&gt;&lt;span class="font-semibold"&gt;Ingredienti:&lt;/span&gt; ${item.ingredients ? item.ingredients.join(', ') : 'Non specificati'}&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="flex justify-between items-center mt-4"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="flex gap-3 text-lg items-center text-text-main/70"&gt;${allergenHtml}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;span class="font-semibold text-lg"&gt;€${item.price.toFixed(2)}&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;p class="calorie-info text-xs text-text-main/70 text-right mt-1" style="display: ${state.caloriesVisible ? 'flex' : 'none'}; justify-content: flex-end; align-items: center;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>~${item.calories} kcal &lt;i class="fas fa-question-circle text-primary ml-1 cursor-pointer calorie-info-icon"&gt;&lt;/i&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;button data-id="${item.id}" class="add-to-cart-btn w-full mt-4 bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg transition-all duration-300"&gt;&lt;i class="fas fa-plus mr-2"&gt;&lt;/i&gt; Aggiungi&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p1"><span class="Apple-converted-space">            </span>dom.menuItemsContainer.innerHTML = menuHtml;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function renderFavorites() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const favoritesContainer = document.getElementById('favorites-section');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (!state.allOrders || state.allOrders.length === 0) { favoritesContainer.innerHTML = ''; return; }</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const itemCounts = state.allOrders.flatMap(order =&gt; order.items.map(item =&gt; item.name.split(' (')[0])).reduce((acc, name) =&gt; { acc[name] = (acc[name] || 0) + 1; return acc; }, {});</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const sortedFavorites = Object.entries(itemCounts).sort(([, a], [, b]) =&gt; b - a).slice(0, 5).map(([name]) =&gt; state.menuData.find(item =&gt; item.name === name)).filter(Boolean);<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (sortedFavorites.length === 0) { favoritesContainer.innerHTML = ''; return; }</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const favoritesHtml = sortedFavorites.map(item =&gt; `&lt;button data-id="${item.id}" class="add-to-cart-btn flex-shrink-0 bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 text-left w-40"&gt;&lt;p class="font-semibold text-sm truncate"&gt;${item.name}&lt;/p&gt;&lt;p class="text-xs text-text-main/70"&gt;€${item.price.toFixed(2)}&lt;/p&gt;&lt;/button&gt;`).join('');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>favoritesContainer.innerHTML = `&lt;h3 class="text-2xl font-bold mb-3"&gt;&lt;i class="fas fa-star text-yellow-400 mr-2"&gt;&lt;/i&gt;I Più Ordinati&lt;/h3&gt;&lt;div class="flex gap-3 overflow-x-auto pb-3"&gt;${favoritesHtml}&lt;/div&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function renderMyOrder() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const totalItems = state.cart.reduce((sum, item) =&gt; sum + item.quantity, 0);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>dom.cartCountEl.textContent = totalItems;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (state.cart.length === 0) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>dom.myOrderContentEl.innerHTML = `&lt;p class="text-center text-gray-500 py-8"&gt;Il tuo carrello è vuoto.&lt;/p&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const total = state.cart.reduce((sum, item) =&gt; sum + (item.price * item.quantity), 0);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const itemsHtml = state.cart.map(item =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>let breadSelectorHtml = '';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (BREAD_OPTIONS[item.category]) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const optionsHtml = BREAD_OPTIONS[item.category].map(opt =&gt; `&lt;option value="${opt}" ${item.selectedType === opt ? 'selected' : ''}&gt;${opt}&lt;/option&gt;`).join('');</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>breadSelectorHtml = `&lt;select data-id="${item.cartId}" class="cart-bread-select mt-2 w-full p-2 border border-gray-300 rounded-md text-sm"&gt;${optionsHtml}&lt;/select&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>return `</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="py-3 border-b border-gray-200"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="flex justify-between items-start"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div&gt;&lt;p class="font-semibold"&gt;${item.name}&lt;/p&gt;&lt;p class="text-sm text-text-main/70"&gt;€${item.price.toFixed(2)}&lt;/p&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="flex items-center gap-3"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;button data-id="${item.cartId}" data-action="decrease" class="cart-qty-btn bg-gray-200 rounded-full h-8 w-8 transition-all duration-300"&gt;-&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;span class="font-bold text-lg"&gt;${item.quantity}&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;button data-id="${item.cartId}" data-action="increase" class="cart-qty-btn bg-gray-200 rounded-full h-8 w-8 transition-all duration-300"&gt;+&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;button data-id="${item.cartId}" class="cart-remove-btn text-red-500 text-lg flex-shrink-0 ml-4 transition-all duration-300"&gt;&lt;i class="fas fa-trash-alt"&gt;&lt;/i&gt;&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>${breadSelectorHtml}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}).join('');</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>const paymentOptionsHtml = Object.entries(PAYMENT_METHODS).map(([key, {name, icon, note}], index) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const noteHtml = note ? `&lt;span class="block text-xs text-text-main/60 mt-1 font-normal"&gt;${note}&lt;/span&gt;` : '';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>return `</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="flex-1"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;input type="radio" id="payment-${key}" name="payment-method" value="${key}" class="hidden payment-radio" ${index === 0 ? 'checked' : ''}&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;label for="payment-${key}" class="block border-2 border-gray-200 rounded-lg p-3 text-center cursor-pointer transition-all duration-300 hover:border-primary-light h-full"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;i class="fas ${icon} text-2xl text-primary"&gt;&lt;/i&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;span class="block text-sm font-semibold mt-2"&gt;${name}&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>${noteHtml}</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>`}).join('');</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>dom.myOrderContentEl.innerHTML = `</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="space-y-2 mb-4"&gt;${itemsHtml}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="mt-6 space-y-4"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;label for="notes-input" class="block mb-2 font-semibold"&gt;Note per la cucina (es. senza cipolla):&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;input type="text" id="notes-input" placeholder="Aggiungi una nota..." class="w-full p-3 border border-gray-300 rounded-lg"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;label for="alternative-input" class="block mb-2 font-semibold"&gt;Alternativa (se un prodotto è esaurito):&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;input type="text" id="alternative-input" placeholder="Es. un supplì o un'altra verdura" class="w-full p-3 border border-gray-300 rounded-lg"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="mt-6"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;h4 class="block mb-2 font-semibold"&gt;Metodo di Pagamento&lt;/h4&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2"&gt;${paymentOptionsHtml}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="text-right font-bold text-2xl mt-6"&gt;Totale: €${total.toFixed(2)}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;button id="confirm-order-btn" class="w-full mt-4 bg-secondary hover:bg-secondary-dark text-white font-bold py-3 px-4 rounded-lg transition-all duration-300"&gt;&lt;i class="fas fa-check-circle mr-2"&gt;&lt;/i&gt;Conferma e Invia Ordine&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>`;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function renderAllOrders() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const today = new Date();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>today.setHours(0, 0, 0, 0);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const todaysOrders = state.allOrders.filter(order =&gt; order.createdAt &amp;&amp; order.createdAt.toDate() &gt;= today).sort((a, b) =&gt; a.user.localeCompare(b.user));</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>const now = new Date();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const isBeforeCutoff = now.getHours() &lt; 11 || (now.getHours() === 11 &amp;&amp; now.getMinutes() &lt; 30);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (todaysOrders.length === 0) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>dom.allOrdersListEl.innerHTML = `&lt;div class="text-center p-8 bg-white rounded-xl shadow"&gt;&lt;p class="text-gray-500"&gt;Nessun ordine per oggi.&lt;/p&gt;&lt;/div&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>dom.grandTotalEl.textContent = '€0.00';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>let grandTotal = 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const ordersHtml = todaysOrders.map(order =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>grandTotal += order.total;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const itemsHtml = order.items.map(item =&gt; `&lt;li class="flex justify-between items-center text-sm"&gt;&lt;span&gt;${item.quantity} x ${item.name} ${item.selectedType ? `(${item.selectedType})` : ''}&lt;/span&gt;&lt;span class="font-medium"&gt;€${(item.price * item.quantity).toFixed(2)}&lt;/span&gt;&lt;/li&gt;`).join('');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const alternativeHtml = order.alternative ? `&lt;p class="text-xs text-text-main/70 mt-2 pl-4 border-l-2 border-primary-light"&gt;&lt;b&gt;Alternativa:&lt;/b&gt; ${order.alternative}&lt;/p&gt;` : '';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const notesHtml = order.notes ? `&lt;p class="text-xs text-text-main/70 mt-2 pl-4 border-l-2 border-blue-300"&gt;&lt;b&gt;Note:&lt;/b&gt; ${order.notes}&lt;/p&gt;` : '';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const paymentInfo = PAYMENT_METHODS[order.paymentMethod] || { name: order.paymentMethod, icon: 'fa-credit-card' };</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>const deleteButtonHtml = isBeforeCutoff</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>? `&lt;button data-id="${order.id}" class="delete-order-btn text-red-500 hover:text-red-700 ml-2 text-sm" title="Elimina ordine"&gt;&lt;i class="fas fa-trash-alt"&gt;&lt;/i&gt;&lt;/button&gt;`</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>: `&lt;button class="text-gray-300 ml-2 text-sm cursor-not-allowed" disabled title="Eliminazione bloccata dopo le 11:30"&gt;&lt;i class="fas fa-trash-alt"&gt;&lt;/i&gt;&lt;/button&gt;`;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>const paymentStatusHtml = `</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div data-id="${order.id}" class="toggle-paid-btn mt-3 cursor-pointer inline-block rounded-full px-3 py-1 text-xs font-semibold ${order.paid ? 'bg-secondary-100 text-secondary-800' : 'bg-primary-100 text-primary-800'}" title="Clicca per cambiare stato"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;i class="fas ${order.paid ? 'fa-check-circle' : 'fa-hourglass-half'} mr-1"&gt;&lt;/i&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>Stato: ${order.paid ? 'Pagato' : 'Da Pagare'}</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>`;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>return `</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div id="order-${order.id}" class="bg-white p-4 rounded-xl shadow-md transition-all duration-300 ${order.paid ? 'paid-order' : ''}"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="flex justify-between items-start border-b pb-2 mb-2"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>&lt;h4 class="font-bold text-lg"&gt;${order.user}&lt;/h4&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="text-xs bg-gray-100 px-2 py-1 rounded-full"&gt;&lt;i class="fas ${paymentInfo.icon} mr-2"&gt;&lt;/i&gt;${paymentInfo.name}&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="text-right flex items-center"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>&lt;span class="font-bold text-primary text-lg"&gt;€${order.total.toFixed(2)}&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>${deleteButtonHtml}</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;ul class="space-y-1"&gt;${itemsHtml}&lt;/ul&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>${alternativeHtml}</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>${notesHtml}</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="text-right"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>${paymentStatusHtml}</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;`;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}).join('');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>dom.allOrdersListEl.innerHTML = ordersHtml;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>dom.grandTotalEl.textContent = `€${grandTotal.toFixed(2)}`;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>async function handlePaidToggle(statusElement) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const orderId = statusElement.dataset.id;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (!orderId) return;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>const order = state.allOrders.find(o =&gt; o.id === orderId);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (!order) return;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>const newPaidStatus = !order.paid;<span class="Apple-converted-space"> </span></p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>const orderRef = doc(db, "orders", orderId);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>await updateDoc(orderRef, { paid: newPaidStatus });</p>
-<p class="p1"><span class="Apple-converted-space">                </span>showToast(`Stato aggiornato a: ${newPaidStatus ? 'Pagato' : 'Da Pagare'}.`);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} catch (error) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>console.error("Errore aggiornamento pagamento: ", error);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>showToast("Errore durante l'aggiornamento.", 4000);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function handleEvents(event) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const target = event.target;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const button = target.closest('button');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const statusToggle = target.closest('.toggle-paid-btn');</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (event.type === 'click' &amp;&amp; statusToggle) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>handlePaidToggle(statusToggle);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} else if (event.type === 'click' &amp;&amp; button) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>handleClicks(button);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} else if (event.type === 'change' &amp;&amp; target.matches('.cart-bread-select')) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const cartId = parseInt(target.dataset.id);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const itemInCart = state.cart.find(i =&gt; i.cartId === cartId);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (itemInCart) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>itemInCart.selectedType = target.value;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} else if (event.type === 'change' &amp;&amp; target.matches('select')) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>handleSelectChange(target);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} else if (event.type === 'input' &amp;&amp; target.id === 'search-input') {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>state.searchTerm = target.value;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>updateFilterCounter();</p>
-<p class="p1"><span class="Apple-converted-space">                </span>renderMenu();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function handleSelectChange(target) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (target.id === 'category-select') state.activeCategoryFilter = target.value;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>else if (target.id === 'diet-select') state.activeDietFilter = target.value;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>updateFilterCounter();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>renderMenu();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>async function handleClicks(button) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (button.matches('.nav-btn')) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>navigate(button.dataset.view);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>else if (button.matches('.add-to-cart-btn')) {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>const item = state.menuData.find(i =&gt; i.id === parseInt(button.dataset.id));</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (!item) return;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const existingItem = state.cart.find(i =&gt; i.id === item.id &amp;&amp; !i.selectedType); // Only increment if no bread type is selected</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (existingItem &amp;&amp; !BREAD_OPTIONS[item.category]) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>existingItem.quantity++;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>let defaultType = (BREAD_OPTIONS[item.category]) ? BREAD_OPTIONS[item.category][0] : null;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>state.cart.push({ ...item, cartId: Date.now(), quantity: 1, selectedType: defaultType });</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>renderMyOrder();</p>
-<p class="p1"><span class="Apple-converted-space">                </span>showToast(`${item.name} aggiunto!`);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>else if (button.matches('.cart-qty-btn')) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const cartId = parseInt(button.dataset.id);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const itemInCart = state.cart.find(i =&gt; i.cartId === cartId);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (itemInCart) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>if (button.dataset.action === 'increase') itemInCart.quantity++;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>else if (button.dataset.action === 'decrease' &amp;&amp; itemInCart.quantity &gt; 1) itemInCart.quantity--;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>else state.cart = state.cart.filter(i =&gt; i.cartId !== cartId);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>renderMyOrder();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>else if (button.matches('.cart-remove-btn')) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>state.cart = state.cart.filter(i =&gt; i.cartId !== parseInt(button.dataset.id));</p>
-<p class="p1"><span class="Apple-converted-space">                </span>renderMyOrder();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>else if (button.matches('.delete-order-btn')) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const now = new Date();</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (now.getHours() &gt; 11 || (now.getHours() === 11 &amp;&amp; now.getMinutes() &gt;= 30)) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>showToast("Non è più possibile eliminare gli ordini dopo le 11:30.");</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>return;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const orderId = button.dataset.id;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (confirm('Sei sicuro di voler eliminare questo ordine? L\'azione è irreversibile.')) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>try {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>await deleteDoc(doc(db, "orders", orderId));</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>showToast("Ordine eliminato con successo.");</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>} catch (error) {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>console.error("Errore eliminazione ordine:", error);</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>showToast("Impossibile eliminare l'ordine.");</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>else if (button.id === 'save-username-btn') {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>const name = dom.usernameInput.value.trim();</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (name) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>localStorage.setItem('dosepranza-username', name);</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>state.currentUser.name = name;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>dom.userModal.classList.add('hidden');</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>updateAdminControlsVisibility();</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>else if (button.id === 'toggle-calories') {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>state.caloriesVisible = !state.caloriesVisible;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>button.querySelector('span').textContent = state.caloriesVisible ? 'Nascondi Calorie' : 'Mostra Calorie';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>button.querySelector('i').className = `fas ${state.caloriesVisible ? 'fa-toggle-on' : 'fa-toggle-off'} mr-2`;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>renderMenu();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>else if (button.id === 'show-allergens-btn') {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>dom.allergenModal.classList.remove('hidden');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>else if (button.id === 'close-allergen-modal-btn') {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>dom.allergenModal.classList.add('hidden');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>else if (button.id === 'confirm-order-btn') {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (state.cart.length === 0) { showToast("Il tuo carrello è vuoto."); return; }</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (!state.currentUser || !state.currentUser.name) { showToast("Per favore, inserisci prima il tuo nome."); dom.userModal.classList.remove('hidden'); return; }</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>const notes = document.getElementById('notes-input').value.trim();</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const alternative = document.getElementById('alternative-input').value.trim();</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const paymentMethod = document.querySelector('input[name="payment-method"]:checked')?.value;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (!paymentMethod) { showToast("Seleziona un metodo di pagamento."); return; }</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>const total = state.cart.reduce((sum, item) =&gt; sum + (item.price * item.quantity), 0);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const itemsToSave = state.cart.map(item =&gt; ({<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>name: item.name,</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>category: item.category,<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>quantity: item.quantity,<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>price: item.price,<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>selectedType: item.selectedType || null<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>}));</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>const orderData = {<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>user: state.currentUser.name,<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>uid: state.currentUser.uid,<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>items: itemsToSave,<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>total,<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>alternative,</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>notes,</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>paymentMethod,</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>createdAt: serverTimestamp(),<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>paid: false<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>};</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>try {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>await addDoc(ordersCollectionRef, orderData);</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>showToast("Ordine confermato con successo!");</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>state.cart = [];</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>renderMyOrder();</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>navigate('all-orders');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>} catch (error) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>console.error("Errore nell'invio dell'ordine: ", error);</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>showToast("Si è verificato un errore. Riprova.", 4000);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>else if (button.id === 'copy-summary-btn') {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const today = new Date();</p>
-<p class="p1"><span class="Apple-converted-space">                </span>today.setHours(0, 0, 0, 0);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const todaysOrders = state.allOrders</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>.filter(order =&gt; order.createdAt &amp;&amp; order.createdAt.toDate() &gt;= today)</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>.sort((a, b) =&gt; a.user.localeCompare(b.user));</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (todaysOrders.length === 0) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>showToast("Nessun ordine da copiare per oggi.");</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>return;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>// --- 1. Preparazione per la Cucina ---</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const prepItems = {};</p>
-<p class="p1"><span class="Apple-converted-space">                </span>todaysOrders.forEach(order =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>order.items.forEach(item =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>const itemName = item.name + (item.selectedType ? ` (${item.selectedType})` : '');</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>if (!prepItems[itemName]) {</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>prepItems[itemName] = { quantity: 0, users: [] };</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>prepItems[itemName].quantity += item.quantity;</p>
-<p class="p2"><span class="Apple-converted-space">                        </span></p>
-<p class="p1"><span class="Apple-converted-space">                        </span>let userNote = `${order.user}`;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>if (item.quantity &gt; 1) {</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>userNote += ` (x${item.quantity})`;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>if (order.notes) {</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>userNote += ` [Nota: ${order.notes}]`;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>prepItems[itemName].users.push(userNote);</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
-<p class="p1"><span class="Apple-converted-space">                </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>let prepText = "--- 📝 LISTA PREPARAZIONE ---\n\n";</p>
-<p class="p1"><span class="Apple-converted-space">                </span>Object.keys(prepItems).sort().forEach(itemName =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const itemDetails = prepItems[itemName];</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>prepText += `*${itemDetails.quantity}x ${itemName}*\n`;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>prepText += `<span class="Apple-converted-space">  </span>- Per: ${itemDetails.users.join(', ')}\n\n`;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>// --- 2. Riepilogo Ordini e Pagamenti ---</p>
-<p class="p1"><span class="Apple-converted-space">                </span>let ordersText = "--- 💵 RIEPILOGO ORDINI E PAGAMENTI ---\n\n";</p>
-<p class="p1"><span class="Apple-converted-space">                </span>let grandTotal = 0;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>todaysOrders.forEach(order =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>ordersText += `*${order.user}* - Totale: €${order.total.toFixed(2)}\n`;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>ordersText += `<span class="Apple-converted-space">  </span>- Pagamento: ${PAYMENT_METHODS[order.paymentMethod]?.name || order.paymentMethod}\n`;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>order.items.forEach(item =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>const itemName = item.name + (item.selectedType ? ` (${item.selectedType})` : '');</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>ordersText += `<span class="Apple-converted-space">  </span>- ${item.quantity}x ${itemName}\n`;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>if (order.notes) {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>ordersText += `<span class="Apple-converted-space">  </span>- Nota: ${order.notes}\n`;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>if (order.alternative) {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>ordersText += `<span class="Apple-converted-space">  </span>- Alternativa: ${order.alternative}\n`;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>ordersText += `\n`;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>grandTotal += order.total;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>ordersText += `-------------------------------------\n`;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>ordersText += `TOTALE COMPLESSIVO: €${grandTotal.toFixed(2)}`;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>// --- Combinazione e Copia ---</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const finalSummary = prepText + "\n\n" + ordersText;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>navigator.clipboard.writeText(finalSummary)</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>.then(() =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>showToast("Riepilogo ottimizzato copiato negli appunti!");</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>})</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>.catch(err =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>console.error('Errore durante la copia:', err);</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>showToast("Errore: impossibile copiare il riepilogo.");</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>else if (button.id === 'export-history-btn') {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>showToast("Esportazione in corso...");</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>try {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const allOrdersQuery = query(ordersCollectionRef, orderBy("createdAt", "desc"));</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const querySnapshot = await getDocs(allOrdersQuery);</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const allOrdersHistory = querySnapshot.docs.map(doc =&gt; ({id: doc.id, ...doc.data()}));</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>if (allOrdersHistory.length === 0) {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>showToast("Nessun ordine nello storico da esportare.");</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>return;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
-<p class="p2"><span class="Apple-converted-space">                    </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const escapeCsvField = (field) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>if (field === null || field === undefined) return '""';</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>let stringField = String(field);</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>if (stringField.search(/("|,|;|\n)/g) &gt;= 0) {</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>stringField = `"${stringField.replace(/"/g, '""')}"`;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>return `"${stringField}"`;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>};</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const header = [</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>'OrderID', 'TimestampISO8601', 'DataLeggibile', 'UserID', 'Utente',<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                        </span>'Prodotto', 'CategoriaProdotto', 'TipoSpecifico', 'Quantita',<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                        </span>'PrezzoUnitario', 'TotaleRiga', 'MetodoPagamento', 'NoteCliente',<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                        </span>'Alternativa', 'CanaleOrdine', 'StatoPagamento'</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>];</p>
-<p class="p2"><span class="Apple-converted-space">                    </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>let csvRows = [header.join(';')];</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>allOrdersHistory.forEach(order =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>order.items.forEach(item =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>let category = item.category;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>if (!category) {</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>const menuItem = state.menuData.find(m =&gt; m.name === item.name);</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>category = menuItem ? menuItem.category : 'Sconosciuta';</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>}</p>
-<p class="p2"><span class="Apple-converted-space">                            </span></p>
-<p class="p1"><span class="Apple-converted-space">                            </span>const row = [</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>escapeCsvField(order.id),</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>escapeCsvField(order.createdAt ? order.createdAt.toDate().toISOString() : 'N/D'),</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>escapeCsvField(order.createdAt ? order.createdAt.toDate().toLocaleString('it-IT') : 'N/D'),</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>escapeCsvField(order.uid || 'N/D'),</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>escapeCsvField(order.user),</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>escapeCsvField(item.name),</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>escapeCsvField(category),</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>escapeCsvField(item.selectedType || ''),</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>escapeCsvField(item.quantity),</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>escapeCsvField(item.price ? item.price.toFixed(2).replace('.', ',') : '0,00'),</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>escapeCsvField(item.price ? (item.quantity * item.price).toFixed(2).replace('.', ',') : '0,00'),</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>escapeCsvField(order.paymentMethod),</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>escapeCsvField(order.notes || ''),</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>escapeCsvField(order.alternative || ''),</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>escapeCsvField('Web'),</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>escapeCsvField(order.paid ? 'Pagato' : 'Da Pagare')</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>];</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>csvRows.push(row.join(';'));</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>});</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const csvContent = csvRows.join('\n');</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const blob = new Blob([`\uFEFF${csvContent}`], { type: 'text/csv;charset=utf-8;' });</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const url = URL.createObjectURL(blob);</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const a = document.createElement('a');</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>a.setAttribute('href', url);</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>a.setAttribute('download', 'storico_ordini_dosepranza.csv');</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>document.body.appendChild(a);</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>a.click();</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>document.body.removeChild(a);</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>URL.revokeObjectURL(url);</p>
-<p class="p2"><span class="Apple-converted-space">                    </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>} catch (error) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>console.error("Errore durante l'esportazione: ", error);</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>showToast("Esportazione fallita. Controlla la console.");</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function updateAdminControlsVisibility() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const exportBtn = document.getElementById('export-history-btn');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (!exportBtn) return;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (state.currentUser &amp;&amp; state.currentUser.name === 'Marco Tranquilli') {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>exportBtn.classList.remove('hidden');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>exportBtn.classList.add('hidden');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function init() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>Object.assign(dom, {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>views: document.querySelectorAll('.view'), navBtns: document.querySelectorAll('.nav-btn'),</p>
-<p class="p1"><span class="Apple-converted-space">                </span>menuItemsContainer: document.getElementById('menu-items'), cartCountEl: document.getElementById('cart-count'),</p>
-<p class="p1"><span class="Apple-converted-space">                </span>myOrderContentEl: document.getElementById('my-order-content'), allOrdersListEl: document.getElementById('all-orders-list'),</p>
-<p class="p1"><span class="Apple-converted-space">                </span>grandTotalEl: document.getElementById('grand-total'), userModal: document.getElementById('user-modal'),</p>
-<p class="p1"><span class="Apple-converted-space">                </span>usernameInput: document.getElementById('username-input'), toastEl: document.getElementById('toast'),</p>
-<p class="p1"><span class="Apple-converted-space">                </span>toastMessageEl: document.getElementById('toast-message'), categorySelect: document.getElementById('category-select'),</p>
-<p class="p1"><span class="Apple-converted-space">                </span>dietSelect: document.getElementById('diet-select'), filterCounterContainer: document.getElementById('filter-counter-container'),</p>
-<p class="p1"><span class="Apple-converted-space">                </span>allergenModal: document.getElementById('allergen-modal'), allergenModalContent: document.getElementById('allergen-modal-content'),</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.body.addEventListener('click', handleEvents);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.body.addEventListener('change', handleEvents);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>document.body.addEventListener('input', handleEvents);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>renderFilters();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>renderMenu();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>navigate('menu');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>onAuthStateChanged(auth, (user) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (user) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>state.currentUser = { uid: user.uid, name: localStorage.getItem('dosepranza-username') };</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (!state.currentUser.name) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>dom.userModal.classList.remove('hidden');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>updateAdminControlsVisibility();</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>onSnapshot(ordersCollectionRef, snapshot =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>state.allOrders = snapshot.docs.map(doc =&gt; ({...doc.data(), id: doc.id}));</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>if(state.currentView === 'all-orders') renderAllOrders();</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>renderFavorites();</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}, error =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>console.error("Errore con lo snapshot di Firestore:", error);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>});</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} else { signInAnonymously(auth); }</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>init();</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+<body class="bg-background text-text-main">
+
+    <div id="app" class="max-w-4xl mx-auto p-4 md:p-6">
+        <header class="mb-6 flex flex-col items-center">
+            <img src="https://i.postimg.cc/SsN4LYBP/Logo-basic-dosepranza.png" alt="Dosepranza Logo" class="w-64 md:w-80 mx-auto">
+            <div class="text-center mt-4">
+                <h1 class="text-5xl md:text-6xl font-extrabold tracking-tight text-text-main">DOSEPRANZA</h1>
+                <p class="text-lg md:text-xl text-gray-500 tracking-wider">Dalla pizzicheria alla scrivania</p>
+            </div>
+            <div class="bg-primary-100 border-l-4 border-primary text-primary-800 p-4 rounded-md my-4 w-full" role="alert">
+                <p class="font-bold">Attenzione: L'ordine deve essere completato entro le 11:30.</p>
+                <p>La consegna è stimata intorno alle 12:30.</p>
+                <p>La consegna è <strong>gratuita</strong>.</p>
+            </div>
+        </header>
+
+        <nav class="flex justify-center bg-white/70 backdrop-blur-sm p-2 rounded-xl shadow-md mb-6 sticky top-4 z-40">
+            <button data-view="menu" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold text-text-main transition-all duration-300"><i class="fas fa-utensils mr-2"></i>Menù</button>
+            <button data-view="my-order" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold text-text-main transition-all duration-300"><i class="fas fa-shopping-basket mr-2"></i>Il Mio Ordine <span id="cart-count" class="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 inline-flex items-center justify-center ml-1">0</span></button>
+            <button data-view="all-orders" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold text-text-main transition-all duration-300"><i class="fas fa-users mr-2"></i>Tutti gli Ordini</button>
+        </nav>
+
+        <main>
+            <div id="menu-view" class="view">
+                <h2 class="text-3xl font-extrabold mb-4">Scegli cosa ordinare</h2>
+                
+                <div id="favorites-section" class="mb-8"></div>
+                
+                <div class="flex flex-col sm:flex-row gap-3 mb-4 items-center">
+                    <div class="relative w-full sm:flex-grow">
+                        <input type="search" id="search-input" placeholder="Cerca un piatto..." class="w-full p-3 pl-10 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-primary transition-all duration-300">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    </div>
+                    <select id="category-select" class="w-full sm:w-auto p-3 border border-gray-300 rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-primary transition-all duration-300"></select>
+                    <select id="diet-select" class="w-full sm:w-auto p-3 border border-gray-300 rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-primary transition-all duration-300"></select>
+                </div>
+                
+                <div class="flex justify-between items-center mb-4">
+                    <div id="filter-counter-container" class="text-sm"></div>
+                    <div class="flex gap-2">
+                        <button id="show-allergens-btn" class="bg-gray-200 hover:bg-gray-300 text-text-main font-bold py-2 px-4 rounded-lg flex items-center text-sm transition-all duration-300"><i class="fas fa-info-circle mr-2"></i> Mostra Allergeni</button>
+                        <button id="toggle-calories" class="bg-gray-200 hover:bg-gray-300 text-text-main font-bold py-2 px-4 rounded-lg flex items-center text-sm transition-all duration-300">
+                            <i class="fas fa-toggle-off mr-2"></i>
+                            <span id="toggle-calories-text">Mostra Calorie</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="menu-items" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </div>
+
+            <div id="my-order-view" class="view">
+                <h2 class="text-3xl font-extrabold mb-4">Riepilogo del Tuo Ordine</h2>
+                <div id="my-order-content" class="bg-white p-6 rounded-xl shadow-md"></div>
+            </div>
+
+            <div id="all-orders-view" class="view">
+                 <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
+                    <h2 class="text-3xl font-extrabold">Riepilogo Ordini di Oggi</h2>
+                    <div class="flex gap-2">
+                        <button id="export-history-btn" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg hidden transition-all duration-300"><i class="fas fa-download mr-2"></i> Esporta Storico</button>
+                        <button id="copy-summary-btn" class="bg-secondary hover:bg-secondary-dark text-white font-bold py-2 px-4 rounded-lg transition-all duration-300"><i class="fas fa-copy mr-2"></i> Copia Riepilogo</button>
+                    </div>
+                </div>
+                <div id="satispay-details" class="bg-white p-4 rounded-xl shadow-md mb-6 flex flex-col md:flex-row items-center gap-4">
+                    <div class="flex-shrink-0">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" alt="QR Code Satispay" class="rounded-lg">
+                    </div>
+                    <div class="text-center md:text-left">
+                        <h3 class="text-xl font-bold">Paga con Satispay</h3>
+                        <p class="text-text-main/80">Inquadra il QR Code o usa il link per pagare l'importo del tuo ordine a <strong>Alimentari Russo</strong>.</p>
+                        <a href="https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" target="_blank" class="mt-2 inline-block bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg transition-all duration-300">
+                            <i class="fas fa-external-link-alt mr-2"></i>Vai a Satispay
+                        </a>
+                    </div>
+                </div>
+                <div id="all-orders-list" class="space-y-4"></div>
+                 <div class="mt-6 bg-white p-4 rounded-xl shadow-lg text-right">
+                    <span class="text-xl font-bold">Totale Complessivo:</span>
+                    <span id="grand-total" class="text-2xl font-bold text-primary ml-2">€0.00</span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="user-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden"><div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md text-center"><h3 class="text-2xl font-bold mb-4">Benvenuto!</h3><p class="text-gray-600 mb-6">Per iniziare, inserisci il tuo nome e cognome. È importante per la gestione dei pagamenti e per eventuali comunicazioni.</p><input type="text" id="username-input" placeholder="Es. Marco Rossi" class="w-full p-3 border rounded-lg"><button id="save-username-btn" class="w-full mt-4 bg-primary hover:bg-primary-dark text-white font-bold py-3 px-4 rounded-lg transition-all duration-300">Salva</button></div></div>
+    <div id="allergen-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden"><div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md relative"><button id="close-allergen-modal-btn" class="absolute top-2 right-4 text-2xl text-gray-500 hover:text-gray-800">&times;</button><h3 class="text-2xl font-bold mb-4">Legenda Allergeni</h3><div id="allergen-modal-content" class="text-gray-600 text-sm space-y-2"></div></div></div>
+    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 bg-text-main text-white py-3 px-6 rounded-full shadow-xl z-50 opacity-0 transition-opacity"><p id="toast-message"></p></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, deleteDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyCQJsNbgaR89gF_1vLe6H4DPboOhQvm9nI", authDomain: "app-ordini-pranzo-alimentari.firebaseapp.com", projectId: "app-ordini-pranzo-alimentari", storageBucket: "app-ordini-pranzo-alimentari.appspot.com", messagingSenderId: "553169964686", appId: "1:553169964686:web:7f8ca6f32a301949e4c3df" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const ordersCollectionRef = collection(db, "orders");
+        
+        const PRICES = { gastronomia: 4.00, verdure: 4.00, panini: 3.50, pizze: 3.50, fritti: 1.50, dessert: 3.00 };
+        const ALLERGENS = { G: { name: "Glutine", icon: "fa-wheat-awn" }, L: { name: "Latticini", icon: "fa-cheese" }, C: { name: "Crostacei", icon: "fa-shrimp" }, P: { name: "Pesce", icon: "fa-fish-fins" }};
+        const DIETS = { vegetariano: { name: "Vegetariano", icon: "🧀" }, vegano: { name: "Vegano", icon: "🌱" }, "carne/pesce": { name: "Carne/🐟Pesce", icon: "🥩" } };
+        const PAYMENT_METHODS = { 
+            Satispay: { name: "Satispay", icon: "fa-mobile-alt" },
+            Contanti: { name: "Contanti", icon: "fa-money-bill-wave", note: "Pagamento alla consegna." },
+            CarteBancomat: { name: "Carte e bancomat", icon: "fa-credit-card", note: "Pagamento alla consegna." },
+            Edenred: { name: "Buoni Pasto Edenred", icon: "fa-ticket-alt", note: "È richiesto il saldo in negozio entro fine settimana." }
+        };
+        const CATEGORY_ORDER = ["Panini", "Pizze", "Gastronomia", "Verdure", "Fritti", "Dessert"];
+        
+        const BREAD_OPTIONS = {
+            Panini: ["Pane classico", "Pane ai cereali", "Focaccia"],
+            Pizze: ["Pizza classica", "Pizza 5 cereali"]
+        };
+
+        const RAW_MENU = {
+            panini: [ { name: "Crudo pomodoro mozzarella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 550, ingredients: ["Prosciutto crudo", "Pomodoro", "Mozzarella"] }, { name: "Crudo stracchino rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580, ingredients: ["Prosciutto crudo", "Stracchino", "Rucola"] }, { name: "Cotto arrosto scamorza e verdura", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 520, ingredients: ["Prosciutto cotto", "Scamorza", "Verdura di stagione"] }, { name: "Capocollo pecorino e pomodori secchi", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 600, ingredients: ["Capocollo", "Pecorino", "Pomodori secchi"] }, { name: "Salame pecorino e pomodori secchi", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 620, ingredients: ["Salame", "Pecorino", "Pomodori secchi"] }, { name: "Speck Brie e pomodori secchi", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 610, ingredients: ["Speck", "Brie", "Pomodori secchi"] }, { name: "Porchetta", allergens: ["G"], diet: ["carne/pesce"], calories: 650, ingredients: ["Porchetta di Ariccia"] }, { name: "Vegetariano melanzane zucchine e peperoni", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 450, ingredients: ["Melanzane", "Zucchine", "Peperoni grigliati"] }, { name: "Tacchino e verdura", allergens: ["G"], diet: ["carne/pesce"], calories: 480, ingredients: ["Tacchino arrosto", "Verdura di stagione"] }, { name: "Bresaola parmigiano e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 500, ingredients: ["Bresaola", "Parmigiano a scaglie", "Rucola"] }, { name: "Bresaola primo sale e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 470, ingredients: ["Bresaola", "Primo sale", "Rucola"] }, { name: "Salmone e formaggio", allergens: ["G", "L", "P"], diet: ["carne/pesce"], calories: 530, ingredients: ["Salmone affumicato", "Formaggio spalmabile"] }, { name: "Tonno e pomodoro", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 490, ingredients: ["Tonno", "Pomodoro a fette"] }, { name: "Tonno e carciofini", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 510, ingredients: ["Tonno", "Carciofini sott'olio"] } ],
+            pizze: [ { name: "Crudo e mozzarella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 600, ingredients: ["Prosciutto crudo", "Mozzarella"] }, { name: "Speck stracchino e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 650, ingredients: ["Speck", "Stracchino", "Rucola"] }, { name: "Cotto arrosto e melanzane", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580, ingredients: ["Prosciutto cotto", "Melanzane"] }, { name: "Mortadella e stracciatella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 700, ingredients: ["Mortadella", "Stracciatella"] }, { name: "Frittata e zucchine", allergens: ["G", "L"], diet: ["vegetariano"], calories: 550, ingredients: ["Frittata", "Zucchine"] }, { name: "Bresaola e formaggio", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580, ingredients: ["Bresaola", "Formaggio"] }, { name: "Insalata di pollo", allergens: ["G"], diet: ["carne/pesce"], calories: 560, ingredients: ["Insalata di pollo"] }, { name: "Cotto e stracchino", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 620, ingredients: ["Prosciutto cotto", "Stracchino"] } ],
+            gastronomia: [ { name: "Cous cous vegetale con pollo", allergens: ["G"], diet: ["carne/pesce"], calories: 450, ingredients: ["Cous cous", "Verdure miste", "Pollo"] }, { name: "Cous cous vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 350, ingredients: ["Cous cous", "Verdure miste"] }, { name: "Farro vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 380, ingredients: ["Farro", "Verdure miste"] }, { name: "Farro vegetale con salmone", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 480, ingredients: ["Farro", "Verdure miste", "Salmone"] }, { name: "Riso Venere con gamberi e zucchine", allergens: ["C"], diet: ["carne/pesce"], calories: 420, ingredients: ["Riso Venere", "Gamberi", "Zucchine"] }, { name: "Insalata di riso", allergens: [], diet: ["carne/pesce"], calories: 400, ingredients: ["Riso", "Wurstel", "Uova", "Verdure sott'olio"] }, { name: "Pasta fredda con tonno pomodori e olive", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 450, ingredients: ["Pasta", "Tonno", "Pomodorini", "Olive"] }, { name: "Pasta fredda pesto primo sale pomodori olive", allergens: ["G", "L"], diet: ["vegetariano"], calories: 500, ingredients: ["Pasta", "Pesto", "Formaggio primo sale", "Pomodorini"] }, { name: "Insalata di pollo", allergens: [], diet: ["carne/pesce"], calories: 350, ingredients: ["Pollo", "Insalata", "Mais", "Pomodorini"] }, { name: "Riso integrale bresaola limone e rughetta", allergens: [], diet: ["carne/pesce"], calories: 380, ingredients: ["Riso integrale", "Bresaola", "Rucola", "Succo di limone"] }, { name: "Pomodori con riso e patate (a peso)", allergens: [], diet: ["vegetariano", "vegano"], calories: 300, ingredients: ["Pomodori", "Riso", "Patate"] } ],
+            verdure: [ { name: "Melanzane (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 180, ingredients: ["Melanzane grigliate"] }, { name: "Zucchine (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 160, ingredients: ["Zucchine grigliate"] }, { name: "Peperoni (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 160, ingredients: ["Peperoni arrostiti"] }, { name: "Cicoria (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 140, ingredients: ["Cicoria ripassata"] }, { name: "Broccoletti (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 150, ingredients: ["Broccoletti ripassati"] }, { name: "Broccoli (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 150, ingredients: ["Broccoli al vapore"] }, { name: "Scarola con olive (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 130, ingredients: ["Scarola", "Olive di Gaeta"] } ],
+            fritti: [ { name: "Supplì", allergens: ["G", "L"], diet: ["vegetariano"], calories: 250, ingredients: ["Riso", "Pomodoro", "Mozzarella", "Pangrattato"] }, { name: "Polpetta di melanzane", allergens: ["G", "L"], diet: ["vegetariano"], calories: 180, ingredients: ["Melanzane", "Parmigiano", "Uova", "Pangrattato"] } ],
+            dessert: [ { name: "Macedonia", allergens: [], diet: ["vegetariano", "vegano"], calories: 120, ingredients: ["Frutta fresca di stagione"] } ]
+        };
+        
+        const state = { currentUser: null, currentView: 'menu', activeCategoryFilter: 'all', activeDietFilter: 'all', searchTerm: '', cart: [], allOrders: [], menuData: processMenuData(RAW_MENU, PRICES), caloriesVisible: false };
+        const dom = { };
+        
+        function processMenuData(rawMenu, prices) { let id = 1; const icons = { gastronomia: 'fa-bowl-food', fritti: 'fa-stroopwafel', verdure: 'fa-carrot', panini: 'fa-bread-slice', pizze: 'fa-pizza-slice', dessert: 'fa-ice-cream' }; return Object.entries(rawMenu).flatMap(([cat, items]) => items.map(item => ({ id: id++, name: item.name, category: cat.charAt(0).toUpperCase() + cat.slice(1), price: prices[cat] || 0, icon: icons[cat] || 'fa-utensils', ...item }))) }
+        function showToast(message, duration = 3000) { dom.toastMessageEl.textContent = message; dom.toastEl.classList.remove('opacity-0'); setTimeout(() => dom.toastEl.classList.add('opacity-0'), duration); }
+        function navigate(viewName) { state.currentView = viewName; dom.views.forEach(v => v.classList.toggle('active', v.id === `${viewName}-view`)); dom.navBtns.forEach(b => { b.classList.toggle('bg-primary', b.dataset.view === viewName); b.classList.toggle('text-white', b.dataset.view === viewName); }); }
+        
+        function updateFilterCounter() {
+            let count = 0; if (state.activeCategoryFilter !== 'all') count++; if (state.activeDietFilter !== 'all') count++; if(state.searchTerm) count++;
+            dom.filterCounterContainer.innerHTML = count > 0 ? `<i class="fas fa-filter text-primary"></i> ${count} ${count === 1 ? 'filtro applicato' : 'filtri applicati'}` : '';
+        }
+
+        function renderFilters() {
+            let catSelectHtml = `<option value="all">Tutte le Categorie</option>`; 
+            Object.keys(RAW_MENU).forEach(cat => { catSelectHtml += `<option value="${cat}">${cat.charAt(0).toUpperCase() + cat.slice(1)}</option>`; }); 
+            dom.categorySelect.innerHTML = catSelectHtml;
+
+            let dietSelectHtml = `<option value="all">Tutti i Regimi</option>`; Object.entries(DIETS).forEach(([key, info]) => { dietSelectHtml += `<option value="${key}">${info.icon} ${info.name}</option>`; }); dom.dietSelect.innerHTML = dietSelectHtml;
+            let legendHtml = ''; Object.values(ALLERGENS).forEach(info => { legendHtml += `<p class="flex items-center text-base mb-1"><i class="fas ${info.icon} mr-2 text-gray-600"></i> ${info.name}</p>`; }); dom.allergenModalContent.innerHTML = legendHtml;
+        }
+
+        function renderMenu() {
+            const term = state.searchTerm.toLowerCase();
+            const filtered = state.menuData.filter(item => (item.name.toLowerCase().includes(term)) && (state.activeCategoryFilter === 'all' || item.category.toLowerCase() === state.activeCategoryFilter) && (state.activeDietFilter === 'all' || item.diet.includes(state.activeDietFilter)));
+            
+            if (filtered.length === 0) {
+                 dom.menuItemsContainer.innerHTML = `<div class="text-center p-8 col-span-full bg-white rounded-xl shadow"><p class="text-gray-500">Nessun piatto trovato.</p></div>`;
+                 return;
+            }
+
+            let currentCategory = '';
+            let menuHtml = '';
+            const sortedItems = filtered.sort((a, b) => CATEGORY_ORDER.indexOf(a.category) - CATEGORY_ORDER.indexOf(b.category));
+
+            sortedItems.forEach(item => {
+                if (item.category !== currentCategory) {
+                    currentCategory = item.category;
+                    menuHtml += `<div class="col-span-full mt-6 mb-2"><h3 class="text-2xl font-bold border-b-2 border-primary-light pb-2">${currentCategory}</h3></div>`;
+                }
+                
+                const allergenHtml = item.allergens.map(key => `<i class="fas ${ALLERGENS[key].icon}" title="${ALLERGENS[key].name}"></i>`).join(' ');
+                
+                menuHtml += `
+                <div class="bg-white p-4 rounded-xl shadow-md flex flex-col hover:shadow-lg transition-all duration-300">
+                    <div class="flex-grow">
+                        <div class="flex items-start mb-2">
+                            <i class="fas ${item.icon} text-primary text-xl mr-3 w-6 text-center pt-1"></i>
+                            <div>
+                                <h3 class="font-bold text-lg">${item.name}</h3>
+                                <p class="text-text-main/70 text-sm">${item.category}</p>
+                            </div>
+                        </div>
+                        <p class="text-xs text-text-main/80 ml-9 mt-1"><span class="font-semibold">Ingredienti:</span> ${item.ingredients ? item.ingredients.join(', ') : 'Non specificati'}</p>
+                    </div>
+                    <div class="flex justify-between items-center mt-4">
+                        <div class="flex gap-3 text-lg items-center text-text-main/70">${allergenHtml}</div>
+                        <span class="font-semibold text-lg">€${item.price.toFixed(2)}</span>
+                    </div>
+                    <p class="calorie-info text-xs text-text-main/70 text-right mt-1" style="display: ${state.caloriesVisible ? 'flex' : 'none'}; justify-content: flex-end; align-items: center;">
+                        ~${item.calories} kcal <i class="fas fa-question-circle text-primary ml-1 cursor-pointer calorie-info-icon"></i>
+                    </p>
+                    <button data-id="${item.id}" class="add-to-cart-btn w-full mt-4 bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg transition-all duration-300"><i class="fas fa-plus mr-2"></i> Aggiungi</button>
+                </div>`;
+            });
+            dom.menuItemsContainer.innerHTML = menuHtml;
+        }
+
+        function renderFavorites() {
+            const favoritesContainer = document.getElementById('favorites-section');
+            if (!state.allOrders || state.allOrders.length === 0) { favoritesContainer.innerHTML = ''; return; }
+            const itemCounts = state.allOrders.flatMap(order => order.items.map(item => item.name.split(' (')[0])).reduce((acc, name) => { acc[name] = (acc[name] || 0) + 1; return acc; }, {});
+            const sortedFavorites = Object.entries(itemCounts).sort(([, a], [, b]) => b - a).slice(0, 5).map(([name]) => state.menuData.find(item => item.name === name)).filter(Boolean); 
+            if (sortedFavorites.length === 0) { favoritesContainer.innerHTML = ''; return; }
+            const favoritesHtml = sortedFavorites.map(item => `<button data-id="${item.id}" class="add-to-cart-btn flex-shrink-0 bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 text-left w-40"><p class="font-semibold text-sm truncate">${item.name}</p><p class="text-xs text-text-main/70">€${item.price.toFixed(2)}</p></button>`).join('');
+            favoritesContainer.innerHTML = `<h3 class="text-2xl font-bold mb-3"><i class="fas fa-star text-yellow-400 mr-2"></i>I Più Ordinati</h3><div class="flex gap-3 overflow-x-auto pb-3">${favoritesHtml}</div>`;
+        }
+        
+        function renderMyOrder() {
+            const totalItems = state.cart.reduce((sum, item) => sum + item.quantity, 0);
+            dom.cartCountEl.textContent = totalItems;
+            if (state.cart.length === 0) {
+                dom.myOrderContentEl.innerHTML = `<p class="text-center text-gray-500 py-8">Il tuo carrello è vuoto.</p>`;
+                return;
+            }
+            const total = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const itemsHtml = state.cart.map(item => {
+                let breadSelectorHtml = '';
+                if (BREAD_OPTIONS[item.category]) {
+                    const optionsHtml = BREAD_OPTIONS[item.category].map(opt => `<option value="${opt}" ${item.selectedType === opt ? 'selected' : ''}>${opt}</option>`).join('');
+                    breadSelectorHtml = `<select data-id="${item.cartId}" class="cart-bread-select mt-2 w-full p-2 border border-gray-300 rounded-md text-sm">${optionsHtml}</select>`;
+                }
+                return `
+                <div class="py-3 border-b border-gray-200">
+                    <div class="flex justify-between items-start">
+                        <div><p class="font-semibold">${item.name}</p><p class="text-sm text-text-main/70">€${item.price.toFixed(2)}</p></div>
+                        <div class="flex items-center gap-3">
+                            <button data-id="${item.cartId}" data-action="decrease" class="cart-qty-btn bg-gray-200 rounded-full h-8 w-8 transition-all duration-300">-</button>
+                            <span class="font-bold text-lg">${item.quantity}</span>
+                            <button data-id="${item.cartId}" data-action="increase" class="cart-qty-btn bg-gray-200 rounded-full h-8 w-8 transition-all duration-300">+</button>
+                            <button data-id="${item.cartId}" class="cart-remove-btn text-red-500 text-lg flex-shrink-0 ml-4 transition-all duration-300"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </div>
+                    ${breadSelectorHtml}
+                </div>`;
+            }).join('');
+
+            const paymentOptionsHtml = Object.entries(PAYMENT_METHODS).map(([key, {name, icon, note}], index) => {
+                const noteHtml = note ? `<span class="block text-xs text-text-main/60 mt-1 font-normal">${note}</span>` : '';
+                return `
+                <div class="flex-1">
+                    <input type="radio" id="payment-${key}" name="payment-method" value="${key}" class="hidden payment-radio" ${index === 0 ? 'checked' : ''}>
+                    <label for="payment-${key}" class="block border-2 border-gray-200 rounded-lg p-3 text-center cursor-pointer transition-all duration-300 hover:border-primary-light h-full">
+                        <i class="fas ${icon} text-2xl text-primary"></i>
+                        <span class="block text-sm font-semibold mt-2">${name}</span>
+                        ${noteHtml}
+                    </label>
+                </div>
+            `}).join('');
+
+            dom.myOrderContentEl.innerHTML = `
+                <div class="space-y-2 mb-4">${itemsHtml}</div>
+                <div class="mt-6 space-y-4">
+                    <div>
+                        <label for="notes-input" class="block mb-2 font-semibold">Note per la cucina (es. senza cipolla):</label>
+                        <input type="text" id="notes-input" placeholder="Aggiungi una nota..." class="w-full p-3 border border-gray-300 rounded-lg">
+                    </div>
+                    <div>
+                        <label for="alternative-input" class="block mb-2 font-semibold">Alternativa (se un prodotto è esaurito):</label>
+                        <input type="text" id="alternative-input" placeholder="Es. un supplì o un'altra verdura" class="w-full p-3 border border-gray-300 rounded-lg">
+                    </div>
+                </div>
+                
+                <div class="mt-6">
+                    <h4 class="block mb-2 font-semibold">Metodo di Pagamento</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">${paymentOptionsHtml}</div>
+                </div>
+
+                <div class="text-right font-bold text-2xl mt-6">Totale: €${total.toFixed(2)}</div>
+                <button id="confirm-order-btn" class="w-full mt-4 bg-secondary hover:bg-secondary-dark text-white font-bold py-3 px-4 rounded-lg transition-all duration-300"><i class="fas fa-check-circle mr-2"></i>Conferma e Invia Ordine</button>
+            `;
+        }
+
+        function renderAllOrders() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todaysOrders = state.allOrders.filter(order => order.createdAt && order.createdAt.toDate() >= today).sort((a, b) => a.user.localeCompare(b.user));
+            
+            const now = new Date();
+            const isBeforeCutoff = now.getHours() < 11 || (now.getHours() === 11 && now.getMinutes() < 30);
+
+            if (todaysOrders.length === 0) {
+                dom.allOrdersListEl.innerHTML = `<div class="text-center p-8 bg-white rounded-xl shadow"><p class="text-gray-500">Nessun ordine per oggi.</p></div>`;
+                dom.grandTotalEl.textContent = '€0.00';
+                return;
+            }
+            
+            let grandTotal = 0;
+            const ordersHtml = todaysOrders.map(order => {
+                grandTotal += order.total;
+                const itemsHtml = order.items.map(item => `<li class="flex justify-between items-center text-sm"><span>${item.quantity} x ${item.name} ${item.selectedType ? `(${item.selectedType})` : ''}</span><span class="font-medium">€${(item.price * item.quantity).toFixed(2)}</span></li>`).join('');
+                const alternativeHtml = order.alternative ? `<p class="text-xs text-text-main/70 mt-2 pl-4 border-l-2 border-primary-light"><b>Alternativa:</b> ${order.alternative}</p>` : '';
+                const notesHtml = order.notes ? `<p class="text-xs text-text-main/70 mt-2 pl-4 border-l-2 border-blue-300"><b>Note:</b> ${order.notes}</p>` : '';
+                const paymentInfo = PAYMENT_METHODS[order.paymentMethod] || { name: order.paymentMethod, icon: 'fa-credit-card' };
+                
+                const deleteButtonHtml = isBeforeCutoff
+                    ? `<button data-id="${order.id}" class="delete-order-btn text-red-500 hover:text-red-700 ml-2 text-sm" title="Elimina ordine"><i class="fas fa-trash-alt"></i></button>`
+                    : `<button class="text-gray-300 ml-2 text-sm cursor-not-allowed" disabled title="Eliminazione bloccata dopo le 11:30"><i class="fas fa-trash-alt"></i></button>`;
+
+                const paymentStatusHtml = `
+                    <div data-id="${order.id}" class="toggle-paid-btn mt-3 cursor-pointer inline-block rounded-full px-3 py-1 text-xs font-semibold ${order.paid ? 'bg-secondary-100 text-secondary-800' : 'bg-primary-100 text-primary-800'}" title="Clicca per cambiare stato">
+                        <i class="fas ${order.paid ? 'fa-check-circle' : 'fa-hourglass-half'} mr-1"></i>
+                        Stato: ${order.paid ? 'Pagato' : 'Da Pagare'}
+                    </div>
+                `;
+
+                return `
+                    <div id="order-${order.id}" class="bg-white p-4 rounded-xl shadow-md transition-all duration-300 ${order.paid ? 'paid-order' : ''}">
+                        <div class="flex justify-between items-start border-b pb-2 mb-2">
+                            <div>
+                                <h4 class="font-bold text-lg">${order.user}</h4>
+                                <span class="text-xs bg-gray-100 px-2 py-1 rounded-full"><i class="fas ${paymentInfo.icon} mr-2"></i>${paymentInfo.name}</span>
+                            </div>
+                            <div class="text-right flex items-center">
+                                <span class="font-bold text-primary text-lg">€${order.total.toFixed(2)}</span>
+                                ${deleteButtonHtml}
+                            </div>
+                        </div>
+                        <ul class="space-y-1">${itemsHtml}</ul>
+                        ${alternativeHtml}
+                        ${notesHtml}
+                        <div class="text-right">
+                            ${paymentStatusHtml}
+                        </div>
+                    </div>`;
+            }).join('');
+            dom.allOrdersListEl.innerHTML = ordersHtml;
+            dom.grandTotalEl.textContent = `€${grandTotal.toFixed(2)}`;
+        }
+        
+        async function handlePaidToggle(statusElement) {
+            const orderId = statusElement.dataset.id;
+            if (!orderId) return;
+            
+            const order = state.allOrders.find(o => o.id === orderId);
+            if (!order) return;
+
+            const newPaidStatus = !order.paid; 
+
+            const orderRef = doc(db, "orders", orderId);
+            try {
+                await updateDoc(orderRef, { paid: newPaidStatus });
+                showToast(`Stato aggiornato a: ${newPaidStatus ? 'Pagato' : 'Da Pagare'}.`);
+            } catch (error) {
+                console.error("Errore aggiornamento pagamento: ", error);
+                showToast("Errore durante l'aggiornamento.", 4000);
+            }
+        }
+
+        function handleEvents(event) {
+            const target = event.target;
+            const button = target.closest('button');
+            const statusToggle = target.closest('.toggle-paid-btn');
+
+            if (event.type === 'click' && statusToggle) {
+                handlePaidToggle(statusToggle);
+            } else if (event.type === 'click' && button) {
+                handleClicks(button);
+            } else if (event.type === 'change' && target.matches('.cart-bread-select')) {
+                const cartId = parseInt(target.dataset.id);
+                const itemInCart = state.cart.find(i => i.cartId === cartId);
+                if (itemInCart) {
+                    itemInCart.selectedType = target.value;
+                }
+            } else if (event.type === 'change' && target.matches('select')) {
+                handleSelectChange(target);
+            } else if (event.type === 'input' && target.id === 'search-input') {
+                state.searchTerm = target.value;
+                updateFilterCounter();
+                renderMenu();
+            }
+        }
+
+        function handleSelectChange(target) {
+            if (target.id === 'category-select') state.activeCategoryFilter = target.value;
+            else if (target.id === 'diet-select') state.activeDietFilter = target.value;
+            updateFilterCounter();
+            renderMenu();
+        }
+        
+        async function handleClicks(button) {
+            if (button.matches('.nav-btn')) {
+                navigate(button.dataset.view);
+            }
+            else if (button.matches('.add-to-cart-btn')) { 
+                const item = state.menuData.find(i => i.id === parseInt(button.dataset.id));
+                if (!item) return;
+                const existingItem = state.cart.find(i => i.id === item.id && !i.selectedType); // Only increment if no bread type is selected
+                if (existingItem && !BREAD_OPTIONS[item.category]) {
+                    existingItem.quantity++;
+                } else {
+                    let defaultType = (BREAD_OPTIONS[item.category]) ? BREAD_OPTIONS[item.category][0] : null;
+                    state.cart.push({ ...item, cartId: Date.now(), quantity: 1, selectedType: defaultType });
+                }
+                renderMyOrder();
+                showToast(`${item.name} aggiunto!`);
+            }
+            else if (button.matches('.cart-qty-btn')) {
+                const cartId = parseInt(button.dataset.id);
+                const itemInCart = state.cart.find(i => i.cartId === cartId);
+                if (itemInCart) {
+                    if (button.dataset.action === 'increase') itemInCart.quantity++;
+                    else if (button.dataset.action === 'decrease' && itemInCart.quantity > 1) itemInCart.quantity--;
+                    else state.cart = state.cart.filter(i => i.cartId !== cartId);
+                }
+                renderMyOrder();
+            }
+            else if (button.matches('.cart-remove-btn')) {
+                state.cart = state.cart.filter(i => i.cartId !== parseInt(button.dataset.id));
+                renderMyOrder();
+            }
+            else if (button.matches('.delete-order-btn')) {
+                const now = new Date();
+                if (now.getHours() > 11 || (now.getHours() === 11 && now.getMinutes() >= 30)) {
+                    showToast("Non è più possibile eliminare gli ordini dopo le 11:30.");
+                    return;
+                }
+                const orderId = button.dataset.id;
+                if (confirm('Sei sicuro di voler eliminare questo ordine? L\'azione è irreversibile.')) {
+                    try {
+                        await deleteDoc(doc(db, "orders", orderId));
+                        showToast("Ordine eliminato con successo.");
+                    } catch (error) {
+                        console.error("Errore eliminazione ordine:", error);
+                        showToast("Impossibile eliminare l'ordine.");
+                    }
+                }
+            }
+            else if (button.id === 'save-username-btn') { 
+                const name = dom.usernameInput.value.trim();
+                if (name) {
+                    localStorage.setItem('dosepranza-username', name);
+                    state.currentUser.name = name;
+                    dom.userModal.classList.add('hidden');
+                    updateAdminControlsVisibility();
+                }
+            }
+            else if (button.id === 'toggle-calories') { 
+                state.caloriesVisible = !state.caloriesVisible;
+                button.querySelector('span').textContent = state.caloriesVisible ? 'Nascondi Calorie' : 'Mostra Calorie';
+                button.querySelector('i').className = `fas ${state.caloriesVisible ? 'fa-toggle-on' : 'fa-toggle-off'} mr-2`;
+                renderMenu();
+            }
+            else if (button.id === 'show-allergens-btn') {
+                dom.allergenModal.classList.remove('hidden');
+            }
+            else if (button.id === 'close-allergen-modal-btn') {
+                dom.allergenModal.classList.add('hidden');
+            }
+            else if (button.id === 'confirm-order-btn') {
+                if (state.cart.length === 0) { showToast("Il tuo carrello è vuoto."); return; }
+                if (!state.currentUser || !state.currentUser.name) { showToast("Per favore, inserisci prima il tuo nome."); dom.userModal.classList.remove('hidden'); return; }
+                
+                const notes = document.getElementById('notes-input').value.trim();
+                const alternative = document.getElementById('alternative-input').value.trim();
+                const paymentMethod = document.querySelector('input[name="payment-method"]:checked')?.value;
+                if (!paymentMethod) { showToast("Seleziona un metodo di pagamento."); return; }
+
+                const total = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                const itemsToSave = state.cart.map(item => ({ 
+                    name: item.name,
+                    category: item.category, 
+                    quantity: item.quantity, 
+                    price: item.price, 
+                    selectedType: item.selectedType || null 
+                }));
+                
+                const orderData = { 
+                    user: state.currentUser.name, 
+                    uid: state.currentUser.uid, 
+                    items: itemsToSave, 
+                    total, 
+                    alternative,
+                    notes,
+                    paymentMethod,
+                    createdAt: serverTimestamp(), 
+                    paid: false 
+                };
+
+                try {
+                    await addDoc(ordersCollectionRef, orderData);
+                    showToast("Ordine confermato con successo!");
+                    state.cart = [];
+                    renderMyOrder();
+                    navigate('all-orders');
+                } catch (error) {
+                    console.error("Errore nell'invio dell'ordine: ", error);
+                    showToast("Si è verificato un errore. Riprova.", 4000);
+                }
+            }
+            else if (button.id === 'copy-summary-btn') {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const todaysOrders = state.allOrders
+                    .filter(order => order.createdAt && order.createdAt.toDate() >= today)
+                    .sort((a, b) => a.user.localeCompare(b.user));
+
+                if (todaysOrders.length === 0) {
+                    showToast("Nessun ordine da copiare per oggi.");
+                    return;
+                }
+
+                // --- 1. Preparazione per la Cucina ---
+                const prepItems = {};
+                todaysOrders.forEach(order => {
+                    order.items.forEach(item => {
+                        const itemName = item.name + (item.selectedType ? ` (${item.selectedType})` : '');
+                        if (!prepItems[itemName]) {
+                            prepItems[itemName] = { quantity: 0, users: [] };
+                        }
+                        prepItems[itemName].quantity += item.quantity;
+                        
+                        let userNote = `${order.user}`;
+                        if (item.quantity > 1) {
+                            userNote += ` (x${item.quantity})`;
+                        }
+                        if (order.notes) {
+                            userNote += ` [Nota: ${order.notes}]`;
+                        }
+                        prepItems[itemName].users.push(userNote);
+                    });
+                });
+
+                let prepText = "--- 📝 LISTA PREPARAZIONE ---\n\n";
+                Object.keys(prepItems).sort().forEach(itemName => {
+                    const itemDetails = prepItems[itemName];
+                    prepText += `*${itemDetails.quantity}x ${itemName}*\n`;
+                    prepText += `  - Per: ${itemDetails.users.join(', ')}\n\n`;
+                });
+
+                // --- 2. Riepilogo Ordini e Pagamenti ---
+                let ordersText = "--- 💵 RIEPILOGO ORDINI E PAGAMENTI ---\n\n";
+                let grandTotal = 0;
+                todaysOrders.forEach(order => {
+                    ordersText += `*${order.user}* - Totale: €${order.total.toFixed(2)}\n`;
+                    ordersText += `  - Pagamento: ${PAYMENT_METHODS[order.paymentMethod]?.name || order.paymentMethod}\n`;
+                    order.items.forEach(item => {
+                        const itemName = item.name + (item.selectedType ? ` (${item.selectedType})` : '');
+                        ordersText += `  - ${item.quantity}x ${itemName}\n`;
+                    });
+                    if (order.notes) {
+                        ordersText += `  - Nota: ${order.notes}\n`;
+                    }
+                    if (order.alternative) {
+                        ordersText += `  - Alternativa: ${order.alternative}\n`;
+                    }
+                    ordersText += `\n`;
+                    grandTotal += order.total;
+                });
+
+                ordersText += `-------------------------------------\n`;
+                ordersText += `TOTALE COMPLESSIVO: €${grandTotal.toFixed(2)}`;
+
+                // --- Combinazione e Copia ---
+                const finalSummary = prepText + "\n\n" + ordersText;
+
+                navigator.clipboard.writeText(finalSummary)
+                    .then(() => {
+                        showToast("Riepilogo ottimizzato copiato negli appunti!");
+                    })
+                    .catch(err => {
+                        console.error('Errore durante la copia:', err);
+                        showToast("Errore: impossibile copiare il riepilogo.");
+                    });
+            }
+            else if (button.id === 'export-history-btn') {
+                showToast("Esportazione in corso...");
+
+                try {
+                    const allOrdersQuery = query(ordersCollectionRef, orderBy("createdAt", "desc"));
+                    const querySnapshot = await getDocs(allOrdersQuery);
+                    const allOrdersHistory = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
+
+                    if (allOrdersHistory.length === 0) {
+                        showToast("Nessun ordine nello storico da esportare.");
+                        return;
+                    }
+                    
+                    const escapeCsvField = (field) => {
+                        if (field === null || field === undefined) return '""';
+                        let stringField = String(field);
+                        if (stringField.search(/("|,|;|\n)/g) >= 0) {
+                            stringField = `"${stringField.replace(/"/g, '""')}"`;
+                        }
+                        return `"${stringField}"`;
+                    };
+
+                    const header = [
+                        'OrderID', 'TimestampISO8601', 'DataLeggibile', 'UserID', 'Utente', 
+                        'Prodotto', 'CategoriaProdotto', 'TipoSpecifico', 'Quantita', 
+                        'PrezzoUnitario', 'TotaleRiga', 'MetodoPagamento', 'NoteCliente', 
+                        'Alternativa', 'CanaleOrdine', 'StatoPagamento'
+                    ];
+                    
+                    let csvRows = [header.join(';')];
+
+                    allOrdersHistory.forEach(order => {
+                        order.items.forEach(item => {
+                            let category = item.category;
+                            if (!category) {
+                                const menuItem = state.menuData.find(m => m.name === item.name);
+                                category = menuItem ? menuItem.category : 'Sconosciuta';
+                            }
+                            
+                            const row = [
+                                escapeCsvField(order.id),
+                                escapeCsvField(order.createdAt ? order.createdAt.toDate().toISOString() : 'N/D'),
+                                escapeCsvField(order.createdAt ? order.createdAt.toDate().toLocaleString('it-IT') : 'N/D'),
+                                escapeCsvField(order.uid || 'N/D'),
+                                escapeCsvField(order.user),
+                                escapeCsvField(item.name),
+                                escapeCsvField(category),
+                                escapeCsvField(item.selectedType || ''),
+                                escapeCsvField(item.quantity),
+                                escapeCsvField(item.price ? item.price.toFixed(2).replace('.', ',') : '0,00'),
+                                escapeCsvField(item.price ? (item.quantity * item.price).toFixed(2).replace('.', ',') : '0,00'),
+                                escapeCsvField(order.paymentMethod),
+                                escapeCsvField(order.notes || ''),
+                                escapeCsvField(order.alternative || ''),
+                                escapeCsvField('Web'),
+                                escapeCsvField(order.paid ? 'Pagato' : 'Da Pagare')
+                            ];
+                            csvRows.push(row.join(';'));
+                        });
+                    });
+
+                    const csvContent = csvRows.join('\n');
+                    const blob = new Blob([`\uFEFF${csvContent}`], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.setAttribute('href', url);
+                    a.setAttribute('download', 'storico_ordini_dosepranza.csv');
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                } catch (error) {
+                    console.error("Errore durante l'esportazione: ", error);
+                    showToast("Esportazione fallita. Controlla la console.");
+                }
+            }
+        }
+
+        function updateAdminControlsVisibility() {
+            const exportBtn = document.getElementById('export-history-btn');
+            if (!exportBtn) return;
+
+            if (state.currentUser && state.currentUser.name === 'Marco Tranquilli') {
+                exportBtn.classList.remove('hidden');
+            } else {
+                exportBtn.classList.add('hidden');
+            }
+        }
+
+        function init() {
+            Object.assign(dom, {
+                views: document.querySelectorAll('.view'), navBtns: document.querySelectorAll('.nav-btn'),
+                menuItemsContainer: document.getElementById('menu-items'), cartCountEl: document.getElementById('cart-count'),
+                myOrderContentEl: document.getElementById('my-order-content'), allOrdersListEl: document.getElementById('all-orders-list'),
+                grandTotalEl: document.getElementById('grand-total'), userModal: document.getElementById('user-modal'),
+                usernameInput: document.getElementById('username-input'), toastEl: document.getElementById('toast'),
+                toastMessageEl: document.getElementById('toast-message'), categorySelect: document.getElementById('category-select'),
+                dietSelect: document.getElementById('diet-select'), filterCounterContainer: document.getElementById('filter-counter-container'),
+                allergenModal: document.getElementById('allergen-modal'), allergenModalContent: document.getElementById('allergen-modal-content'),
+            });
+            document.body.addEventListener('click', handleEvents);
+            document.body.addEventListener('change', handleEvents);
+            document.body.addEventListener('input', handleEvents);
+            renderFilters();
+            renderMenu();
+            navigate('menu');
+        }
+        
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                state.currentUser = { uid: user.uid, name: localStorage.getItem('dosepranza-username') };
+                if (!state.currentUser.name) {
+                    dom.userModal.classList.remove('hidden');
+                }
+                updateAdminControlsVisibility();
+                
+                onSnapshot(ordersCollectionRef, snapshot => {
+                    state.allOrders = snapshot.docs.map(doc => ({...doc.data(), id: doc.id}));
+                    if(state.currentView === 'all-orders') renderAllOrders();
+                    renderFavorites();
+                }, error => {
+                    console.error("Errore con lo snapshot di Firestore:", error);
+                });
+            } else { signInAnonymously(auth); }
+        });
+        
+        init();
+    </script>
 </body>
 </html>
