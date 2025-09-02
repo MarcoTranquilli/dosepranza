@@ -536,42 +536,76 @@
             else if (button.id === 'copy-summary-btn') {
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
-                const todaysOrders = state.allOrders.filter(order => order.createdAt && order.createdAt.toDate() >= today);
+                const todaysOrders = state.allOrders
+                    .filter(order => order.createdAt && order.createdAt.toDate() >= today)
+                    .sort((a, b) => a.user.localeCompare(b.user));
 
                 if (todaysOrders.length === 0) {
                     showToast("Nessun ordine da copiare per oggi.");
                     return;
                 }
 
-                const summaryItems = {};
-                let grandTotal = 0;
+                // --- 1. Preparazione per la Cucina ---
+                const prepItems = {};
                 todaysOrders.forEach(order => {
-                    grandTotal += order.total;
                     order.items.forEach(item => {
                         const itemName = item.name + (item.selectedType ? ` (${item.selectedType})` : '');
-                        if (summaryItems[itemName]) {
-                            summaryItems[itemName] += item.quantity;
-                        } else {
-                            summaryItems[itemName] = item.quantity;
+                        if (!prepItems[itemName]) {
+                            prepItems[itemName] = { quantity: 0, users: [] };
                         }
+                        prepItems[itemName].quantity += item.quantity;
+                        
+                        let userNote = `${order.user}`;
+                        if (item.quantity > 1) {
+                            userNote += ` (x${item.quantity})`;
+                        }
+                        if (order.notes) {
+                            userNote += ` [Nota: ${order.notes}]`;
+                        }
+                        prepItems[itemName].users.push(userNote);
                     });
                 });
 
-                let summaryText = "Riepilogo Ordini di Oggi:\n\n";
-                for (const [name, quantity] of Object.entries(summaryItems)) {
-                    summaryText += `- ${quantity}x ${name}\n`;
-                }
-                
-                summaryText += `\n-------------------\n`;
-                summaryText += `TOTALE COMPLESSIVO: €${grandTotal.toFixed(2)}`;
+                let prepText = "--- 📝 LISTA PREPARAZIONE ---\n\n";
+                Object.keys(prepItems).sort().forEach(itemName => {
+                    const itemDetails = prepItems[itemName];
+                    prepText += `*${itemDetails.quantity}x ${itemName}*\n`;
+                    prepText += `  - Per: ${itemDetails.users.join(', ')}\n\n`;
+                });
 
-                navigator.clipboard.writeText(summaryText)
+                // --- 2. Riepilogo Ordini e Pagamenti ---
+                let ordersText = "--- 💵 RIEPILOGO ORDINI E PAGAMENTI ---\n\n";
+                let grandTotal = 0;
+                todaysOrders.forEach(order => {
+                    ordersText += `*${order.user}* - Totale: €${order.total.toFixed(2)}\n`;
+                    ordersText += `  - Pagamento: ${PAYMENT_METHODS[order.paymentMethod]?.name || order.paymentMethod}\n`;
+                    order.items.forEach(item => {
+                        const itemName = item.name + (item.selectedType ? ` (${item.selectedType})` : '');
+                        ordersText += `  - ${item.quantity}x ${itemName}\n`;
+                    });
+                    if (order.notes) {
+                        ordersText += `  - Nota: ${order.notes}\n`;
+                    }
+                    if (order.alternative) {
+                        ordersText += `  - Alternativa: ${order.alternative}\n`;
+                    }
+                    ordersText += `\n`;
+                    grandTotal += order.total;
+                });
+
+                ordersText += `-------------------------------------\n`;
+                ordersText += `TOTALE COMPLESSIVO: €${grandTotal.toFixed(2)}`;
+
+                // --- Combinazione e Copia ---
+                const finalSummary = prepText + "\n\n" + ordersText;
+
+                navigator.clipboard.writeText(finalSummary)
                     .then(() => {
-                        showToast("Riepilogo ordini copiato negli appunti!");
+                        showToast("Riepilogo ottimizzato copiato negli appunti!");
                     })
                     .catch(err => {
                         console.error('Errore durante la copia:', err);
-                        showToast("Errore: impossibile copiare il testo.");
+                        showToast("Errore: impossibile copiare il riepilogo.");
                     });
             }
             else if (button.id === 'export-history-btn') {
