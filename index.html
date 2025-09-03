@@ -57,12 +57,19 @@
 
     <div id="app" class="max-w-4xl mx-auto p-4 md:p-6">
         <header class="mb-6 flex flex-col items-center">
-            <img src="https://i.postimg.cc/SsN4LYBP/Logo-basic-dosepranza.png" alt="Dosepranza Logo" class="w-64 md:w-80 mx-auto">
-            <div class="text-center mt-4">
-                <h1 class="text-5xl md:text-6xl font-extrabold tracking-tight text-text-main">DOSEPRANZA</h1>
-                <p class="text-lg md:text-xl text-gray-500 tracking-wider">Dalla pizzicheria alla scrivania</p>
+            <!-- Contenitore per Logo e Titolo per centratura e spaziatura corrette -->
+            <div class="flex flex-col items-center">
+                <img src="https://i.postimg.cc/SsN4LYBP/Logo-basic-dosepranza.png" alt="Dosepranza Logo" class="w-48 md:w-56">
+                <div class="text-center -mt-2">
+                    <h1 class="text-5xl md:text-6xl font-extrabold tracking-tight text-text-main">DOSEPRANZA</h1>
+                    <p class="text-lg md:text-xl text-gray-500 tracking-wider">Dalla pizzicheria alla scrivania</p>
+                    <a href="https://www.mermaidchart.com/app/projects/6940d9d3-fca9-4615-9516-3753f0d6dd1e/diagrams/7034c164-c365-454d-9a8e-02d597c94465/version/v0.1/edit" target="_blank" class="mt-2 inline-block text-sm text-secondary-dark hover:underline">
+                        <i class="fas fa-project-diagram mr-1"></i> Come funziona? Vedi il processo d'ordine
+                    </a>
+                </div>
             </div>
-            <div class="bg-primary-100 border-l-4 border-primary text-primary-800 p-4 rounded-md my-4 w-full" role="alert">
+
+            <div class="bg-primary-100 border-l-4 border-primary text-primary-800 p-4 rounded-md my-4 w-full mt-6" role="alert">
                 <p class="font-bold">Attenzione: L'ordine deve essere completato entro le 11:30.</p>
                 <p>La consegna è stimata intorno alle 12:30.</p>
                 <p>La consegna è <strong>gratuita</strong>.</p>
@@ -124,6 +131,7 @@
                     <div class="text-center md:text-left">
                         <h3 class="text-xl font-bold">Paga con Satispay</h3>
                         <p class="text-text-main/80">Inquadra il QR Code o usa il link per pagare l'importo del tuo ordine a <strong>Alimentari Russo</strong>.</p>
+                        <p class="text-primary-800 font-semibold text-sm mt-1">Il pagamento va effettuato entro le 11:30.</p>
                         <a href="https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" target="_blank" class="mt-2 inline-block bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg transition-all duration-300">
                             <i class="fas fa-external-link-alt mr-2"></i>Vai a Satispay
                         </a>
@@ -157,7 +165,7 @@
         const ALLERGENS = { G: { name: "Glutine", icon: "fa-wheat-awn" }, L: { name: "Latticini", icon: "fa-cheese" }, C: { name: "Crostacei", icon: "fa-shrimp" }, P: { name: "Pesce", icon: "fa-fish-fins" }};
         const DIETS = { vegetariano: { name: "Vegetariano", icon: "🧀" }, vegano: { name: "Vegano", icon: "🌱" }, "carne/pesce": { name: "Carne/🐟Pesce", icon: "🥩" } };
         const PAYMENT_METHODS = { 
-            Satispay: { name: "Satispay", icon: "fa-mobile-alt" },
+            Satispay: { name: "Satispay", icon: "fa-mobile-alt", note: "Pagamento da effettuare entro le 11:30." },
             Contanti: { name: "Contanti", icon: "fa-money-bill-wave", note: "Pagamento alla consegna." },
             CarteBancomat: { name: "Carte e bancomat", icon: "fa-credit-card", note: "Pagamento alla consegna." },
             Edenred: { name: "Buoni Pasto Edenred", icon: "fa-ticket-alt", note: "È richiesto il saldo in negozio entro fine settimana." }
