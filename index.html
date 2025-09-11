@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>dosepranza</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://cdn.tailwindcss.com/3.4.3"></script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -203,7 +205,6 @@
             state.currentView = viewName; 
             dom.views.forEach(v => v.classList.toggle('active', v.id === `${viewName}-view`)); 
             dom.navBtns.forEach(b => { b.classList.toggle('bg-primary', b.dataset.view === viewName); b.classList.toggle('text-white', b.dataset.view === viewName); }); 
-            // Quando si naviga a "Il mio ordine", la vista viene aggiornata
             if (viewName === 'my-order') {
                 renderMyOrder();
             }
@@ -284,7 +285,6 @@
             today.setHours(0, 0, 0, 0);
             const todaysUserOrder = state.allOrders.find(order => order.uid === state.currentUser?.uid && order.createdAt && order.createdAt.toDate() >= today);
             
-            // Se esiste un ordine per oggi, mostra il riepilogo
             if (todaysUserOrder) {
                 const itemsHtml = todaysUserOrder.items.map(item => `<li class="flex justify-between items-center text-sm"><span>${item.quantity} x ${item.name} ${item.selectedType ? `(${item.selectedType})` : ''}</span><span class="font-medium">€${(item.price * item.quantity).toFixed(2)}</span></li>`).join('');
                 const notesHtml = `
@@ -294,12 +294,12 @@
                     ${todaysUserOrder.cutlery ? `<p class="text-sm mt-2 p-2 bg-green-50 border-l-4 border-green-400"><b>Posate richieste.</b></p>` : ''}
                 `;
                 
-                // const paymentStatusHtml = `
+                const paymentStatusHtml = `
                 <div id="payment-status" class="mt-4 p-3 rounded-lg ${todaysUserOrder.paid ? 'bg-secondary-100 text-secondary-800' : 'bg-primary-100 text-primary-800'}">
                     <p class="font-bold"><i class="fas ${todaysUserOrder.paid ? 'fa-check-circle' : 'fa-hourglass-half'} mr-2"></i>Stato Pagamento: ${todaysUserOrder.paid ? 'Pagato' : 'In attesa di pagamento'}</p>
                 </div>`;
 
-                // const responseHtml = todaysUserOrder.restaurateurResponse 
+                const responseHtml = todaysUserOrder.restaurateurResponse 
                     ? `<div id="restaurateur-response" class="mt-4 p-3 rounded-lg bg-yellow-100 border-l-4 border-yellow-400">
                            <p class="font-bold text-yellow-800"><i class="fas fa-comment-dots mr-2"></i>Messaggio dal ristoratore:</p>
                            <p class="text-yellow-700">${todaysUserOrder.restaurateurResponse}</p>
@@ -315,11 +315,10 @@
                     ${responseHtml}
                     <p class="text-xs text-gray-500 mt-4 text-center">Puoi modificare o eliminare l'ordine dalla sezione "Tutti gli Ordini" entro le 11:30.</p>
                 `;
-                dom.cartCountEl.textContent = '✓'; // Indica che l'ordine è inviato
+                dom.cartCountEl.textContent = '✓'; 
                 return;
             }
 
-            // Altrimenti, mostra il carrello
             const totalItems = state.cart.reduce((sum, item) => sum + item.quantity, 0);
             dom.cartCountEl.textContent = totalItems;
             if (state.cart.length === 0) {
@@ -329,7 +328,7 @@
 
             const total = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
             
-            // const itemsHtml = state.cart.map(item => {
+            const itemsHtml = state.cart.map(item => {
                 let breadSelectorHtml = '';
                 if (BREAD_OPTIONS[item.category]) {
                     const optionsHtml = BREAD_OPTIONS[item.category].map(opt => `<option value="${opt}" ${item.selectedType === opt ? 'selected' : ''}>${opt}</option>`).join('');
@@ -437,7 +436,7 @@
                     </div>
                 `;
 
-                // const restaurateurResponseHtml = `
+                const restaurateurResponseHtml = `
                     <div class="mt-3 pt-3 border-t">
                         <label for="response-input-${order.id}" class="text-xs font-semibold">Risposta del ristoratore:</label>
                         <div class="flex gap-2 mt-1">
@@ -528,7 +527,7 @@
             else if (button.matches('.add-to-cart-btn')) { 
                 const item = state.menuData.find(i => i.id === parseInt(button.dataset.id));
                 if (!item) return;
-                const existingItem = state.cart.find(i => i.id === item.id && !i.selectedType); // Only increment if no bread type is selected
+                const existingItem = state.cart.find(i => i.id === item.id && !i.selectedType);
                 if (existingItem && !BREAD_OPTIONS[item.category]) {
                     existingItem.quantity++;
                 } else {
@@ -563,14 +562,13 @@
                     try {
                         await deleteDoc(doc(db, "orders", orderId));
                         showToast("Ordine eliminato con successo.");
-                        renderMyOrder(); // Aggiorna la vista "Il Mio Ordine" se l'utente si trova lì
+                        renderMyOrder(); 
                     } catch (error) {
                         console.error("Errore eliminazione ordine:", error);
                         showToast("Impossibile eliminare l'ordine.");
                     }
                 }
             }
-            // Change Request: Pietanza random
             else if (button.id === 'suggest-dish-btn') {
                 const category = dom.categorySelect.value;
                 const possibleItems = state.menuData.filter(item => category === 'all' || item.category.toLowerCase() === category);
@@ -591,7 +589,6 @@
                     }
                 }
             }
-            // Change Request: Interlocuzione ristoratore–cliente
             else if (button.matches('.save-response-btn')) {
                 const orderId = button.dataset.id;
                 const responseInput = document.getElementById(`response-input-${orderId}`);
@@ -634,8 +631,8 @@
                 
                 const notes = document.getElementById('notes-input').value.trim();
                 const alternative = document.getElementById('alternative-input').value.trim();
-                const allergies = document.getElementById('allergies-input').value.trim(); // Get allergy info
-                const cutlery = document.getElementById('cutlery-checkbox').checked; // Get cutlery choice
+                const allergies = document.getElementById('allergies-input').value.trim();
+                const cutlery = document.getElementById('cutlery-checkbox').checked;
                 const paymentMethod = document.querySelector('input[name="payment-method"]:checked')?.value;
                 if (!paymentMethod) { showToast("Seleziona un metodo di pagamento."); return; }
 
@@ -655,12 +652,12 @@
                     total, 
                     alternative,
                     notes,
-                    allergies, // Add allergy info to order data
-                    cutlery,   // Add cutlery choice to order data
+                    allergies,
+                    cutlery,
                     paymentMethod,
                     createdAt: serverTimestamp(), 
                     paid: false,
-                    restaurateurResponse: "" // Initialize response field
+                    restaurateurResponse: ""
                 };
 
                 try {
@@ -668,7 +665,7 @@
                     showToast("Ordine confermato con successo!");
                     state.cart = [];
                     renderMyOrder();
-                    navigate('my-order'); // Naviga alla pagina di riepilogo dopo l'ordine
+                    navigate('my-order');
                 } catch (error) {
                     console.error("Errore nell'invio dell'ordine: ", error);
                     showToast("Si è verificato un errore. Riprova.", 4000);
@@ -686,7 +683,6 @@
                     return;
                 }
 
-                // --- 1. Preparazione per la Cucina ---
                 const prepItems = {};
                 todaysOrders.forEach(order => {
                     order.items.forEach(item => {
@@ -716,7 +712,6 @@
                     prepText += `  - Per: ${itemDetails.users.join(', ')}\n\n`;
                 });
 
-                // --- 2. Riepilogo Ordini e Pagamenti ---
                 let ordersText = "--- 💵 RIEPILOGO ORDINI E PAGAMENTI ---\n\n";
                 let grandTotal = 0;
                 todaysOrders.forEach(order => {
@@ -878,7 +873,6 @@
                 
                 onSnapshot(ordersCollectionRef, snapshot => {
                     state.allOrders = snapshot.docs.map(doc => ({...doc.data(), id: doc.id}));
-                    // Rirenderizza la vista corrente se è 'all-orders' o 'my-order'
                     if(state.currentView === 'all-orders') renderAllOrders();
                     if(state.currentView === 'my-order') renderMyOrder();
                     renderFavorites();
