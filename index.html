@@ -53,7 +53,6 @@
             border-color: #D6804F;
             box-shadow: 0 0 0 2px rgba(214, 128, 79, 0.4);
         }
-        /* Stile per lo switch della richiesta posate */
         .toggle-checkbox:checked { right: 0; border-color: #709460; }
         .toggle-checkbox:checked + .toggle-label { background-color: #709460; }
     </style>
@@ -64,16 +63,14 @@
         <header class="mb-6 flex flex-col items-center">
             <div class="flex flex-col items-center">
                 <img src="https://i.postimg.cc/L6H20zfp/logo-dosepranza-People-About-Food.png" alt="Dosepranza Logo" class="w-48 md:w-56 mx-auto">
-                <div class="text-center -mt-2">
-                    <h1 class="text-5xl md:text-6xl font-extrabold tracking-tight text-text-main">DOSEPRANZA</h1>
-                    <p class="text-lg md:text-xl text-gray-500 tracking-wider">Dalla pizzicheria alla scrivania</p>
+                <div class="text-center">
                     <a href="https://www.mermaidchart.com/app/projects/6940d9d3-fca9-4615-9516-3753f0d6dd1e/diagrams/7034c164-c365-454d-9a8e-02d597c94465/version/v0.1/edit" target="_blank" class="mt-2 inline-block text-sm text-secondary-dark hover:underline">
                         <i class="fas fa-project-diagram mr-1"></i> Come funziona? Vedi il processo d'ordine
                     </a>
                 </div>
             </div>
 
-            <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1974&auto=format&fit=crop" alt="Immagine di un banco di alimentari tradizionale con prodotti freschi" class="w-full h-48 object-cover rounded-lg shadow-md my-6">
+            <img src="https://i.postimg.cc/GpFvxwFt/Pizzicagnolobanner.png" alt="Banner di una bottega di pizzicagnolo tradizionale italiana" class="w-full h-48 object-cover rounded-lg shadow-md my-6">
 
             <div class="bg-primary-100 border-l-4 border-primary text-primary-800 p-4 rounded-md my-4 w-full mt-6" role="alert">
                 <p class="font-bold">Attenzione: L'ordine deve essere completato entro le 11:30.</p>
@@ -153,9 +150,20 @@
         </main>
     </div>
 
-    <div id="user-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden"><div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md text-center"><h3 class="text-2xl font-bold mb-4">Benvenuto!</h3><p class="text-gray-600 mb-6">Per iniziare, inserisci il tuo nome e cognome. È importante per la gestione dei pagamenti e per eventuali comunicazioni.</p><input type="text" id="username-input" placeholder="Es. Marco Rossi" class="w-full p-3 border rounded-lg"><button id="save-username-btn" class="w-full mt-4 bg-primary hover:bg-primary-dark text-white font-bold py-3 px-4 rounded-lg transition-all duration-300">Salva</button></div></div>
+    <div id="user-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden"><div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md text-center"><h3 class="text-2xl font-bold mb-4">Benvenuto!</h3><p class="text-gray-600 mb-6">Per iniziare, inserisci il tuo nome e cognome.</p><input type="text" id="username-input" placeholder="Es. Marco Rossi" class="w-full p-3 border rounded-lg"><button id="save-username-btn" class="w-full mt-4 bg-primary hover:bg-primary-dark text-white font-bold py-3 px-4 rounded-lg transition-all duration-300">Salva</button></div></div>
     <div id="allergen-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden"><div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md relative"><button id="close-allergen-modal-btn" class="absolute top-2 right-4 text-2xl text-gray-500 hover:text-gray-800">&times;</button><h3 class="text-2xl font-bold mb-4">Legenda Allergeni</h3><div id="allergen-modal-content" class="text-gray-600 text-sm space-y-2"></div></div></div>
     <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 bg-text-main text-white py-3 px-6 rounded-full shadow-xl z-50 opacity-0 transition-opacity"><p id="toast-message"></p></div>
+    <div id="suggestion-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md text-center transform transition-all scale-95 opacity-0" id="suggestion-modal-content-box">
+          <h3 class="text-2xl font-bold mb-2">💡 Ti suggeriamo...</h3>
+          <div id="suggestion-content" class="my-6"></div>
+          <div class="flex justify-center gap-4">
+            <button id="suggestion-add-btn" class="flex-1 bg-primary hover:bg-primary-dark text-white font-bold py-3 px-4 rounded-lg transition-all duration-300">Aggiungi</button>
+            <button id="suggestion-close-btn" class="flex-1 bg-gray-200 hover:bg-gray-300 font-bold py-3 px-4 rounded-lg transition-all duration-300">Chiudi</button>
+          </div>
+        </div>
+    </div>
+
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -188,7 +196,6 @@
             panini: [ { name: "Crudo pomodoro mozzarella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 550, ingredients: ["Prosciutto crudo", "Pomodoro", "Mozzarella"] }, { name: "Crudo stracchino rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580, ingredients: ["Prosciutto crudo", "Stracchino", "Rucola"] }, { name: "Cotto arrosto scamorza e verdura", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 520, ingredients: ["Prosciutto cotto", "Scamorza", "Verdura di stagione"] }, { name: "Capocollo pecorino e pomodori secchi", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 600, ingredients: ["Capocollo", "Pecorino", "Pomodori secchi"] }, { name: "Salame pecorino e pomodori secchi", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 620, ingredients: ["Salame", "Pecorino", "Pomodori secchi"] }, { name: "Speck Brie e pomodori secchi", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 610, ingredients: ["Speck", "Brie", "Pomodori secchi"] }, { name: "Porchetta", allergens: ["G"], diet: ["carne/pesce"], calories: 650, ingredients: ["Porchetta di Ariccia"] }, { name: "Vegetariano melanzane zucchine e peperoni", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 450, ingredients: ["Melanzane", "Zucchine", "Peperoni grigliati"] }, { name: "Tacchino e verdura", allergens: ["G"], diet: ["carne/pesce"], calories: 480, ingredients: ["Tacchino arrosto", "Verdura di stagione"] }, { name: "Bresaola parmigiano e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 500, ingredients: ["Bresaola", "Parmigiano a scaglie", "Rucola"] }, { name: "Bresaola primo sale e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 470, ingredients: ["Bresaola", "Primo sale", "Rucola"] }, { name: "Salmone e formaggio", allergens: ["G", "L", "P"], diet: ["carne/pesce"], calories: 530, ingredients: ["Salmone affumicato", "Formaggio spalmabile"] }, { name: "Tonno e pomodoro", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 490, ingredients: ["Tonno", "Pomodoro a fette"] }, { name: "Tonno e carciofini", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 510, ingredients: ["Tonno", "Carciofini sott'olio"] } ],
             pizze: [ { name: "Crudo e mozzarella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 600, ingredients: ["Prosciutto crudo", "Mozzarella"] }, { name: "Speck stracchino e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 650, ingredients: ["Speck", "Stracchino", "Rucola"] }, { name: "Cotto arrosto e melanzane", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580, ingredients: ["Prosciutto cotto", "Melanzane"] }, { name: "Mortadella e stracciatella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 700, ingredients: ["Mortadella", "Stracciatella"] }, { name: "Frittata e zucchine", allergens: ["G", "L"], diet: ["vegetariano"], calories: 550, ingredients: ["Frittata", "Zucchine"] }, { name: "Bresaola e formaggio", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580, ingredients: ["Bresaola", "Formaggio"] }, { name: "Insalata di pollo", allergens: ["G"], diet: ["carne/pesce"], calories: 560, ingredients: ["Insalata di pollo"] }, { name: "Cotto e stracchino", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 620, ingredients: ["Prosciutto cotto", "Stracchino"] } ],
             gastronomia: [ { name: "Cous cous vegetale con pollo", allergens: ["G"], diet: ["carne/pesce"], calories: 450, ingredients: ["Cous cous", "Verdure miste", "Pollo"] }, { name: "Cous cous vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 350, ingredients: ["Cous cous", "Verdure miste"] }, { name: "Farro vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 380, ingredients: ["Farro", "Verdure miste"] }, { name: "Farro vegetale con salmone", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 480, ingredients: ["Farro", "Verdure miste", "Salmone"] }, { name: "Riso Venere con gamberi e zucchine", allergens: ["C"], diet: ["carne/pesce"], calories: 420, ingredients: ["Riso Venere", "Gamberi", "Zucchine"] }, { name: "Insalata di riso", allergens: [], diet: ["carne/pesce"], calories: 400, ingredients: ["Riso", "Wurstel", "Uova", "Verdure sott'olio"] }, { name: "Pasta fredda con tonno pomodori e olive", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 450, ingredients: ["Pasta", "Tonno", "Pomodorini", "Olive"] }, { name: "Pasta fredda pesto primo sale pomodori olive", allergens: ["G", "L"], diet: ["vegetariano"], calories: 500, ingredients: ["Pasta", "Pesto", "Formaggio primo sale", "Pomodorini", "Olive"] }, 
-                // Change Request: Aggiornamento menù olive
                 { name: "Insalata di pollo", allergens: [], diet: ["carne/pesce"], calories: 350, ingredients: ["Pollo", "Insalata", "Mais", "Pomodorini", "Olive"] }, 
                 { name: "Riso integrale bresaola limone e rughetta", allergens: [], diet: ["carne/pesce"], calories: 380, ingredients: ["Riso integrale", "Bresaola", "Rucola", "Succo di limone"] }, { name: "Pomodori con riso e patate (a peso)", allergens: [], diet: ["vegetariano", "vegano"], calories: 300, ingredients: ["Pomodori", "Riso", "Patate"] } ],
             verdure: [ { name: "Melanzane (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 180, ingredients: ["Melanzane grigliate"] }, { name: "Zucchine (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 160, ingredients: ["Zucchine grigliate"] }, { name: "Peperoni (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 160, ingredients: ["Peperoni arrostiti"] }, { name: "Cicoria (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 140, ingredients: ["Cicoria ripassata"] }, { name: "Broccoletti (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 150, ingredients: ["Broccoletti ripassati"] }, { name: "Broccoli (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 150, ingredients: ["Broccoli al vapore"] }, { name: "Scarola con olive (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 130, ingredients: ["Scarola", "Olive di Gaeta"] } ],
@@ -196,10 +203,36 @@
             dessert: [ { name: "Macedonia", allergens: [], diet: ["vegetariano", "vegano"], calories: 120, ingredients: ["Frutta fresca di stagione"] } ]
         };
         
-        const state = { currentUser: null, currentView: 'menu', activeCategoryFilter: 'all', activeDietFilter: 'all', searchTerm: '', cart: [], allOrders: [], menuData: processMenuData(RAW_MENU, PRICES), caloriesVisible: false };
+        const state = { currentUser: null, currentView: 'menu', activeCategoryFilter: 'all', activeDietFilter: 'all', searchTerm: '', cart: [], allOrders: [], menuData: [], caloriesVisible: false };
         const dom = { };
         
-        function processMenuData(rawMenu, prices) { let id = 1; const icons = { gastronomia: 'fa-bowl-food', fritti: 'fa-stroopwafel', verdure: 'fa-carrot', panini: 'fa-bread-slice', pizze: 'fa-pizza-slice', dessert: 'fa-ice-cream' }; return Object.entries(rawMenu).flatMap(([cat, items]) => items.map(item => ({ id: id++, name: item.name, category: cat.charAt(0).toUpperCase() + cat.slice(1), price: prices[cat] || 0, icon: icons[cat] || 'fa-utensils', ...item }))) }
+        // 3) Funzione per aggiornare gli ingredienti con le olive
+        function updateIngredientsWithOlives(menu) {
+            for (const category in menu) {
+                menu[category].forEach(item => {
+                    const hasSalad = item.name.toLowerCase().includes('insalata') || 
+                                     (item.ingredients && item.ingredients.some(ing => ing.toLowerCase().includes('insalata')));
+                    if (hasSalad) {
+                        if (!item.ingredients) {
+                            item.ingredients = [];
+                        }
+                        const hasOlives = item.ingredients.some(ing => ing.toLowerCase().includes('olive'));
+                        if (!hasOlives) {
+                            item.ingredients.push('Olive');
+                        }
+                    }
+                });
+            }
+            return menu;
+        }
+
+        function processMenuData(rawMenu, prices) { 
+            const updatedMenu = updateIngredientsWithOlives(rawMenu);
+            let id = 1; 
+            const icons = { gastronomia: 'fa-bowl-food', fritti: 'fa-stroopwafel', verdure: 'fa-carrot', panini: 'fa-bread-slice', pizze: 'fa-pizza-slice', dessert: 'fa-ice-cream' }; 
+            return Object.entries(updatedMenu).flatMap(([cat, items]) => items.map(item => ({ id: id++, name: item.name, category: cat.charAt(0).toUpperCase() + cat.slice(1), price: prices[cat] || 0, icon: icons[cat] || 'fa-utensils', ...item }))) 
+        }
+
         function showToast(message, duration = 3000) { dom.toastMessageEl.textContent = message; dom.toastEl.classList.remove('opacity-0'); setTimeout(() => dom.toastEl.classList.add('opacity-0'), duration); }
         function navigate(viewName) { 
             state.currentView = viewName; 
@@ -361,9 +394,10 @@
                     </label>
                 </div>
             `}).join('');
-
+            
+            // 4) Aumentato lo spazio tra i prodotti nel riepilogo (space-y-3 -> space-y-4)
             dom.myOrderContentEl.innerHTML = `
-                <div class="space-y-3 mb-4">${itemsHtml}</div>
+                <div class="space-y-4 mb-4">${itemsHtml}</div>
                 <div class="mt-6 space-y-4">
                     <div>
                         <label for="notes-input" class="block mb-2 font-semibold">Note per la cucina (es. senza cipolla):</label>
@@ -569,6 +603,7 @@
                     }
                 }
             }
+            // 5) Logica per il nuovo popup di suggerimento
             else if (button.id === 'suggest-dish-btn') {
                 const category = dom.categorySelect.value;
                 const possibleItems = state.menuData.filter(item => category === 'all' || item.category.toLowerCase() === category);
@@ -579,15 +614,37 @@
                 }
 
                 const randomItem = possibleItems[Math.floor(Math.random() * possibleItems.length)];
-                if (confirm(`Che ne dici di: "${randomItem.name}"? Vuoi aggiungerlo al carrello?`)) {
-                    const item = state.menuData.find(i => i.id === randomItem.id);
-                    if (item) {
-                       let defaultType = (BREAD_OPTIONS[item.category]) ? BREAD_OPTIONS[item.category][0] : null;
-                       state.cart.push({ ...item, cartId: Date.now(), quantity: 1, selectedType: defaultType });
-                       renderMyOrder();
-                       showToast(`${item.name} aggiunto!`);
-                    }
+                
+                dom.suggestionContent.innerHTML = `
+                    <i class="fas ${randomItem.icon} text-primary text-4xl mb-4"></i>
+                    <h4 class="font-bold text-xl">${randomItem.name}</h4>
+                    <p class="text-text-main/70 text-md">€${randomItem.price.toFixed(2)}</p>
+                `;
+                dom.suggestionAddBtn.dataset.itemId = randomItem.id;
+                dom.suggestionModal.classList.remove('hidden');
+                setTimeout(() => {
+                    dom.suggestionModalContentBox.classList.remove('scale-95', 'opacity-0');
+                }, 10);
+            }
+            else if (button.id === 'suggestion-close-btn') {
+                dom.suggestionModalContentBox.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    dom.suggestionModal.classList.add('hidden');
+                }, 200);
+            }
+            else if (button.id === 'suggestion-add-btn') {
+                const itemId = parseInt(button.dataset.itemId);
+                const item = state.menuData.find(i => i.id === itemId);
+                if (item) {
+                   let defaultType = (BREAD_OPTIONS[item.category]) ? BREAD_OPTIONS[item.category][0] : null;
+                   state.cart.push({ ...item, cartId: Date.now(), quantity: 1, selectedType: defaultType });
+                   renderMyOrder();
+                   showToast(`${item.name} aggiunto!`);
                 }
+                dom.suggestionModalContentBox.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    dom.suggestionModal.classList.add('hidden');
+                }, 200);
             }
             else if (button.matches('.save-response-btn')) {
                 const orderId = button.dataset.id;
@@ -845,6 +902,7 @@
         }
 
         function init() {
+            state.menuData = processMenuData(RAW_MENU, PRICES);
             Object.assign(dom, {
                 views: document.querySelectorAll('.view'), navBtns: document.querySelectorAll('.nav-btn'),
                 menuItemsContainer: document.getElementById('menu-items'), cartCountEl: document.getElementById('cart-count'),
@@ -854,6 +912,11 @@
                 toastMessageEl: document.getElementById('toast-message'), categorySelect: document.getElementById('category-select'),
                 dietSelect: document.getElementById('diet-select'), filterCounterContainer: document.getElementById('filter-counter-container'),
                 allergenModal: document.getElementById('allergen-modal'), allergenModalContent: document.getElementById('allergen-modal-content'),
+                // 5) Aggiunti elementi del nuovo popup al DOM
+                suggestionModal: document.getElementById('suggestion-modal'),
+                suggestionModalContentBox: document.getElementById('suggestion-modal-content-box'),
+                suggestionContent: document.getElementById('suggestion-content'),
+                suggestionAddBtn: document.getElementById('suggestion-add-btn'),
             });
             document.body.addEventListener('click', handleEvents);
             document.body.addEventListener('change', handleEvents);
