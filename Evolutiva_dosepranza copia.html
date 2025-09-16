@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dosepranza</title>
+    
+    <script src="https://cdn.tailwindcss.com/3.4.3"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            light: '#e8b39a',
+                            DEFAULT: '#D6804F',
+                            dark: '#c0673a',
+                            '100': '#fef4ef',
+                            '800': '#8c502f'
+                        },
+                        secondary: {
+                            light: '#a1bb96',
+                            DEFAULT: '#709460',
+                            dark: '#5a794d',
+                            '100': '#eef4ec',
+                            '800': '#415738'
+                        },
+                        background: '#F3F1E7',
+                        'text-main': '#3B3F2F',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        .view { display: none; }
+        .view.active { display: block; }
+        .paid-order { opacity: 0.7; }
+        #favorites-section .overflow-x-auto::-webkit-scrollbar { height: 6px; }
+        #favorites-section .overflow-x-auto::-webkit-scrollbar-track { background: #e0ddd3; border-radius: 10px; }
+        #favorites-section .overflow-x-auto::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+        #favorites-section .overflow-x-auto::-webkit-scrollbar-thumb:hover { background: #aaa; }
+        .payment-radio:checked + label {
+            border-color: #D6804F;
+            box-shadow: 0 0 0 2px rgba(214, 128, 79, 0.4);
+        }
+        .toggle-checkbox:checked { right: 0; border-color: #709460; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #709460; }
+        .ingredient-card.selected, .choice-btn.selected {
+            border-color: #D6804F;
+            box-shadow: 0 0 0 3px rgba(214, 128, 79, 0.5);
+            transform: translateY(-4px);
+        }
+    </style>
+</head>
+<body class="bg-background text-text-main">
+
+    <div id="app" class="max-w-4xl mx-auto p-4 md:p-6">
+        <header class="mb-6 flex flex-col items-center">
+            <div class="flex flex-col items-center">
+                <img src="https://i.postimg.cc/L6H20zfp/logo-dosepranza-People-About-Food.png" alt="Dosepranza Logo" class="w-48 md:w-56 mx-auto">
+                <div class="text-center">
+                    <a href="https://www.mermaidchart.com/app/projects/6940d9d3-fca9-4615-9516-3753f0d6dd1e/diagrams/7034c164-c365-454d-9a8e-02d597c94465/version/v0.1/edit" target="_blank" class="mt-2 inline-block text-sm text-secondary-dark hover:underline">
+                        <i class="fas fa-project-diagram mr-1"></i> Come funziona? Vedi il processo d'ordine
+                    </a>
+                </div>
+            </div>
+
+            <img src="https://i.postimg.cc/GpFvxwFt/Pizzicagnolobanner.png" alt="Banner di una bottega di pizzicagnolo tradizionale italiana" class="w-full h-48 object-cover rounded-lg shadow-md my-6">
+
+            <div class="bg-primary-100 border-l-4 border-primary text-primary-800 p-4 rounded-md my-4 w-full mt-6" role="alert">
+                <p class="font-bold">Attenzione: L'ordine deve essere completato entro le 11:30.</p>
+                <p>La consegna è stimata intorno alle 12:30.</p>
+                <p>La consegna è <strong>gratuita</strong>.</p>
+            </div>
+        </header>
+
+        <nav class="flex justify-center bg-white/70 backdrop-blur-sm p-2 rounded-xl shadow-md mb-6 sticky top-4 z-40">
+            <button data-view="menu" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold text-text-main transition-all duration-300"><i class="fas fa-utensils mr-2"></i>Menù</button>
+            <button data-view="custom-sandwich" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold text-text-main transition-all duration-300"><i class="fas fa-plus-circle mr-2"></i>Crea Prodotto</button>
+            <button data-view="my-order" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold text-text-main transition-all duration-300"><i class="fas fa-shopping-basket mr-2"></i>Il Mio Ordine <span id="cart-count" class="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 inline-flex items-center justify-center ml-1">0</span></button>
+            <button data-view="all-orders" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold text-text-main transition-all duration-300"><i class="fas fa-users mr-2"></i>Tutti gli Ordini</button>
+        </nav>
+
+        <main>
+            <section id="menu-view" class="view">
+                <h2 class="text-3xl font-extrabold mb-4">Scegli cosa ordinare</h2>
+                
+                <div id="favorites-section" class="mb-8"></div>
+                
+                <div class="flex flex-col sm:flex-row gap-3 mb-4 items-center flex-wrap">
+                    <div class="relative w-full sm:flex-grow">
+                        <input type="search" id="search-input" placeholder="Cerca un piatto..." class="w-full p-3 pl-10 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-primary transition-all duration-300">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    </div>
+                    <select id="category-select" class="w-full sm:w-auto p-3 border border-gray-300 rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-primary transition-all duration-300"></select>
+                    <select id="diet-select" class="w-full sm:w-auto p-3 border border-gray-300 rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-primary transition-all duration-300"></select>
+                    <button id="suggest-dish-btn" class="w-full sm:w-auto p-3 border border-dashed border-primary text-primary rounded-lg bg-primary-100/50 shadow-sm hover:bg-primary-100 transition-all duration-300 font-semibold"><i class="fas fa-random mr-2"></i>Suggerisci una pietanza</button>
+                </div>
+                
+                <div class="flex justify-between items-center mb-4">
+                    <div id="filter-counter-container" class="text-sm"></div>
+                    <div class="flex gap-2">
+                        <button id="show-allergens-btn" class="bg-gray-200 hover:bg-gray-300 text-text-main font-bold py-2 px-4 rounded-lg flex items-center text-sm transition-all duration-300"><i class="fas fa-info-circle mr-2"></i> Mostra Allergeni</button>
+                        <button id="toggle-calories" class="bg-gray-200 hover:bg-gray-300 text-text-main font-bold py-2 px-4 rounded-lg flex items-center text-sm transition-all duration-300">
+                            <i class="fas fa-toggle-off mr-2"></i>
+                            <span id="toggle-calories-text">Mostra Calorie</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="menu-items" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </section>
+
+            <section id="custom-sandwich-view" class="view">
+                <h2 class="text-3xl font-extrabold mb-4">Crea il Tuo Prodotto</h2>
+                
+                <div class="bg-white p-4 rounded-xl shadow-md mb-6">
+                    <h3 class="text-xl font-bold mb-3 text-center">1. Scegli la base</h3>
+                    <div id="base-choice-container" class="flex gap-4">
+                        <button data-type="panino" class="choice-btn flex-1 p-4 bg-gray-50 rounded-lg shadow-sm border-2 border-transparent transition-all duration-200 flex flex-col items-center">
+                            <i class="fas fa-bread-slice text-2xl text-primary mb-2"></i>
+                            <span class="font-semibold">Panino</span>
+                        </button>
+                        <button data-type="pizza" class="choice-btn flex-1 p-4 bg-gray-50 rounded-lg shadow-sm border-2 border-transparent transition-all duration-200 flex flex-col items-center">
+                            <i class="fas fa-pizza-slice text-2xl text-primary mb-2"></i>
+                            <span class="font-semibold">Pizza Ripiena</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="subtype-choice-container" class="bg-white p-4 rounded-xl shadow-md mb-6 hidden">
+                    <h3 class="text-xl font-bold mb-3 text-center">2. Scegli la variante</h3>
+                    <div id="subtype-options" class="flex flex-wrap gap-4 justify-center">
+                    </div>
+                </div>
+                
+                <div id="ingredients-step-container" class="hidden">
+                    <h3 class="text-xl font-bold mb-3 text-center">3. Aggiungi gli ingredienti</h3>
+                    <p class="text-center text-text-main/80 mb-4">Il prezzo base di **3,50€** include fino a 3 ingredienti. Dal 4° in poi si applica un supplemento.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div id="ingredients-list" class="md:col-span-2 grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        </div>
+
+                        <div id="sandwich-summary" class="md:col-span-1">
+                            <div class="bg-white p-4 rounded-xl shadow-md sticky top-24">
+                                <h3 class="font-bold text-lg border-b pb-2 mb-3">Riepilogo</h3>
+                                <div class="mb-3">
+                                    <p class="font-semibold" id="sandwich-base-summary">Seleziona una base...</p>
+                                </div>
+                                <ul id="selected-ingredients-list" class="space-y-2 text-sm mb-4 min-h-[60px]">
+                                </ul>
+                                <div class="border-t pt-3">
+                                    <p id="extra-charge-notice" class="text-xs text-red-500 mb-2 h-4"></p>
+                                    <p class="text-right text-2xl font-bold text-primary" id="sandwich-total-price">0.00€</p>
+                                </div>
+                                <button id="add-sandwich-to-cart-btn" class="w-full mt-4 bg-secondary hover:bg-secondary-dark text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                    <i class="fas fa-plus-circle mr-2"></i>Aggiungi al Carrello
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="my-order-view" class="view">
+                <h2 class="text-3xl font-extrabold mb-4">Riepilogo del Tuo Ordine</h2>
+                <div id="my-order-content" class="bg-white p-6 rounded-xl shadow-md"></div>
+            </section>
+
+            <section id="all-orders-view" class="view">
+                 <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
+                    <h2 class="text-3xl font-extrabold">Riepilogo Ordini di Oggi</h2>
+                    <div class="flex gap-2">
+                        <button id="export-history-btn" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg hidden transition-all duration-300"><i class="fas fa-download mr-2"></i> Esporta Storico</button>
+                        <button id="copy-summary-btn" class="bg-secondary hover:bg-secondary-dark text-white font-bold py-2 px-4 rounded-lg transition-all duration-300"><i class="fas fa-copy mr-2"></i> Copia Riepilogo</button>
+                    </div>
+                </div>
+                <div id="satispay-details" class="bg-white p-4 rounded-xl shadow-md mb-6 flex flex-col md:flex-row items-center gap-4">
+                    <div class="flex-shrink-0">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" alt="QR Code Satispay" class="rounded-lg">
+                    </div>
+                    <div class="text-center md:text-left">
+                        <h3 class="text-xl font-bold">Paga con Satispay</h3>
+                        <p class="text-text-main/80">Inquadra il QR Code o usa il link per pagare l'importo del tuo ordine a <strong>Alimentari Russo</strong>.</p>
+                        <p class="text-primary-800 font-semibold text-sm mt-1">Il pagamento va effettuato entro le 11:30.</p>
+                        <a href="https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" target="_blank" class="mt-2 inline-block bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg transition-all duration-300">
+                            <i class="fas fa-external-link-alt mr-2"></i>Vai a Satispay
+                        </a>
+                    </div>
+                </div>
+                <div id="all-orders-list" class="space-y-4"></div>
+                 <div class="mt-6 bg-white p-4 rounded-xl shadow-lg text-right">
+                    <span class="text-xl font-bold">Totale Complessivo:</span>
+                    <span id="grand-total" class="text-2xl font-bold text-primary ml-2">€0.00</span>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="user-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden"><div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md text-center"><h3 class="text-2xl font-bold mb-4">Benvenuto!</h3><p class="text-gray-600 mb-6">Per iniziare, inserisci il tuo nome e cognome.</p><input type="text" id="username-input" placeholder="Es. Marco Rossi" class="w-full p-3 border rounded-lg"><button id="save-username-btn" class="w-full mt-4 bg-primary hover:bg-primary-dark text-white font-bold py-3 px-4 rounded-lg transition-all duration-300">Salva</button></div></div>
+    <div id="allergen-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden"><div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md relative"><button id="close-allergen-modal-btn" class="absolute top-2 right-4 text-2xl text-gray-500 hover:text-gray-800">&times;</button><h3 class="text-2xl font-bold mb-4">Legenda Allergeni</h3><div id="allergen-modal-content" class="text-gray-600 text-sm space-y-2"></div></div></div>
+    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 bg-text-main text-white py-3 px-6 rounded-full shadow-xl z-50 opacity-0 transition-opacity"><p id="toast-message"></p></div>
+    <div id="suggestion-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md text-center transform transition-all scale-95 opacity-0" id="suggestion-modal-content-box">
+          <h3 class="text-2xl font-bold mb-2">💡 Ti suggeriamo...</h3>
+          <div id="suggestion-content" class="my-6"></div>
+          <div class="flex justify-center gap-4">
+            <button id="suggestion-add-btn" class="flex-1 bg-primary hover:bg-primary-dark text-white font-bold py-3 px-4 rounded-lg transition-all duration-300">Aggiungi</button>
+            <button id="suggestion-close-btn" class="flex-1 bg-gray-200 hover:bg-gray-300 font-bold py-3 px-4 rounded-lg transition-all duration-300">Chiudi</button>
+          </div>
+        </div>
+    </div>
+
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, deleteDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyCQJsNbgaR89gF_1vLe6H4DPboOhQvm9nI", authDomain: "app-ordini-pranzo-alimentari.firebaseapp.com", projectId: "app-ordini-pranzo-alimentari", storageBucket: "app-ordini-pranzo-alimentari.appspot.com", messagingSenderId: "553169964686", appId: "1:553169964686:web:7f8ca6f32a301949e4c3df" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const ordersCollectionRef = collection(db, "orders");
+        
+        const PRICES = { gastronomia: 4.00, verdure: 4.00, panini: 3.50, pizze: 3.50, fritti: 1.50, dessert: 3.00 };
+        const ALLERGENS = { G: { name: "Glutine", icon: "fa-wheat-awn" }, L: { name: "Latticini", icon: "fa-cheese" }, C: { name: "Crostacei", icon: "fa-shrimp" }, P: { name: "Pesce", icon: "fa-fish-fins" }};
+        const DIETS = { vegetariano: { name: "Vegetariano", icon: "🧀" }, vegano: { name: "Vegano", icon: "🌱" }, "carne/pesce": { name: "Carne/🐟Pesce", icon: "🥩" } };
+        const PAYMENT_METHODS = { 
+            Satispay: { name: "Satispay", icon: "fa-mobile-alt", note: "Pagamento da effettuare entro le 11:30." },
+            Contanti: { name: "Contanti", icon: "fa-money-bill-wave", note: "Pagamento alla consegna." },
+            CarteBancomat: { name: "Carte e bancomat", icon: "fa-credit-card", note: "Pagamento alla consegna." },
+            Edenred: { name: "Buoni Pasto Edenred", icon: "fa-ticket-alt", note: "È richiesto il saldo in negozio entro fine settimana." }
+        };
+        const CATEGORY_ORDER = ["Panini", "Pizze", "Gastronomia", "Verdure", "Fritti", "Dessert"];
+        
+        const BREAD_OPTIONS = {
+            Panini: ["Pane classico", "Pane ai cereali", "Focaccia"],
+            Pizze: ["Pizza classica", "Pizza 5 cereali"]
+        };
+
+        const BASE_OPTIONS = {
+            panino: { name: 'Panino', subtypes: ['Pane Classico', '5 Cereali', 'Focaccia'] },
+            pizza: { name: 'Pizza Ripiena', subtypes: ['Pizza Classica', 'Pizza 5 Cereali'] }
+        };
+
+        const SANDWICH_INGREDIENTS = [
+            { id: 'p-crudo', name: 'Prosciutto Crudo', price: 1.50 },
+            { id: 'p-cotto', name: 'Prosciutto Cotto', price: 1.20 },
+            { id: 'salame', name: 'Salame', price: 1.20 },
+            { id: 'mortadella', name: 'Mortadella', price: 1.20 },
+            { id: 'porchetta', name: 'Porchetta', price: 1.80 },
+            { id: 'tacchino', name: 'Tacchino Arrosto', price: 1.50 },
+            { id: 'mozzarella', name: 'Mozzarella', price: 1.00 },
+            { id: 'scamorza', name: 'Scamorza', price: 1.00 },
+            { id: 'stracchino', name: 'Stracchino', price: 1.00 },
+            { id: 'pomodoro', name: 'Pomodoro', price: 0.50 },
+            { id: 'rucola', name: 'Rucola', price: 0.50 },
+            { id: 'melanzane', name: 'Melanzane Grigliate', price: 1.00 },
+        ];
+
+
+        const RAW_MENU = {
+            panini: [ { name: "Crudo pomodoro mozzarella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 550, ingredients: ["Prosciutto crudo", "Pomodoro", "Mozzarella"] }, { name: "Crudo stracchino rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580, ingredients: ["Prosciutto crudo", "Stracchino", "Rucola"] }, { name: "Cotto arrosto scamorza e verdura", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 520, ingredients: ["Prosciutto cotto", "Scamorza", "Verdura di stagione"] }, { name: "Capocollo pecorino e pomodori secchi", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 600, ingredients: ["Capocollo", "Pecorino", "Pomodori secchi"] }, { name: "Salame pecorino e pomodori secchi", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 620, ingredients: ["Salame", "Pecorino", "Pomodori secchi"] }, { name: "Speck Brie e pomodori secchi", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 610, ingredients: ["Speck", "Brie", "Pomodori secchi"] }, { name: "Porchetta", allergens: ["G"], diet: ["carne/pesce"], calories: 650, ingredients: ["Porchetta di Ariccia"] }, { name: "Vegetariano melanzane zucchine e peperoni", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 450, ingredients: ["Melanzane", "Zucchine", "Peperoni grigliati"] }, { name: "Tacchino e verdura", allergens: ["G"], diet: ["carne/pesce"], calories: 480, ingredients: ["Tacchino arrosto", "Verdura di stagione"] }, { name: "Bresaola parmigiano e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 500, ingredients: ["Bresaola", "Parmigiano a scaglie", "Rucola"] }, { name: "Bresaola primo sale e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 470, ingredients: ["Bresaola", "Primo sale", "Rucola"] }, { name: "Salmone e formaggio", allergens: ["G", "L", "P"], diet: ["carne/pesce"], calories: 530, ingredients: ["Salmone affumicato", "Formaggio spalmabile"] }, { name: "Tonno e pomodoro", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 490, ingredients: ["Tonno", "Pomodoro a fette"] }, { name: "Tonno e carciofini", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 510, ingredients: ["Tonno", "Carciofini sott'olio"] } ],
+            pizze: [ { name: "Crudo e mozzarella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 600, ingredients: ["Prosciutto crudo", "Mozzarella"] }, { name: "Speck stracchino e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 650, ingredients: ["Speck", "Stracchino", "Rucola"] }, { name: "Cotto arrosto e melanzane", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580, ingredients: ["Prosciutto cotto", "Melanzane"] }, { name: "Mortadella e stracciatella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 700, ingredients: ["Mortadella", "Stracciatella"] }, { name: "Frittata e zucchine", allergens: ["G", "L"], diet: ["vegetariano"], calories: 550, ingredients: ["Frittata", "Zucchine"] }, { name: "Bresaola e formaggio", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580, ingredients: ["Bresaola", "Formaggio"] }, { name: "Insalata di pollo", allergens: ["G"], diet: ["carne/pesce"], calories: 560, ingredients: ["Insalata di pollo"] }, { name: "Cotto e stracchino", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 620, ingredients: ["Prosciutto cotto", "Stracchino"] } ],
+            gastronomia: [ { name: "Cous cous vegetale con pollo", allergens: ["G"], diet: ["carne/pesce"], calories: 450, ingredients: ["Cous cous", "Verdure miste", "Pollo"] }, { name: "Cous cous vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 350, ingredients: ["Cous cous", "Verdure miste"] }, { name: "Farro vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 380, ingredients: ["Farro", "Verdure miste"] }, { name: "Farro vegetale con salmone", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 480, ingredients: ["Farro", "Verdure miste", "Salmone"] }, { name: "Riso Venere con gamberi e zucchine", allergens: ["C"], diet: ["carne/pesce"], calories: 420, ingredients: ["Riso Venere", "Gamberi", "Zucchine"] }, { name: "Insalata di riso", allergens: [], diet: ["carne/pesce"], calories: 400, ingredients: ["Riso", "Wurstel", "Uova", "Verdure sott'olio"] }, { name: "Pasta fredda con tonno pomodori e olive", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 450, ingredients: ["Pasta", "Tonno", "Pomodorini", "Olive"] }, { name: "Pasta fredda pesto primo sale pomodori olive", allergens: ["G", "L"], diet: ["vegetariano"], calories: 500, ingredients: ["Pasta", "Pesto", "Formaggio primo sale", "Pomodorini", "Olive"] }, 
+                { name: "Insalata di pollo", allergens: [], diet: ["carne/pesce"], calories: 350, ingredients: ["Pollo", "Insalata", "Mais", "Pomodorini", "Olive"] }, 
+                { name: "Riso integrale bresaola limone e rughetta", allergens: [], diet: ["carne/pesce"], calories: 380, ingredients: ["Riso integrale", "Bresaola", "Rucola", "Succo di limone"] }, { name: "Pomodori con riso e patate (a peso)", allergens: [], diet: ["vegetariano", "vegano"], calories: 300, ingredients: ["Pomodori", "Riso", "Patate"] } ],
+            verdure: [ { name: "Melanzane", allergens: [], diet: ["vegetariano", "vegano"], calories: 180, ingredients: ["Melanzane grigliate"] }, { name: "Zucchine", allergens: [], diet: ["vegetariano", "vegano"], calories: 160, ingredients: ["Zucchine grigliate"] }, { name: "Peperoni", allergens: [], diet: ["vegetariano", "vegano"], calories: 160, ingredients: ["Peperoni arrostiti"] }, { name: "Cicoria", allergens: [], diet: ["vegetariano", "vegano"], calories: 140, ingredients: ["Cicoria ripassata"] }, { name: "Broccoletti", allergens: [], diet: ["vegetariano", "vegano"], calories: 150, ingredients: ["Broccoletti ripassati"] }, { name: "Broccoli", allergens: [], diet: ["vegetariano", "vegano"], calories: 150, ingredients: ["Broccoli al vapore"] }, { name: "Scarola con olive", allergens: [], diet: ["vegetariano", "vegano"], calories: 130, ingredients: ["Scarola", "Olive di Gaeta"] } ],
+            fritti: [ { name: "Supplì", allergens: ["G", "L"], diet: ["vegetariano"], calories: 250, ingredients: ["Riso", "Pomodoro", "Mozzarella", "Pangrattato"] }, { name: "Polpetta di melanzane", allergens: ["G", "L"], diet: ["vegetariano"], calories: 180, ingredients: ["Melanzane", "Parmigiano", "Uova", "Pangrattato"] } ],
+            dessert: [ { name: "Macedonia", allergens: [], diet: ["vegetariano", "vegano"], calories: 120, ingredients: ["Frutta fresca di stagione"] } ]
+        };
+        
+        const state = { 
+            currentUser: null, 
+            currentView: 'menu', 
+            activeCategoryFilter: 'all', 
+            activeDietFilter: 'all', 
+            searchTerm: '', 
+            cart: [], 
+            allOrders: [], 
+            menuData: [], 
+            caloriesVisible: false,
+            customSandwich: {
+                base: null,
+                subtype: null,
+                ingredients: [],
+                basePrice: 3.50,
+                totalPrice: 0
+            }
+        };
+        const dom = { };
+        
+        function updateIngredientsWithOlives(menu) {
+            for (const category in menu) {
+                menu[category].forEach(item => {
+                    const hasSalad = item.name.toLowerCase().includes('insalata') || 
+                                     (item.ingredients && item.ingredients.some(ing => ing.toLowerCase().includes('insalata')));
+                    if (hasSalad) {
+                        if (!item.ingredients) item.ingredients = [];
+                        const hasOlives = item.ingredients.some(ing => ing.toLowerCase().includes('olive'));
+                        if (!hasOlives) item.ingredients.push('Olive');
+                    }
+                });
+            }
+            return menu;
+        }
+
+        function processMenuData(rawMenu, prices) { 
+            const updatedMenu = updateIngredientsWithOlives(rawMenu);
+            let id = 1; 
+            const icons = { gastronomia: 'fa-bowl-food', fritti: 'fa-stroopwafel', verdure: 'fa-carrot', panini: 'fa-bread-slice', pizze: 'fa-pizza-slice', dessert: 'fa-ice-cream' }; 
+            return Object.entries(updatedMenu).flatMap(([cat, items]) => items.map(item => ({ id: id++, name: item.name, category: cat.charAt(0).toUpperCase() + cat.slice(1), price: prices[cat] || 0, icon: icons[cat] || 'fa-utensils', ...item }))) 
+        }
+
+        function showToast(message, duration = 3000) { dom.toastMessageEl.textContent = message; dom.toastEl.classList.remove('opacity-0'); setTimeout(() => dom.toastEl.classList.add('opacity-0'), duration); }
+        function navigate(viewName) { 
+            state.currentView = viewName; 
+            dom.views.forEach(v => v.classList.toggle('active', v.id === `${viewName}-view`)); 
+            dom.navBtns.forEach(b => { b.classList.toggle('bg-primary', b.dataset.view === viewName); b.classList.toggle('text-white', b.dataset.view === viewName); }); 
+            if (viewName === 'my-order') renderMyOrder();
+            if (viewName === 'custom-sandwich') renderCustomSandwichBuilder();
+        }
+        
+        function updateFilterCounter() {
+            let count = 0; if (state.activeCategoryFilter !== 'all') count++; if (state.activeDietFilter !== 'all') count++; if(state.searchTerm) count++;
+            dom.filterCounterContainer.innerHTML = count > 0 ? `<i class="fas fa-filter text-primary"></i> ${count} ${count === 1 ? 'filtro applicato' : 'filtri applicati'}` : '';
+        }
+
+        function renderFilters() {
+            let catSelectHtml = `<option value="all">Tutte le Categorie</option>`; 
+            Object.keys(RAW_MENU).forEach(cat => { catSelectHtml += `<option value="${cat}">${cat.charAt(0).toUpperCase() + cat.slice(1)}</option>`; }); 
+            dom.categorySelect.innerHTML = catSelectHtml;
+
+            let dietSelectHtml = `<option value="all">Tutti i Regimi</option>`; Object.entries(DIETS).forEach(([key, info]) => { dietSelectHtml += `<option value="${key}">${info.icon} ${info.name}</option>`; }); dom.dietSelect.innerHTML = dietSelectHtml;
+            let legendHtml = ''; Object.values(ALLERGENS).forEach(info => { legendHtml += `<p class="flex items-center text-base mb-1"><i class="fas ${info.icon} mr-2 text-gray-600"></i> ${info.name}</p>`; }); dom.allergenModalContent.innerHTML = legendHtml;
+        }
+
+        function renderMenu() {
+            const term = state.searchTerm.toLowerCase();
+            const filtered = state.menuData.filter(item => (item.name.toLowerCase().includes(term)) && (state.activeCategoryFilter === 'all' || item.category.toLowerCase() === state.activeCategoryFilter) && (state.activeDietFilter === 'all' || item.diet.includes(state.activeDietFilter)));
+            
+            if (filtered.length === 0) {
+                 dom.menuItemsContainer.innerHTML = `<div class="text-center p-8 col-span-full bg-white rounded-xl shadow"><p class="text-gray-500">Nessun piatto trovato.</p></div>`;
+                 return;
+            }
+
+            let currentCategory = '';
+            let menuHtml = '';
+            const sortedItems = filtered.sort((a, b) => CATEGORY_ORDER.indexOf(a.category) - CATEGORY_ORDER.indexOf(b.category));
+
+            sortedItems.forEach(item => {
+                if (item.category !== currentCategory) {
+                    currentCategory = item.category;
+                    menuHtml += `<div class="col-span-full mt-6 mb-2"><h3 class="text-2xl font-bold border-b-2 border-primary-light pb-2">${currentCategory}</h3></div>`;
+                }
+                
+                const allergenHtml = item.allergens.map(key => `<i class="fas ${ALLERGENS[key].icon}" title="${ALLERGENS[key].name}"></i>`).join(' ');
+                
+                let priceOrPortionSelectorHtml = `<span class="font-semibold text-lg">€${item.price.toFixed(2)}</span>`;
+                if (item.category === 'Verdure') {
+                    priceOrPortionSelectorHtml = `
+                        <div class="flex items-center gap-2">
+                           <select data-id="${item.id}" class="vegetable-portion-select bg-gray-50 border border-gray-300 text-sm rounded-lg p-2">
+                                <option value="2.00" selected>100g - 2.00€</option>
+                                <option value="3.00">150g - 3.00€</option>
+                                <option value="4.00">200g - 4.00€</option>
+                            </select>
+                            <span id="price-vegetable-${item.id}" class="font-bold text-lg text-primary w-20 text-right">€2.00</span>
+                        </div>
+                    `;
+                }
+
+                menuHtml += `
+                <div class="bg-white p-4 rounded-xl shadow-md flex flex-col hover:shadow-lg transition-all duration-300">
+                    <div class="flex-grow">
+                        <div class="flex items-start mb-2">
+                            <i class="fas ${item.icon} text-primary text-xl mr-3 w-6 text-center pt-1"></i>
+                            <div>
+                                <h3 class="font-bold text-lg">${item.name}</h3>
+                                <p class="text-text-main/70 text-sm">${item.category}</p>
+                            </div>
+                        </div>
+                        <p class="text-xs text-text-main/80 ml-9 mt-1"><span class="font-semibold">Ingredienti:</span> ${item.ingredients ? item.ingredients.join(', ') : 'Non specificati'}</p>
+                    </div>
+                    <div class="flex justify-between items-center mt-4">
+                        <div class="flex gap-3 text-lg items-center text-text-main/70">${allergenHtml}</div>
+                        ${priceOrPortionSelectorHtml}
+                    </div>
+                    <p class="calorie-info text-xs text-text-main/70 text-right mt-1" style="display: ${state.caloriesVisible ? 'flex' : 'none'}; justify-content: flex-end; align-items: center;">
+                        ~${item.calories} kcal <i class="fas fa-question-circle text-primary ml-1 cursor-pointer calorie-info-icon"></i>
+                    </p>
+                    <button data-id="${item.id}" class="add-to-cart-btn w-full mt-4 bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg transition-all duration-300"><i class="fas fa-plus mr-2"></i> Aggiungi</button>
+                </div>`;
+            });
+            dom.menuItemsContainer.innerHTML = menuHtml;
+        }
+
+        function renderFavorites() {
+            const favoritesContainer = document.getElementById('favorites-section');
+            if (!state.allOrders || state.allOrders.length === 0) { favoritesContainer.innerHTML = ''; return; }
+            const itemCounts = state.allOrders.flatMap(order => order.items.map(item => item.name.split(' (')[0])).reduce((acc, name) => { acc[name] = (acc[name] || 0) + 1; return acc; }, {});
+            const sortedFavorites = Object.entries(itemCounts).sort(([, a], [, b]) => b - a).slice(0, 5).map(([name]) => state.menuData.find(item => item.name === name)).filter(Boolean); 
+            if (sortedFavorites.length === 0) { favoritesContainer.innerHTML = ''; return; }
+            const favoritesHtml = sortedFavorites.map(item => `<button data-id="${item.id}" class="add-to-cart-btn flex-shrink-0 bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 text-left w-40"><p class="font-semibold text-sm truncate">${item.name}</p><p class="text-xs text-text-main/70">€${item.price.toFixed(2)}</p></button>`).join('');
+            favoritesContainer.innerHTML = `<h3 class="text-2xl font-bold mb-3"><i class="fas fa-star text-yellow-400 mr-2"></i>I Più Ordinati</h3><div class="flex gap-3 overflow-x-auto pb-3">${favoritesHtml}</div>`;
+        }
+        
+        function renderMyOrder() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todaysUserOrder = state.allOrders.find(order => order.uid === state.currentUser?.uid && order.createdAt && order.createdAt.toDate() >= today);
+            
+            if (todaysUserOrder) {
+                const itemsHtml = todaysUserOrder.items.map(item => `<li class="flex justify-between items-center text-sm"><span>${item.quantity} x ${item.name} ${item.selectedType ? `(${item.selectedType})` : ''}</span><span class="font-medium">€${(item.price * item.quantity).toFixed(2)}</span></li>`).join('');
+                const notesHtml = `
+                    ${todaysUserOrder.allergies ? `<p class="text-sm mt-2 p-2 bg-red-50 border-l-4 border-red-400"><b class="text-red-700">Allergie:</b> ${todaysUserOrder.allergies}</p>` : ''}
+                    ${todaysUserOrder.notes ? `<p class="text-sm mt-2 p-2 bg-blue-50 border-l-4 border-blue-300"><b>Note:</b> ${todaysUserOrder.notes}</p>` : ''}
+                    ${todaysUserOrder.alternative ? `<p class="text-sm mt-2 p-2 bg-gray-50 border-l-4 border-gray-300"><b>Alternativa:</b> ${todaysUserOrder.alternative}</p>` : ''}
+                    ${todaysUserOrder.cutlery ? `<p class="text-sm mt-2 p-2 bg-green-50 border-l-4 border-green-400"><b>Posate richieste.</b></p>` : ''}
+                `;
+                
+                const paymentStatusHtml = `
+                <div id="payment-status" class="mt-4 p-3 rounded-lg ${todaysUserOrder.paid ? 'bg-secondary-100 text-secondary-800' : 'bg-primary-100 text-primary-800'}">
+                    <p class="font-bold"><i class="fas ${todaysUserOrder.paid ? 'fa-check-circle' : 'fa-hourglass-half'} mr-2"></i>Stato Pagamento: ${todaysUserOrder.paid ? 'Pagato' : 'In attesa di pagamento'}</p>
+                </div>`;
+
+                const responseHtml = todaysUserOrder.restaurateurResponse 
+                    ? `<div id="restaurateur-response" class="mt-4 p-3 rounded-lg bg-yellow-100 border-l-4 border-yellow-400">
+                           <p class="font-bold text-yellow-800"><i class="fas fa-comment-dots mr-2"></i>Messaggio dal ristoratore:</p>
+                           <p class="text-yellow-700">${todaysUserOrder.restaurateurResponse}</p>
+                       </div>`
+                    : '';
+
+                dom.myOrderContentEl.innerHTML = `
+                    <p class="mb-4">Hai già inviato il tuo ordine per oggi. Ecco il riepilogo:</p>
+                    <ul class="space-y-2 border-t border-b py-4">${itemsHtml}</ul>
+                    <div class="text-right font-bold text-2xl mt-4">Totale: €${todaysUserOrder.total.toFixed(2)}</div>
+                    <div class="mt-2">${notesHtml}</div>
+                    ${paymentStatusHtml}
+                    ${responseHtml}
+                    <p class="text-xs text-gray-500 mt-4 text-center">Puoi modificare o eliminare l'ordine dalla sezione "Tutti gli Ordini" entro le 11:30.</p>
+                `;
+                dom.cartCountEl.textContent = '✓'; 
+                return;
+            }
+
+            const totalItems = state.cart.reduce((sum, item) => sum + item.quantity, 0);
+            dom.cartCountEl.textContent = totalItems;
+            if (state.cart.length === 0) {
+                dom.myOrderContentEl.innerHTML = `<p class="text-center text-gray-500 py-8">Il tuo carrello è vuoto.</p>`;
+                return;
+            }
+
+            const total = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            const itemsHtml = state.cart.map(item => {
+                let breadSelectorHtml = '';
+                if (BREAD_OPTIONS[item.category] && !item.isCustom) {
+                    const optionsHtml = BREAD_OPTIONS[item.category].map(opt => `<option value="${opt}" ${item.selectedType === opt ? 'selected' : ''}>${opt}</option>`).join('');
+                    breadSelectorHtml = `<select data-id="${item.cartId}" class="cart-bread-select mt-2 w-full p-2 border border-gray-300 rounded-md text-sm">${optionsHtml}</select>`;
+                } else if (item.isCustom) {
+                    breadSelectorHtml = `<p class="text-xs text-gray-500 mt-1">Ingredienti: ${item.ingredients.join(', ')}</p>`;
+                }
+                return `
+                <div class="py-4 border-b border-gray-200">
+                    <div class="flex justify-between items-start">
+                        <div><p class="font-semibold">${item.name}</p><p class="text-sm text-text-main/70">€${item.price.toFixed(2)}</p></div>
+                        <div class="flex items-center gap-3">
+                            <button data-id="${item.cartId}" data-action="decrease" class="cart-qty-btn bg-gray-200 rounded-full h-8 w-8 transition-all duration-300">-</button>
+                            <span class="font-bold text-lg">${item.quantity}</span>
+                            <button data-id="${item.cartId}" data-action="increase" class="cart-qty-btn bg-gray-200 rounded-full h-8 w-8 transition-all duration-300">+</button>
+                            <button data-id="${item.cartId}" class="cart-remove-btn text-red-500 text-lg flex-shrink-0 ml-4 transition-all duration-300"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </div>
+                    ${breadSelectorHtml}
+                </div>`;
+            }).join('');
+
+            const paymentOptionsHtml = Object.entries(PAYMENT_METHODS).map(([key, {name, icon, note}], index) => {
+                const noteHtml = note ? `<span class="block text-xs text-text-main/60 mt-1 font-normal">${note}</span>` : '';
+                return `
+                <div class="flex-1">
+                    <input type="radio" id="payment-${key}" name="payment-method" value="${key}" class="hidden payment-radio" ${index === 0 ? 'checked' : ''}>
+                    <label for="payment-${key}" class="block border-2 border-gray-200 rounded-lg p-3 text-center cursor-pointer transition-all duration-300 hover:border-primary-light h-full">
+                        <i class="fas ${icon} text-2xl text-primary"></i>
+                        <span class="block text-sm font-semibold mt-2">${name}</span>
+                        ${noteHtml}
+                    </label>
+                </div>
+            `}).join('');
+            
+            dom.myOrderContentEl.innerHTML = `
+                <div class="space-y-4 mb-4">${itemsHtml}</div>
+                <div class="mt-6 space-y-4">
+                    <div>
+                        <label for="notes-input" class="block mb-2 font-semibold">Note per la cucina (es. senza cipolla):</label>
+                        <input type="text" id="notes-input" placeholder="Aggiungi una nota..." class="w-full p-3 border border-gray-300 rounded-lg">
+                    </div>
+                    <div>
+                        <label for="alternative-input" class="block mb-2 font-semibold">Alternativa (se un prodotto è esaurito):</label>
+                        <input type="text" id="alternative-input" placeholder="Es. un supplì o un'altra verdura" class="w-full p-3 border border-gray-300 rounded-lg">
+                    </div>
+                    
+                    <div>
+                        <label for="allergies-input" class="block mb-2 font-semibold text-red-700"><i class="fas fa-exclamation-triangle mr-2"></i>Segnalazione Allergie Importanti:</label>
+                        <textarea id="allergies-input" placeholder="Per favore, specifica qui eventuali allergie gravi." class="w-full p-3 border border-red-300 rounded-lg focus:ring-2 focus:ring-red-400"></textarea>
+                    </div>
+
+                    <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                        <label for="cutlery-checkbox" class="font-semibold cursor-pointer">Hai bisogno di posate?</label>
+                        <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                            <input type="checkbox" name="cutlery-checkbox" id="cutlery-checkbox" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300 ease-in-out"/>
+                            <label for="cutlery-checkbox" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6">
+                    <h4 class="block mb-2 font-semibold">Metodo di Pagamento</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">${paymentOptionsHtml}</div>
+                </div>
+
+                <div class="text-right font-bold text-2xl mt-6">Totale: €${total.toFixed(2)}</div>
+                <button id="confirm-order-btn" class="w-full mt-4 bg-secondary hover:bg-secondary-dark text-white font-bold py-3 px-4 rounded-lg transition-all duration-300"><i class="fas fa-check-circle mr-2"></i>Conferma e Invia Ordine</button>
+            `;
+        }
+
+        function renderCustomSandwichBuilder() {
+            state.customSandwich = { base: null, subtype: null, ingredients: [], basePrice: 3.50, totalPrice: 0 };
+            
+            dom.baseChoiceContainer.querySelectorAll('.choice-btn').forEach(btn => btn.classList.remove('selected'));
+            dom.subtypeChoiceContainer.classList.add('hidden');
+            dom.ingredientsStepContainer.classList.add('hidden');
+
+            const ingredientsHtml = SANDWICH_INGREDIENTS.map(ing => `
+                <div data-id="${ing.id}" class="ingredient-card bg-white p-3 rounded-lg shadow-sm cursor-pointer border-2 border-transparent transition-all duration-200 flex flex-col justify-center items-center text-center">
+                    <p class="font-semibold text-sm">${ing.name}</p>
+                    <p class="text-xs text-primary font-bold mt-1">+${ing.price.toFixed(2)}€</p>
+                </div>
+            `).join('');
+            dom.ingredientsList.innerHTML = ingredientsHtml;
+            updateSandwichSummary();
+        }
+
+        function updateSandwichSummary() {
+            const { ingredients, basePrice, base, subtype } = state.customSandwich;
+            
+            if (!base || !subtype) {
+                dom.sandwichTotalPrice.textContent = `0.00€`;
+                dom.addSandwichBtn.disabled = true;
+                return;
+            }
+
+            dom.sandwichBaseSummary.textContent = `${BASE_OPTIONS[base].name} (${subtype})`;
+            
+            let currentPrice = basePrice;
+            let extraCharge = 0;
+            
+            if (ingredients.length > 3) {
+                for (let i = 3; i < ingredients.length; i++) {
+                    currentPrice += ingredients[i].price;
+                    extraCharge += ingredients[i].price;
+                }
+            }
+            dom.extraChargeNotice.textContent = extraCharge > 0 ? `Supplemento: +${extraCharge.toFixed(2)}€` : '';
+            
+            const listHtml = ingredients.map((ing, index) => {
+                const priceText = index < 3 ? '(incluso)' : `+${ing.price.toFixed(2)}€`;
+                return `<li class="flex justify-between"><span>${ing.name}</span> <span class="text-gray-500">${priceText}</span></li>`;
+            }).join('');
+
+            if (ingredients.length === 0) {
+                dom.selectedIngredientsList.innerHTML = `<li class="text-gray-400">Seleziona almeno 1 ingrediente...</li>`;
+            } else {
+                 dom.selectedIngredientsList.innerHTML = listHtml;
+            }
+            
+            state.customSandwich.totalPrice = currentPrice;
+            dom.sandwichTotalPrice.textContent = `${currentPrice.toFixed(2)}€`;
+            
+            dom.addSandwichBtn.disabled = ingredients.length < 1;
+
+            document.querySelectorAll('.ingredient-card').forEach(card => {
+                const cardId = card.dataset.id;
+                card.classList.toggle('selected', ingredients.some(ing => ing.id === cardId));
+            });
+        }
+        
+
+        function renderAllOrders() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todaysOrders = state.allOrders.filter(order => order.createdAt && order.createdAt.toDate() >= today).sort((a, b) => a.user.localeCompare(b.user));
+            
+            const now = new Date();
+            const isBeforeCutoff = now.getHours() < 11 || (now.getHours() === 11 && now.getMinutes() < 30);
+
+            if (todaysOrders.length === 0) {
+                dom.allOrdersListEl.innerHTML = `<div class="text-center p-8 bg-white rounded-xl shadow"><p class="text-gray-500">Nessun ordine per oggi.</p></div>`;
+                dom.grandTotalEl.textContent = '€0.00';
+                return;
+            }
+            
+            let grandTotal = 0;
+            const ordersHtml = todaysOrders.map(order => {
+                grandTotal += order.total;
+                const itemsHtml = order.items.map(item => `<li class="flex justify-between items-center text-sm"><span>${item.quantity} x ${item.name} ${item.selectedType ? `(${item.selectedType})` : ''}</span><span class="font-medium">€${(item.price * item.quantity).toFixed(2)}</span></li>`).join('');
+                
+                const notesHtml = `
+                    ${order.allergies ? `<p class="text-xs text-red-700 mt-2 pl-4 border-l-2 border-red-300"><b>Allergie:</b> ${order.allergies}</p>` : ''}
+                    ${order.notes ? `<p class="text-xs text-text-main/70 mt-2 pl-4 border-l-2 border-blue-300"><b>Note:</b> ${order.notes}</p>` : ''}
+                    ${order.alternative ? `<p class="text-xs text-text-main/70 mt-2 pl-4 border-l-2 border-primary-light"><b>Alternativa:</b> ${order.alternative}</p>` : ''}
+                    ${order.cutlery ? `<p class="text-xs text-secondary-800 mt-2 pl-4 border-l-2 border-secondary-light"><b><i class="fas fa-utensils"></i> Posate richieste</b></p>` : ''}
+                `;
+                const paymentInfo = PAYMENT_METHODS[order.paymentMethod] || { name: order.paymentMethod, icon: 'fa-credit-card' };
+                
+                const deleteButtonHtml = (state.currentUser?.uid === order.uid && isBeforeCutoff)
+                    ? `<button data-id="${order.id}" class="delete-order-btn text-red-500 hover:text-red-700 ml-2 text-sm" title="Elimina ordine"><i class="fas fa-trash-alt"></i></button>`
+                    : `<button class="text-gray-300 ml-2 text-sm cursor-not-allowed" disabled title="Eliminazione bloccata dopo le 11:30 o non sei il proprietario"><i class="fas fa-trash-alt"></i></button>`;
+
+                const paymentStatusHtml = `
+                    <div data-id="${order.id}" class="toggle-paid-btn mt-3 cursor-pointer inline-block rounded-full px-3 py-1 text-xs font-semibold ${order.paid ? 'bg-secondary-100 text-secondary-800' : 'bg-primary-100 text-primary-800'}" title="Clicca per cambiare stato">
+                        <i class="fas ${order.paid ? 'fa-check-circle' : 'fa-hourglass-half'} mr-1"></i>
+                        Stato: ${order.paid ? 'Pagato' : 'Da Pagare'}
+                    </div>
+                `;
+
+                const restaurateurResponseHtml = `
+                    <div class="mt-3 pt-3 border-t">
+                        <label for="response-input-${order.id}" class="text-xs font-semibold">Risposta del ristoratore:</label>
+                        <div class="flex gap-2 mt-1">
+                            <input type="text" id="response-input-${order.id}" class="flex-grow p-1 border rounded text-sm" value="${order.restaurateurResponse || ''}" placeholder="Invia un messaggio al cliente...">
+                            <button data-id="${order.id}" class="save-response-btn bg-secondary hover:bg-secondary-dark text-white text-xs px-3 rounded">Salva</button>
+                        </div>
+                    </div>
+                `;
+
+                return `
+                    <div id="order-${order.id}" class="bg-white p-4 rounded-xl shadow-md transition-all duration-300 ${order.paid ? 'paid-order' : ''}">
+                        <div class="flex justify-between items-start border-b pb-2 mb-2">
+                            <div>
+                                <h4 class="font-bold text-lg">${order.user}</h4>
+                                <span class="text-xs bg-gray-100 px-2 py-1 rounded-full"><i class="fas ${paymentInfo.icon} mr-2"></i>${paymentInfo.name}</span>
+                            </div>
+                            <div class="text-right flex items-center">
+                                <span class="font-bold text-primary text-lg">€${order.total.toFixed(2)}</span>
+                                ${deleteButtonHtml}
+                            </div>
+                        </div>
+                        <ul class="space-y-1">${itemsHtml}</ul>
+                        ${notesHtml}
+                        <div class="flex justify-end items-center gap-4">
+                           ${paymentStatusHtml}
+                        </div>
+                        ${restaurateurResponseHtml}
+                    </div>`;
+            }).join('');
+            dom.allOrdersListEl.innerHTML = ordersHtml;
+            dom.grandTotalEl.textContent = `€${grandTotal.toFixed(2)}`;
+        }
+        
+        async function handlePaidToggle(statusElement) {
+            const orderId = statusElement.dataset.id;
+            if (!orderId) return;
+            
+            const order = state.allOrders.find(o => o.id === orderId);
+            if (!order) return;
+
+            const newPaidStatus = !order.paid; 
+
+            const orderRef = doc(db, "orders", orderId);
+            try {
+                await updateDoc(orderRef, { paid: newPaidStatus });
+                showToast(`Stato aggiornato a: ${newPaidStatus ? 'Pagato' : 'Da Pagare'}.`);
+            } catch (error) {
+                console.error("Errore aggiornamento pagamento: ", error);
+                showToast("Errore durante l'aggiornamento.", 4000);
+            }
+        }
+
+        function handleEvents(event) {
+            const target = event.target;
+            const button = target.closest('button');
+            const statusToggle = target.closest('.toggle-paid-btn');
+            const ingredientCard = target.closest('.ingredient-card');
+            const choiceBtn = target.closest('.choice-btn');
+
+            if (choiceBtn) {
+                if (choiceBtn.classList.contains('subtype-choice-btn')) {
+                    // Gestione scelta variante
+                    state.customSandwich.subtype = choiceBtn.dataset.subtype;
+                    dom.subtypeOptions.querySelectorAll('.choice-btn').forEach(btn => btn.classList.remove('selected'));
+                    choiceBtn.classList.add('selected');
+                    dom.ingredientsStepContainer.classList.remove('hidden');
+                } else {
+                    // Gestione scelta base
+                    const type = choiceBtn.dataset.type;
+                    state.customSandwich.base = type;
+                    state.customSandwich.subtype = null;
+                    
+                    dom.baseChoiceContainer.querySelectorAll('.choice-btn').forEach(btn => btn.classList.remove('selected'));
+                    choiceBtn.classList.add('selected');
+
+                    const subtypes = BASE_OPTIONS[type].subtypes;
+                    dom.subtypeOptions.innerHTML = subtypes.map(st => `<button data-subtype="${st}" class="choice-btn subtype-choice-btn flex-1 p-3 bg-gray-50 rounded-lg shadow-sm border-2 border-transparent transition-all duration-200">${st}</button>`).join('');
+                    
+                    dom.subtypeChoiceContainer.classList.remove('hidden');
+                    dom.ingredientsStepContainer.classList.add('hidden');
+                }
+                updateSandwichSummary();
+            }
+            else if (ingredientCard) {
+                const ingredientId = ingredientCard.dataset.id;
+                const selectedIngredient = SANDWICH_INGREDIENTS.find(ing => ing.id === ingredientId);
+                const index = state.customSandwich.ingredients.findIndex(ing => ing.id === ingredientId);
+
+                if (index > -1) {
+                    state.customSandwich.ingredients.splice(index, 1);
+                } else {
+                    state.customSandwich.ingredients.push(selectedIngredient);
+                }
+                updateSandwichSummary();
+            }
+            else if (event.type === 'click' && statusToggle) {
+                handlePaidToggle(statusToggle);
+            } else if (event.type === 'click' && button) {
+                handleClicks(button);
+            } else if (event.type === 'change' && target.matches('.cart-bread-select')) {
+                const cartId = parseInt(target.dataset.id);
+                const itemInCart = state.cart.find(i => i.cartId === cartId);
+                if (itemInCart) {
+                    itemInCart.selectedType = target.value;
+                }
+            } 
+            else if (event.type === 'change' && target.matches('.vegetable-portion-select')) {
+                const price = target.value;
+                const itemId = target.dataset.id;
+                const priceElement = document.getElementById(`price-vegetable-${itemId}`);
+                if (priceElement) {
+                    priceElement.textContent = `€${parseFloat(price).toFixed(2)}`;
+                }
+            }
+            else if (event.type === 'change' && target.matches('select')) {
+                handleSelectChange(target);
+            } else if (event.type === 'input' && target.id === 'search-input') {
+                state.searchTerm = target.value;
+                updateFilterCounter();
+                renderMenu();
+            }
+        }
+
+        function handleSelectChange(target) {
+            if (target.id === 'category-select') state.activeCategoryFilter = target.value;
+            else if (target.id === 'diet-select') state.activeDietFilter = target.value;
+            updateFilterCounter();
+            renderMenu();
+        }
+        
+        async function handleClicks(button) {
+            if (button.matches('.nav-btn')) {
+                navigate(button.dataset.view);
+            }
+            else if (button.matches('.add-to-cart-btn')) { 
+                const item = { ...state.menuData.find(i => i.id === parseInt(button.dataset.id))};
+                if (!item) return;
+
+                if (item.category === 'Verdure') {
+                    const select = document.querySelector(`.vegetable-portion-select[data-id="${item.id}"]`);
+                    const selectedOption = select.options[select.selectedIndex];
+                    item.price = parseFloat(select.value);
+                    item.name = `${item.name.split(' (')[0]} (${selectedOption.text.split(' - ')[0]})`;
+                }
+                
+                const cartItem = { ...item, cartId: Date.now(), quantity: 1 };
+                if (BREAD_OPTIONS[item.category]) {
+                    cartItem.selectedType = BREAD_OPTIONS[item.category][0];
+                }
+
+                state.cart.push(cartItem);
+                renderMyOrder();
+                showToast(`${item.name} aggiunto!`);
+            }
+            else if (button.id === 'add-sandwich-to-cart-btn') {
+                const { ingredients, totalPrice, subtype } = state.customSandwich;
+                if (ingredients.length < 1) return;
+
+                const ingredientNames = ingredients.map(ing => ing.name);
+                const sandwichName = `${subtype} con ${ingredientNames.join(', ')}`;
+
+                state.cart.push({
+                    cartId: Date.now(),
+                    name: sandwichName,
+                    price: totalPrice,
+                    quantity: 1,
+                    isCustom: true,
+                    ingredients: ingredientNames
+                });
+
+                showToast('Prodotto personalizzato aggiunto!');
+                navigate('my-order');
+            }
+            else if (button.matches('.cart-qty-btn')) {
+                const cartId = parseInt(button.dataset.id);
+                const itemInCart = state.cart.find(i => i.cartId === cartId);
+                if (itemInCart) {
+                    if (button.dataset.action === 'increase') itemInCart.quantity++;
+                    else if (button.dataset.action === 'decrease' && itemInCart.quantity > 1) itemInCart.quantity--;
+                    else state.cart = state.cart.filter(i => i.cartId !== cartId);
+                }
+                renderMyOrder();
+            }
+            else if (button.matches('.cart-remove-btn')) {
+                state.cart = state.cart.filter(i => i.cartId !== parseInt(button.dataset.id));
+                renderMyOrder();
+            }
+            else if (button.matches('.delete-order-btn')) {
+                const now = new Date();
+                if (now.getHours() > 11 || (now.getHours() === 11 && now.getMinutes() >= 30)) {
+                    showToast("Non è più possibile eliminare gli ordini dopo le 11:30.");
+                    return;
+                }
+                const orderId = button.dataset.id;
+                if (confirm('Sei sicuro di voler eliminare questo ordine? L\'azione è irreversibile.')) {
+                    try {
+                        await deleteDoc(doc(db, "orders", orderId));
+                        showToast("Ordine eliminato con successo.");
+                        renderMyOrder(); 
+                    } catch (error) {
+                        console.error("Errore eliminazione ordine:", error);
+                        showToast("Impossibile eliminare l'ordine.");
+                    }
+                }
+            }
+            else if (button.id === 'suggest-dish-btn') {
+                const category = dom.categorySelect.value;
+                const possibleItems = state.menuData.filter(item => category === 'all' || item.category.toLowerCase() === category);
+                
+                if (possibleItems.length === 0) {
+                    showToast("Nessun piatto da suggerire in questa categoria.");
+                    return;
+                }
+
+                const randomItem = possibleItems[Math.floor(Math.random() * possibleItems.length)];
+                
+                dom.suggestionContent.innerHTML = `
+                    <i class="fas ${randomItem.icon} text-primary text-4xl mb-4"></i>
+                    <h4 class="font-bold text-xl">${randomItem.name}</h4>
+                    <p class="text-text-main/70 text-md">€${randomItem.price.toFixed(2)}</p>
+                `;
+                dom.suggestionAddBtn.dataset.itemId = randomItem.id;
+                dom.suggestionModal.classList.remove('hidden');
+                setTimeout(() => {
+                    dom.suggestionModalContentBox.classList.remove('scale-95', 'opacity-0');
+                }, 10);
+            }
+            else if (button.id === 'suggestion-close-btn') {
+                dom.suggestionModalContentBox.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    dom.suggestionModal.classList.add('hidden');
+                }, 200);
+            }
+            else if (button.id === 'suggestion-add-btn') {
+                const itemId = parseInt(button.dataset.itemId);
+                const item = state.menuData.find(i => i.id === itemId);
+                if (item) {
+                   let defaultType = (BREAD_OPTIONS[item.category]) ? BREAD_OPTIONS[item.category][0] : null;
+                   state.cart.push({ ...item, cartId: Date.now(), quantity: 1, selectedType: defaultType });
+                   renderMyOrder();
+                   showToast(`${item.name} aggiunto!`);
+                }
+                dom.suggestionModalContentBox.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    dom.suggestionModal.classList.add('hidden');
+                }, 200);
+            }
+            else if (button.matches('.save-response-btn')) {
+                const orderId = button.dataset.id;
+                const responseInput = document.getElementById(`response-input-${orderId}`);
+                if (!orderId || !responseInput) return;
+
+                const responseText = responseInput.value.trim();
+                const orderRef = doc(db, "orders", orderId);
+                try {
+                    await updateDoc(orderRef, { restaurateurResponse: responseText });
+                    showToast("Risposta salvata.");
+                } catch (error) {
+                    console.error("Errore salvataggio risposta: ", error);
+                    showToast("Errore durante il salvataggio.", 4000);
+                }
+            }
+            else if (button.id === 'save-username-btn') { 
+                const name = dom.usernameInput.value.trim();
+                if (name) {
+                    localStorage.setItem('dosepranza-username', name);
+                    state.currentUser.name = name;
+                    dom.userModal.classList.add('hidden');
+                    updateAdminControlsVisibility();
+                }
+            }
+            else if (button.id === 'toggle-calories') { 
+                state.caloriesVisible = !state.caloriesVisible;
+                button.querySelector('span').textContent = state.caloriesVisible ? 'Nascondi Calorie' : 'Mostra Calorie';
+                button.querySelector('i').className = `fas ${state.caloriesVisible ? 'fa-toggle-on' : 'fa-toggle-off'} mr-2`;
+                renderMenu();
+            }
+            else if (button.id === 'show-allergens-btn') {
+                dom.allergenModal.classList.remove('hidden');
+            }
+            else if (button.id === 'close-allergen-modal-btn') {
+                dom.allergenModal.classList.add('hidden');
+            }
+            else if (button.id === 'confirm-order-btn') {
+                if (state.cart.length === 0) { showToast("Il tuo carrello è vuoto."); return; }
+                if (!state.currentUser || !state.currentUser.name) { showToast("Per favore, inserisci prima il tuo nome."); dom.userModal.classList.remove('hidden'); return; }
+                
+                const notes = document.getElementById('notes-input').value.trim();
+                const alternative = document.getElementById('alternative-input').value.trim();
+                const allergies = document.getElementById('allergies-input').value.trim();
+                const cutlery = document.getElementById('cutlery-checkbox').checked;
+                const paymentMethod = document.querySelector('input[name="payment-method"]:checked')?.value;
+                if (!paymentMethod) { showToast("Seleziona un metodo di pagamento."); return; }
+
+                const total = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                const itemsToSave = state.cart.map(item => ({ 
+                    name: item.name,
+                    category: item.category, 
+                    quantity: item.quantity, 
+                    price: item.price, 
+                    selectedType: item.selectedType || null 
+                }));
+                
+                const orderData = { 
+                    user: state.currentUser.name, 
+                    uid: state.currentUser.uid, 
+                    items: itemsToSave, 
+                    total, 
+                    alternative,
+                    notes,
+                    allergies,
+                    cutlery,
+                    paymentMethod,
+                    createdAt: serverTimestamp(), 
+                    paid: false,
+                    restaurateurResponse: ""
+                };
+
+                try {
+                    await addDoc(ordersCollectionRef, orderData);
+                    showToast("Ordine confermato con successo!");
+                    state.cart = [];
+                    renderMyOrder();
+                    navigate('my-order');
+                } catch (error) {
+                    console.error("Errore nell'invio dell'ordine: ", error);
+                    showToast("Si è verificato un errore. Riprova.", 4000);
+                }
+            }
+            else if (button.id === 'copy-summary-btn') {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const todaysOrders = state.allOrders
+                    .filter(order => order.createdAt && order.createdAt.toDate() >= today)
+                    .sort((a, b) => a.user.localeCompare(b.user));
+
+                if (todaysOrders.length === 0) {
+                    showToast("Nessun ordine da copiare per oggi.");
+                    return;
+                }
+
+                const prepItems = {};
+                todaysOrders.forEach(order => {
+                    order.items.forEach(item => {
+                        const itemName = item.name + (item.selectedType ? ` (${item.selectedType})` : '');
+                        if (!prepItems[itemName]) {
+                            prepItems[itemName] = { quantity: 0, users: [] };
+                        }
+                        prepItems[itemName].quantity += item.quantity;
+                        
+                        let userNote = `${order.user}`;
+                        if (item.quantity > 1) {
+                            userNote += ` (x${item.quantity})`;
+                        }
+                        let combinedNotes = [];
+                        if(order.allergies) combinedNotes.push(`ALLERGIA: ${order.allergies}`);
+                        if(order.notes) combinedNotes.push(order.notes);
+                        if(combinedNotes.length > 0) userNote += ` [${combinedNotes.join('; ')}]`;
+
+                        prepItems[itemName].users.push(userNote);
+                    });
+                });
+
+                let prepText = "--- 📝 LISTA PREPARAZIONE ---\n\n";
+                Object.keys(prepItems).sort().forEach(itemName => {
+                    const itemDetails = prepItems[itemName];
+                    prepText += `*${itemDetails.quantity}x ${itemName}*\n`;
+                    prepText += `  - Per: ${itemDetails.users.join(', ')}\n\n`;
+                });
+
+                let ordersText = "--- 💵 RIEPILOGO ORDINI E PAGAMENTI ---\n\n";
+                let grandTotal = 0;
+                todaysOrders.forEach(order => {
+                    ordersText += `*${order.user}* - Totale: €${order.total.toFixed(2)}\n`;
+                    ordersText += `  - Pagamento: ${PAYMENT_METHODS[order.paymentMethod]?.name || order.paymentMethod}\n`;
+                    order.items.forEach(item => {
+                        const itemName = item.name + (item.selectedType ? ` (${item.selectedType})` : '');
+                        ordersText += `  - ${item.quantity}x ${itemName}\n`;
+                    });
+                    if (order.allergies) {
+                        ordersText += `  - ❗ ALLERGIA: ${order.allergies}\n`;
+                    }
+                    if (order.notes) {
+                        ordersText += `  - Nota: ${order.notes}\n`;
+                    }
+                    if (order.alternative) {
+                        ordersText += `  - Alternativa: ${order.alternative}\n`;
+                    }
+                     if (order.cutlery) {
+                        ordersText += `  - 🍴 Posate: Sì\n`;
+                    }
+                    ordersText += `\n`;
+                    grandTotal += order.total;
+                });
+
+                ordersText += `-------------------------------------\n`;
+                ordersText += `TOTALE COMPLESSIVO: €${grandTotal.toFixed(2)}`;
+
+                const finalSummary = prepText + "\n\n" + ordersText;
+
+                navigator.clipboard.writeText(finalSummary)
+                    .then(() => {
+                        showToast("Riepilogo ottimizzato copiato negli appunti!");
+                    })
+                    .catch(err => {
+                        console.error('Errore durante la copia:', err);
+                        showToast("Errore: impossibile copiare il riepilogo.");
+                    });
+            }
+            else if (button.id === 'export-history-btn') {
+                showToast("Esportazione in corso...");
+
+                try {
+                    const allOrdersQuery = query(ordersCollectionRef, orderBy("createdAt", "desc"));
+                    const querySnapshot = await getDocs(allOrdersQuery);
+                    const allOrdersHistory = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
+
+                    if (allOrdersHistory.length === 0) {
+                        showToast("Nessun ordine nello storico da esportare.");
+                        return;
+                    }
+                    
+                    const escapeCsvField = (field) => {
+                        if (field === null || field === undefined) return '""';
+                        let stringField = String(field);
+                        if (stringField.search(/("|,|;|\n)/g) >= 0) {
+                            stringField = `"${stringField.replace(/"/g, '""')}"`;
+                        }
+                        return `"${stringField}"`;
+                    };
+
+                    const header = [
+                        'OrderID', 'TimestampISO8601', 'DataLeggibile', 'UserID', 'Utente', 
+                        'Prodotto', 'CategoriaProdotto', 'TipoSpecifico', 'Quantita', 
+                        'PrezzoUnitario', 'TotaleRiga', 'MetodoPagamento', 'NoteCliente', 
+                        'Allergie', 'Posate', 'Alternativa', 'CanaleOrdine', 'StatoPagamento', 'RispostaRistoratore'
+                    ];
+                    
+                    let csvRows = [header.join(';')];
+
+                    allOrdersHistory.forEach(order => {
+                        order.items.forEach(item => {
+                            let category = item.category;
+                            if (!category) {
+                                const menuItem = state.menuData.find(m => m.name === item.name);
+                                category = menuItem ? menuItem.category : 'Sconosciuta';
+                            }
+                            
+                            const row = [
+                                escapeCsvField(order.id),
+                                escapeCsvField(order.createdAt ? order.createdAt.toDate().toISOString() : 'N/D'),
+                                escapeCsvField(order.createdAt ? order.createdAt.toDate().toLocaleString('it-IT') : 'N/D'),
+                                escapeCsvField(order.uid || 'N/D'),
+                                escapeCsvField(order.user),
+                                escapeCsvField(item.name),
+                                escapeCsvField(category),
+                                escapeCsvField(item.selectedType || ''),
+                                escapeCsvField(item.quantity),
+                                escapeCsvField(item.price ? item.price.toFixed(2).replace('.', ',') : '0,00'),
+                                escapeCsvField(item.price ? (item.quantity * item.price).toFixed(2).replace('.', ',') : '0,00'),
+                                escapeCsvField(order.paymentMethod),
+                                escapeCsvField(order.notes || ''),
+                                escapeCsvField(order.allergies || ''),
+                                escapeCsvField(order.cutlery ? 'Si' : 'No'),
+                                escapeCsvField(order.alternative || ''),
+                                escapeCsvField('Web'),
+                                escapeCsvField(order.paid ? 'Pagato' : 'Da Pagare'),
+                                escapeCsvField(order.restaurateurResponse || '')
+                            ];
+                            csvRows.push(row.join(';'));
+                        });
+                    });
+
+                    const csvContent = csvRows.join('\n');
+                    const blob = new Blob([`\uFEFF${csvContent}`], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.setAttribute('href', url);
+                    a.setAttribute('download', 'storico_ordini_dosepranza.csv');
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                } catch (error) {
+                    console.error("Errore durante l'esportazione: ", error);
+                    showToast("Esportazione fallita. Controlla la console.");
+                }
+            }
+        }
+
+        function updateAdminControlsVisibility() {
+            const exportBtn = document.getElementById('export-history-btn');
+            if (!exportBtn) return;
+
+            if (state.currentUser && state.currentUser.name === 'Marco Tranquilli') {
+                exportBtn.classList.remove('hidden');
+            } else {
+                exportBtn.classList.add('hidden');
+            }
+        }
+
+        function init() {
+            state.menuData = processMenuData(RAW_MENU, PRICES);
+            Object.assign(dom, {
+                views: document.querySelectorAll('.view'), navBtns: document.querySelectorAll('.nav-btn'),
+                menuItemsContainer: document.getElementById('menu-items'), cartCountEl: document.getElementById('cart-count'),
+                myOrderContentEl: document.getElementById('my-order-content'), allOrdersListEl: document.getElementById('all-orders-list'),
+                grandTotalEl: document.getElementById('grand-total'), userModal: document.getElementById('user-modal'),
+                usernameInput: document.getElementById('username-input'), toastEl: document.getElementById('toast'),
+                toastMessageEl: document.getElementById('toast-message'), categorySelect: document.getElementById('category-select'),
+                dietSelect: document.getElementById('diet-select'), filterCounterContainer: document.getElementById('filter-counter-container'),
+                allergenModal: document.getElementById('allergen-modal'), allergenModalContent: document.getElementById('allergen-modal-content'),
+                suggestionModal: document.getElementById('suggestion-modal'),
+                suggestionModalContentBox: document.getElementById('suggestion-modal-content-box'),
+                suggestionContent: document.getElementById('suggestion-content'),
+                suggestionAddBtn: document.getElementById('suggestion-add-btn'),
+                ingredientsList: document.getElementById('ingredients-list'),
+                selectedIngredientsList: document.getElementById('selected-ingredients-list'),
+                sandwichTotalPrice: document.getElementById('sandwich-total-price'),
+                addSandwichBtn: document.getElementById('add-sandwich-to-cart-btn'),
+                baseChoiceContainer: document.getElementById('base-choice-container'),
+                subtypeChoiceContainer: document.getElementById('subtype-choice-container'),
+                ingredientsStepContainer: document.getElementById('ingredients-step-container'),
+                subtypeOptions: document.getElementById('subtype-options'),
+                sandwichBaseSummary: document.getElementById('sandwich-base-summary'),
+                extraChargeNotice: document.getElementById('extra-charge-notice')
+            });
+            document.body.addEventListener('click', handleEvents);
+            document.body.addEventListener('change', handleEvents);
+            document.body.addEventListener('input', handleEvents);
+            renderFilters();
+            renderMenu();
+            navigate('menu');
+        }
+        
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                state.currentUser = { uid: user.uid, name: localStorage.getItem('dosepranza-username') };
+                if (!state.currentUser.name) {
+                    dom.userModal.classList.remove('hidden');
+                }
+                updateAdminControlsVisibility();
+                
+                onSnapshot(ordersCollectionRef, snapshot => {
+                    state.allOrders = snapshot.docs.map(doc => ({...doc.data(), id: doc.id}));
+                    if(state.currentView === 'all-orders') renderAllOrders();
+                    if(state.currentView === 'my-order') renderMyOrder();
+                    renderFavorites();
+                }, error => {
+                    console.error("Errore con lo snapshot di Firestore:", error);
+                });
+            } else { signInAnonymously(auth); }
+        });
+        
+        init();
+    </script>
+</body>
+</html>
