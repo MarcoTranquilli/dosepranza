@@ -55,6 +55,11 @@
         }
         .toggle-checkbox:checked { right: 0; border-color: #709460; }
         .toggle-checkbox:checked + .toggle-label { background-color: #709460; }
+        .ingredient-card.selected, .choice-btn.selected {
+            border-color: #D6804F;
+            box-shadow: 0 0 0 3px rgba(214, 128, 79, 0.5);
+            transform: translateY(-4px);
+        }
     </style>
 </head>
 <body class="bg-background text-text-main">
@@ -81,6 +86,7 @@
 
         <nav class="flex justify-center bg-white/70 backdrop-blur-sm p-2 rounded-xl shadow-md mb-6 sticky top-4 z-40">
             <button data-view="menu" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold text-text-main transition-all duration-300"><i class="fas fa-utensils mr-2"></i>Menù</button>
+            <button data-view="custom-sandwich" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold text-text-main transition-all duration-300"><i class="fas fa-plus-circle mr-2"></i>Crea Prodotto</button>
             <button data-view="my-order" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold text-text-main transition-all duration-300"><i class="fas fa-shopping-basket mr-2"></i>Il Mio Ordine <span id="cart-count" class="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 inline-flex items-center justify-center ml-1">0</span></button>
             <button data-view="all-orders" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold text-text-main transition-all duration-300"><i class="fas fa-users mr-2"></i>Tutti gli Ordini</button>
         </nav>
@@ -113,6 +119,58 @@
                 </div>
 
                 <div id="menu-items" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </section>
+
+            <section id="custom-sandwich-view" class="view">
+                <h2 class="text-3xl font-extrabold mb-4">Crea il Tuo Prodotto</h2>
+                
+                <div class="bg-white p-4 rounded-xl shadow-md mb-6">
+                    <h3 class="text-xl font-bold mb-3 text-center">1. Scegli la base</h3>
+                    <div id="base-choice-container" class="flex gap-4">
+                        <button data-type="panino" class="choice-btn flex-1 p-4 bg-gray-50 rounded-lg shadow-sm border-2 border-transparent transition-all duration-200 flex flex-col items-center">
+                            <i class="fas fa-bread-slice text-2xl text-primary mb-2"></i>
+                            <span class="font-semibold">Panino</span>
+                        </button>
+                        <button data-type="pizza" class="choice-btn flex-1 p-4 bg-gray-50 rounded-lg shadow-sm border-2 border-transparent transition-all duration-200 flex flex-col items-center">
+                            <i class="fas fa-pizza-slice text-2xl text-primary mb-2"></i>
+                            <span class="font-semibold">Pizza Ripiena</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="subtype-choice-container" class="bg-white p-4 rounded-xl shadow-md mb-6 hidden">
+                    <h3 class="text-xl font-bold mb-3 text-center">2. Scegli la variante</h3>
+                    <div id="subtype-options" class="flex flex-wrap gap-4 justify-center">
+                    </div>
+                </div>
+                
+                <div id="ingredients-step-container" class="hidden">
+                    <h3 class="text-xl font-bold mb-3 text-center">3. Aggiungi gli ingredienti</h3>
+                    <p class="text-center text-text-main/80 mb-4">Il prezzo base di **3,50€** include fino a 3 ingredienti. Dal 4° in poi si applica un supplemento.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div id="ingredients-list" class="md:col-span-2 grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        </div>
+
+                        <div id="sandwich-summary" class="md:col-span-1">
+                            <div class="bg-white p-4 rounded-xl shadow-md sticky top-24">
+                                <h3 class="font-bold text-lg border-b pb-2 mb-3">Riepilogo</h3>
+                                <div class="mb-3">
+                                    <p class="font-semibold" id="sandwich-base-summary">Seleziona una base...</p>
+                                </div>
+                                <ul id="selected-ingredients-list" class="space-y-2 text-sm mb-4 min-h-[60px]">
+                                </ul>
+                                <div class="border-t pt-3">
+                                    <p id="extra-charge-notice" class="text-xs text-red-500 mb-2 h-4"></p>
+                                    <p class="text-right text-2xl font-bold text-primary" id="sandwich-total-price">0.00€</p>
+                                </div>
+                                <button id="add-sandwich-to-cart-btn" class="w-full mt-4 bg-secondary hover:bg-secondary-dark text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                    <i class="fas fa-plus-circle mr-2"></i>Aggiungi al Carrello
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <section id="my-order-view" class="view">
@@ -192,34 +250,67 @@
             Pizze: ["Pizza classica", "Pizza 5 cereali"]
         };
 
+        const BASE_OPTIONS = {
+            panino: { name: 'Panino', subtypes: ['Pane Classico', '5 Cereali', 'Focaccia'] },
+            pizza: { name: 'Pizza Ripiena', subtypes: ['Pizza Classica', 'Pizza 5 Cereali'] }
+        };
+
+        const SANDWICH_INGREDIENTS = [
+            { id: 'p-crudo', name: 'Prosciutto Crudo', price: 1.50 },
+            { id: 'p-cotto', name: 'Prosciutto Cotto', price: 1.20 },
+            { id: 'salame', name: 'Salame', price: 1.20 },
+            { id: 'mortadella', name: 'Mortadella', price: 1.20 },
+            { id: 'porchetta', name: 'Porchetta', price: 1.80 },
+            { id: 'tacchino', name: 'Tacchino Arrosto', price: 1.50 },
+            { id: 'mozzarella', name: 'Mozzarella', price: 1.00 },
+            { id: 'scamorza', name: 'Scamorza', price: 1.00 },
+            { id: 'stracchino', name: 'Stracchino', price: 1.00 },
+            { id: 'pomodoro', name: 'Pomodoro', price: 0.50 },
+            { id: 'rucola', name: 'Rucola', price: 0.50 },
+            { id: 'melanzane', name: 'Melanzane Grigliate', price: 1.00 },
+        ];
+
+
         const RAW_MENU = {
             panini: [ { name: "Crudo pomodoro mozzarella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 550, ingredients: ["Prosciutto crudo", "Pomodoro", "Mozzarella"] }, { name: "Crudo stracchino rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580, ingredients: ["Prosciutto crudo", "Stracchino", "Rucola"] }, { name: "Cotto arrosto scamorza e verdura", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 520, ingredients: ["Prosciutto cotto", "Scamorza", "Verdura di stagione"] }, { name: "Capocollo pecorino e pomodori secchi", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 600, ingredients: ["Capocollo", "Pecorino", "Pomodori secchi"] }, { name: "Salame pecorino e pomodori secchi", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 620, ingredients: ["Salame", "Pecorino", "Pomodori secchi"] }, { name: "Speck Brie e pomodori secchi", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 610, ingredients: ["Speck", "Brie", "Pomodori secchi"] }, { name: "Porchetta", allergens: ["G"], diet: ["carne/pesce"], calories: 650, ingredients: ["Porchetta di Ariccia"] }, { name: "Vegetariano melanzane zucchine e peperoni", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 450, ingredients: ["Melanzane", "Zucchine", "Peperoni grigliati"] }, { name: "Tacchino e verdura", allergens: ["G"], diet: ["carne/pesce"], calories: 480, ingredients: ["Tacchino arrosto", "Verdura di stagione"] }, { name: "Bresaola parmigiano e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 500, ingredients: ["Bresaola", "Parmigiano a scaglie", "Rucola"] }, { name: "Bresaola primo sale e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 470, ingredients: ["Bresaola", "Primo sale", "Rucola"] }, { name: "Salmone e formaggio", allergens: ["G", "L", "P"], diet: ["carne/pesce"], calories: 530, ingredients: ["Salmone affumicato", "Formaggio spalmabile"] }, { name: "Tonno e pomodoro", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 490, ingredients: ["Tonno", "Pomodoro a fette"] }, { name: "Tonno e carciofini", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 510, ingredients: ["Tonno", "Carciofini sott'olio"] } ],
             pizze: [ { name: "Crudo e mozzarella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 600, ingredients: ["Prosciutto crudo", "Mozzarella"] }, { name: "Speck stracchino e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 650, ingredients: ["Speck", "Stracchino", "Rucola"] }, { name: "Cotto arrosto e melanzane", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580, ingredients: ["Prosciutto cotto", "Melanzane"] }, { name: "Mortadella e stracciatella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 700, ingredients: ["Mortadella", "Stracciatella"] }, { name: "Frittata e zucchine", allergens: ["G", "L"], diet: ["vegetariano"], calories: 550, ingredients: ["Frittata", "Zucchine"] }, { name: "Bresaola e formaggio", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580, ingredients: ["Bresaola", "Formaggio"] }, { name: "Insalata di pollo", allergens: ["G"], diet: ["carne/pesce"], calories: 560, ingredients: ["Insalata di pollo"] }, { name: "Cotto e stracchino", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 620, ingredients: ["Prosciutto cotto", "Stracchino"] } ],
             gastronomia: [ { name: "Cous cous vegetale con pollo", allergens: ["G"], diet: ["carne/pesce"], calories: 450, ingredients: ["Cous cous", "Verdure miste", "Pollo"] }, { name: "Cous cous vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 350, ingredients: ["Cous cous", "Verdure miste"] }, { name: "Farro vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 380, ingredients: ["Farro", "Verdure miste"] }, { name: "Farro vegetale con salmone", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 480, ingredients: ["Farro", "Verdure miste", "Salmone"] }, { name: "Riso Venere con gamberi e zucchine", allergens: ["C"], diet: ["carne/pesce"], calories: 420, ingredients: ["Riso Venere", "Gamberi", "Zucchine"] }, { name: "Insalata di riso", allergens: [], diet: ["carne/pesce"], calories: 400, ingredients: ["Riso", "Wurstel", "Uova", "Verdure sott'olio"] }, { name: "Pasta fredda con tonno pomodori e olive", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 450, ingredients: ["Pasta", "Tonno", "Pomodorini", "Olive"] }, { name: "Pasta fredda pesto primo sale pomodori olive", allergens: ["G", "L"], diet: ["vegetariano"], calories: 500, ingredients: ["Pasta", "Pesto", "Formaggio primo sale", "Pomodorini", "Olive"] }, 
                 { name: "Insalata di pollo", allergens: [], diet: ["carne/pesce"], calories: 350, ingredients: ["Pollo", "Insalata", "Mais", "Pomodorini", "Olive"] }, 
                 { name: "Riso integrale bresaola limone e rughetta", allergens: [], diet: ["carne/pesce"], calories: 380, ingredients: ["Riso integrale", "Bresaola", "Rucola", "Succo di limone"] }, { name: "Pomodori con riso e patate (a peso)", allergens: [], diet: ["vegetariano", "vegano"], calories: 300, ingredients: ["Pomodori", "Riso", "Patate"] } ],
-            verdure: [ { name: "Melanzane (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 180, ingredients: ["Melanzane grigliate"] }, { name: "Zucchine (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 160, ingredients: ["Zucchine grigliate"] }, { name: "Peperoni (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 160, ingredients: ["Peperoni arrostiti"] }, { name: "Cicoria (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 140, ingredients: ["Cicoria ripassata"] }, { name: "Broccoletti (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 150, ingredients: ["Broccoletti ripassati"] }, { name: "Broccoli (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 150, ingredients: ["Broccoli al vapore"] }, { name: "Scarola con olive (circa 200g)", allergens: [], diet: ["vegetariano", "vegano"], calories: 130, ingredients: ["Scarola", "Olive di Gaeta"] } ],
+            verdure: [ { name: "Melanzane", allergens: [], diet: ["vegetariano", "vegano"], calories: 180, ingredients: ["Melanzane grigliate"] }, { name: "Zucchine", allergens: [], diet: ["vegetariano", "vegano"], calories: 160, ingredients: ["Zucchine grigliate"] }, { name: "Peperoni", allergens: [], diet: ["vegetariano", "vegano"], calories: 160, ingredients: ["Peperoni arrostiti"] }, { name: "Cicoria", allergens: [], diet: ["vegetariano", "vegano"], calories: 140, ingredients: ["Cicoria ripassata"] }, { name: "Broccoletti", allergens: [], diet: ["vegetariano", "vegano"], calories: 150, ingredients: ["Broccoletti ripassati"] }, { name: "Broccoli", allergens: [], diet: ["vegetariano", "vegano"], calories: 150, ingredients: ["Broccoli al vapore"] }, { name: "Scarola con olive", allergens: [], diet: ["vegetariano", "vegano"], calories: 130, ingredients: ["Scarola", "Olive di Gaeta"] } ],
             fritti: [ { name: "Supplì", allergens: ["G", "L"], diet: ["vegetariano"], calories: 250, ingredients: ["Riso", "Pomodoro", "Mozzarella", "Pangrattato"] }, { name: "Polpetta di melanzane", allergens: ["G", "L"], diet: ["vegetariano"], calories: 180, ingredients: ["Melanzane", "Parmigiano", "Uova", "Pangrattato"] } ],
             dessert: [ { name: "Macedonia", allergens: [], diet: ["vegetariano", "vegano"], calories: 120, ingredients: ["Frutta fresca di stagione"] } ]
         };
         
-        const state = { currentUser: null, currentView: 'menu', activeCategoryFilter: 'all', activeDietFilter: 'all', searchTerm: '', cart: [], allOrders: [], menuData: [], caloriesVisible: false };
+        const state = { 
+            currentUser: null, 
+            currentView: 'menu', 
+            activeCategoryFilter: 'all', 
+            activeDietFilter: 'all', 
+            searchTerm: '', 
+            cart: [], 
+            allOrders: [], 
+            menuData: [], 
+            caloriesVisible: false,
+            customSandwich: {
+                base: null,
+                subtype: null,
+                ingredients: [],
+                basePrice: 3.50,
+                totalPrice: 0
+            }
+        };
         const dom = { };
         
-        // 3) Funzione per aggiornare gli ingredienti con le olive
         function updateIngredientsWithOlives(menu) {
             for (const category in menu) {
                 menu[category].forEach(item => {
                     const hasSalad = item.name.toLowerCase().includes('insalata') || 
                                      (item.ingredients && item.ingredients.some(ing => ing.toLowerCase().includes('insalata')));
                     if (hasSalad) {
-                        if (!item.ingredients) {
-                            item.ingredients = [];
-                        }
+                        if (!item.ingredients) item.ingredients = [];
                         const hasOlives = item.ingredients.some(ing => ing.toLowerCase().includes('olive'));
-                        if (!hasOlives) {
-                            item.ingredients.push('Olive');
-                        }
+                        if (!hasOlives) item.ingredients.push('Olive');
                     }
                 });
             }
@@ -238,9 +329,8 @@
             state.currentView = viewName; 
             dom.views.forEach(v => v.classList.toggle('active', v.id === `${viewName}-view`)); 
             dom.navBtns.forEach(b => { b.classList.toggle('bg-primary', b.dataset.view === viewName); b.classList.toggle('text-white', b.dataset.view === viewName); }); 
-            if (viewName === 'my-order') {
-                renderMyOrder();
-            }
+            if (viewName === 'my-order') renderMyOrder();
+            if (viewName === 'custom-sandwich') renderCustomSandwichBuilder();
         }
         
         function updateFilterCounter() {
@@ -278,6 +368,20 @@
                 
                 const allergenHtml = item.allergens.map(key => `<i class="fas ${ALLERGENS[key].icon}" title="${ALLERGENS[key].name}"></i>`).join(' ');
                 
+                let priceOrPortionSelectorHtml = `<span class="font-semibold text-lg">€${item.price.toFixed(2)}</span>`;
+                if (item.category === 'Verdure') {
+                    priceOrPortionSelectorHtml = `
+                        <div class="flex items-center gap-2">
+                           <select data-id="${item.id}" class="vegetable-portion-select bg-gray-50 border border-gray-300 text-sm rounded-lg p-2">
+                                <option value="2.00" selected>100g - 2.00€</option>
+                                <option value="3.00">150g - 3.00€</option>
+                                <option value="4.00">200g - 4.00€</option>
+                            </select>
+                            <span id="price-vegetable-${item.id}" class="font-bold text-lg text-primary w-20 text-right">€2.00</span>
+                        </div>
+                    `;
+                }
+
                 menuHtml += `
                 <div class="bg-white p-4 rounded-xl shadow-md flex flex-col hover:shadow-lg transition-all duration-300">
                     <div class="flex-grow">
@@ -292,7 +396,7 @@
                     </div>
                     <div class="flex justify-between items-center mt-4">
                         <div class="flex gap-3 text-lg items-center text-text-main/70">${allergenHtml}</div>
-                        <span class="font-semibold text-lg">€${item.price.toFixed(2)}</span>
+                        ${priceOrPortionSelectorHtml}
                     </div>
                     <p class="calorie-info text-xs text-text-main/70 text-right mt-1" style="display: ${state.caloriesVisible ? 'flex' : 'none'}; justify-content: flex-end; align-items: center;">
                         ~${item.calories} kcal <i class="fas fa-question-circle text-primary ml-1 cursor-pointer calorie-info-icon"></i>
@@ -363,9 +467,11 @@
             
             const itemsHtml = state.cart.map(item => {
                 let breadSelectorHtml = '';
-                if (BREAD_OPTIONS[item.category]) {
+                if (BREAD_OPTIONS[item.category] && !item.isCustom) {
                     const optionsHtml = BREAD_OPTIONS[item.category].map(opt => `<option value="${opt}" ${item.selectedType === opt ? 'selected' : ''}>${opt}</option>`).join('');
                     breadSelectorHtml = `<select data-id="${item.cartId}" class="cart-bread-select mt-2 w-full p-2 border border-gray-300 rounded-md text-sm">${optionsHtml}</select>`;
+                } else if (item.isCustom) {
+                    breadSelectorHtml = `<p class="text-xs text-gray-500 mt-1">Ingredienti: ${item.ingredients.join(', ')}</p>`;
                 }
                 return `
                 <div class="py-4 border-b border-gray-200">
@@ -395,7 +501,6 @@
                 </div>
             `}).join('');
             
-            // 4) Aumentato lo spazio tra i prodotti nel riepilogo (space-y-3 -> space-y-4)
             dom.myOrderContentEl.innerHTML = `
                 <div class="space-y-4 mb-4">${itemsHtml}</div>
                 <div class="mt-6 space-y-4">
@@ -431,6 +536,68 @@
                 <button id="confirm-order-btn" class="w-full mt-4 bg-secondary hover:bg-secondary-dark text-white font-bold py-3 px-4 rounded-lg transition-all duration-300"><i class="fas fa-check-circle mr-2"></i>Conferma e Invia Ordine</button>
             `;
         }
+
+        function renderCustomSandwichBuilder() {
+            state.customSandwich = { base: null, subtype: null, ingredients: [], basePrice: 3.50, totalPrice: 0 };
+            
+            dom.baseChoiceContainer.querySelectorAll('.choice-btn').forEach(btn => btn.classList.remove('selected'));
+            dom.subtypeChoiceContainer.classList.add('hidden');
+            dom.ingredientsStepContainer.classList.add('hidden');
+
+            const ingredientsHtml = SANDWICH_INGREDIENTS.map(ing => `
+                <div data-id="${ing.id}" class="ingredient-card bg-white p-3 rounded-lg shadow-sm cursor-pointer border-2 border-transparent transition-all duration-200 flex flex-col justify-center items-center text-center">
+                    <p class="font-semibold text-sm">${ing.name}</p>
+                    <p class="text-xs text-primary font-bold mt-1">+${ing.price.toFixed(2)}€</p>
+                </div>
+            `).join('');
+            dom.ingredientsList.innerHTML = ingredientsHtml;
+            updateSandwichSummary();
+        }
+
+        function updateSandwichSummary() {
+            const { ingredients, basePrice, base, subtype } = state.customSandwich;
+            
+            if (!base || !subtype) {
+                dom.sandwichTotalPrice.textContent = `0.00€`;
+                dom.addSandwichBtn.disabled = true;
+                return;
+            }
+
+            dom.sandwichBaseSummary.textContent = `${BASE_OPTIONS[base].name} (${subtype})`;
+            
+            let currentPrice = basePrice;
+            let extraCharge = 0;
+            
+            if (ingredients.length > 3) {
+                for (let i = 3; i < ingredients.length; i++) {
+                    currentPrice += ingredients[i].price;
+                    extraCharge += ingredients[i].price;
+                }
+            }
+            dom.extraChargeNotice.textContent = extraCharge > 0 ? `Supplemento: +${extraCharge.toFixed(2)}€` : '';
+            
+            const listHtml = ingredients.map((ing, index) => {
+                const priceText = index < 3 ? '(incluso)' : `+${ing.price.toFixed(2)}€`;
+                return `<li class="flex justify-between"><span>${ing.name}</span> <span class="text-gray-500">${priceText}</span></li>`;
+            }).join('');
+
+            if (ingredients.length === 0) {
+                dom.selectedIngredientsList.innerHTML = `<li class="text-gray-400">Seleziona almeno 1 ingrediente...</li>`;
+            } else {
+                 dom.selectedIngredientsList.innerHTML = listHtml;
+            }
+            
+            state.customSandwich.totalPrice = currentPrice;
+            dom.sandwichTotalPrice.textContent = `${currentPrice.toFixed(2)}€`;
+            
+            dom.addSandwichBtn.disabled = ingredients.length < 1;
+
+            document.querySelectorAll('.ingredient-card').forEach(card => {
+                const cardId = card.dataset.id;
+                card.classList.toggle('selected', ingredients.some(ing => ing.id === cardId));
+            });
+        }
+        
 
         function renderAllOrders() {
             const today = new Date();
@@ -527,8 +694,46 @@
             const target = event.target;
             const button = target.closest('button');
             const statusToggle = target.closest('.toggle-paid-btn');
+            const ingredientCard = target.closest('.ingredient-card');
+            const choiceBtn = target.closest('.choice-btn');
 
-            if (event.type === 'click' && statusToggle) {
+            if (choiceBtn) {
+                if (choiceBtn.classList.contains('subtype-choice-btn')) {
+                    // Gestione scelta variante
+                    state.customSandwich.subtype = choiceBtn.dataset.subtype;
+                    dom.subtypeOptions.querySelectorAll('.choice-btn').forEach(btn => btn.classList.remove('selected'));
+                    choiceBtn.classList.add('selected');
+                    dom.ingredientsStepContainer.classList.remove('hidden');
+                } else {
+                    // Gestione scelta base
+                    const type = choiceBtn.dataset.type;
+                    state.customSandwich.base = type;
+                    state.customSandwich.subtype = null;
+                    
+                    dom.baseChoiceContainer.querySelectorAll('.choice-btn').forEach(btn => btn.classList.remove('selected'));
+                    choiceBtn.classList.add('selected');
+
+                    const subtypes = BASE_OPTIONS[type].subtypes;
+                    dom.subtypeOptions.innerHTML = subtypes.map(st => `<button data-subtype="${st}" class="choice-btn subtype-choice-btn flex-1 p-3 bg-gray-50 rounded-lg shadow-sm border-2 border-transparent transition-all duration-200">${st}</button>`).join('');
+                    
+                    dom.subtypeChoiceContainer.classList.remove('hidden');
+                    dom.ingredientsStepContainer.classList.add('hidden');
+                }
+                updateSandwichSummary();
+            }
+            else if (ingredientCard) {
+                const ingredientId = ingredientCard.dataset.id;
+                const selectedIngredient = SANDWICH_INGREDIENTS.find(ing => ing.id === ingredientId);
+                const index = state.customSandwich.ingredients.findIndex(ing => ing.id === ingredientId);
+
+                if (index > -1) {
+                    state.customSandwich.ingredients.splice(index, 1);
+                } else {
+                    state.customSandwich.ingredients.push(selectedIngredient);
+                }
+                updateSandwichSummary();
+            }
+            else if (event.type === 'click' && statusToggle) {
                 handlePaidToggle(statusToggle);
             } else if (event.type === 'click' && button) {
                 handleClicks(button);
@@ -538,7 +743,16 @@
                 if (itemInCart) {
                     itemInCart.selectedType = target.value;
                 }
-            } else if (event.type === 'change' && target.matches('select')) {
+            } 
+            else if (event.type === 'change' && target.matches('.vegetable-portion-select')) {
+                const price = target.value;
+                const itemId = target.dataset.id;
+                const priceElement = document.getElementById(`price-vegetable-${itemId}`);
+                if (priceElement) {
+                    priceElement.textContent = `€${parseFloat(price).toFixed(2)}`;
+                }
+            }
+            else if (event.type === 'change' && target.matches('select')) {
                 handleSelectChange(target);
             } else if (event.type === 'input' && target.id === 'search-input') {
                 state.searchTerm = target.value;
@@ -559,17 +773,43 @@
                 navigate(button.dataset.view);
             }
             else if (button.matches('.add-to-cart-btn')) { 
-                const item = state.menuData.find(i => i.id === parseInt(button.dataset.id));
+                const item = { ...state.menuData.find(i => i.id === parseInt(button.dataset.id))};
                 if (!item) return;
-                const existingItem = state.cart.find(i => i.id === item.id && !i.selectedType);
-                if (existingItem && !BREAD_OPTIONS[item.category]) {
-                    existingItem.quantity++;
-                } else {
-                    let defaultType = (BREAD_OPTIONS[item.category]) ? BREAD_OPTIONS[item.category][0] : null;
-                    state.cart.push({ ...item, cartId: Date.now(), quantity: 1, selectedType: defaultType });
+
+                if (item.category === 'Verdure') {
+                    const select = document.querySelector(`.vegetable-portion-select[data-id="${item.id}"]`);
+                    const selectedOption = select.options[select.selectedIndex];
+                    item.price = parseFloat(select.value);
+                    item.name = `${item.name.split(' (')[0]} (${selectedOption.text.split(' - ')[0]})`;
                 }
+                
+                const cartItem = { ...item, cartId: Date.now(), quantity: 1 };
+                if (BREAD_OPTIONS[item.category]) {
+                    cartItem.selectedType = BREAD_OPTIONS[item.category][0];
+                }
+
+                state.cart.push(cartItem);
                 renderMyOrder();
                 showToast(`${item.name} aggiunto!`);
+            }
+            else if (button.id === 'add-sandwich-to-cart-btn') {
+                const { ingredients, totalPrice, subtype } = state.customSandwich;
+                if (ingredients.length < 1) return;
+
+                const ingredientNames = ingredients.map(ing => ing.name);
+                const sandwichName = `${subtype} con ${ingredientNames.join(', ')}`;
+
+                state.cart.push({
+                    cartId: Date.now(),
+                    name: sandwichName,
+                    price: totalPrice,
+                    quantity: 1,
+                    isCustom: true,
+                    ingredients: ingredientNames
+                });
+
+                showToast('Prodotto personalizzato aggiunto!');
+                navigate('my-order');
             }
             else if (button.matches('.cart-qty-btn')) {
                 const cartId = parseInt(button.dataset.id);
@@ -603,7 +843,6 @@
                     }
                 }
             }
-            // 5) Logica per il nuovo popup di suggerimento
             else if (button.id === 'suggest-dish-btn') {
                 const category = dom.categorySelect.value;
                 const possibleItems = state.menuData.filter(item => category === 'all' || item.category.toLowerCase() === category);
@@ -912,11 +1151,20 @@
                 toastMessageEl: document.getElementById('toast-message'), categorySelect: document.getElementById('category-select'),
                 dietSelect: document.getElementById('diet-select'), filterCounterContainer: document.getElementById('filter-counter-container'),
                 allergenModal: document.getElementById('allergen-modal'), allergenModalContent: document.getElementById('allergen-modal-content'),
-                // 5) Aggiunti elementi del nuovo popup al DOM
                 suggestionModal: document.getElementById('suggestion-modal'),
                 suggestionModalContentBox: document.getElementById('suggestion-modal-content-box'),
                 suggestionContent: document.getElementById('suggestion-content'),
                 suggestionAddBtn: document.getElementById('suggestion-add-btn'),
+                ingredientsList: document.getElementById('ingredients-list'),
+                selectedIngredientsList: document.getElementById('selected-ingredients-list'),
+                sandwichTotalPrice: document.getElementById('sandwich-total-price'),
+                addSandwichBtn: document.getElementById('add-sandwich-to-cart-btn'),
+                baseChoiceContainer: document.getElementById('base-choice-container'),
+                subtypeChoiceContainer: document.getElementById('subtype-choice-container'),
+                ingredientsStepContainer: document.getElementById('ingredients-step-container'),
+                subtypeOptions: document.getElementById('subtype-options'),
+                sandwichBaseSummary: document.getElementById('sandwich-base-summary'),
+                extraChargeNotice: document.getElementById('extra-charge-notice')
             });
             document.body.addEventListener('click', handleEvents);
             document.body.addEventListener('change', handleEvents);
