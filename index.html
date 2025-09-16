@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>dosepranza</title>
-    
+    <title>dosemagna</title>
     <script src="https://cdn.tailwindcss.com/3.4.3"></script>
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -146,7 +144,7 @@
                 
                 <div id="ingredients-step-container" class="hidden">
                     <h3 class="text-xl font-bold mb-3 text-center">3. Aggiungi gli ingredienti</h3>
-                    <p class="text-center text-text-main/80 mb-4">Il prezzo base di **3,50€** include fino a 3 ingredienti. Dal 4° in poi si applica un supplemento.</p>
+                    <p class="text-center text-text-main/80 mb-4">Il prezzo base di **3,50€** include fino a 3 ingredienti. Dal 4° in poi si applica un supplemento di **1,00€** per ogni ingrediente.</p>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div id="ingredients-list" class="md:col-span-2 grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -162,7 +160,7 @@
                                 </ul>
                                 <div class="border-t pt-3">
                                     <p id="extra-charge-notice" class="text-xs text-red-500 mb-2 h-4"></p>
-                                    <p class="text-right text-2xl font-bold text-primary" id="sandwich-total-price">0.00€</p>
+                                    <p class="text-right text-2xl font-bold text-primary" id="sandwich-total-price">€0.00</p>
                                 </div>
                                 <button id="add-sandwich-to-cart-btn" class="w-full mt-4 bg-secondary hover:bg-secondary-dark text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
                                     <i class="fas fa-plus-circle mr-2"></i>Aggiungi al Carrello
@@ -255,20 +253,30 @@
             pizza: { name: 'Pizza Ripiena', subtypes: ['Pizza Classica', 'Pizza 5 Cereali'] }
         };
 
+        // CR1 & CR2: Lista ingredienti aggiornata e logica prezzo
+        const CUSTOM_PRODUCT_BASE_PRICE = 3.50;
+        const CUSTOM_PRODUCT_EXTRA_INGREDIENT_PRICE = 1.00;
+        const CUSTOM_PRODUCT_INCLUDED_INGREDIENTS = 3;
+
         const SANDWICH_INGREDIENTS = [
-            { id: 'p-crudo', name: 'Prosciutto Crudo', price: 1.50 },
-            { id: 'p-cotto', name: 'Prosciutto Cotto', price: 1.20 },
-            { id: 'salame', name: 'Salame', price: 1.20 },
-            { id: 'mortadella', name: 'Mortadella', price: 1.20 },
-            { id: 'porchetta', name: 'Porchetta', price: 1.80 },
-            { id: 'tacchino', name: 'Tacchino Arrosto', price: 1.50 },
-            { id: 'mozzarella', name: 'Mozzarella', price: 1.00 },
-            { id: 'scamorza', name: 'Scamorza', price: 1.00 },
-            { id: 'stracchino', name: 'Stracchino', price: 1.00 },
-            { id: 'pomodoro', name: 'Pomodoro', price: 0.50 },
-            { id: 'rucola', name: 'Rucola', price: 0.50 },
-            { id: 'melanzane', name: 'Melanzane Grigliate', price: 1.00 },
-        ];
+            // Salumi
+            { id: 'p-crudo', name: 'Prosciutto Crudo' }, { id: 'p-cotto', name: 'Prosciutto Cotto' },
+            { id: 'salame', name: 'Salame' }, { id: 'mortadella', name: 'Mortadella' },
+            { id: 'porchetta', name: 'Porchetta' }, { id: 'tacchino', name: 'Tacchino Arrosto' },
+            { id: 'bresaola', name: 'Bresaola' }, { id: 'speck', name: 'Speck' },
+            { id: 'capocollo', name: 'Capocollo' }, { id: 'salmone', name: 'Salmone' }, { id: 'tonno', name: 'Tonno' },
+            // Formaggi
+            { id: 'mozzarella', name: 'Mozzarella' }, { id: 'scamorza', name: 'Scamorza' },
+            { id: 'stracchino', name: 'Stracchino' }, { id: 'parmigiano', name: 'Parmigiano' },
+            { id: 'pecorino', name: 'Pecorino' }, { id: 'brie', name: 'Brie' },
+            { id: 'primo-sale', name: 'Primo Sale' }, { id: 'stracciatella', name: 'Stracciatella' },
+            // Verdure e Altro
+            { id: 'pomodoro', name: 'Pomodoro' }, { id: 'pom-secchi', name: 'Pomodori Secchi' },
+            { id: 'rucola', name: 'Rucola' }, { id: 'melanzane', name: 'Melanzane Grigliate' },
+            { id: 'zucchine', name: 'Zucchine Grigliate' }, { id: 'peperoni', name: 'Peperoni Grigliati' },
+            { id: 'carciofini', name: 'Carciofini' }, { id: 'frittata', name: 'Frittata' },
+            { id: 'insalata', name: 'Insalata' }, { id: 'olive', name: 'Olive' }
+        ].sort((a, b) => a.name.localeCompare(b.name));
 
 
         const RAW_MENU = {
@@ -296,7 +304,7 @@
                 base: null,
                 subtype: null,
                 ingredients: [],
-                basePrice: 3.50,
+                basePrice: CUSTOM_PRODUCT_BASE_PRICE,
                 totalPrice: 0
             }
         };
@@ -538,7 +546,7 @@
         }
 
         function renderCustomSandwichBuilder() {
-            state.customSandwich = { base: null, subtype: null, ingredients: [], basePrice: 3.50, totalPrice: 0 };
+            state.customSandwich = { base: null, subtype: null, ingredients: [], basePrice: CUSTOM_PRODUCT_BASE_PRICE, totalPrice: 0 };
             
             dom.baseChoiceContainer.querySelectorAll('.choice-btn').forEach(btn => btn.classList.remove('selected'));
             dom.subtypeChoiceContainer.classList.add('hidden');
@@ -547,7 +555,6 @@
             const ingredientsHtml = SANDWICH_INGREDIENTS.map(ing => `
                 <div data-id="${ing.id}" class="ingredient-card bg-white p-3 rounded-lg shadow-sm cursor-pointer border-2 border-transparent transition-all duration-200 flex flex-col justify-center items-center text-center">
                     <p class="font-semibold text-sm">${ing.name}</p>
-                    <p class="text-xs text-primary font-bold mt-1">+${ing.price.toFixed(2)}€</p>
                 </div>
             `).join('');
             dom.ingredientsList.innerHTML = ingredientsHtml;
@@ -558,7 +565,7 @@
             const { ingredients, basePrice, base, subtype } = state.customSandwich;
             
             if (!base || !subtype) {
-                dom.sandwichTotalPrice.textContent = `0.00€`;
+                dom.sandwichTotalPrice.textContent = `€0.00`;
                 dom.addSandwichBtn.disabled = true;
                 return;
             }
@@ -566,29 +573,24 @@
             dom.sandwichBaseSummary.textContent = `${BASE_OPTIONS[base].name} (${subtype})`;
             
             let currentPrice = basePrice;
-            let extraCharge = 0;
+            const extraIngredientsCount = Math.max(0, ingredients.length - CUSTOM_PRODUCT_INCLUDED_INGREDIENTS);
+            currentPrice += extraIngredientsCount * CUSTOM_PRODUCT_EXTRA_INGREDIENT_PRICE;
             
-            if (ingredients.length > 3) {
-                for (let i = 3; i < ingredients.length; i++) {
-                    currentPrice += ingredients[i].price;
-                    extraCharge += ingredients[i].price;
-                }
-            }
-            dom.extraChargeNotice.textContent = extraCharge > 0 ? `Supplemento: +${extraCharge.toFixed(2)}€` : '';
+            dom.extraChargeNotice.textContent = extraIngredientsCount > 0 ? `Supplemento: +€${(extraIngredientsCount * CUSTOM_PRODUCT_EXTRA_INGREDIENT_PRICE).toFixed(2)}` : '';
             
             const listHtml = ingredients.map((ing, index) => {
-                const priceText = index < 3 ? '(incluso)' : `+${ing.price.toFixed(2)}€`;
+                const priceText = index < CUSTOM_PRODUCT_INCLUDED_INGREDIENTS ? '(incluso)' : `+€${CUSTOM_PRODUCT_EXTRA_INGREDIENT_PRICE.toFixed(2)}`;
                 return `<li class="flex justify-between"><span>${ing.name}</span> <span class="text-gray-500">${priceText}</span></li>`;
             }).join('');
 
             if (ingredients.length === 0) {
-                dom.selectedIngredientsList.innerHTML = `<li class="text-gray-400">Seleziona almeno 1 ingrediente...</li>`;
+                dom.selectedIngredientsList.innerHTML = `<li class="text-gray-400">Seleziona fino a 3 ingredienti inclusi...</li>`;
             } else {
                  dom.selectedIngredientsList.innerHTML = listHtml;
             }
             
             state.customSandwich.totalPrice = currentPrice;
-            dom.sandwichTotalPrice.textContent = `${currentPrice.toFixed(2)}€`;
+            dom.sandwichTotalPrice.textContent = `€${currentPrice.toFixed(2)}`;
             
             dom.addSandwichBtn.disabled = ingredients.length < 1;
 
@@ -699,13 +701,11 @@
 
             if (choiceBtn) {
                 if (choiceBtn.classList.contains('subtype-choice-btn')) {
-                    // Gestione scelta variante
                     state.customSandwich.subtype = choiceBtn.dataset.subtype;
                     dom.subtypeOptions.querySelectorAll('.choice-btn').forEach(btn => btn.classList.remove('selected'));
                     choiceBtn.classList.add('selected');
                     dom.ingredientsStepContainer.classList.remove('hidden');
                 } else {
-                    // Gestione scelta base
                     const type = choiceBtn.dataset.type;
                     state.customSandwich.base = type;
                     state.customSandwich.subtype = null;
