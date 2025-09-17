@@ -65,15 +65,13 @@
     <div id="app" class="max-w-4xl mx-auto p-4 md:p-6">
         <header class="mb-6 flex flex-col items-center">
             <div class="flex flex-col items-center">
-                <img src="https://i.postimg.cc/L6H20zfp/logo-dosepranza-People-About-Food.png" alt="Dosepranza Logo" class="w-48 md:w-56 mx-auto">
+                <img src="https://i.postimg.cc/L6H20zfp/logo-dosepranza-People-About-Food.png" alt="Dosepranza Logo" class="w-64 md:w-80 mx-auto">
                 <div class="text-center">
                     <a href="https://www.mermaidchart.com/app/projects/6940d9d3-fca9-4615-9516-3753f0d6dd1e/diagrams/7034c164-c365-454d-9a8e-02d597c94465/version/v0.1/edit" target="_blank" class="mt-2 inline-block text-sm text-secondary-dark hover:underline">
                         <i class="fas fa-project-diagram mr-1"></i> Come funziona? Vedi il processo d'ordine
                     </a>
                 </div>
             </div>
-
-            <img src="https://i.postimg.cc/GpFvxwFt/Pizzicagnolobanner.png" alt="Banner di una bottega di pizzicagnolo tradizionale italiana" class="w-full h-48 object-cover rounded-lg shadow-md my-6">
 
             <div class="bg-primary-100 border-l-4 border-primary text-primary-800 p-4 rounded-md my-4 w-full mt-6" role="alert">
                 <p class="font-bold">Attenzione: L'ordine deve essere completato entro le 11:30.</p>
@@ -253,7 +251,6 @@
             pizza: { name: 'Pizza Ripiena', subtypes: ['Pizza Classica', 'Pizza 5 Cereali'] }
         };
 
-        // CR1 & CR2: Lista ingredienti aggiornata e logica prezzo
         const CUSTOM_PRODUCT_BASE_PRICE = 3.50;
         const CUSTOM_PRODUCT_EXTRA_INGREDIENT_PRICE = 1.00;
         const CUSTOM_PRODUCT_INCLUDED_INGREDIENTS = 3;
@@ -847,7 +844,6 @@
                     try {
                         await deleteDoc(doc(db, "orders", orderId));
                         showToast("Ordine eliminato con successo.");
-                        renderMyOrder(); 
                     } catch (error) {
                         console.error("Errore eliminazione ordine:", error);
                         showToast("Impossibile eliminare l'ordine.");
