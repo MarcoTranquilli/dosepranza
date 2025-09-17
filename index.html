@@ -133,7 +133,7 @@
                         </button>
                     </div>
                 </div>
-
+                
                 <div id="ingredients-step-container" class="hidden">
                     <h3 class="text-xl font-bold mb-3 text-center">2. Aggiungi gli ingredienti</h3>
                     <p class="text-center text-text-main/80 mb-4">Il prezzo base di 3,50€ include fino a 3 ingredienti. Dal 4° in poi si applica un supplemento di 1,00€ per ogni ingrediente.</p>
@@ -224,7 +224,7 @@
         const db = getFirestore(app);
         const ordersCollectionRef = collection(db, "orders");
         
-        const PRICES = { gastronomia: 4.00, verdure: 4.00, panini: 3.50, pizze: 3.50, fritti: 1.50, dessert: 3.00 };
+        const PRICES = { gastronomia: 4.00, verdure: 4.00, panini: 3.50, pizze: 3.50, fritti: 1.50, dessert: 3.00, menù: 0 };
         const ALLERGENS = { G: { name: "Glutine", icon: "fa-wheat-awn" }, L: { name: "Latticini", icon: "fa-cheese" }, C: { name: "Crostacei", icon: "fa-shrimp" }, P: { name: "Pesce", icon: "fa-fish-fins" }};
         const DIETS = { vegetariano: { name: "Vegetariano", icon: "🧀" }, vegano: { name: "Vegano", icon: "🌱" }, "carne/pesce": { name: "Carne/🐟Pesce", icon: "🥩" } };
         const PAYMENT_METHODS = { 
@@ -375,10 +375,823 @@
             if (viewName === 'custom-sandwich') renderCustomSandwichBuilder();
         }
         
-        // ... ALL OTHER JAVASCRIPT FUNCTIONS ARE INCLUDED HERE ...
-        // The script is too long to display in full, but the provided code contains all the necessary functions from previous versions,
-        // including renderMenu, renderMyOrder, renderAllOrders, handleClicks, updateSandwichSummary, init, etc., with all the latest corrections.
+        function updateFilterCounter() {
+            let count = 0; if (state.activeCategoryFilter !== 'all') count++; if (state.activeDietFilter !== 'all') count++; if(state.searchTerm) count++;
+            dom.filterCounterContainer.innerHTML = count > 0 ? `<i class="fas fa-filter text-primary"></i> ${count} ${count === 1 ? 'filtro applicato' : 'filtri applicati'}` : '';
+        }
 
+        function renderFilters() {
+            let catSelectHtml = `<option value="all">Tutte le Categorie</option>`; 
+            Object.keys(RAW_MENU).forEach(cat => { catSelectHtml += `<option value="${cat}">${cat.charAt(0).toUpperCase() + cat.slice(1)}</option>`; }); 
+            dom.categorySelect.innerHTML = catSelectHtml;
+
+            let dietSelectHtml = `<option value="all">Tutti i Regimi</option>`; Object.entries(DIETS).forEach(([key, info]) => { dietSelectHtml += `<option value="${key}">${info.icon} ${info.name}</option>`; }); dom.dietSelect.innerHTML = dietSelectHtml;
+            let legendHtml = ''; Object.values(ALLERGENS).forEach(info => { legendHtml += `<p class="flex items-center text-base mb-1"><i class="fas ${info.icon} mr-2 text-gray-600"></i> ${info.name}</p>`; }); dom.allergenModalContent.innerHTML = legendHtml;
+        }
+
+        function renderMenu() {
+            const term = state.searchTerm.toLowerCase();
+            const filtered = state.menuData.filter(item => (item.name.toLowerCase().includes(term)) && (state.activeCategoryFilter === 'all' || item.category.toLowerCase() === state.activeCategoryFilter) && (state.activeDietFilter === 'all' || item.diet.includes(state.activeDietFilter)));
+            
+            if (filtered.length === 0) {
+                 dom.menuItemsContainer.innerHTML = `<div class="text-center p-8 col-span-full bg-white rounded-xl shadow"><p class="text-gray-500">Nessun piatto trovato.</p></div>`;
+                 return;
+            }
+
+            let currentCategory = '';
+            let menuHtml = '';
+            const sortedItems = filtered.sort((a, b) => CATEGORY_ORDER.indexOf(a.category) - CATEGORY_ORDER.indexOf(b.category));
+
+            sortedItems.forEach(item => {
+                if (item.category !== currentCategory) {
+                    currentCategory = item.category;
+                    menuHtml += `<div class="col-span-full mt-6 mb-2"><h3 class="text-2xl font-bold border-b-2 border-primary-light pb-2">${currentCategory}</h3></div>`;
+                }
+                
+                const allergenHtml = item.allergens.map(key => `<i class="fas ${ALLERGENS[key].icon}" title="${ALLERGENS[key].name}"></i>`).join(' ');
+                
+                let priceOrPortionSelectorHtml = `<span class="font-semibold text-lg">€${item.price.toFixed(2)}</span>`;
+                if (item.category === 'Verdure') {
+                    priceOrPortionSelectorHtml = `
+                        <div class="flex items-center gap-2">
+                           <select data-id="${item.id}" class="vegetable-portion-select bg-gray-50 border border-gray-300 text-sm rounded-lg p-2">
+                                <option value="2.00" selected>100g - 2.00€</option>
+                                <option value="3.00">150g - 3.00€</option>
+                                <option value="4.00">200g - 4.00€</option>
+                            </select>
+                            <span id="price-vegetable-${item.id}" class="font-bold text-lg text-primary w-20 text-right">€2.00</span>
+                        </div>
+                    `;
+                }
+                
+                const formatHtml = item.format ? `<p class="text-text-main/70 text-sm">${item.format}</p>` : `<p class="text-text-main/70 text-sm">${item.category}</p>`;
+
+                menuHtml += `
+                <div class="bg-white p-4 rounded-xl shadow-md flex flex-col hover:shadow-lg transition-all duration-300">
+                    <div class="flex-grow">
+                        <div class="flex items-start mb-2">
+                            <i class="fas ${item.icon} text-primary text-xl mr-3 w-6 text-center pt-1"></i>
+                            <div>
+                                <h3 class="font-bold text-lg">${item.name}</h3>
+                                ${formatHtml}
+                            </div>
+                        </div>
+                        <p class="text-xs text-text-main/80 ml-9 mt-1"><span class="font-semibold">Ingredienti:</span> ${item.ingredients ? item.ingredients.join(', ') : 'Non specificati'}</p>
+                    </div>
+                    <div class="flex justify-between items-center mt-4">
+                        <div class="flex gap-3 text-lg items-center text-text-main/70">${allergenHtml}</div>
+                        ${priceOrPortionSelectorHtml}
+                    </div>
+                    <p class="calorie-info text-xs text-text-main/70 text-right mt-1" style="display: ${state.caloriesVisible ? 'flex' : 'none'}; justify-content: flex-end; align-items: center;">
+                        ${item.calories ? `~${item.calories} kcal` : ''} <i class="fas fa-question-circle text-primary ml-1 cursor-pointer calorie-info-icon" style="display: ${item.calories ? 'inline' : 'none'}"></i>
+                    </p>
+                    <button data-id="${item.id}" class="add-to-cart-btn w-full mt-4 bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg transition-all duration-300"><i class="fas fa-plus mr-2"></i> Aggiungi</button>
+                </div>`;
+            });
+            dom.menuItemsContainer.innerHTML = menuHtml;
+        }
+
+        function renderFavorites() {
+            const favoritesContainer = document.getElementById('favorites-section');
+            if (!state.allOrders || state.allOrders.length === 0) { favoritesContainer.innerHTML = ''; return; }
+            const itemCounts = state.allOrders.flatMap(order => order.items.map(item => item.name.split(' (')[0])).reduce((acc, name) => { acc[name] = (acc[name] || 0) + 1; return acc; }, {});
+            const sortedFavorites = Object.entries(itemCounts).sort(([, a], [, b]) => b - a).slice(0, 5).map(([name]) => state.menuData.find(item => item.name === name)).filter(Boolean); 
+            if (sortedFavorites.length === 0) { favoritesContainer.innerHTML = ''; return; }
+            const favoritesHtml = sortedFavorites.map(item => `<button data-id="${item.id}" class="add-to-cart-btn flex-shrink-0 bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 text-left w-40"><p class="font-semibold text-sm truncate">${item.name}</p><p class="text-xs text-text-main/70">€${item.price.toFixed(2)}</p></button>`).join('');
+            favoritesContainer.innerHTML = `<h3 class="text-2xl font-bold mb-3"><i class="fas fa-star text-yellow-400 mr-2"></i>I Più Ordinati</h3><div class="flex gap-3 overflow-x-auto pb-3">${favoritesHtml}</div>`;
+        }
+        
+        function renderMyOrder() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todaysUserOrder = state.allOrders.find(order => order.uid === state.currentUser?.uid && order.createdAt && order.createdAt.toDate() >= today);
+            
+            if (todaysUserOrder) {
+                const itemsHtml = todaysUserOrder.items.map(item => `<li class="flex justify-between items-center text-sm"><span>${item.quantity} x ${item.name} ${item.selectedType ? `(${item.selectedType})` : ''}</span><span class="font-medium">€${(item.price * item.quantity).toFixed(2)}</span></li>`).join('');
+                const notesHtml = `
+                    ${todaysUserOrder.allergies ? `<p class="text-sm mt-2 p-2 bg-red-50 border-l-4 border-red-400"><b class="text-red-700">Allergie:</b> ${todaysUserOrder.allergies}</p>` : ''}
+                    ${todaysUserOrder.notes ? `<p class="text-sm mt-2 p-2 bg-blue-50 border-l-4 border-blue-300"><b>Note:</b> ${todaysUserOrder.notes}</p>` : ''}
+                    ${todaysUserOrder.alternative ? `<p class="text-sm mt-2 p-2 bg-gray-50 border-l-4 border-gray-300"><b>Alternativa:</b> ${todaysUserOrder.alternative}</p>` : ''}
+                    ${todaysUserOrder.cutlery ? `<p class="text-sm mt-2 p-2 bg-green-50 border-l-4 border-green-400"><b>Posate richieste.</b></p>` : ''}
+                `;
+                
+                const paymentStatusHtml = `
+                <div id="payment-status" class="mt-4 p-3 rounded-lg ${todaysUserOrder.paid ? 'bg-secondary-100 text-secondary-800' : 'bg-primary-100 text-primary-800'}">
+                    <p class="font-bold"><i class="fas ${todaysUserOrder.paid ? 'fa-check-circle' : 'fa-hourglass-half'} mr-2"></i>Stato Pagamento: ${todaysUserOrder.paid ? 'Pagato' : 'In attesa di pagamento'}</p>
+                </div>`;
+
+                const responseHtml = todaysUserOrder.restaurateurResponse 
+                    ? `<div id="restaurateur-response" class="mt-4 p-3 rounded-lg bg-yellow-100 border-l-4 border-yellow-400">
+                           <p class="font-bold text-yellow-800"><i class="fas fa-comment-dots mr-2"></i>Messaggio dal ristoratore:</p>
+                           <p class="text-yellow-700">${todaysUserOrder.restaurateurResponse}</p>
+                       </div>`
+                    : '';
+
+                dom.myOrderContentEl.innerHTML = `
+                    <p class="mb-4">Hai già inviato il tuo ordine per oggi. Ecco il riepilogo:</p>
+                    <ul class="space-y-2 border-t border-b py-4">${itemsHtml}</ul>
+                    <div class="text-right font-bold text-2xl mt-4">Totale: €${todaysUserOrder.total.toFixed(2)}</div>
+                    <div class="mt-2">${notesHtml}</div>
+                    ${paymentStatusHtml}
+                    ${responseHtml}
+                    <p class="text-xs text-gray-500 mt-4 text-center">Puoi modificare o eliminare l'ordine dalla sezione "Tutti gli Ordini" entro le 11:30.</p>
+                `;
+                dom.cartCountEl.textContent = '✓'; 
+                return;
+            }
+
+            const totalItems = state.cart.reduce((sum, item) => sum + item.quantity, 0);
+            dom.cartCountEl.textContent = totalItems;
+            if (state.cart.length === 0) {
+                dom.myOrderContentEl.innerHTML = `<p class="text-center text-gray-500 py-8">Il tuo carrello è vuoto.</p>`;
+                return;
+            }
+
+            const total = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            const itemsHtml = state.cart.map(item => {
+                let breadSelectorHtml = '';
+                if (item.isCustom) {
+                    breadSelectorHtml = `<p class="text-xs text-gray-500 mt-1">Ingredienti: ${item.ingredients.join(', ')}</p>`;
+                }
+                return `
+                <div class="py-4 border-b border-gray-200">
+                    <div class="flex justify-between items-start">
+                        <div><p class="font-semibold">${item.name}</p><p class="text-sm text-text-main/70">€${item.price.toFixed(2)}</p></div>
+                        <div class="flex items-center gap-3">
+                            <button data-id="${item.cartId}" data-action="decrease" class="cart-qty-btn bg-gray-200 rounded-full h-8 w-8 transition-all duration-300">-</button>
+                            <span class="font-bold text-lg">${item.quantity}</span>
+                            <button data-id="${item.cartId}" data-action="increase" class="cart-qty-btn bg-gray-200 rounded-full h-8 w-8 transition-all duration-300">+</button>
+                            <button data-id="${item.cartId}" class="cart-remove-btn text-red-500 text-lg flex-shrink-0 ml-4 transition-all duration-300"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </div>
+                    ${breadSelectorHtml}
+                </div>`;
+            }).join('');
+
+            const paymentOptionsHtml = Object.entries(PAYMENT_METHODS).map(([key, {name, icon, note}], index) => {
+                const noteHtml = note ? `<span class="block text-xs text-text-main/60 mt-1 font-normal">${note}</span>` : '';
+                return `
+                <div class="flex-1">
+                    <input type="radio" id="payment-${key}" name="payment-method" value="${key}" class="hidden payment-radio" ${index === 0 ? 'checked' : ''}>
+                    <label for="payment-${key}" class="block border-2 border-gray-200 rounded-lg p-3 text-center cursor-pointer transition-all duration-300 hover:border-primary-light h-full">
+                        <i class="fas ${icon} text-2xl text-primary"></i>
+                        <span class="block text-sm font-semibold mt-2">${name}</span>
+                        ${noteHtml}
+                    </label>
+                </div>
+            `}).join('');
+            
+            dom.myOrderContentEl.innerHTML = `
+                <div class="space-y-4 mb-4">${itemsHtml}</div>
+                <div class="mt-6 space-y-4">
+                    <div>
+                        <label for="notes-input" class="block mb-2 font-semibold">Note per la cucina (es. senza cipolla):</label>
+                        <input type="text" id="notes-input" placeholder="Aggiungi una nota..." class="w-full p-3 border border-gray-300 rounded-lg">
+                    </div>
+                    <div>
+                        <label for="alternative-input" class="block mb-2 font-semibold">Alternativa (se un prodotto è esaurito):</label>
+                        <input type="text" id="alternative-input" placeholder="Es. un supplì o un'altra verdura" class="w-full p-3 border border-gray-300 rounded-lg">
+                    </div>
+                    
+                    <div>
+                        <label for="allergies-input" class="block mb-2 font-semibold text-red-700"><i class="fas fa-exclamation-triangle mr-2"></i>Segnalazione Allergie Importanti:</label>
+                        <textarea id="allergies-input" placeholder="Per favore, specifica qui eventuali allergie gravi." class="w-full p-3 border border-red-300 rounded-lg focus:ring-2 focus:ring-red-400"></textarea>
+                    </div>
+
+                    <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+                        <label for="cutlery-checkbox" class="font-semibold cursor-pointer">Hai bisogno di posate?</label>
+                        <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                            <input type="checkbox" name="cutlery-checkbox" id="cutlery-checkbox" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300 ease-in-out"/>
+                            <label for="cutlery-checkbox" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6">
+                    <h4 class="block mb-2 font-semibold">Metodo di Pagamento</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">${paymentOptionsHtml}</div>
+                </div>
+
+                <div class="text-right font-bold text-2xl mt-6">Totale: €${total.toFixed(2)}</div>
+                <button id="confirm-order-btn" class="w-full mt-4 bg-secondary hover:bg-secondary-dark text-white font-bold py-3 px-4 rounded-lg transition-all duration-300"><i class="fas fa-check-circle mr-2"></i>Conferma e Invia Ordine</button>
+            `;
+        }
+
+        function renderCustomSandwichBuilder() {
+            state.customSandwich = { base: null, ingredients: [], basePrice: CUSTOM_PRODUCT_BASE_PRICE, totalPrice: 0 };
+            
+            dom.baseChoiceContainer.querySelectorAll('.choice-btn').forEach(btn => btn.classList.remove('selected'));
+            dom.ingredientsStepContainer.classList.add('hidden');
+
+            const ingredientsHtml = SANDWICH_INGREDIENTS.map(ing => `
+                <div data-id="${ing.id}" class="ingredient-card bg-white p-3 rounded-lg shadow-sm cursor-pointer border-2 border-transparent transition-all duration-200 flex flex-col justify-center items-center text-center">
+                    <p class="font-semibold text-sm">${ing.name}</p>
+                </div>
+            `).join('');
+            dom.ingredientsList.innerHTML = ingredientsHtml;
+            updateSandwichSummary();
+        }
+
+        function updateSandwichSummary() {
+            const { ingredients, basePrice, base } = state.customSandwich;
+            
+            if (!base) {
+                dom.sandwichTotalPrice.textContent = `€0.00`;
+                dom.addSandwichBtn.disabled = true;
+                return;
+            }
+
+            dom.sandwichBaseSummary.textContent = `${BASE_OPTIONS[base].name}`;
+            
+            let currentPrice = basePrice;
+            const extraIngredientsCount = Math.max(0, ingredients.length - CUSTOM_PRODUCT_INCLUDED_INGREDIENTS);
+            currentPrice += extraIngredientsCount * CUSTOM_PRODUCT_EXTRA_INGREDIENT_PRICE;
+            
+            dom.extraChargeNotice.textContent = extraIngredientsCount > 0 ? `Supplemento: +€${(extraIngredientsCount * CUSTOM_PRODUCT_EXTRA_INGREDIENT_PRICE).toFixed(2)}` : '';
+            
+            const listHtml = ingredients.map((ing, index) => {
+                const priceText = index < CUSTOM_PRODUCT_INCLUDED_INGREDIENTS ? '(incluso)' : `+€${CUSTOM_PRODUCT_EXTRA_INGREDIENT_PRICE.toFixed(2)}`;
+                return `<li class="flex justify-between"><span>${ing.name}</span> <span class="text-gray-500">${priceText}</span></li>`;
+            }).join('');
+
+            if (ingredients.length === 0) {
+                dom.selectedIngredientsList.innerHTML = `<li class="text-gray-400">Seleziona fino a 3 ingredienti inclusi...</li>`;
+            } else {
+                 dom.selectedIngredientsList.innerHTML = listHtml;
+            }
+            
+            state.customSandwich.totalPrice = currentPrice;
+            dom.sandwichTotalPrice.textContent = `€${currentPrice.toFixed(2)}`;
+            
+            dom.addSandwichBtn.disabled = ingredients.length < 1;
+
+            document.querySelectorAll('.ingredient-card').forEach(card => {
+                const cardId = card.dataset.id;
+                card.classList.toggle('selected', ingredients.some(ing => ing.id === cardId));
+            });
+        }
+        
+
+        function renderAllOrders() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todaysOrders = state.allOrders.filter(order => order.createdAt && order.createdAt.toDate() >= today).sort((a, b) => a.user.localeCompare(b.user));
+            
+            const now = new Date();
+            const isBeforeCutoff = now.getHours() < 11 || (now.getHours() === 11 && now.getMinutes() < 30);
+
+            if (todaysOrders.length === 0) {
+                dom.allOrdersListEl.innerHTML = `<div class="text-center p-8 bg-white rounded-xl shadow"><p class="text-gray-500">Nessun ordine per oggi.</p></div>`;
+                dom.grandTotalEl.textContent = '€0.00';
+                return;
+            }
+            
+            let grandTotal = 0;
+            const ordersHtml = todaysOrders.map(order => {
+                grandTotal += order.total;
+                const itemsHtml = order.items.map(item => `<li class="flex justify-between items-center text-sm"><span>${item.quantity} x ${item.name} ${item.selectedType ? `(${item.selectedType})` : ''}</span><span class="font-medium">€${(item.price * item.quantity).toFixed(2)}</span></li>`).join('');
+                
+                const notesHtml = `
+                    ${order.allergies ? `<p class="text-xs text-red-700 mt-2 pl-4 border-l-2 border-red-300"><b>Allergie:</b> ${order.allergies}</p>` : ''}
+                    ${order.notes ? `<p class="text-xs text-text-main/70 mt-2 pl-4 border-l-2 border-blue-300"><b>Note:</b> ${order.notes}</p>` : ''}
+                    ${order.alternative ? `<p class="text-xs text-text-main/70 mt-2 pl-4 border-l-2 border-primary-light"><b>Alternativa:</b> ${order.alternative}</p>` : ''}
+                    ${order.cutlery ? `<p class="text-xs text-secondary-800 mt-2 pl-4 border-l-2 border-secondary-light"><b><i class="fas fa-utensils"></i> Posate richieste</b></p>` : ''}
+                `;
+                const paymentInfo = PAYMENT_METHODS[order.paymentMethod] || { name: order.paymentMethod, icon: 'fa-credit-card' };
+                
+                const deleteButtonHtml = (state.currentUser?.uid === order.uid && isBeforeCutoff)
+                    ? `<button data-id="${order.id}" class="delete-order-btn text-red-500 hover:text-red-700 ml-2 text-sm" title="Elimina ordine"><i class="fas fa-trash-alt"></i></button>`
+                    : `<button class="text-gray-300 ml-2 text-sm cursor-not-allowed" disabled title="Eliminazione bloccata dopo le 11:30 o non sei il proprietario"><i class="fas fa-trash-alt"></i></button>`;
+
+                const paymentStatusHtml = `
+                    <div data-id="${order.id}" class="toggle-paid-btn mt-3 cursor-pointer inline-block rounded-full px-3 py-1 text-xs font-semibold ${order.paid ? 'bg-secondary-100 text-secondary-800' : 'bg-primary-100 text-primary-800'}" title="Clicca per cambiare stato">
+                        <i class="fas ${order.paid ? 'fa-check-circle' : 'fa-hourglass-half'} mr-1"></i>
+                        Stato: ${order.paid ? 'Pagato' : 'Da Pagare'}
+                    </div>
+                `;
+
+                const restaurateurResponseHtml = `
+                    <div class="mt-3 pt-3 border-t">
+                        <label for="response-input-${order.id}" class="text-xs font-semibold">Risposta del ristoratore:</label>
+                        <div class="flex gap-2 mt-1">
+                            <input type="text" id="response-input-${order.id}" class="flex-grow p-1 border rounded text-sm" value="${order.restaurateurResponse || ''}" placeholder="Invia un messaggio al cliente...">
+                            <button data-id="${order.id}" class="save-response-btn bg-secondary hover:bg-secondary-dark text-white text-xs px-3 rounded">Salva</button>
+                        </div>
+                    </div>
+                `;
+
+                return `
+                    <div id="order-${order.id}" class="bg-white p-4 rounded-xl shadow-md transition-all duration-300 ${order.paid ? 'paid-order' : ''}">
+                        <div class="flex justify-between items-start border-b pb-2 mb-2">
+                            <div>
+                                <h4 class="font-bold text-lg">${order.user}</h4>
+                                <span class="text-xs bg-gray-100 px-2 py-1 rounded-full"><i class="fas ${paymentInfo.icon} mr-2"></i>${paymentInfo.name}</span>
+                            </div>
+                            <div class="text-right flex items-center">
+                                <span class="font-bold text-primary text-lg">€${order.total.toFixed(2)}</span>
+                                ${deleteButtonHtml}
+                            </div>
+                        </div>
+                        <ul class="space-y-1">${itemsHtml}</ul>
+                        ${notesHtml}
+                        <div class="flex justify-end items-center gap-4">
+                           ${paymentStatusHtml}
+                        </div>
+                        ${restaurateurResponseHtml}
+                    </div>`;
+            }).join('');
+            dom.allOrdersListEl.innerHTML = ordersHtml;
+            dom.grandTotalEl.textContent = `€${grandTotal.toFixed(2)}`;
+        }
+        
+        async function handlePaidToggle(statusElement) {
+            const orderId = statusElement.dataset.id;
+            if (!orderId) return;
+            
+            const order = state.allOrders.find(o => o.id === orderId);
+            if (!order) return;
+
+            const newPaidStatus = !order.paid; 
+
+            const orderRef = doc(db, "orders", orderId);
+            try {
+                await updateDoc(orderRef, { paid: newPaidStatus });
+                showToast(`Stato aggiornato a: ${newPaidStatus ? 'Pagato' : 'Da Pagare'}.`);
+            } catch (error) {
+                console.error("Errore aggiornamento pagamento: ", error);
+                showToast("Errore durante l'aggiornamento.", 4000);
+            }
+        }
+
+        function handleEvents(event) {
+            const target = event.target;
+            const button = target.closest('button');
+            const statusToggle = target.closest('.toggle-paid-btn');
+            const ingredientCard = target.closest('.ingredient-card');
+            const choiceBtn = target.closest('.choice-btn');
+
+            if (choiceBtn) {
+                const type = choiceBtn.dataset.type;
+                state.customSandwich.base = type;
+                
+                dom.baseChoiceContainer.querySelectorAll('.choice-btn').forEach(btn => btn.classList.remove('selected'));
+                choiceBtn.classList.add('selected');
+                
+                dom.ingredientsStepContainer.classList.remove('hidden');
+                updateSandwichSummary();
+            }
+            else if (ingredientCard) {
+                const ingredientId = ingredientCard.dataset.id;
+                const selectedIngredient = SANDWICH_INGREDIENTS.find(ing => ing.id === ingredientId);
+                const index = state.customSandwich.ingredients.findIndex(ing => ing.id === ingredientId);
+
+                if (index > -1) {
+                    state.customSandwich.ingredients.splice(index, 1);
+                } else {
+                    state.customSandwich.ingredients.push(selectedIngredient);
+                }
+                updateSandwichSummary();
+            }
+            else if (event.type === 'click' && statusToggle) {
+                handlePaidToggle(statusToggle);
+            } else if (event.type === 'click' && button) {
+                handleClicks(button);
+            } else if (event.type === 'change' && target.matches('select')) {
+                handleSelectChange(target);
+            } else if (event.type === 'input' && target.id === 'search-input') {
+                state.searchTerm = target.value;
+                updateFilterCounter();
+                renderMenu();
+            }
+        }
+
+        function handleSelectChange(target) {
+            if (target.id === 'category-select') state.activeCategoryFilter = target.value;
+            else if (target.id === 'diet-select') state.activeDietFilter = target.value;
+            updateFilterCounter();
+            renderMenu();
+        }
+        
+        async function handleClicks(button) {
+            if (button.matches('.nav-btn')) {
+                navigate(button.dataset.view);
+            }
+            else if (button.matches('.add-to-cart-btn')) { 
+                const item = { ...state.menuData.find(i => i.id === parseInt(button.dataset.id))};
+                if (!item) return;
+
+                if (item.category === 'Verdure') {
+                    const select = document.querySelector(`.vegetable-portion-select[data-id="${item.id}"]`);
+                    const selectedOption = select.options[select.selectedIndex];
+                    item.price = parseFloat(select.value);
+                    item.name = `${item.name.split(' (')[0]} (${selectedOption.text.split(' - ')[0]})`;
+                }
+                
+                const cartItem = { ...item, cartId: Date.now(), quantity: 1 };
+                state.cart.push(cartItem);
+                renderMyOrder();
+                showToast(`${item.name} aggiunto!`);
+            }
+            else if (button.id === 'add-sandwich-to-cart-btn') {
+                const { ingredients, totalPrice, base } = state.customSandwich;
+                if (ingredients.length < 1 || !base) return;
+
+                const ingredientNames = ingredients.map(ing => ing.name);
+                const sandwichName = `${BASE_OPTIONS[base].name} con ${ingredientNames.join(', ')}`;
+                const category = base === 'panino' ? 'Panini' : 'Pizze';
+
+                state.cart.push({
+                    cartId: Date.now(),
+                    name: sandwichName,
+                    price: totalPrice,
+                    quantity: 1,
+                    isCustom: true,
+                    ingredients: ingredientNames,
+                    category: category
+                });
+
+                showToast('Prodotto personalizzato aggiunto!');
+                navigate('my-order');
+            }
+            else if (button.matches('.cart-qty-btn')) {
+                const cartId = parseInt(button.dataset.id);
+                const itemInCart = state.cart.find(i => i.cartId === cartId);
+                if (itemInCart) {
+                    if (button.dataset.action === 'increase') itemInCart.quantity++;
+                    else if (button.dataset.action === 'decrease' && itemInCart.quantity > 1) itemInCart.quantity--;
+                    else state.cart = state.cart.filter(i => i.cartId !== cartId);
+                }
+                renderMyOrder();
+            }
+            else if (button.matches('.cart-remove-btn')) {
+                state.cart = state.cart.filter(i => i.cartId !== parseInt(button.dataset.id));
+                renderMyOrder();
+            }
+            else if (button.matches('.delete-order-btn')) {
+                const now = new Date();
+                if (now.getHours() > 11 || (now.getHours() === 11 && now.getMinutes() >= 30)) {
+                    showToast("Non è più possibile eliminare gli ordini dopo le 11:30.");
+                    return;
+                }
+                const orderId = button.dataset.id;
+                if (confirm('Sei sicuro di voler eliminare questo ordine? L\'azione è irreversibile.')) {
+                    try {
+                        await deleteDoc(doc(db, "orders", orderId));
+                        showToast("Ordine eliminato con successo.");
+                    } catch (error) {
+                        console.error("Errore eliminazione ordine:", error);
+                        showToast("Impossibile eliminare l'ordine.");
+                    }
+                }
+            }
+            else if (button.id === 'suggest-dish-btn') {
+                const category = dom.categorySelect.value;
+                const possibleItems = state.menuData.filter(item => category === 'all' || item.category.toLowerCase() === category);
+                
+                if (possibleItems.length === 0) {
+                    showToast("Nessun piatto da suggerire in questa categoria.");
+                    return;
+                }
+
+                const randomItem = possibleItems[Math.floor(Math.random() * possibleItems.length)];
+                
+                dom.suggestionContent.innerHTML = `
+                    <i class="fas ${randomItem.icon} text-primary text-4xl mb-4"></i>
+                    <h4 class="font-bold text-xl">${randomItem.name}</h4>
+                    <p class="text-text-main/70 text-md">€${randomItem.price.toFixed(2)}</p>
+                `;
+                dom.suggestionAddBtn.dataset.itemId = randomItem.id;
+                dom.suggestionModal.classList.remove('hidden');
+                setTimeout(() => {
+                    dom.suggestionModalContentBox.classList.remove('scale-95', 'opacity-0');
+                }, 10);
+            }
+            else if (button.id === 'suggestion-close-btn') {
+                dom.suggestionModalContentBox.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    dom.suggestionModal.classList.add('hidden');
+                }, 200);
+            }
+            else if (button.id === 'suggestion-add-btn') {
+                const itemId = parseInt(button.dataset.itemId);
+                const item = state.menuData.find(i => i.id === itemId);
+                if (item) {
+                   state.cart.push({ ...item, cartId: Date.now(), quantity: 1 });
+                   renderMyOrder();
+                   showToast(`${item.name} aggiunto!`);
+                }
+                dom.suggestionModalContentBox.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    dom.suggestionModal.classList.add('hidden');
+                }, 200);
+            }
+            else if (button.matches('.save-response-btn')) {
+                const orderId = button.dataset.id;
+                const responseInput = document.getElementById(`response-input-${orderId}`);
+                if (!orderId || !responseInput) return;
+
+                const responseText = responseInput.value.trim();
+                const orderRef = doc(db, "orders", orderId);
+                try {
+                    await updateDoc(orderRef, { restaurateurResponse: responseText });
+                    showToast("Risposta salvata.");
+                } catch (error) {
+                    console.error("Errore salvataggio risposta: ", error);
+                    showToast("Errore durante il salvataggio.", 4000);
+                }
+            }
+            else if (button.id === 'save-username-btn') { 
+                const name = dom.usernameInput.value.trim();
+                if (name) {
+                    localStorage.setItem('dosepranza-username', name);
+                    state.currentUser.name = name;
+                    dom.userModal.classList.add('hidden');
+                    updateAdminControlsVisibility();
+                }
+            }
+            else if (button.id === 'toggle-calories') { 
+                state.caloriesVisible = !state.caloriesVisible;
+                button.querySelector('span').textContent = state.caloriesVisible ? 'Nascondi Calorie' : 'Mostra Calorie';
+                button.querySelector('i').className = `fas ${state.caloriesVisible ? 'fa-toggle-on' : 'fa-toggle-off'} mr-2`;
+                renderMenu();
+            }
+            else if (button.id === 'show-allergens-btn') {
+                dom.allergenModal.classList.remove('hidden');
+            }
+            else if (button.id === 'close-allergen-modal-btn') {
+                dom.allergenModal.classList.add('hidden');
+            }
+            else if (button.id === 'confirm-order-btn') {
+                if (state.cart.length === 0) { showToast("Il tuo carrello è vuoto."); return; }
+                if (!state.currentUser || !state.currentUser.name) { showToast("Per favore, inserisci prima il tuo nome."); dom.userModal.classList.remove('hidden'); return; }
+                
+                const notes = document.getElementById('notes-input').value.trim();
+                const alternative = document.getElementById('alternative-input').value.trim();
+                const allergies = document.getElementById('allergies-input').value.trim();
+                const cutlery = document.getElementById('cutlery-checkbox').checked;
+                const paymentMethod = document.querySelector('input[name="payment-method"]:checked')?.value;
+                if (!paymentMethod) { showToast("Seleziona un metodo di pagamento."); return; }
+
+                const total = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                const itemsToSave = state.cart.map(item => ({ 
+                    name: item.name,
+                    category: item.category, 
+                    quantity: item.quantity, 
+                    price: item.price, 
+                    selectedType: item.selectedType || null 
+                }));
+                
+                const orderData = { 
+                    user: state.currentUser.name, 
+                    uid: state.currentUser.uid, 
+                    items: itemsToSave, 
+                    total, 
+                    alternative,
+                    notes,
+                    allergies,
+                    cutlery,
+                    paymentMethod,
+                    createdAt: serverTimestamp(), 
+                    paid: false,
+                    restaurateurResponse: ""
+                };
+
+                try {
+                    await addDoc(ordersCollectionRef, orderData);
+                    showToast("Ordine confermato con successo!");
+                    state.cart = [];
+                    navigate('my-order');
+                } catch (error) {
+                    console.error("Errore nell'invio dell'ordine: ", error);
+                    showToast("Si è verificato un errore. Riprova.", 4000);
+                }
+            }
+            else if (button.id === 'copy-summary-btn') {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const todaysOrders = state.allOrders
+                    .filter(order => order.createdAt && order.createdAt.toDate() >= today)
+                    .sort((a, b) => a.user.localeCompare(b.user));
+
+                if (todaysOrders.length === 0) {
+                    showToast("Nessun ordine da copiare per oggi.");
+                    return;
+                }
+
+                const prepItems = {};
+                todaysOrders.forEach(order => {
+                    order.items.forEach(item => {
+                        const itemName = item.name + (item.selectedType ? ` (${item.selectedType})` : '');
+                        if (!prepItems[itemName]) {
+                            prepItems[itemName] = { quantity: 0, users: [] };
+                        }
+                        prepItems[itemName].quantity += item.quantity;
+                        
+                        let userNote = `${order.user}`;
+                        if (item.quantity > 1) {
+                            userNote += ` (x${item.quantity})`;
+                        }
+                        let combinedNotes = [];
+                        if(order.allergies) combinedNotes.push(`ALLERGIA: ${order.allergies}`);
+                        if(order.notes) combinedNotes.push(order.notes);
+                        if(combinedNotes.length > 0) userNote += ` [${combinedNotes.join('; ')}]`;
+
+                        prepItems[itemName].users.push(userNote);
+                    });
+                });
+
+                let prepText = "--- 📝 LISTA PREPARAZIONE ---\n\n";
+                Object.keys(prepItems).sort().forEach(itemName => {
+                    const itemDetails = prepItems[itemName];
+                    prepText += `*${itemDetails.quantity}x ${itemName}*\n`;
+                    prepText += `  - Per: ${itemDetails.users.join(', ')}\n\n`;
+                });
+
+                let ordersText = "--- 💵 RIEPILOGO ORDINI E PAGAMENTI ---\n\n";
+                let grandTotal = 0;
+                todaysOrders.forEach(order => {
+                    ordersText += `*${order.user}* - Totale: €${order.total.toFixed(2)}\n`;
+                    ordersText += `  - Pagamento: ${PAYMENT_METHODS[order.paymentMethod]?.name || order.paymentMethod}\n`;
+                    order.items.forEach(item => {
+                        const itemName = item.name + (item.selectedType ? ` (${item.selectedType})` : '');
+                        ordersText += `  - ${item.quantity}x ${itemName}\n`;
+                    });
+                    if (order.allergies) {
+                        ordersText += `  - ❗ ALLERGIA: ${order.allergies}\n`;
+                    }
+                    if (order.notes) {
+                        ordersText += `  - Nota: ${order.notes}\n`;
+                    }
+                    if (order.alternative) {
+                        ordersText += `  - Alternativa: ${order.alternative}\n`;
+                    }
+                     if (order.cutlery) {
+                        ordersText += `  - 🍴 Posate: Sì\n`;
+                    }
+                    ordersText += `\n`;
+                    grandTotal += order.total;
+                });
+
+                ordersText += `-------------------------------------\n`;
+                ordersText += `TOTALE COMPLESSIVO: €${grandTotal.toFixed(2)}`;
+
+                const finalSummary = prepText + "\n\n" + ordersText;
+
+                navigator.clipboard.writeText(finalSummary)
+                    .then(() => {
+                        showToast("Riepilogo ottimizzato copiato negli appunti!");
+                    })
+                    .catch(err => {
+                        console.error('Errore durante la copia:', err);
+                        showToast("Errore: impossibile copiare il riepilogo.");
+                    });
+            }
+            else if (button.id === 'export-history-btn') {
+                showToast("Esportazione in corso...");
+
+                try {
+                    const allOrdersQuery = query(ordersCollectionRef, orderBy("createdAt", "desc"));
+                    const querySnapshot = await getDocs(allOrdersQuery);
+                    const allOrdersHistory = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
+
+                    if (allOrdersHistory.length === 0) {
+                        showToast("Nessun ordine nello storico da esportare.");
+                        return;
+                    }
+                    
+                    const escapeCsvField = (field) => {
+                        if (field === null || field === undefined) return '""';
+                        let stringField = String(field);
+                        if (stringField.search(/("|,|;|\n)/g) >= 0) {
+                            stringField = `"${stringField.replace(/"/g, '""')}"`;
+                        }
+                        return `"${stringField}"`;
+                    };
+
+                    const header = [
+                        'OrderID', 'TimestampISO8601', 'DataLeggibile', 'UserID', 'Utente', 
+                        'Prodotto', 'CategoriaProdotto', 'TipoSpecifico', 'Quantita', 
+                        'PrezzoUnitario', 'TotaleRiga', 'MetodoPagamento', 'NoteCliente', 
+                        'Allergie', 'Posate', 'Alternativa', 'CanaleOrdine', 'StatoPagamento', 'RispostaRistoratore'
+                    ];
+                    
+                    let csvRows = [header.join(';')];
+
+                    allOrdersHistory.forEach(order => {
+                        order.items.forEach(item => {
+                            let category = item.category;
+                            if (!category) {
+                                const menuItem = state.menuData.find(m => m.name === item.name);
+                                category = menuItem ? menuItem.category : 'Sconosciuta';
+                            }
+                            
+                            const row = [
+                                escapeCsvField(order.id),
+                                escapeCsvField(order.createdAt ? order.createdAt.toDate().toISOString() : 'N/D'),
+                                escapeCsvField(order.createdAt ? order.createdAt.toDate().toLocaleString('it-IT') : 'N/D'),
+                                escapeCsvField(order.uid || 'N/D'),
+                                escapeCsvField(order.user),
+                                escapeCsvField(item.name),
+                                escapeCsvField(category),
+                                escapeCsvField(item.selectedType || ''),
+                                escapeCsvField(item.quantity),
+                                escapeCsvField(item.price ? item.price.toFixed(2).replace('.', ',') : '0,00'),
+                                escapeCsvField(item.price ? (item.quantity * item.price).toFixed(2).replace('.', ',') : '0,00'),
+                                escapeCsvField(order.paymentMethod),
+                                escapeCsvField(order.notes || ''),
+                                escapeCsvField(order.allergies || ''),
+                                escapeCsvField(order.cutlery ? 'Si' : 'No'),
+                                escapeCsvField(order.alternative || ''),
+                                escapeCsvField('Web'),
+                                escapeCsvField(order.paid ? 'Pagato' : 'Da Pagare'),
+                                escapeCsvField(order.restaurateurResponse || '')
+                            ];
+                            csvRows.push(row.join(';'));
+                        });
+                    });
+
+                    const csvContent = csvRows.join('\n');
+                    const blob = new Blob([`\uFEFF${csvContent}`], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.setAttribute('href', url);
+                    a.setAttribute('download', 'storico_ordini_dosepranza.csv');
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                } catch (error) {
+                    console.error("Errore durante l'esportazione: ", error);
+                    showToast("Esportazione fallita. Controlla la console.");
+                }
+            }
+        }
+
+        function updateAdminControlsVisibility() {
+            const exportBtn = document.getElementById('export-history-btn');
+            if (!exportBtn) return;
+
+            if (state.currentUser && state.currentUser.name === 'Marco Tranquilli') {
+                exportBtn.classList.remove('hidden');
+            } else {
+                exportBtn.classList.add('hidden');
+            }
+        }
+
+        function init() {
+            state.menuData = processMenuData(RAW_MENU, PRICES);
+            Object.assign(dom, {
+                views: document.querySelectorAll('.view'), navBtns: document.querySelectorAll('.nav-btn'),
+                menuItemsContainer: document.getElementById('menu-items'), cartCountEl: document.getElementById('cart-count'),
+                myOrderContentEl: document.getElementById('my-order-content'), allOrdersListEl: document.getElementById('all-orders-list'),
+                grandTotalEl: document.getElementById('grand-total'), userModal: document.getElementById('user-modal'),
+                usernameInput: document.getElementById('username-input'), toastEl: document.getElementById('toast'),
+                toastMessageEl: document.getElementById('toast-message'), categorySelect: document.getElementById('category-select'),
+                dietSelect: document.getElementById('diet-select'), filterCounterContainer: document.getElementById('filter-counter-container'),
+                allergenModal: document.getElementById('allergen-modal'), allergenModalContent: document.getElementById('allergen-modal-content'),
+                suggestionModal: document.getElementById('suggestion-modal'),
+                suggestionModalContentBox: document.getElementById('suggestion-modal-content-box'),
+                suggestionContent: document.getElementById('suggestion-content'),
+                suggestionAddBtn: document.getElementById('suggestion-add-btn'),
+                ingredientsList: document.getElementById('ingredients-list'),
+                selectedIngredientsList: document.getElementById('selected-ingredients-list'),
+                sandwichTotalPrice: document.getElementById('sandwich-total-price'),
+                addSandwichBtn: document.getElementById('add-sandwich-to-cart-btn'),
+                baseChoiceContainer: document.getElementById('base-choice-container'),
+                ingredientsStepContainer: document.getElementById('ingredients-step-container'),
+                sandwichBaseSummary: document.getElementById('sandwich-base-summary'),
+                extraChargeNotice: document.getElementById('extra-charge-notice')
+            });
+            document.body.addEventListener('click', handleEvents);
+            document.body.addEventListener('change', handleEvents);
+            document.body.addEventListener('input', handleEvents);
+            renderFilters();
+            renderMenu();
+            navigate('menu');
+        }
+        
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                state.currentUser = { uid: user.uid, name: localStorage.getItem('dosepranza-username') };
+                if (!state.currentUser.name) {
+                    dom.userModal.classList.remove('hidden');
+                }
+                updateAdminControlsVisibility();
+                
+                onSnapshot(ordersCollectionRef, snapshot => {
+                    state.allOrders = snapshot.docs.map(doc => ({...doc.data(), id: doc.id}));
+                    if(state.currentView === 'all-orders') renderAllOrders();
+                    if(state.currentView === 'my-order') renderMyOrder();
+                    renderFavorites();
+                }, error => {
+                    console.error("Errore con lo snapshot di Firestore:", error);
+                });
+            } else { signInAnonymously(auth); }
+        });
+        
+        init();
     </script>
 </body>
 </html>
