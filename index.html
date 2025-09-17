@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>dosemagna</title>
+    <title>dosepranza</title>
     <script src="https://cdn.tailwindcss.com/3.4.3"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -701,11 +701,13 @@
 
             if (choiceBtn) {
                 if (choiceBtn.classList.contains('subtype-choice-btn')) {
+                    // Gestione scelta variante
                     state.customSandwich.subtype = choiceBtn.dataset.subtype;
                     dom.subtypeOptions.querySelectorAll('.choice-btn').forEach(btn => btn.classList.remove('selected'));
                     choiceBtn.classList.add('selected');
                     dom.ingredientsStepContainer.classList.remove('hidden');
                 } else {
+                    // Gestione scelta base
                     const type = choiceBtn.dataset.type;
                     state.customSandwich.base = type;
                     state.customSandwich.subtype = null;
@@ -793,11 +795,18 @@
                 showToast(`${item.name} aggiunto!`);
             }
             else if (button.id === 'add-sandwich-to-cart-btn') {
-                const { ingredients, totalPrice, subtype } = state.customSandwich;
-                if (ingredients.length < 1) return;
+                const { ingredients, totalPrice, subtype, base } = state.customSandwich;
+                if (ingredients.length < 1 || !base) return;
 
                 const ingredientNames = ingredients.map(ing => ing.name);
                 const sandwichName = `${subtype} con ${ingredientNames.join(', ')}`;
+
+                let category = 'Prodotto Personalizzato'; // Default
+                if (base === 'panino') {
+                    category = 'Panini';
+                } else if (base === 'pizza') {
+                    category = 'Pizze';
+                }
 
                 state.cart.push({
                     cartId: Date.now(),
@@ -805,7 +814,9 @@
                     price: totalPrice,
                     quantity: 1,
                     isCustom: true,
-                    ingredients: ingredientNames
+                    ingredients: ingredientNames,
+                    category: category,
+                    selectedType: subtype
                 });
 
                 showToast('Prodotto personalizzato aggiunto!');
