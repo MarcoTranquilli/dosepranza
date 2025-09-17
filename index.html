@@ -335,6 +335,7 @@
             dom.views.forEach(v => v.classList.toggle('active', v.id === `${viewName}-view`)); 
             dom.navBtns.forEach(b => { b.classList.toggle('bg-primary', b.dataset.view === viewName); b.classList.toggle('text-white', b.dataset.view === viewName); }); 
             if (viewName === 'my-order') renderMyOrder();
+            if (viewName === 'all-orders') renderAllOrders();
             if (viewName === 'custom-sandwich') renderCustomSandwichBuilder();
         }
         
