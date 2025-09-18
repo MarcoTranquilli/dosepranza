@@ -39,6 +39,7 @@
         }
     </script>
     <style>
+        html { scroll-behavior: smooth; }
         body { font-family: 'Poppins', sans-serif; }
         .view { display: none; }
         .view.active { display: block; }
@@ -65,7 +66,7 @@
     <div id="app" class="max-w-4xl mx-auto p-4 md:p-6">
         <header class="mb-6 flex flex-col items-center">
             <div class="flex flex-col items-center">
-                <img src="https://i.postimg.cc/L6H20zfp/logo-dosepranza-People-About-Food.png" alt="Dosepranza Logo" class="w-64 md:w-80 mx-auto">
+                <img src="https://i.postimg.cc/L6H20zfp/logo-dosepranza-People-About-Food.png" alt="Dosepranza Logo" class="w-80 md:w-96 mx-auto">
                 <div class="text-center">
                     <a href="https://www.mermaidchart.com/app/projects/6940d9d3-fca9-4615-9516-3753f0d6dd1e/diagrams/7034c164-c365-454d-9a8e-02d597c94465/version/v0.1/edit" target="_blank" class="mt-2 inline-block text-sm text-secondary-dark hover:underline">
                         <i class="fas fa-project-diagram mr-1"></i> Come funziona? Vedi il processo d'ordine
@@ -81,15 +82,15 @@
         </header>
 
         <nav class="flex justify-center bg-white/70 backdrop-blur-sm p-2 rounded-xl shadow-md mb-6 sticky top-4 z-40">
-            <button data-view="menu" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold text-text-main transition-all duration-300"><i class="fas fa-utensils mr-2"></i>Menù</button>
-            <button data-view="custom-sandwich" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold text-text-main transition-all duration-300"><i class="fas fa-plus-circle mr-2"></i>Crea Prodotto</button>
-            <button data-view="my-order" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold text-text-main transition-all duration-300"><i class="fas fa-shopping-basket mr-2"></i>Il Mio Ordine <span id="cart-count" class="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 inline-flex items-center justify-center ml-1">0</span></button>
-            <button data-view="all-orders" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold text-text-main transition-all duration-300"><i class="fas fa-users mr-2"></i>Tutti gli Ordini</button>
+            <a href="#menu-view" data-view="menu" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold text-text-main transition-all duration-300"><i class="fas fa-utensils mr-2"></i>Menù</a>
+            <a href="#custom-sandwich-view" data-view="custom-sandwich" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold text-text-main transition-all duration-300"><i class="fas fa-plus-circle mr-2"></i>Crea Prodotto</a>
+            <a href="#my-order-view" data-view="my-order" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold text-text-main transition-all duration-300"><i class="fas fa-shopping-basket mr-2"></i>Il Mio Ordine <span id="cart-count" class="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 inline-flex items-center justify-center ml-1">0</span></a>
+            <a href="#all-orders-view" data-view="all-orders" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold text-text-main transition-all duration-300"><i class="fas fa-users mr-2"></i>Tutti gli Ordini</a>
         </nav>
 
         <main>
             <section id="menu-view" class="view">
-                <h2 class="text-3xl font-extrabold mb-4">Scegli cosa ordinare</h2>
+                <h2 id="Menù" class="text-3xl font-extrabold mb-4">Scegli cosa ordinare</h2>
                 
                 <div id="favorites-section" class="mb-8"></div>
                 
@@ -118,7 +119,7 @@
             </section>
 
             <section id="custom-sandwich-view" class="view">
-                <h2 class="text-3xl font-extrabold mb-4">Crea il Tuo Prodotto</h2>
+                <h2 id="Crea Prodotto" class="text-3xl font-extrabold mb-4">Crea il Tuo Prodotto</h2>
                 
                 <div class="bg-white p-4 rounded-xl shadow-md mb-6">
                     <h3 class="text-xl font-bold mb-3 text-center">1. Scegli la base</h3>
@@ -170,13 +171,13 @@
             </section>
 
             <section id="my-order-view" class="view">
-                <h2 class="text-3xl font-extrabold mb-4">Riepilogo del Tuo Ordine</h2>
+                <h2 id="Il Mio Ordine" class="text-3xl font-extrabold mb-4">Riepilogo del Tuo Ordine</h2>
                 <div id="my-order-content" class="bg-white p-6 rounded-xl shadow-md"></div>
             </section>
 
             <section id="all-orders-view" class="view">
                  <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-                    <h2 class="text-3xl font-extrabold">Riepilogo Ordini di Oggi</h2>
+                    <h2 id="Tutti gli Ordini" class="text-3xl font-extrabold">Riepilogo Ordini di Oggi</h2>
                     <div class="flex gap-2">
                         <button id="export-history-btn" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg hidden transition-all duration-300"><i class="fas fa-download mr-2"></i> Esporta Storico</button>
                         <button id="copy-summary-btn" class="bg-secondary hover:bg-secondary-dark text-white font-bold py-2 px-4 rounded-lg transition-all duration-300"><i class="fas fa-copy mr-2"></i> Copia Riepilogo</button>
@@ -217,6 +218,26 @@
           </div>
         </div>
     </div>
+    
+    <div id="combo-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md">
+            <h3 class="text-2xl font-bold mb-4">Scegli il tuo menù</h3>
+            <div class="space-y-4">
+                <div>
+                    <label for="combo-panino-select" class="block mb-2 font-semibold">Scegli il Panino:</label>
+                    <select id="combo-panino-select" class="w-full p-3 border border-gray-300 rounded-lg"></select>
+                </div>
+                <div>
+                    <label for="combo-drink-select" class="block mb-2 font-semibold">Scegli la Bevanda:</label>
+                    <select id="combo-drink-select" class="w-full p-3 border border-gray-300 rounded-lg"></select>
+                </div>
+            </div>
+            <div class="flex justify-end gap-4 mt-6">
+                <button id="combo-cancel-btn" class="bg-gray-200 hover:bg-gray-300 font-bold py-2 px-4 rounded-lg">Annulla</button>
+                <button id="combo-add-btn" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg">Aggiungi al Carrello</button>
+            </div>
+        </div>
+    </div>
 
 
     <script type="module">
@@ -230,7 +251,7 @@
         const db = getFirestore(app);
         const ordersCollectionRef = collection(db, "orders");
         
-        const PRICES = { gastronomia: 4.00, verdure: 4.00, panini: 3.50, pizze: 3.50, fritti: 1.50, dessert: 3.00 };
+        const PRICES = { gastronomia: 4.00, verdure: 4.00, panini: 3.50, pizze: 3.50, fritti: 1.50, dessert: 3.00, "menù combinati": 0 };
         const ALLERGENS = { G: { name: "Glutine", icon: "fa-wheat-awn" }, L: { name: "Latticini", icon: "fa-cheese" }, C: { name: "Crostacei", icon: "fa-shrimp" }, P: { name: "Pesce", icon: "fa-fish-fins" }};
         const DIETS = { vegetariano: { name: "Vegetariano", icon: "🧀" }, vegano: { name: "Vegano", icon: "🌱" }, "carne/pesce": { name: "Carne/🐟Pesce", icon: "🥩" } };
         const PAYMENT_METHODS = { 
@@ -239,16 +260,11 @@
             CarteBancomat: { name: "Carte e bancomat", icon: "fa-credit-card", note: "Pagamento alla consegna." },
             Edenred: { name: "Buoni Pasto Edenred", icon: "fa-ticket-alt", note: "È richiesto il saldo in negozio entro fine settimana." }
         };
-        const CATEGORY_ORDER = ["Panini", "Pizze", "Gastronomia", "Verdure", "Fritti", "Dessert"];
+        const CATEGORY_ORDER = ["Menù Combinati", "Panini", "Pizze", "Gastronomia", "Verdure", "Fritti", "Dessert"];
         
-        const BREAD_OPTIONS = {
-            Panini: ["Pane classico", "Pane ai cereali", "Focaccia"],
-            Pizze: ["Pizza classica", "Pizza 5 cereali"]
-        };
-
         const BASE_OPTIONS = {
-            panino: { name: 'Panino', subtypes: ['Pane Classico', '5 Cereali', 'Focaccia'] },
-            pizza: { name: 'Pizza Ripiena', subtypes: ['Pizza Classica', 'Pizza 5 Cereali'] }
+            panino: { name: 'Panino', subtypes: ['Pane Classico', 'Focaccia'] },
+            pizza: { name: 'Pizza Ripiena', subtypes: ['Pizza Classica'] }
         };
 
         const CUSTOM_PRODUCT_BASE_PRICE = 3.50;
@@ -277,11 +293,53 @@
 
 
         const RAW_MENU = {
-            panini: [ { name: "Crudo pomodoro mozzarella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 550, ingredients: ["Prosciutto crudo", "Pomodoro", "Mozzarella"] }, { name: "Crudo stracchino rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580, ingredients: ["Prosciutto crudo", "Stracchino", "Rucola"] }, { name: "Cotto arrosto scamorza e verdura", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 520, ingredients: ["Prosciutto cotto", "Scamorza", "Verdura di stagione"] }, { name: "Capocollo pecorino e pomodori secchi", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 600, ingredients: ["Capocollo", "Pecorino", "Pomodori secchi"] }, { name: "Salame pecorino e pomodori secchi", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 620, ingredients: ["Salame", "Pecorino", "Pomodori secchi"] }, { name: "Speck Brie e pomodori secchi", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 610, ingredients: ["Speck", "Brie", "Pomodori secchi"] }, { name: "Porchetta", allergens: ["G"], diet: ["carne/pesce"], calories: 650, ingredients: ["Porchetta di Ariccia"] }, { name: "Vegetariano melanzane zucchine e peperoni", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 450, ingredients: ["Melanzane", "Zucchine", "Peperoni grigliati"] }, { name: "Tacchino e verdura", allergens: ["G"], diet: ["carne/pesce"], calories: 480, ingredients: ["Tacchino arrosto", "Verdura di stagione"] }, { name: "Bresaola parmigiano e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 500, ingredients: ["Bresaola", "Parmigiano a scaglie", "Rucola"] }, { name: "Bresaola primo sale e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 470, ingredients: ["Bresaola", "Primo sale", "Rucola"] }, { name: "Salmone e formaggio", allergens: ["G", "L", "P"], diet: ["carne/pesce"], calories: 530, ingredients: ["Salmone affumicato", "Formaggio spalmabile"] }, { name: "Tonno e pomodoro", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 490, ingredients: ["Tonno", "Pomodoro a fette"] }, { name: "Tonno e carciofini", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 510, ingredients: ["Tonno", "Carciofini sott'olio"] } ],
-            pizze: [ { name: "Crudo e mozzarella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 600, ingredients: ["Prosciutto crudo", "Mozzarella"] }, { name: "Speck stracchino e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 650, ingredients: ["Speck", "Stracchino", "Rucola"] }, { name: "Cotto arrosto e melanzane", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580, ingredients: ["Prosciutto cotto", "Melanzane"] }, { name: "Mortadella e stracciatella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 700, ingredients: ["Mortadella", "Stracciatella"] }, { name: "Frittata e zucchine", allergens: ["G", "L"], diet: ["vegetariano"], calories: 550, ingredients: ["Frittata", "Zucchine"] }, { name: "Bresaola e formaggio", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580, ingredients: ["Bresaola", "Formaggio"] }, { name: "Insalata di pollo", allergens: ["G"], diet: ["carne/pesce"], calories: 560, ingredients: ["Insalata di pollo"] }, { name: "Cotto e stracchino", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 620, ingredients: ["Prosciutto cotto", "Stracchino"] } ],
-            gastronomia: [ { name: "Cous cous vegetale con pollo", allergens: ["G"], diet: ["carne/pesce"], calories: 450, ingredients: ["Cous cous", "Verdure miste", "Pollo"] }, { name: "Cous cous vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 350, ingredients: ["Cous cous", "Verdure miste"] }, { name: "Farro vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 380, ingredients: ["Farro", "Verdure miste"] }, { name: "Farro vegetale con salmone", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 480, ingredients: ["Farro", "Verdure miste", "Salmone"] }, { name: "Riso Venere con gamberi e zucchine", allergens: ["C"], diet: ["carne/pesce"], calories: 420, ingredients: ["Riso Venere", "Gamberi", "Zucchine"] }, { name: "Insalata di riso", allergens: [], diet: ["carne/pesce"], calories: 400, ingredients: ["Riso", "Wurstel", "Uova", "Verdure sott'olio"] }, { name: "Pasta fredda con tonno pomodori e olive", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 450, ingredients: ["Pasta", "Tonno", "Pomodorini", "Olive"] }, { name: "Pasta fredda pesto primo sale pomodori olive", allergens: ["G", "L"], diet: ["vegetariano"], calories: 500, ingredients: ["Pasta", "Pesto", "Formaggio primo sale", "Pomodorini", "Olive"] }, 
+            "menù combinati": [
+                { name: "Panino + lattina 3_3 cl", price: 4.00, isCombo: true, comboType: 'panino_33cl', ingredients: ["Un panino a scelta", "Una bevanda a scelta"], diet: ["carne/pesce", "vegetariano", "vegano"], allergens: ["G", "L", "P"] },
+                { name: "Panino + lattina 50 cl", price: 4.50, isCombo: true, comboType: 'panino_50cl', ingredients: ["Un panino a scelta", "Una bevanda a scelta"], diet: ["carne/pesce", "vegetariano", "vegano"], allergens: ["G", "L", "P"] }
+            ],
+            panini: [ 
+                { name: "Crudo pomodoro mozzarella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 550, ingredients: ["Prosciutto crudo", "Pomodoro", "Mozzarella"] }, 
+                { name: "Crudo stracchino rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580, ingredients: ["Prosciutto crudo", "Stracchino", "Rucola"] }, 
+                { name: "Cotto arrosto scamorza e verdura", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 520, ingredients: ["Prosciutto cotto", "Scamorza", "Verdura di stagione"] }, 
+                { name: "Capocollo pecorino e pomodori secchi", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 600, ingredients: ["Capocollo", "Pecorino", "Pomodori secchi"] }, 
+                { name: "Salame pecorino e pomodori secchi", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 620, ingredients: ["Salame", "Pecorino", "Pomodori secchi"] }, 
+                { name: "Speck Brie e pomodori secchi", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 610, ingredients: ["Speck", "Brie", "Pomodori secchi"] }, 
+                { name: "Porchetta", allergens: ["G"], diet: ["carne/pesce"], calories: 650, ingredients: ["Porchetta di Ariccia"] }, 
+                { name: "Vegetariano melanzane zucchine e peperoni", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 450, ingredients: ["Melanzane", "Zucchine", "Peperoni grigliati"] }, 
+                { name: "Tacchino e verdura", allergens: ["G"], diet: ["carne/pesce"], calories: 480, ingredients: ["Tacchino arrosto", "Verdura di stagione"] }, 
+                { name: "Bresaola parmigiano e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 500, ingredients: ["Bresaola", "Parmigiano a scaglie", "Rucola"] }, 
+                { name: "Bresaola primo sale e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 470, ingredients: ["Bresaola", "Primo sale", "Rucola"] }, 
+                { name: "Salmone e formaggio", allergens: ["G", "L", "P"], diet: ["carne/pesce"], calories: 530, ingredients: ["Salmone affumicato", "Formaggio spalmabile"] }, 
+                { name: "Tonno e pomodoro", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 490, ingredients: ["Tonno", "Pomodoro a fette"] }, 
+                { name: "Tonno e carciofini", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 510, ingredients: ["Tonno", "Carciofini sott'olio"] },
+                { name: "Pane ai 5 cereali con formaggio spalmabile e salmone", allergens: ["G", "L", "P"], diet: ["carne/pesce"], calories: 540, ingredients: ["Pane 5 cereali", "Salmone affumicato", "Formaggio spalmabile"] },
+                { name: "Pane ai 5 cereali con tacchino e zucchine o scarola", allergens: ["G"], diet: ["carne/pesce"], calories: 490, ingredients: ["Pane 5 cereali", "Tacchino arrosto", "Verdura di stagione"] }
+            ],
+            pizze: [ 
+                { name: "Crudo e mozzarella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 600, ingredients: ["Prosciutto crudo", "Mozzarella"] }, 
+                { name: "Speck stracchino e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 650, ingredients: ["Speck", "Stracchino", "Rucola"] }, 
+                { name: "Cotto arrosto e melanzane", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580, ingredients: ["Prosciutto cotto", "Melanzane"] }, 
+                { name: "Mortadella e stracciatella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 700, ingredients: ["Mortadella", "Stracciatella"] }, 
+                { name: "Frittata e zucchine", allergens: ["G", "L"], diet: ["vegetariano"], calories: 550, ingredients: ["Frittata", "Zucchine"] }, 
+                { name: "Bresaola e formaggio", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580, ingredients: ["Bresaola", "Formaggio"] }, 
+                { name: "Insalata di pollo", allergens: ["G"], diet: ["carne/pesce"], calories: 560, ingredients: ["Insalata di pollo"] }, 
+                { name: "Cotto e stracchino", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 620, ingredients: ["Prosciutto cotto", "Stracchino"] },
+                { name: "Pizza ai 5 cereali bresaola formaggio spalmabile e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 590, ingredients: ["Pizza 5 cereali", "Bresaola", "Formaggio spalmabile", "Rucola"] },
+                { name: "Pizza ai 5 cereali con insalata di pollo", allergens: ["G"], diet: ["carne/pesce"], calories: 570, ingredients: ["Pizza 5 cereali", "Insalata di pollo"] }
+            ],
+            gastronomia: [ 
+                { name: "Cous cous vegetale con pollo", allergens: ["G"], diet: ["carne/pesce"], calories: 450, ingredients: ["Cous cous", "Verdure miste", "Pollo"] }, 
+                { name: "Cous cous vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 350, ingredients: ["Cous cous", "Verdure miste"] }, 
+                { name: "Farro vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 380, ingredients: ["Farro", "Verdure miste"] }, 
+                { name: "Farro vegetale con salmone", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 480, ingredients: ["Farro", "Verdure miste", "Salmone"] }, 
+                { name: "Riso Venere con gamberi e zucchine", allergens: ["C"], diet: ["carne/pesce"], calories: 420, ingredients: ["Riso Venere", "Gamberi", "Zucchine"] }, 
+                { name: "Insalata di riso", allergens: [], diet: ["carne/pesce"], calories: 400, ingredients: ["Riso", "Wurstel", "Uova", "Verdure sott'olio"] }, 
+                { name: "Pasta fredda con tonno pomodori e olive", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 450, ingredients: ["Pasta", "Tonno", "Pomodorini", "Olive"] }, 
+                { name: "Pasta fredda pesto primo sale pomodori olive", allergens: ["G", "L"], diet: ["vegetariano"], calories: 500, ingredients: ["Pasta", "Pesto", "Formaggio primo sale", "Pomodorini", "Olive"] }, 
                 { name: "Insalata di pollo", allergens: [], diet: ["carne/pesce"], calories: 350, ingredients: ["Pollo", "Insalata", "Mais", "Pomodorini", "Olive"] }, 
-                { name: "Riso integrale bresaola limone e rughetta", allergens: [], diet: ["carne/pesce"], calories: 380, ingredients: ["Riso integrale", "Bresaola", "Rucola", "Succo di limone"] }, { name: "Pomodori con riso e patate (a peso)", allergens: [], diet: ["vegetariano", "vegano"], calories: 300, ingredients: ["Pomodori", "Riso", "Patate"] } ],
+                { name: "Riso integrale bresaola limone e rughetta", allergens: [], diet: ["carne/pesce"], calories: 380, ingredients: ["Riso integrale", "Bresaola", "Rucola", "Succo di limone"] }, 
+                { name: "Pomodori con il riso (2 pz)", price: 6.00, allergens: [], diet: ["vegetariano", "vegano"], calories: 320, ingredients: ["Pomodori", "Riso", "Patate al forno"] } 
+            ],
             verdure: [ { name: "Melanzane", allergens: [], diet: ["vegetariano", "vegano"], calories: 180, ingredients: ["Melanzane grigliate"] }, { name: "Zucchine", allergens: [], diet: ["vegetariano", "vegano"], calories: 160, ingredients: ["Zucchine grigliate"] }, { name: "Peperoni", allergens: [], diet: ["vegetariano", "vegano"], calories: 160, ingredients: ["Peperoni arrostiti"] }, { name: "Cicoria", allergens: [], diet: ["vegetariano", "vegano"], calories: 140, ingredients: ["Cicoria ripassata"] }, { name: "Broccoletti", allergens: [], diet: ["vegetariano", "vegano"], calories: 150, ingredients: ["Broccoletti ripassati"] }, { name: "Broccoli", allergens: [], diet: ["vegetariano", "vegano"], calories: 150, ingredients: ["Broccoli al vapore"] }, { name: "Scarola con olive", allergens: [], diet: ["vegetariano", "vegano"], calories: 130, ingredients: ["Scarola", "Olive di Gaeta"] } ],
             fritti: [ { name: "Supplì", allergens: ["G", "L"], diet: ["vegetariano"], calories: 250, ingredients: ["Riso", "Pomodoro", "Mozzarella", "Pangrattato"] }, { name: "Polpetta di melanzane", allergens: ["G", "L"], diet: ["vegetariano"], calories: 180, ingredients: ["Melanzane", "Parmigiano", "Uova", "Pangrattato"] } ],
             dessert: [ { name: "Macedonia", allergens: [], diet: ["vegetariano", "vegano"], calories: 120, ingredients: ["Frutta fresca di stagione"] } ]
@@ -297,6 +355,7 @@
             allOrders: [], 
             menuData: [], 
             caloriesVisible: false,
+            currentComboItem: null,
             customSandwich: {
                 base: null,
                 subtype: null,
@@ -325,11 +384,13 @@
         function processMenuData(rawMenu, prices) { 
             const updatedMenu = updateIngredientsWithOlives(rawMenu);
             let id = 1; 
-            const icons = { gastronomia: 'fa-bowl-food', fritti: 'fa-stroopwafel', verdure: 'fa-carrot', panini: 'fa-bread-slice', pizze: 'fa-pizza-slice', dessert: 'fa-ice-cream' }; 
-            return Object.entries(updatedMenu).flatMap(([cat, items]) => items.map(item => ({ id: id++, name: item.name, category: cat.charAt(0).toUpperCase() + cat.slice(1), price: prices[cat] || 0, icon: icons[cat] || 'fa-utensils', ...item }))) 
+            const icons = { gastronomia: 'fa-bowl-food', fritti: 'fa-stroopwafel', verdure: 'fa-carrot', panini: 'fa-bread-slice', pizze: 'fa-pizza-slice', dessert: 'fa-ice-cream', "menù combinati": 'fa-box-open' }; 
+            return Object.entries(updatedMenu).flatMap(([cat, items]) => items.map(item => ({ id: id++, name: item.name, category: cat.charAt(0).toUpperCase() + cat.slice(1), price: item.price !== undefined ? item.price : (prices[cat] || 0), icon: icons[cat] || 'fa-utensils', ...item }))) 
         }
 
         function showToast(message, duration = 3000) { dom.toastMessageEl.textContent = message; dom.toastEl.classList.remove('opacity-0'); setTimeout(() => dom.toastEl.classList.add('opacity-0'), duration); }
+        
+        // MODIFICA NAVIGAZIONE: Aggiornata la funzione per un corretto scroll
         function navigate(viewName) { 
             state.currentView = viewName; 
             dom.views.forEach(v => v.classList.toggle('active', v.id === `${viewName}-view`)); 
@@ -337,6 +398,18 @@
             if (viewName === 'my-order') renderMyOrder();
             if (viewName === 'all-orders') renderAllOrders();
             if (viewName === 'custom-sandwich') renderCustomSandwichBuilder();
+
+            const targetElement = document.getElementById(viewName + "-view");
+            if (targetElement) {
+                const navHeight = dom.navEl.offsetHeight;
+                const targetOffsetTop = targetElement.getBoundingClientRect().top + window.scrollY;
+                const finalPosition = targetOffsetTop - navHeight - 32; // 32px (2rem) di padding extra
+
+                window.scrollTo({
+                    top: finalPosition,
+                    behavior: 'smooth'
+                });
+            }
         }
         
         function updateFilterCounter() {
@@ -405,7 +478,7 @@
                         ${priceOrPortionSelectorHtml}
                     </div>
                     <p class="calorie-info text-xs text-text-main/70 text-right mt-1" style="display: ${state.caloriesVisible ? 'flex' : 'none'}; justify-content: flex-end; align-items: center;">
-                        ~${item.calories} kcal <i class="fas fa-question-circle text-primary ml-1 cursor-pointer calorie-info-icon"></i>
+                        ~${item.calories || 'N/A'} kcal <i class="fas fa-question-circle text-primary ml-1 cursor-pointer calorie-info-icon"></i>
                     </p>
                     <button data-id="${item.id}" class="add-to-cart-btn w-full mt-4 bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg transition-all duration-300"><i class="fas fa-plus mr-2"></i> Aggiungi</button>
                 </div>`;
@@ -429,7 +502,7 @@
             const todaysUserOrder = state.allOrders.find(order => order.uid === state.currentUser?.uid && order.createdAt && order.createdAt.toDate() >= today);
             
             if (todaysUserOrder) {
-                const itemsHtml = todaysUserOrder.items.map(item => `<li class="flex justify-between items-center text-sm"><span>${item.quantity} x ${item.name} ${item.selectedType ? `(${item.selectedType})` : ''}</span><span class="font-medium">€${(item.price * item.quantity).toFixed(2)}</span></li>`).join('');
+                const itemsHtml = todaysUserOrder.items.map(item => `<li class="flex justify-between items-center text-sm"><span>${item.quantity} x ${item.name}</span><span class="font-medium">€${(item.price * item.quantity).toFixed(2)}</span></li>`).join('');
                 const notesHtml = `
                     ${todaysUserOrder.allergies ? `<p class="text-sm mt-2 p-2 bg-red-50 border-l-4 border-red-400"><b class="text-red-700">Allergie:</b> ${todaysUserOrder.allergies}</p>` : ''}
                     ${todaysUserOrder.notes ? `<p class="text-sm mt-2 p-2 bg-blue-50 border-l-4 border-blue-300"><b>Note:</b> ${todaysUserOrder.notes}</p>` : ''}
@@ -472,13 +545,10 @@
             const total = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
             
             const itemsHtml = state.cart.map(item => {
-                let breadSelectorHtml = '';
-                if (BREAD_OPTIONS[item.category] && !item.isCustom) {
-                    const optionsHtml = BREAD_OPTIONS[item.category].map(opt => `<option value="${opt}" ${item.selectedType === opt ? 'selected' : ''}>${opt}</option>`).join('');
-                    breadSelectorHtml = `<select data-id="${item.cartId}" class="cart-bread-select mt-2 w-full p-2 border border-gray-300 rounded-md text-sm">${optionsHtml}</select>`;
-                } else if (item.isCustom) {
-                    breadSelectorHtml = `<p class="text-xs text-gray-500 mt-1">Ingredienti: ${item.ingredients.join(', ')}</p>`;
-                }
+                let detailsHtml = (item.isCustom || item.isCombo) 
+                    ? `<p class="text-xs text-gray-500 mt-1">${item.details}</p>` 
+                    : '';
+
                 return `
                 <div class="py-4 border-b border-gray-200">
                     <div class="flex justify-between items-start">
@@ -490,7 +560,7 @@
                             <button data-id="${item.cartId}" class="cart-remove-btn text-red-500 text-lg flex-shrink-0 ml-4 transition-all duration-300"><i class="fas fa-trash-alt"></i></button>
                         </div>
                     </div>
-                    ${breadSelectorHtml}
+                    ${detailsHtml}
                 </div>`;
             }).join('');
 
@@ -510,6 +580,10 @@
             dom.myOrderContentEl.innerHTML = `
                 <div class="space-y-4 mb-4">${itemsHtml}</div>
                 <div class="mt-6 space-y-4">
+                    <div>
+                        <label for="email-input" class="block mb-2 font-semibold"><i class="fas fa-envelope mr-2"></i>Email (per conferma ordine)</label>
+                        <input type="email" id="email-input" placeholder="ilmionome@esempio.com" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary">
+                    </div>
                     <div>
                         <label for="notes-input" class="block mb-2 font-semibold">Note per la cucina (es. senza cipolla):</label>
                         <input type="text" id="notes-input" placeholder="Aggiungi una nota..." class="w-full p-3 border border-gray-300 rounded-lg">
@@ -616,7 +690,7 @@
             let grandTotal = 0;
             const ordersHtml = todaysOrders.map(order => {
                 grandTotal += order.total;
-                const itemsHtml = order.items.map(item => `<li class="flex justify-between items-center text-sm"><span>${item.quantity} x ${item.name} ${item.selectedType ? `(${item.selectedType})` : ''}</span><span class="font-medium">€${(item.price * item.quantity).toFixed(2)}</span></li>`).join('');
+                const itemsHtml = order.items.map(item => `<li class="flex justify-between items-center text-sm"><span>${item.quantity} x ${item.name}</span><span class="font-medium">€${(item.price * item.quantity).toFixed(2)}</span></li>`).join('');
                 
                 const notesHtml = `
                     ${order.allergies ? `<p class="text-xs text-red-700 mt-2 pl-4 border-l-2 border-red-300"><b>Allergie:</b> ${order.allergies}</p>` : ''}
@@ -693,19 +767,22 @@
         function handleEvents(event) {
             const target = event.target;
             const button = target.closest('button');
+            const navLink = target.closest('a.nav-btn');
             const statusToggle = target.closest('.toggle-paid-btn');
             const ingredientCard = target.closest('.ingredient-card');
             const choiceBtn = target.closest('.choice-btn');
 
-            if (choiceBtn) {
+            if (navLink) {
+                event.preventDefault();
+                navigate(navLink.dataset.view);
+            }
+            else if (choiceBtn) {
                 if (choiceBtn.classList.contains('subtype-choice-btn')) {
-                    // Gestione scelta variante
                     state.customSandwich.subtype = choiceBtn.dataset.subtype;
                     dom.subtypeOptions.querySelectorAll('.choice-btn').forEach(btn => btn.classList.remove('selected'));
                     choiceBtn.classList.add('selected');
                     dom.ingredientsStepContainer.classList.remove('hidden');
                 } else {
-                    // Gestione scelta base
                     const type = choiceBtn.dataset.type;
                     state.customSandwich.base = type;
                     state.customSandwich.subtype = null;
@@ -737,12 +814,6 @@
                 handlePaidToggle(statusToggle);
             } else if (event.type === 'click' && button) {
                 handleClicks(button);
-            } else if (event.type === 'change' && target.matches('.cart-bread-select')) {
-                const cartId = parseInt(target.dataset.id);
-                const itemInCart = state.cart.find(i => i.cartId === cartId);
-                if (itemInCart) {
-                    itemInCart.selectedType = target.value;
-                }
             } 
             else if (event.type === 'change' && target.matches('.vegetable-portion-select')) {
                 const price = target.value;
@@ -767,6 +838,22 @@
             updateFilterCounter();
             renderMenu();
         }
+
+        function openComboModal(item) {
+            state.currentComboItem = item;
+            const panini = state.menuData.filter(m => m.category === 'Panini' && !m.name.toLowerCase().includes("5 cereali"));
+            dom.comboPaninoSelect.innerHTML = panini.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
+
+            const drinks = ['Acqua naturale', 'Acqua frizzante', 'Coca Cola', 'Fanta', 'Tè freddo'];
+            dom.comboDrinkSelect.innerHTML = drinks.map(d => `<option value="${d}">${d}</option>`).join('');
+
+            dom.comboModal.classList.remove('hidden');
+        }
+
+        function closeComboModal() {
+            state.currentComboItem = null;
+            dom.comboModal.classList.add('hidden');
+        }
         
         async function handleClicks(button) {
             if (button.matches('.nav-btn')) {
@@ -776,6 +863,11 @@
                 const item = { ...state.menuData.find(i => i.id === parseInt(button.dataset.id))};
                 if (!item) return;
 
+                if (item.isCombo) {
+                    openComboModal(item);
+                    return;
+                }
+
                 if (item.category === 'Verdure') {
                     const select = document.querySelector(`.vegetable-portion-select[data-id="${item.id}"]`);
                     const selectedOption = select.options[select.selectedIndex];
@@ -784,10 +876,6 @@
                 }
                 
                 const cartItem = { ...item, cartId: Date.now(), quantity: 1 };
-                if (BREAD_OPTIONS[item.category]) {
-                    cartItem.selectedType = BREAD_OPTIONS[item.category][0];
-                }
-
                 state.cart.push(cartItem);
                 renderMyOrder();
                 showToast(`${item.name} aggiunto!`);
@@ -797,28 +885,47 @@
                 if (ingredients.length < 1 || !base) return;
 
                 const ingredientNames = ingredients.map(ing => ing.name);
-                const sandwichName = `${subtype} con ${ingredientNames.join(', ')}`;
-
-                let category = 'Prodotto Personalizzato'; // Default
-                if (base === 'panino') {
-                    category = 'Panini';
-                } else if (base === 'pizza') {
-                    category = 'Pizze';
-                }
-
+                const sandwichName = `${subtype} personalizzato`;
+                
                 state.cart.push({
                     cartId: Date.now(),
                     name: sandwichName,
                     price: totalPrice,
                     quantity: 1,
                     isCustom: true,
-                    ingredients: ingredientNames,
-                    category: category,
-                    selectedType: subtype
+                    details: ingredientNames.join(', '),
+                    category: base === 'panino' ? 'Panini' : 'Pizze',
                 });
 
                 showToast('Prodotto personalizzato aggiunto!');
                 navigate('my-order');
+            }
+            else if (button.id === 'combo-add-btn') {
+                if (!state.currentComboItem) return;
+
+                const selectedPanino = dom.comboPaninoSelect.value;
+                const selectedDrink = dom.comboDrinkSelect.value;
+                const baseItem = state.currentComboItem;
+                
+                const finalName = `Menù (${selectedPanino} + ${selectedDrink})`;
+                const details = `Panino: ${selectedPanino}, Bevanda: ${selectedDrink}`;
+                
+                state.cart.push({
+                    cartId: Date.now(),
+                    name: finalName,
+                    details: details,
+                    price: baseItem.price,
+                    quantity: 1,
+                    isCombo: true,
+                    category: baseItem.category,
+                });
+                
+                renderMyOrder();
+                showToast('Menù aggiunto al carrello!');
+                closeComboModal();
+            }
+            else if (button.id === 'combo-cancel-btn') {
+                closeComboModal();
             }
             else if (button.matches('.cart-qty-btn')) {
                 const cartId = parseInt(button.dataset.id);
@@ -853,7 +960,7 @@
             }
             else if (button.id === 'suggest-dish-btn') {
                 const category = dom.categorySelect.value;
-                const possibleItems = state.menuData.filter(item => category === 'all' || item.category.toLowerCase() === category);
+                const possibleItems = state.menuData.filter(item => (category === 'all' || item.category.toLowerCase() === category) && !item.isCombo);
                 
                 if (possibleItems.length === 0) {
                     showToast("Nessun piatto da suggerire in questa categoria.");
@@ -883,8 +990,7 @@
                 const itemId = parseInt(button.dataset.itemId);
                 const item = state.menuData.find(i => i.id === itemId);
                 if (item) {
-                   let defaultType = (BREAD_OPTIONS[item.category]) ? BREAD_OPTIONS[item.category][0] : null;
-                   state.cart.push({ ...item, cartId: Date.now(), quantity: 1, selectedType: defaultType });
+                   state.cart.push({ ...item, cartId: Date.now(), quantity: 1 });
                    renderMyOrder();
                    showToast(`${item.name} aggiunto!`);
                 }
@@ -933,6 +1039,22 @@
                 if (state.cart.length === 0) { showToast("Il tuo carrello è vuoto."); return; }
                 if (!state.currentUser || !state.currentUser.name) { showToast("Per favore, inserisci prima il tuo nome."); dom.userModal.classList.remove('hidden'); return; }
                 
+                const emailInput = document.getElementById('email-input');
+                const email = emailInput.value.trim();
+                if (!email) {
+                    showToast("Il campo Email è obbligatorio.");
+                    emailInput.focus();
+                    emailInput.classList.add('border-red-500');
+                    return;
+                }
+                if (!/^\S+@\S+\.\S+$/.test(email)) {
+                    showToast("Per favore, inserisci un indirizzo email valido.");
+                    emailInput.focus();
+                    emailInput.classList.add('border-red-500');
+                    return;
+                }
+                emailInput.classList.remove('border-red-500');
+
                 const notes = document.getElementById('notes-input').value.trim();
                 const alternative = document.getElementById('alternative-input').value.trim();
                 const allergies = document.getElementById('allergies-input').value.trim();
@@ -945,13 +1067,13 @@
                     name: item.name,
                     category: item.category, 
                     quantity: item.quantity, 
-                    price: item.price, 
-                    selectedType: item.selectedType || null 
+                    price: item.price,
                 }));
                 
                 const orderData = { 
                     user: state.currentUser.name, 
                     uid: state.currentUser.uid, 
+                    email: email,
                     items: itemsToSave, 
                     total, 
                     alternative,
@@ -989,7 +1111,7 @@
                 const prepItems = {};
                 todaysOrders.forEach(order => {
                     order.items.forEach(item => {
-                        const itemName = item.name + (item.selectedType ? ` (${item.selectedType})` : '');
+                        const itemName = item.name;
                         if (!prepItems[itemName]) {
                             prepItems[itemName] = { quantity: 0, users: [] };
                         }
@@ -1021,8 +1143,7 @@
                     ordersText += `*${order.user}* - Totale: €${order.total.toFixed(2)}\n`;
                     ordersText += `  - Pagamento: ${PAYMENT_METHODS[order.paymentMethod]?.name || order.paymentMethod}\n`;
                     order.items.forEach(item => {
-                        const itemName = item.name + (item.selectedType ? ` (${item.selectedType})` : '');
-                        ordersText += `  - ${item.quantity}x ${itemName}\n`;
+                        ordersText += `  - ${item.quantity}x ${item.name}\n`;
                     });
                     if (order.allergies) {
                         ordersText += `  - ❗ ALLERGIA: ${order.allergies}\n`;
@@ -1078,7 +1199,7 @@
 
                     const header = [
                         'OrderID', 'TimestampISO8601', 'DataLeggibile', 'UserID', 'Utente', 
-                        'Prodotto', 'CategoriaProdotto', 'TipoSpecifico', 'Quantita', 
+                        'EmailUtente', 'Prodotto', 'CategoriaProdotto', 'Quantita', 
                         'PrezzoUnitario', 'TotaleRiga', 'MetodoPagamento', 'NoteCliente', 
                         'Allergie', 'Posate', 'Alternativa', 'CanaleOrdine', 'StatoPagamento', 'RispostaRistoratore'
                     ];
@@ -1099,9 +1220,9 @@
                                 escapeCsvField(order.createdAt ? order.createdAt.toDate().toLocaleString('it-IT') : 'N/D'),
                                 escapeCsvField(order.uid || 'N/D'),
                                 escapeCsvField(order.user),
+                                escapeCsvField(order.email || ''),
                                 escapeCsvField(item.name),
                                 escapeCsvField(category),
-                                escapeCsvField(item.selectedType || ''),
                                 escapeCsvField(item.quantity),
                                 escapeCsvField(item.price ? item.price.toFixed(2).replace('.', ',') : '0,00'),
                                 escapeCsvField(item.price ? (item.quantity * item.price).toFixed(2).replace('.', ',') : '0,00'),
@@ -1150,7 +1271,9 @@
         function init() {
             state.menuData = processMenuData(RAW_MENU, PRICES);
             Object.assign(dom, {
-                views: document.querySelectorAll('.view'), navBtns: document.querySelectorAll('.nav-btn'),
+                views: document.querySelectorAll('.view'), 
+                navBtns: document.querySelectorAll('.nav-btn'),
+                navEl: document.querySelector('nav'), // MODIFICA NAVIGAZIONE: Aggiunto elemento nav al DOM object
                 menuItemsContainer: document.getElementById('menu-items'), cartCountEl: document.getElementById('cart-count'),
                 myOrderContentEl: document.getElementById('my-order-content'), allOrdersListEl: document.getElementById('all-orders-list'),
                 grandTotalEl: document.getElementById('grand-total'), userModal: document.getElementById('user-modal'),
@@ -1162,6 +1285,9 @@
                 suggestionModalContentBox: document.getElementById('suggestion-modal-content-box'),
                 suggestionContent: document.getElementById('suggestion-content'),
                 suggestionAddBtn: document.getElementById('suggestion-add-btn'),
+                comboModal: document.getElementById('combo-modal'),
+                comboPaninoSelect: document.getElementById('combo-panino-select'),
+                comboDrinkSelect: document.getElementById('combo-drink-select'),
                 ingredientsList: document.getElementById('ingredients-list'),
                 selectedIngredientsList: document.getElementById('selected-ingredients-list'),
                 sandwichTotalPrice: document.getElementById('sandwich-total-price'),
