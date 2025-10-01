@@ -251,7 +251,7 @@
         const db = getFirestore(app);
         const ordersCollectionRef = collection(db, "orders");
         
-        const PRICES = { gastronomia: 4.00, verdure: 4.00, panini: 3.50, pizze: 3.50, fritti: 1.50, dessert: 3.00, "menù combinati": 0 };
+        const PRICES = { gastronomia: 4.00, verdure: 4.00, panini: 3.50, pizze: 3.50, fritti: 1.50, dessert: 3.00, "menù combinati": 0, insalatone: 5.00 };
         const ALLERGENS = { G: { name: "Glutine", icon: "fa-wheat-awn" }, L: { name: "Latticini", icon: "fa-cheese" }, C: { name: "Crostacei", icon: "fa-shrimp" }, P: { name: "Pesce", icon: "fa-fish-fins" }};
         const DIETS = { vegetariano: { name: "Vegetariano", icon: "🧀" }, vegano: { name: "Vegano", icon: "🌱" }, "carne/pesce": { name: "Carne/🐟Pesce", icon: "🥩" } };
         const PAYMENT_METHODS = { 
@@ -260,7 +260,7 @@
             CarteBancomat: { name: "Carte e bancomat", icon: "fa-credit-card", note: "Pagamento alla consegna." },
             Edenred: { name: "Buoni Pasto Edenred", icon: "fa-ticket-alt", note: "È richiesto il saldo in negozio entro fine settimana." }
         };
-        const CATEGORY_ORDER = ["Menù Combinati", "Panini", "Pizze", "Gastronomia", "Verdure", "Fritti", "Dessert"];
+        const CATEGORY_ORDER = ["Menù Combinati", "Panini", "Pizze", "Gastronomia", "Insalatone", "Verdure", "Fritti", "Dessert"];
         
         const BASE_OPTIONS = {
             panino: { name: 'Panino', subtypes: ['Pane Classico', 'Focaccia'] },
@@ -340,8 +340,18 @@
                 { name: "Riso integrale bresaola limone e rughetta", allergens: [], diet: ["carne/pesce"], calories: 380, ingredients: ["Riso integrale", "Bresaola", "Rucola", "Succo di limone"] }, 
                 { name: "Pomodori con il riso (2 pz)", price: 6.00, allergens: [], diet: ["vegetariano", "vegano"], calories: 320, ingredients: ["Pomodori", "Riso", "Patate al forno"] } 
             ],
+            insalatone: [
+                { name: "Insalatona con Uovo Sodo", diet: ["vegetariano"], allergens: [], calories: 380, ingredients: ["Base: Misticanza, mais, pomodorini, olive e carote", "Proteina: Uovo Sodo"] },
+                { name: "Insalatona con Primo Sale", diet: ["vegetariano"], allergens: ["L"], calories: 420, ingredients: ["Base: Misticanza, mais, pomodorini, olive e carote", "Proteina: Primo Sale"] },
+                { name: "Insalatona con Tonno", diet: ["carne/pesce"], allergens: ["P"], calories: 450, ingredients: ["Base: Misticanza, mais, pomodorini, olive e carote", "Proteina: Tonno"] }
+            ],
             verdure: [ { name: "Melanzane", allergens: [], diet: ["vegetariano", "vegano"], calories: 180, ingredients: ["Melanzane grigliate"] }, { name: "Zucchine", allergens: [], diet: ["vegetariano", "vegano"], calories: 160, ingredients: ["Zucchine grigliate"] }, { name: "Peperoni", allergens: [], diet: ["vegetariano", "vegano"], calories: 160, ingredients: ["Peperoni arrostiti"] }, { name: "Cicoria", allergens: [], diet: ["vegetariano", "vegano"], calories: 140, ingredients: ["Cicoria ripassata"] }, { name: "Broccoletti", allergens: [], diet: ["vegetariano", "vegano"], calories: 150, ingredients: ["Broccoletti ripassati"] }, { name: "Broccoli", allergens: [], diet: ["vegetariano", "vegano"], calories: 150, ingredients: ["Broccoli al vapore"] }, { name: "Scarola con olive", allergens: [], diet: ["vegetariano", "vegano"], calories: 130, ingredients: ["Scarola", "Olive di Gaeta"] } ],
-            fritti: [ { name: "Supplì", allergens: ["G", "L"], diet: ["vegetariano"], calories: 250, ingredients: ["Riso", "Pomodoro", "Mozzarella", "Pangrattato"] }, { name: "Polpetta di melanzane", allergens: ["G", "L"], diet: ["vegetariano"], calories: 180, ingredients: ["Melanzane", "Parmigiano", "Uova", "Pangrattato"] } ],
+            fritti: [ 
+                { name: "Pizzetta rossa", price: 1.50, isCustomPriced: true, pricingOptions: [ { text: '2 pz - 1.50€', value: '1.50' }, { text: '3 pz - 2.00€', value: '2.00' }, { text: '6 pz - 4.00€', value: '4.00' } ], allergens: ["G"], diet: ["vegetariano"], calories: 180, ingredients: ["Pomodoro", "Pasta per pizza"] },
+                { name: "Lingua romana scrocchiarella", price: 1.50, allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 190, ingredients: ["Pomodoro", "Olio EVO"] },
+                { name: "Supplì", allergens: ["G", "L"], diet: ["vegetariano"], calories: 250, ingredients: ["Riso", "Pomodoro", "Mozzarella", "Pangrattato"] }, 
+                { name: "Polpetta di melanzane", allergens: ["G", "L"], diet: ["vegetariano"], calories: 180, ingredients: ["Melanzane", "Parmigiano", "Uova", "Pangrattato"] } 
+            ],
             dessert: [ { name: "Macedonia", allergens: [], diet: ["vegetariano", "vegano"], calories: 120, ingredients: ["Frutta fresca di stagione"] } ]
         };
         
@@ -384,13 +394,12 @@
         function processMenuData(rawMenu, prices) { 
             const updatedMenu = updateIngredientsWithOlives(rawMenu);
             let id = 1; 
-            const icons = { gastronomia: 'fa-bowl-food', fritti: 'fa-stroopwafel', verdure: 'fa-carrot', panini: 'fa-bread-slice', pizze: 'fa-pizza-slice', dessert: 'fa-ice-cream', "menù combinati": 'fa-box-open' }; 
+            const icons = { gastronomia: 'fa-bowl-food', fritti: 'fa-stroopwafel', verdure: 'fa-carrot', panini: 'fa-bread-slice', pizze: 'fa-pizza-slice', dessert: 'fa-ice-cream', "menù combinati": 'fa-box-open', insalatone: 'fa-seedling' }; 
             return Object.entries(updatedMenu).flatMap(([cat, items]) => items.map(item => ({ id: id++, name: item.name, category: cat.charAt(0).toUpperCase() + cat.slice(1), price: item.price !== undefined ? item.price : (prices[cat] || 0), icon: icons[cat] || 'fa-utensils', ...item }))) 
         }
 
         function showToast(message, duration = 3000) { dom.toastMessageEl.textContent = message; dom.toastEl.classList.remove('opacity-0'); setTimeout(() => dom.toastEl.classList.add('opacity-0'), duration); }
         
-        // MODIFICA NAVIGAZIONE: Aggiornata la funzione per un corretto scroll
         function navigate(viewName) { 
             state.currentView = viewName; 
             dom.views.forEach(v => v.classList.toggle('active', v.id === `${viewName}-view`)); 
@@ -403,7 +412,7 @@
             if (targetElement) {
                 const navHeight = dom.navEl.offsetHeight;
                 const targetOffsetTop = targetElement.getBoundingClientRect().top + window.scrollY;
-                const finalPosition = targetOffsetTop - navHeight - 32; // 32px (2rem) di padding extra
+                const finalPosition = targetOffsetTop - navHeight - 32;
 
                 window.scrollTo({
                     top: finalPosition,
@@ -448,15 +457,28 @@
                 const allergenHtml = item.allergens.map(key => `<i class="fas ${ALLERGENS[key].icon}" title="${ALLERGENS[key].name}"></i>`).join(' ');
                 
                 let priceOrPortionSelectorHtml = `<span class="font-semibold text-lg">€${item.price.toFixed(2)}</span>`;
-                if (item.category === 'Verdure') {
+                
+                if (item.category === 'Verdure' || item.isCustomPriced) {
+                    let options;
+                    if (item.category === 'Verdure') {
+                        options = [
+                            { text: '100g - 2.00€', value: '2.00' },
+                            { text: '150g - 3.00€', value: '3.00' },
+                            { text: '200g - 4.00€', value: '4.00' }
+                        ];
+                    } else { // isCustomPriced
+                        options = item.pricingOptions;
+                    }
+
+                    const initialPrice = options[0].value;
+                    const optionsHtml = options.map(opt => `<option value="${opt.value}" ${opt.value === initialPrice ? 'selected' : ''}>${opt.text}</option>`).join('');
+
                     priceOrPortionSelectorHtml = `
                         <div class="flex items-center gap-2">
-                           <select data-id="${item.id}" class="vegetable-portion-select bg-gray-50 border border-gray-300 text-sm rounded-lg p-2">
-                                <option value="2.00" selected>100g - 2.00€</option>
-                                <option value="3.00">150g - 3.00€</option>
-                                <option value="4.00">200g - 4.00€</option>
+                            <select data-id="${item.id}" class="portion-select bg-gray-50 border border-gray-300 text-sm rounded-lg p-2">
+                                ${optionsHtml}
                             </select>
-                            <span id="price-vegetable-${item.id}" class="font-bold text-lg text-primary w-20 text-right">€2.00</span>
+                            <span id="price-display-${item.id}" class="font-bold text-lg text-primary w-20 text-right">€${parseFloat(initialPrice).toFixed(2)}</span>
                         </div>
                     `;
                 }
@@ -815,10 +837,10 @@
             } else if (event.type === 'click' && button) {
                 handleClicks(button);
             } 
-            else if (event.type === 'change' && target.matches('.vegetable-portion-select')) {
+            else if (event.type === 'change' && target.matches('.portion-select')) {
                 const price = target.value;
                 const itemId = target.dataset.id;
-                const priceElement = document.getElementById(`price-vegetable-${itemId}`);
+                const priceElement = document.getElementById(`price-display-${itemId}`);
                 if (priceElement) {
                     priceElement.textContent = `€${parseFloat(price).toFixed(2)}`;
                 }
@@ -868,11 +890,12 @@
                     return;
                 }
 
-                if (item.category === 'Verdure') {
-                    const select = document.querySelector(`.vegetable-portion-select[data-id="${item.id}"]`);
-                    const selectedOption = select.options[select.selectedIndex];
-                    item.price = parseFloat(select.value);
-                    item.name = `${item.name.split(' (')[0]} (${selectedOption.text.split(' - ')[0]})`;
+                const portionSelect = document.querySelector(`.portion-select[data-id="${item.id}"]`);
+                if (portionSelect) {
+                    const selectedOption = portionSelect.options[portionSelect.selectedIndex];
+                    item.price = parseFloat(portionSelect.value);
+                    const portionText = selectedOption.text.split(' - ')[0];
+                    item.name = `${item.name.split(' (')[0]} (${portionText})`;
                 }
                 
                 const cartItem = { ...item, cartId: Date.now(), quantity: 1 };
@@ -1273,7 +1296,7 @@
             Object.assign(dom, {
                 views: document.querySelectorAll('.view'), 
                 navBtns: document.querySelectorAll('.nav-btn'),
-                navEl: document.querySelector('nav'), // MODIFICA NAVIGAZIONE: Aggiunto elemento nav al DOM object
+                navEl: document.querySelector('nav'),
                 menuItemsContainer: document.getElementById('menu-items'), cartCountEl: document.getElementById('cart-count'),
                 myOrderContentEl: document.getElementById('my-order-content'), allOrdersListEl: document.getElementById('all-orders-list'),
                 grandTotalEl: document.getElementById('grand-total'), userModal: document.getElementById('user-modal'),
