@@ -294,7 +294,7 @@
 
         const RAW_MENU = {
             "menù combinati": [
-                { name: "Panino + lattina 3_3 cl", price: 4.00, isCombo: true, comboType: 'panino_33cl', ingredients: ["Un panino a scelta", "Una bevanda a scelta"], diet: ["carne/pesce", "vegetariano", "vegano"], allergens: ["G", "L", "P"] },
+                { name: "Panino + lattina 33 cl", price: 4.00, isCombo: true, comboType: 'panino_33cl', ingredients: ["Un panino a scelta", "Una bevanda a scelta"], diet: ["carne/pesce", "vegetariano", "vegano"], allergens: ["G", "L", "P"] },
                 { name: "Panino + lattina 50 cl", price: 4.50, isCombo: true, comboType: 'panino_50cl', ingredients: ["Un panino a scelta", "Una bevanda a scelta"], diet: ["carne/pesce", "vegetariano", "vegano"], allergens: ["G", "L", "P"] }
             ],
             panini: [ 
@@ -1086,11 +1086,14 @@
                 if (!paymentMethod) { showToast("Seleziona un metodo di pagamento."); return; }
 
                 const total = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                
+                // MODIFICA: Aggiunto 'details' all'oggetto salvato
                 const itemsToSave = state.cart.map(item => ({ 
                     name: item.name,
                     category: item.category, 
                     quantity: item.quantity, 
                     price: item.price,
+                    details: item.details || null 
                 }));
                 
                 const orderData = { 
@@ -1134,7 +1137,12 @@
                 const prepItems = {};
                 todaysOrders.forEach(order => {
                     order.items.forEach(item => {
-                        const itemName = item.name;
+                        // MODIFICA: Aggiunta dei dettagli (ingredienti) al nome del prodotto
+                        let itemName = item.name;
+                        if (item.details) {
+                            itemName += ` (${item.details})`;
+                        }
+
                         if (!prepItems[itemName]) {
                             prepItems[itemName] = { quantity: 0, users: [] };
                         }
@@ -1166,7 +1174,12 @@
                     ordersText += `*${order.user}* - Totale: €${order.total.toFixed(2)}\n`;
                     ordersText += `  - Pagamento: ${PAYMENT_METHODS[order.paymentMethod]?.name || order.paymentMethod}\n`;
                     order.items.forEach(item => {
-                        ordersText += `  - ${item.quantity}x ${item.name}\n`;
+                        // MODIFICA: Aggiunta dei dettagli (ingredienti) al nome del prodotto anche qui
+                        let itemText = item.name;
+                        if (item.details) {
+                            itemText += ` (${item.details})`;
+                        }
+                        ordersText += `  - ${item.quantity}x ${itemText}\n`;
                     });
                     if (order.allergies) {
                         ordersText += `  - ❗ ALLERGIA: ${order.allergies}\n`;
@@ -1222,7 +1235,7 @@
 
                     const header = [
                         'OrderID', 'TimestampISO8601', 'DataLeggibile', 'UserID', 'Utente', 
-                        'EmailUtente', 'Prodotto', 'CategoriaProdotto', 'Quantita', 
+                        'EmailUtente', 'Prodotto', 'Dettagli', 'CategoriaProdotto', 'Quantita', 
                         'PrezzoUnitario', 'TotaleRiga', 'MetodoPagamento', 'NoteCliente', 
                         'Allergie', 'Posate', 'Alternativa', 'CanaleOrdine', 'StatoPagamento', 'RispostaRistoratore'
                     ];
@@ -1245,6 +1258,7 @@
                                 escapeCsvField(order.user),
                                 escapeCsvField(order.email || ''),
                                 escapeCsvField(item.name),
+                                escapeCsvField(item.details || ''),
                                 escapeCsvField(category),
                                 escapeCsvField(item.quantity),
                                 escapeCsvField(item.price ? item.price.toFixed(2).replace('.', ',') : '0,00'),
