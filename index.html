@@ -272,12 +272,13 @@
         const CUSTOM_PRODUCT_INCLUDED_INGREDIENTS = 3;
 
         const SANDWICH_INGREDIENTS = [
-            // Salumi
+            // Salumi & Carni
             { id: 'p-crudo', name: 'Prosciutto Crudo' }, { id: 'p-cotto', name: 'Prosciutto Cotto' },
             { id: 'salame', name: 'Salame' }, { id: 'mortadella', name: 'Mortadella' },
             { id: 'porchetta', name: 'Porchetta' }, { id: 'tacchino', name: 'Tacchino Arrosto' },
             { id: 'bresaola', name: 'Bresaola' }, { id: 'speck', name: 'Speck' },
             { id: 'capocollo', name: 'Capocollo' }, { id: 'salmone', name: 'Salmone' }, { id: 'tonno', name: 'Tonno' },
+            { id: 'cotoletta', name: 'Cotoletta di Pollo' }, { id: 'brasato', name: 'Brasato di Manzo' },
             // Formaggi
             { id: 'mozzarella', name: 'Mozzarella' }, { id: 'scamorza', name: 'Scamorza' },
             { id: 'stracchino', name: 'Stracchino' }, { id: 'parmigiano', name: 'Parmigiano' },
@@ -288,7 +289,9 @@
             { id: 'rucola', name: 'Rucola' }, { id: 'melanzane', name: 'Melanzane Grigliate' },
             { id: 'zucchine', name: 'Zucchine Grigliate' }, { id: 'peperoni', name: 'Peperoni Grigliati' },
             { id: 'carciofini', name: 'Carciofini' }, { id: 'frittata', name: 'Frittata' },
-            { id: 'insalata', name: 'Insalata' }, { id: 'olive', name: 'Olive' }
+            { id: 'insalata', name: 'Insalata' }, { id: 'olive', name: 'Olive' },
+            { id: 'lattuga', name: 'Lattuga' }, { id: 'broccoletti', name: 'Broccoletti' },
+            { id: 'cicoria', name: 'Cicoria' }, { id: 'scarola', name: 'Scarola' }
         ].sort((a, b) => a.name.localeCompare(b.name));
 
 
@@ -313,7 +316,9 @@
                 { name: "Tonno e pomodoro", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 490, ingredients: ["Tonno", "Pomodoro a fette"] }, 
                 { name: "Tonno e carciofini", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 510, ingredients: ["Tonno", "Carciofini sott'olio"] },
                 { name: "Pane ai 5 cereali con formaggio spalmabile e salmone", allergens: ["G", "L", "P"], diet: ["carne/pesce"], calories: 540, ingredients: ["Pane 5 cereali", "Salmone affumicato", "Formaggio spalmabile"] },
-                { name: "Pane ai 5 cereali con tacchino e zucchine o scarola", allergens: ["G"], diet: ["carne/pesce"], calories: 490, ingredients: ["Pane 5 cereali", "Tacchino arrosto", "Verdura di stagione"] }
+                { name: "Pane ai 5 cereali con tacchino e zucchine o scarola", allergens: ["G"], diet: ["carne/pesce"], calories: 490, ingredients: ["Pane 5 cereali", "Tacchino arrosto", "Verdura di stagione"] },
+                { name: "Cotoletta di pollo lattuga e pomodoro", allergens: ["G"], diet: ["carne/pesce"], calories: 580, ingredients: ["Cotoletta di pollo", "Lattuga", "Pomodoro"] },
+                { name: "Brasato di manzo e verdura cotta", allergens: ["G"], diet: ["carne/pesce"], calories: 620, ingredients: ["Brasato di manzo", "Verdura cotta di stagione (broccoletti/cicoria/scarola)"] }
             ],
             pizze: [ 
                 { name: "Crudo e mozzarella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 600, ingredients: ["Prosciutto crudo", "Mozzarella"] }, 
