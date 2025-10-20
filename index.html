@@ -44,10 +44,6 @@
         .view { display: none; }
         .view.active { display: block; }
         .paid-order { opacity: 0.7; }
-        #favorites-section .overflow-x-auto::-webkit-scrollbar { height: 6px; }
-        #favorites-section .overflow-x-auto::-webkit-scrollbar-track { background: #e0ddd3; border-radius: 10px; }
-        #favorites-section .overflow-x-auto::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
-        #favorites-section .overflow-x-auto::-webkit-scrollbar-thumb:hover { background: #aaa; }
         .payment-radio:checked + label {
             border-color: #D6804F;
             box-shadow: 0 0 0 2px rgba(214, 128, 79, 0.4);
@@ -67,11 +63,6 @@
         <header class="mb-6 flex flex-col items-center">
             <div class="flex flex-col items-center">
                 <img src="https://i.postimg.cc/L6H20zfp/logo-dosepranza-People-About-Food.png" alt="Dosepranza Logo" class="w-80 md:w-96 mx-auto">
-                <div class="text-center">
-                    <a href="https://www.mermaidchart.com/app/projects/6940d9d3-fca9-4615-9516-3753f0d6dd1e/diagrams/7034c164-c365-454d-9a8e-02d597c94465/version/v0.1/edit" target="_blank" class="mt-2 inline-block text-sm text-secondary-dark hover:underline">
-                        <i class="fas fa-project-diagram mr-1"></i> Come funziona? Vedi il processo d'ordine
-                    </a>
-                </div>
             </div>
 
             <div class="bg-primary-100 border-l-4 border-primary text-primary-800 p-4 rounded-md my-4 w-full mt-6" role="alert">
@@ -92,8 +83,6 @@
             <section id="menu-view" class="view">
                 <h2 id="Menù" class="text-3xl font-extrabold mb-4">Scegli cosa ordinare</h2>
 
-                <div id="favorites-section" class="mb-8"></div>
-
                 <div class="flex flex-col sm:flex-row gap-3 mb-4 items-center flex-wrap">
                     <div class="relative w-full sm:flex-grow">
                         <input type="search" id="search-input" placeholder="Cerca un piatto..." class="w-full p-3 pl-10 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-primary transition-all duration-300">
@@ -101,7 +90,6 @@
                     </div>
                     <select id="category-select" class="w-full sm:w-auto p-3 border border-gray-300 rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-primary transition-all duration-300"></select>
                     <select id="diet-select" class="w-full sm:w-auto p-3 border border-gray-300 rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-primary transition-all duration-300"></select>
-                    <button id="suggest-dish-btn" class="w-full sm:w-auto p-3 border border-dashed border-primary text-primary rounded-lg bg-primary-100/50 shadow-sm hover:bg-primary-100 transition-all duration-300 font-semibold"><i class="fas fa-random mr-2"></i>Suggerisci una pietanza</button>
                 </div>
 
                 <div class="flex justify-between items-center mb-4">
@@ -205,20 +193,19 @@
         </main>
     </div>
 
-    <div id="user-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden"><div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md text-center"><h3 class="text-2xl font-bold mb-4">Benvenuto!</h3><p class="text-gray-600 mb-6">Per iniziare, inserisci il tuo nome e cognome.</p><input type="text" id="username-input" placeholder="Es. Marco Rossi" class="w-full p-3 border rounded-lg"><button id="save-username-btn" class="w-full mt-4 bg-primary hover:bg-primary-dark text-white font-bold py-3 px-4 rounded-lg transition-all duration-300">Salva</button></div></div>
-    <div id="allergen-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden"><div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md relative"><button id="close-allergen-modal-btn" class="absolute top-2 right-4 text-2xl text-gray-500 hover:text-gray-800">&times;</button><h3 class="text-2xl font-bold mb-4">Legenda Allergeni</h3><div id="allergen-modal-content" class="text-gray-600 text-sm space-y-2"></div></div></div>
-    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 bg-text-main text-white py-3 px-6 rounded-full shadow-xl z-50 opacity-0 transition-opacity"><p id="toast-message"></p></div>
-    <div id="suggestion-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
-        <div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md text-center transform transition-all scale-95 opacity-0" id="suggestion-modal-content-box">
-          <h3 class="text-2xl font-bold mb-2">💡 Ti suggeriamo...</h3>
-          <div id="suggestion-content" class="my-6"></div>
-          <div class="flex justify-center gap-4">
-            <button id="suggestion-add-btn" class="flex-1 bg-primary hover:bg-primary-dark text-white font-bold py-3 px-4 rounded-lg transition-all duration-300">Aggiungi</button>
-            <button id="suggestion-close-btn" class="flex-1 bg-gray-200 hover:bg-gray-300 font-bold py-3 px-4 rounded-lg transition-all duration-300">Chiudi</button>
-          </div>
+    <div id="user-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md text-center">
+            <h3 class="text-2xl font-bold mb-4">Benvenuto!</h3>
+            <p class="text-gray-600 mb-6">Per iniziare, inserisci i tuoi dati.</p>
+            <input type="text" id="username-input" placeholder="Es. Marco Rossi" class="w-full p-3 border rounded-lg mb-3">
+            <input type="email" id="user-email-input" placeholder="Es. marco.rossi@email.com" class="w-full p-3 border rounded-lg">
+            <button id="save-username-btn" class="w-full mt-4 bg-primary hover:bg-primary-dark text-white font-bold py-3 px-4 rounded-lg transition-all duration-300">Salva</button>
         </div>
     </div>
 
+    <div id="allergen-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden"><div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md relative"><button id="close-allergen-modal-btn" class="absolute top-2 right-4 text-2xl text-gray-500 hover:text-gray-800">&times;</button><h3 class="text-2xl font-bold mb-4">Legenda Allergeni</h3><div id="allergen-modal-content" class="text-gray-600 text-sm space-y-2"></div></div></div>
+    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 bg-text-main text-white py-3 px-6 rounded-full shadow-xl z-50 opacity-0 transition-opacity"><p id="toast-message"></p></div>
+    
     <div id="combo-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
         <div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md">
             <h3 class="text-2xl font-bold mb-4">Scegli il tuo menù</h3>
@@ -236,6 +223,18 @@
                 <button id="combo-cancel-btn" class="bg-gray-200 hover:bg-gray-300 font-bold py-2 px-4 rounded-lg">Annulla</button>
                 <button id="combo-add-btn" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg">Aggiungi al Carrello</button>
             </div>
+        </div>
+    </div>
+
+    <div id="satispay-modal" class="fixed inset-0 bg-gray-900 bg-opacity-90 flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-md text-center relative">
+            <button id="satispay-close-btn" class="absolute top-2 right-4 text-3xl text-gray-400 hover:text-gray-700">&times;</button>
+            <h3 class="text-2xl font-bold mb-4">Paga con Satispay</h3>
+            <p class="text-text-main/80 mb-4">Il tuo ordine è stato inviato! <br> Inquadra il QR Code o usa il link per pagare <strong>Alimentari Russo</strong>.</p>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" alt="QR Code Satispay" class="rounded-lg mx-auto w-64 h-64">
+            <a href="https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" target="_blank" class="mt-6 inline-block w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300">
+                <i class="fas fa-external-link-alt mr-2"></i>Apri Satispay
+            </a>
         </div>
     </div>
 
@@ -517,16 +516,6 @@
             dom.menuItemsContainer.innerHTML = menuHtml;
         }
 
-        function renderFavorites() {
-            const favoritesContainer = document.getElementById('favorites-section');
-            if (!state.allOrders || state.allOrders.length === 0) { favoritesContainer.innerHTML = ''; return; }
-            const itemCounts = state.allOrders.flatMap(order => order.items.map(item => item.name.split(' (')[0])).reduce((acc, name) => { acc[name] = (acc[name] || 0) + 1; return acc; }, {});
-            const sortedFavorites = Object.entries(itemCounts).sort(([, a], [, b]) => b - a).slice(0, 5).map(([name]) => state.menuData.find(item => item.name === name)).filter(Boolean);
-            if (sortedFavorites.length === 0) { favoritesContainer.innerHTML = ''; return; }
-            const favoritesHtml = sortedFavorites.map(item => `<button data-id="${item.id}" class="add-to-cart-btn flex-shrink-0 bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 text-left w-40"><p class="font-semibold text-sm truncate">${item.name}</p><p class="text-xs text-text-main/70">€${item.price.toFixed(2)}</p></button>`).join('');
-            favoritesContainer.innerHTML = `<h3 class="text-2xl font-bold mb-3"><i class="fas fa-star text-yellow-400 mr-2"></i>I Più Ordinati</h3><div class="flex gap-3 overflow-x-auto pb-3">${favoritesHtml}</div>`;
-        }
-
         function renderMyOrder() {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
@@ -534,23 +523,18 @@
 
             if (todaysUserOrder) {
                 const itemsHtml = todaysUserOrder.items.map(item => `<li class="flex justify-between items-center text-sm"><span>${item.quantity} x ${item.name}</span><span class="font-medium">€${(item.price * item.quantity).toFixed(2)}</span></li>`).join('');
+                
+                // NUOVA MODIFICA [1] - Ripristinato 'allergies' in 'notesHtml'
                 const notesHtml = `
                     ${todaysUserOrder.allergies ? `<p class="text-sm mt-2 p-2 bg-red-50 border-l-4 border-red-400"><b class="text-red-700">Allergie:</b> ${todaysUserOrder.allergies}</p>` : ''}
-                    ${todaysUserOrder.notes ? `<p class="text-sm mt-2 p-2 bg-blue-50 border-l-4 border-blue-300"><b>Note:</b> ${todaysUserOrder.notes}</p>` : ''}
-                    ${todaysUserOrder.alternative ? `<p class="text-sm mt-2 p-2 bg-gray-50 border-l-4 border-gray-300"><b>Alternativa:</b> ${todaysUserOrder.alternative}</p>` : ''}
                     ${todaysUserOrder.cutlery ? `<p class="text-sm mt-2 p-2 bg-green-50 border-l-4 border-green-400"><b>Posate richieste.</b></p>` : ''}
                 `;
 
-                const paymentStatusHtml = `
-                <div id="payment-status" class="mt-4 p-3 rounded-lg ${todaysUserOrder.paid ? 'bg-secondary-100 text-secondary-800' : 'bg-primary-100 text-primary-800'}">
-                    <p class="font-bold"><i class="fas ${todaysUserOrder.paid ? 'fa-check-circle' : 'fa-hourglass-half'} mr-2"></i>Stato Pagamento: ${todaysUserOrder.paid ? 'Pagato' : 'In attesa di pagamento'}</p>
-                </div>`;
-
                 const responseHtml = todaysUserOrder.restaurateurResponse
                     ? `<div id="restaurateur-response" class="mt-4 p-3 rounded-lg bg-yellow-100 border-l-4 border-yellow-400">
-                           <p class="font-bold text-yellow-800"><i class="fas fa-comment-dots mr-2"></i>Messaggio dal ristoratore:</p>
-                           <p class="text-yellow-700">${todaysUserOrder.restaurateurResponse}</p>
-                       </div>`
+                            <p class="font-bold text-yellow-800"><i class="fas fa-comment-dots mr-2"></i>Messaggio dal ristoratore:</p>
+                            <p class="text-yellow-700">${todaysUserOrder.restaurateurResponse}</p>
+                        </div>`
                     : '';
 
                 dom.myOrderContentEl.innerHTML = `
@@ -558,7 +542,6 @@
                     <ul class="space-y-2 border-t border-b py-4">${itemsHtml}</ul>
                     <div class="text-right font-bold text-2xl mt-4">Totale: €${todaysUserOrder.total.toFixed(2)}</div>
                     <div class="mt-2">${notesHtml}</div>
-                    ${paymentStatusHtml}
                     ${responseHtml}
                     <p class="text-xs text-gray-500 mt-4 text-center">Puoi modificare o eliminare l'ordine dalla sezione "Tutti gli Ordini" entro le 11:30.</p>
                 `;
@@ -611,19 +594,7 @@
             dom.myOrderContentEl.innerHTML = `
                 <div class="space-y-4 mb-4">${itemsHtml}</div>
                 <div class="mt-6 space-y-4">
-                    <div>
-                        <label for="email-input" class="block mb-2 font-semibold"><i class="fas fa-envelope mr-2"></i>Email (per conferma ordine)</label>
-                        <input type="email" id="email-input" placeholder="ilmionome@esempio.com" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary">
-                    </div>
-                    <div>
-                        <label for="notes-input" class="block mb-2 font-semibold">Note per la cucina (es. senza cipolla):</label>
-                        <input type="text" id="notes-input" placeholder="Aggiungi una nota..." class="w-full p-3 border border-gray-300 rounded-lg">
-                    </div>
-                    <div>
-                        <label for="alternative-input" class="block mb-2 font-semibold">Alternativa (se un prodotto è esaurito):</label>
-                        <input type="text" id="alternative-input" placeholder="Es. un supplì o un'altra verdura" class="w-full p-3 border border-gray-300 rounded-lg">
-                    </div>
-
+                    
                     <div>
                         <label for="allergies-input" class="block mb-2 font-semibold text-red-700"><i class="fas fa-exclamation-triangle mr-2"></i>Segnalazione Allergie Importanti:</label>
                         <textarea id="allergies-input" placeholder="Per favore, specifica qui eventuali allergie gravi." class="w-full p-3 border border-red-300 rounded-lg focus:ring-2 focus:ring-red-400"></textarea>
@@ -646,6 +617,12 @@
                 <div class="text-right font-bold text-2xl mt-6">Totale: €${total.toFixed(2)}</div>
                 <button id="confirm-order-btn" class="w-full mt-4 bg-secondary hover:bg-secondary-dark text-white font-bold py-3 px-4 rounded-lg transition-all duration-300"><i class="fas fa-check-circle mr-2"></i>Conferma e Invia Ordine</button>
             `;
+
+            // NUOVA MODIFICA [2] - Forza l'aggiornamento del testo del pulsante Satispay se è già selezionato
+            const selectedPayment = document.querySelector('input[name="payment-method"]:checked');
+            if (selectedPayment) {
+                handlePaymentChange(selectedPayment);
+            }
         }
 
         function renderCustomSandwichBuilder() {
@@ -724,8 +701,6 @@
             const ordersHtml = todaysOrders.map(order => {
                 grandTotal += order.total;
 
-                // --- INIZIO MODIFICA ---
-                // Ora 'itemsHtml' include i dettagli per i prodotti personalizzati
                 const itemsHtml = order.items.map(item => {
                     let detailsHtml = item.details
                         ? `<p class="text-xs text-gray-500 pl-4">${item.details}</p>`
@@ -739,12 +714,10 @@
                             ${detailsHtml}
                         </li>`;
                 }).join('');
-                // --- FINE MODIFICA ---
-
+                
+                // NUOVA MODIFICA [1] - Ripristinato 'allergies' in 'notesHtml'
                 const notesHtml = `
                     ${order.allergies ? `<p class="text-xs text-red-700 mt-2 pl-4 border-l-2 border-red-300"><b>Allergie:</b> ${order.allergies}</p>` : ''}
-                    ${order.notes ? `<p class="text-xs text-text-main/70 mt-2 pl-4 border-l-2 border-blue-300"><b>Note:</b> ${order.notes}</p>` : ''}
-                    ${order.alternative ? `<p class="text-xs text-text-main/70 mt-2 pl-4 border-l-2 border-primary-light"><b>Alternativa:</b> ${order.alternative}</p>` : ''}
                     ${order.cutlery ? `<p class="text-xs text-secondary-800 mt-2 pl-4 border-l-2 border-secondary-light"><b><i class="fas fa-utensils"></i> Posate richieste</b></p>` : ''}
                 `;
                 const paymentInfo = PAYMENT_METHODS[order.paymentMethod] || { name: order.paymentMethod, icon: 'fa-credit-card' };
@@ -752,13 +725,6 @@
                 const deleteButtonHtml = (state.currentUser?.uid === order.uid && isBeforeCutoff)
                     ? `<button data-id="${order.id}" class="delete-order-btn text-red-500 hover:text-red-700 ml-2 text-sm" title="Elimina ordine"><i class="fas fa-trash-alt"></i></button>`
                     : `<button class="text-gray-300 ml-2 text-sm cursor-not-allowed" disabled title="Eliminazione bloccata dopo le 11:30 o non sei il proprietario"><i class="fas fa-trash-alt"></i></button>`;
-
-                const paymentStatusHtml = `
-                    <div data-id="${order.id}" class="toggle-paid-btn mt-3 cursor-pointer inline-block rounded-full px-3 py-1 text-xs font-semibold ${order.paid ? 'bg-secondary-100 text-secondary-800' : 'bg-primary-100 text-primary-800'}" title="Clicca per cambiare stato">
-                        <i class="fas ${order.paid ? 'fa-check-circle' : 'fa-hourglass-half'} mr-1"></i>
-                        Stato: ${order.paid ? 'Pagato' : 'Da Pagare'}
-                    </div>
-                `;
 
                 const restaurateurResponseHtml = `
                     <div class="mt-3 pt-3 border-t">
@@ -784,9 +750,6 @@
                         </div>
                         <ul class="space-y-1">${itemsHtml}</ul>
                         ${notesHtml}
-                        <div class="flex justify-end items-center gap-4">
-                           ${paymentStatusHtml}
-                        </div>
                         ${restaurateurResponseHtml}
                     </div>`;
             }).join('');
@@ -794,22 +757,19 @@
             dom.grandTotalEl.textContent = `€${grandTotal.toFixed(2)}`;
         }
 
-        async function handlePaidToggle(statusElement) {
-            const orderId = statusElement.dataset.id;
-            if (!orderId) return;
-
-            const order = state.allOrders.find(o => o.id === orderId);
-            if (!order) return;
-
-            const newPaidStatus = !order.paid;
-
-            const orderRef = doc(db, "orders", orderId);
-            try {
-                await updateDoc(orderRef, { paid: newPaidStatus });
-                showToast(`Stato aggiornato a: ${newPaidStatus ? 'Pagato' : 'Da Pagare'}.`);
-            } catch (error) {
-                console.error("Errore aggiornamento pagamento: ", error);
-                showToast("Errore durante l'aggiornamento.", 4000);
+        // NUOVA MODIFICA [2] - Nuova funzione per gestire il cambio di metodo di pagamento
+        function handlePaymentChange(target) {
+            const confirmBtn = document.getElementById('confirm-order-btn');
+            if (!confirmBtn) return;
+            
+            if (target.value === 'Satispay') {
+                confirmBtn.innerHTML = '<i class="fab fa-satispay mr-2"></i>Paga ora e Invia Ordine';
+                confirmBtn.classList.remove('bg-secondary', 'hover:bg-secondary-dark');
+                confirmBtn.classList.add('bg-blue-500', 'hover:bg-blue-600'); // Satispay blue
+            } else {
+                confirmBtn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Conferma e Invia Ordine';
+                confirmBtn.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+                confirmBtn.classList.add('bg-secondary', 'hover:bg-secondary-dark');
             }
         }
 
@@ -817,7 +777,6 @@
             const target = event.target;
             const button = target.closest('button');
             const navLink = target.closest('a.nav-btn');
-            const statusToggle = target.closest('.toggle-paid-btn');
             const ingredientCard = target.closest('.ingredient-card');
             const choiceBtn = target.closest('.choice-btn');
 
@@ -859,9 +818,7 @@
                 }
                 updateSandwichSummary();
             }
-            else if (event.type === 'click' && statusToggle) {
-                handlePaidToggle(statusToggle);
-            } else if (event.type === 'click' && button) {
+            else if (event.type === 'click' && button) {
                 handleClicks(button);
             }
             else if (event.type === 'change' && target.matches('.portion-select')) {
@@ -871,6 +828,10 @@
                 if (priceElement) {
                     priceElement.textContent = `€${parseFloat(price).toFixed(2)}`;
                 }
+            }
+            // NUOVA MODIFICA [2] - Aggiunto handler per il cambio di pagamento
+            else if (event.type === 'change' && target.matches('input[name="payment-method"]')) { 
+                handlePaymentChange(target);
             }
             else if (event.type === 'change' && target.matches('select')) {
                 handleSelectChange(target);
@@ -908,13 +869,17 @@
              if (button.matches('.nav-btn')) {
                  navigate(button.dataset.view);
              }
+             // NUOVA MODIFICA [2] - Aggiunto handler per chiudere il modal Satispay
+             else if (button.id === 'satispay-close-btn') {
+                dom.satispayModal.classList.add('hidden');
+             }
              else if (button.matches('.add-to-cart-btn')) {
                  const item = { ...state.menuData.find(i => i.id === parseInt(button.dataset.id))};
                  if (!item) return;
 
                  if (item.isCombo) {
-                     openComboModal(item);
-                     return;
+                      openComboModal(item);
+                      return;
                  }
 
                  const portionSelect = document.querySelector(`.portion-select[data-id="${item.id}"]`);
@@ -1002,59 +967,11 @@
                      try {
                          await deleteDoc(doc(db, "orders", orderId));
                          showToast("Ordine eliminato con successo.");
-                         // Optionally navigate back to menu if user deletes their own current order
-                         // if(state.currentView === 'my-order') navigate('menu');
                      } catch (error) {
                          console.error("Errore eliminazione ordine:", error);
                          showToast("Impossibile eliminare l'ordine.");
                      }
                  }
-             }
-             else if (button.id === 'suggest-dish-btn') {
-                 const category = dom.categorySelect.value;
-                 const diet = dom.dietSelect.value;
-                 const possibleItems = state.menuData.filter(item =>
-                    (category === 'all' || item.category.toLowerCase() === category) &&
-                    (diet === 'all' || (item.diet && item.diet.includes(diet))) &&
-                    !item.isCombo
-                 );
-
-                 if (possibleItems.length === 0) {
-                     showToast("Nessun piatto da suggerire con i filtri attuali.");
-                     return;
-                 }
-
-                 const randomItem = possibleItems[Math.floor(Math.random() * possibleItems.length)];
-
-                 dom.suggestionContent.innerHTML = `
-                     <i class="fas ${randomItem.icon} text-primary text-4xl mb-4"></i>
-                     <h4 class="font-bold text-xl">${randomItem.name}</h4>
-                     <p class="text-text-main/70 text-md">€${randomItem.price.toFixed(2)}</p>
-                 `;
-                 dom.suggestionAddBtn.dataset.itemId = randomItem.id;
-                 dom.suggestionModal.classList.remove('hidden');
-                 setTimeout(() => {
-                     dom.suggestionModalContentBox.classList.remove('scale-95', 'opacity-0');
-                 }, 10);
-             }
-             else if (button.id === 'suggestion-close-btn') {
-                 dom.suggestionModalContentBox.classList.add('scale-95', 'opacity-0');
-                 setTimeout(() => {
-                     dom.suggestionModal.classList.add('hidden');
-                 }, 200);
-             }
-             else if (button.id === 'suggestion-add-btn') {
-                 const itemId = parseInt(button.dataset.itemId);
-                 const item = state.menuData.find(i => i.id === itemId);
-                 if (item) {
-                    state.cart.push({ ...item, cartId: Date.now(), quantity: 1 });
-                    renderMyOrder();
-                    showToast(`${item.name} aggiunto!`);
-                 }
-                 dom.suggestionModalContentBox.classList.add('scale-95', 'opacity-0');
-                 setTimeout(() => {
-                     dom.suggestionModal.classList.add('hidden');
-                 }, 200);
              }
              else if (button.matches('.save-response-btn')) {
                  const orderId = button.dataset.id;
@@ -1073,11 +990,18 @@
              }
              else if (button.id === 'save-username-btn') {
                  const name = dom.usernameInput.value.trim();
-                 if (name) {
+                 const email = dom.userEmailInput.value.trim();
+                 if (name && email && /^\S+@\S+\.\S+$/.test(email)) {
                      localStorage.setItem('dosepranza-username', name);
+                     localStorage.setItem('dosepranza-useremail', email);
                      state.currentUser.name = name;
+                     state.currentUser.email = email;
                      dom.userModal.classList.add('hidden');
                      updateAdminControlsVisibility();
+                 } else if (!name) {
+                     showToast("Per favore, inserisci il tuo nome.");
+                 } else {
+                     showToast("Per favore, inserisci un'email valida.");
                  }
              }
              else if (button.id === 'toggle-calories') {
@@ -1094,26 +1018,14 @@
              }
              else if (button.id === 'confirm-order-btn') {
                  if (state.cart.length === 0) { showToast("Il tuo carrello è vuoto."); return; }
-                 if (!state.currentUser || !state.currentUser.name) { showToast("Per favore, inserisci prima il tuo nome."); dom.userModal.classList.remove('hidden'); return; }
-
-                 const emailInput = document.getElementById('email-input');
-                 const email = emailInput.value.trim();
-                 if (!email) {
-                     showToast("Il campo Email è obbligatorio.");
-                     emailInput.focus();
-                     emailInput.classList.add('border-red-500');
-                     return;
+                 
+                 if (!state.currentUser || !state.currentUser.name || !state.currentUser.email) { 
+                     showToast("Per favore, inserisci nome ed email."); 
+                     dom.userModal.classList.remove('hidden'); 
+                     return; 
                  }
-                 if (!/^\S+@\S+\.\S+$/.test(email)) {
-                     showToast("Per favore, inserisci un indirizzo email valido.");
-                     emailInput.focus();
-                     emailInput.classList.add('border-red-500');
-                     return;
-                 }
-                 emailInput.classList.remove('border-red-500');
 
-                 const notes = document.getElementById('notes-input').value.trim();
-                 const alternative = document.getElementById('alternative-input').value.trim();
+                 // NUOVA MODIFICA [1] - Ripristinata lettura 'allergies'
                  const allergies = document.getElementById('allergies-input').value.trim();
                  const cutlery = document.getElementById('cutlery-checkbox').checked;
                  const paymentMethod = document.querySelector('input[name="payment-method"]:checked')?.value;
@@ -1126,18 +1038,17 @@
                      category: item.category,
                      quantity: item.quantity,
                      price: item.price,
-                     details: item.details || null // Include details if present
+                     details: item.details || null
                  }));
 
+                 // NUOVA MODIFICA [1] - Ripristinato 'allergies' in 'orderData'
                  const orderData = {
                      user: state.currentUser.name,
                      uid: state.currentUser.uid,
-                     email: email,
+                     email: state.currentUser.email,
                      items: itemsToSave,
                      total,
-                     alternative,
-                     notes,
-                     allergies,
+                     allergies, // Ripristinato
                      cutlery,
                      paymentMethod,
                      createdAt: serverTimestamp(),
@@ -1147,6 +1058,12 @@
 
                  try {
                      await addDoc(ordersCollectionRef, orderData);
+                     
+                     // NUOVA MODIFICA [2] - Mostra il modal Satispay DOPO aver inviato l'ordine
+                     if (orderData.paymentMethod === 'Satispay') {
+                         dom.satispayModal.classList.remove('hidden');
+                     }
+
                      showToast("Ordine confermato con successo!");
                      state.cart = []; // Clear cart
                      navigate('my-order'); // Navigate to confirmation/order view
@@ -1184,9 +1101,11 @@
                          if (item.quantity > 1) {
                              userNote += ` (x${item.quantity})`;
                          }
+                         
+                         // NUOVA MODIFICA [1] - Ripristinato 'allergies' in 'combinedNotes'
                          let combinedNotes = [];
                          if(order.allergies) combinedNotes.push(`ALLERGIA: ${order.allergies}`);
-                         if(order.notes) combinedNotes.push(order.notes);
+                         if(order.notes) combinedNotes.push(order.notes); // 'notes' era già stato rimosso, ma lo lascio qui nel caso
                          if(combinedNotes.length > 0) userNote += ` [${combinedNotes.join('; ')}]`;
 
                          prepItems[itemName].users.push(userNote);
@@ -1212,15 +1131,14 @@
                          }
                          ordersText += `  - ${item.quantity}x ${itemText}\n`;
                      });
+                     
+                     // NUOVA MODIFICA [1] - Ripristinato 'allergies' in 'ordersText'
                      if (order.allergies) {
                          ordersText += `  - ❗ ALLERGIA: ${order.allergies}\n`;
                      }
-                     if (order.notes) {
-                         ordersText += `  - Nota: ${order.notes}\n`;
-                     }
-                     if (order.alternative) {
-                         ordersText += `  - Alternativa: ${order.alternative}\n`;
-                     }
+                     // if (order.notes) { ... }
+                     // if (order.alternative) { ... }
+
                       if (order.cutlery) {
                          ordersText += `  - 🍴 Posate: Sì\n`;
                      }
@@ -1261,16 +1179,15 @@
                          if (stringField.search(/("|,|;|\n)/g) >= 0) {
                              stringField = `"${stringField.replace(/"/g, '""')}"`;
                          }
-                         // No need to wrap in extra quotes if no special chars
                          return stringField.includes(';') ? `"${stringField}"` : stringField;
                      };
 
-
+                     // NUOVA MODIFICA [1] - Ripristinato 'Allergie' nell'header CSV
                      const header = [
                          'OrderID', 'TimestampISO8601', 'DataLeggibile', 'UserID', 'Utente',
                          'EmailUtente', 'Prodotto', 'Dettagli', 'CategoriaProdotto', 'Quantita',
-                         'PrezzoUnitario', 'TotaleRiga', 'MetodoPagamento', 'NoteCliente',
-                         'Allergie', 'Posate', 'Alternativa', 'CanaleOrdine', 'StatoPagamento', 'RispostaRistoratore'
+                         'PrezzoUnitario', 'TotaleRiga', 'MetodoPagamento',
+                         'Allergie', 'Posate', 'CanaleOrdine', 'StatoPagamento', 'RispostaRistoratore'
                      ];
 
                      let csvRows = [header.join(';')];
@@ -1283,6 +1200,7 @@
                                  category = menuItem ? menuItem.category : 'Sconosciuta';
                              }
 
+                             // NUOVA MODIFICA [1] - Ripristinato 'allergies' nella riga CSV
                              const row = [
                                  escapeCsvField(order.id),
                                  escapeCsvField(order.createdAt ? order.createdAt.toDate().toISOString() : 'N/D'),
@@ -1297,11 +1215,9 @@
                                  escapeCsvField(item.price ? item.price.toFixed(2).replace('.', ',') : '0,00'),
                                  escapeCsvField(item.price ? (item.quantity * item.price).toFixed(2).replace('.', ',') : '0,00'),
                                  escapeCsvField(order.paymentMethod),
-                                 escapeCsvField(order.notes || ''),
-                                 escapeCsvField(order.allergies || ''),
+                                 escapeCsvField(order.allergies || ''), // Ripristinato
                                  escapeCsvField(order.cutlery ? 'Si' : 'No'),
-                                 escapeCsvField(order.alternative || ''),
-                                 escapeCsvField('Web'), // Assuming all orders are via web
+                                 escapeCsvField('Web'), 
                                  escapeCsvField(order.paid ? 'Pagato' : 'Da Pagare'),
                                  escapeCsvField(order.restaurateurResponse || '')
                              ];
@@ -1325,20 +1241,18 @@
                      showToast("Esportazione fallita. Controlla la console.");
                  }
              }
-        }
+         }
 
         function updateAdminControlsVisibility() {
             const exportBtn = document.getElementById('export-history-btn');
             if (!exportBtn) return;
 
-            // Simplified check: show if the user is logged in and has a name set
             if (state.currentUser && state.currentUser.name) {
-                 // Example: Show export button only for a specific user
-                 if (state.currentUser.name === 'Marco Tranquilli') {
-                     exportBtn.classList.remove('hidden');
-                 } else {
-                     exportBtn.classList.add('hidden');
-                 }
+                if (state.currentUser.name === 'Marco Tranquilli') {
+                    exportBtn.classList.remove('hidden');
+                } else {
+                    exportBtn.classList.add('hidden');
+                }
             } else {
                 exportBtn.classList.add('hidden');
             }
@@ -1353,14 +1267,12 @@
                 menuItemsContainer: document.getElementById('menu-items'), cartCountEl: document.getElementById('cart-count'),
                 myOrderContentEl: document.getElementById('my-order-content'), allOrdersListEl: document.getElementById('all-orders-list'),
                 grandTotalEl: document.getElementById('grand-total'), userModal: document.getElementById('user-modal'),
-                usernameInput: document.getElementById('username-input'), toastEl: document.getElementById('toast'),
+                usernameInput: document.getElementById('username-input'),
+                userEmailInput: document.getElementById('user-email-input'),
+                toastEl: document.getElementById('toast'),
                 toastMessageEl: document.getElementById('toast-message'), categorySelect: document.getElementById('category-select'),
                 dietSelect: document.getElementById('diet-select'), filterCounterContainer: document.getElementById('filter-counter-container'),
                 allergenModal: document.getElementById('allergen-modal'), allergenModalContent: document.getElementById('allergen-modal-content'),
-                suggestionModal: document.getElementById('suggestion-modal'),
-                suggestionModalContentBox: document.getElementById('suggestion-modal-content-box'),
-                suggestionContent: document.getElementById('suggestion-content'),
-                suggestionAddBtn: document.getElementById('suggestion-add-btn'),
                 comboModal: document.getElementById('combo-modal'),
                 comboPaninoSelect: document.getElementById('combo-panino-select'),
                 comboDrinkSelect: document.getElementById('combo-drink-select'),
@@ -1373,49 +1285,49 @@
                 ingredientsStepContainer: document.getElementById('ingredients-step-container'),
                 subtypeOptions: document.getElementById('subtype-options'),
                 sandwichBaseSummary: document.getElementById('sandwich-base-summary'),
-                extraChargeNotice: document.getElementById('extra-charge-notice')
+                extraChargeNotice: document.getElementById('extra-charge-notice'),
+                satispayModal: document.getElementById('satispay-modal'), // NUOVA MODIFICA [2] - Aggiunto modal Satispay al DOM
             });
             document.body.addEventListener('click', handleEvents);
             document.body.addEventListener('change', handleEvents);
             document.body.addEventListener('input', handleEvents);
             renderFilters();
 
-            // --- INIZIO MODIFICA ---
-            // Force the correct initial view BEFORE the first navigate
             dom.views.forEach(v => {
                 if (v.id === 'menu-view') {
-                    v.classList.add('active'); // Ensure menu is visible
+                    v.classList.add('active'); 
                 } else {
-                    v.classList.remove('active'); // Ensure others are hidden
+                    v.classList.remove('active'); 
                 }
             });
             dom.navBtns.forEach(b => {
                 b.classList.toggle('bg-primary', b.dataset.view === 'menu');
                 b.classList.toggle('text-white', b.dataset.view === 'menu');
             });
-            state.currentView = 'menu'; // Update internal state
-            // --- FINE MODIFICA ---
+            state.currentView = 'menu'; 
 
-            renderMenu(); // Render the menu after making it active
-            // navigate('menu'); // This line might no longer be strictly necessary,
-                               // but you can leave it for consistency or remove it.
-                               // If left, ensure it doesn't cause flashing.
+            renderMenu(); 
         }
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                state.currentUser = { uid: user.uid, name: localStorage.getItem('dosepranza-username') };
-                if (!state.currentUser.name) {
+                state.currentUser = { 
+                    uid: user.uid, 
+                    name: localStorage.getItem('dosepranza-username'),
+                    email: localStorage.getItem('dosepranza-useremail')
+                };
+                if (!state.currentUser.name || !state.currentUser.email) {
+                    // Pre-popola l'email se è nel localStorage
+                    dom.userEmailInput.value = state.currentUser.email || '';
+                    dom.usernameInput.value = state.currentUser.name || '';
                     dom.userModal.classList.remove('hidden');
                 }
                 updateAdminControlsVisibility();
 
-                onSnapshot(query(ordersCollectionRef, orderBy("createdAt", "desc")), snapshot => { // Order by time
+                onSnapshot(query(ordersCollectionRef, orderBy("createdAt", "desc")), snapshot => { 
                     state.allOrders = snapshot.docs.map(doc => ({...doc.data(), id: doc.id}));
-                    // Sort locally by user name AFTER getting today's orders
                     if (state.currentView === 'all-orders') renderAllOrders();
                     if (state.currentView === 'my-order') renderMyOrder();
-                    renderFavorites(); // Update favorites based on potentially new orders
                 }, error => {
                     console.error("Errore con lo snapshot di Firestore:", error);
                 });
