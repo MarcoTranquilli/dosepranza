@@ -215,7 +215,7 @@
                     <select id="combo-panino-select" class="w-full p-3 border border-gray-300 rounded-lg"></select>
                 </div>
                 <div>
-                    <label for="combo-drink-select" class="block mb-2 font-semibold">Scegli la Bevanda:</label>
+                    <label for="combo-drink-select" id="combo-drink-label" class="block mb-2 font-semibold">Scegli la Bevanda:</label>
                     <select id="combo-drink-select" class="w-full p-3 border border-gray-300 rounded-lg"></select>
                 </div>
             </div>
@@ -296,8 +296,9 @@
 
         const RAW_MENU = {
             "menù combinati": [
-                { name: "Panino + lattina 33 cl", price: 4.00, isCombo: true, comboType: 'panino_33cl', ingredients: ["Un panino a scelta", "Una bevanda a scelta"], diet: ["carne/pesce", "vegetariano", "vegano"], allergens: ["G", "L", "P"] },
-                { name: "Panino + lattina 50 cl", price: 4.50, isCombo: true, comboType: 'panino_50cl', ingredients: ["Un panino a scelta", "Una bevanda a scelta"], diet: ["carne/pesce", "vegetariano", "vegano"], allergens: ["G", "L", "P"] }
+                { name: "Panino + bottiglia acqua 50 cl", price: 4.00, isCombo: true, comboType: 'panino_acqua_50cl', ingredients: ["Un panino a scelta", "Una bottiglietta di acqua naturale o frizzante da 50 cl"], diet: ["carne/pesce", "vegetariano", "vegano"], allergens: ["G", "L", "P"] },
+                { name: "Panino + lattina 33 cl", price: 4.50, isCombo: true, comboType: 'panino_33cl', ingredients: ["Un panino a scelta", "Una bevanda da 33 cl a scelta"], diet: ["carne/pesce", "vegetariano", "vegano"], allergens: ["G", "L", "P"] },
+                { name: "Panino + bottiglia 50 cl", price: 5.00, isCombo: true, comboType: 'panino_bevanda_50cl', ingredients: ["Un panino a scelta", "Una bevanda da 50 cl a scelta"], diet: ["carne/pesce", "vegetariano", "vegano"], allergens: ["G", "L", "P"] }
             ],
             panini: [
                 { name: "Crudo pomodoro mozzarella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 550, ingredients: ["Prosciutto crudo", "Pomodoro", "Mozzarella"] },
@@ -524,7 +525,6 @@
             if (todaysUserOrder) {
                 const itemsHtml = todaysUserOrder.items.map(item => `<li class="flex justify-between items-center text-sm"><span>${item.quantity} x ${item.name}</span><span class="font-medium">€${(item.price * item.quantity).toFixed(2)}</span></li>`).join('');
                 
-                // NUOVA MODIFICA [1] - Ripristinato 'allergies' in 'notesHtml'
                 const notesHtml = `
                     ${todaysUserOrder.allergies ? `<p class="text-sm mt-2 p-2 bg-red-50 border-l-4 border-red-400"><b class="text-red-700">Allergie:</b> ${todaysUserOrder.allergies}</p>` : ''}
                     ${todaysUserOrder.cutlery ? `<p class="text-sm mt-2 p-2 bg-green-50 border-l-4 border-green-400"><b>Posate richieste.</b></p>` : ''}
@@ -609,6 +609,30 @@
                     </div>
                 </div>
 
+                <div class="mt-6 mb-4 p-4 bg-blue-50 border-l-4 border-blue-400 rounded-md">
+                    <h4 class="font-bold text-blue-800"><i class="fas fa-info-circle mr-2"></i>Aggiornamento Metodi di Pagamento</h4>
+                    <p class="text-sm text-blue-700 mt-2">
+                        Per esigenze organizzative, <strong>dal 27 Ottobre accetteremo solo pagamenti con Satispay</strong>.
+                        <a href="https://www.satispay.com/it-it/privati/pagare/online/" target="_blank" class="font-semibold underline hover:text-blue-900">Maggiori informazioni <i class="fas fa-external-link-alt text-xs"></i></a>
+                    </p>
+                    
+                    <a href="https://www.satispay.com/it-it/privati/" target="_blank" 
+                       class="block mt-4 p-3 rounded-lg shadow-sm bg-primary-100 border-2 border-primary">
+                       
+                        <div class="flex items-center justify-center gap-3 sm:gap-4">
+                            <div class="text-left text-primary-800 flex-1">
+                                <p class="font-bold text-lg leading-tight">Scarica l'app e</p>
+                                <p class="font-bold text-lg leading-tight">ottieni 5€</p>
+                                <p class="font-semibold text-base mt-1">con il codice: <span class="font-extrabold">WEB</span></p>
+                            </div>
+                            <div class="flex-shrink-0 w-24 h-24 sm:w-28 sm:h-28">
+                                <img src="https://www.satispay.com/_next/image/?url=https%3A%2F%2Fwww.datocms-assets.com%2F133951%2F1737978066-qr_code_svg_giftcard_mainpage.svg&w=640&q=75" 
+                                     alt="QR Code Satispay" 
+                                     class="w-full h-full object-cover rounded-md bg-white p-1">
+                            </div>
+                        </div>
+                    </a>
+                </div>
                 <div class="mt-6">
                     <h4 class="block mb-2 font-semibold">Metodo di Pagamento</h4>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">${paymentOptionsHtml}</div>
@@ -618,7 +642,7 @@
                 <button id="confirm-order-btn" class="w-full mt-4 bg-secondary hover:bg-secondary-dark text-white font-bold py-3 px-4 rounded-lg transition-all duration-300"><i class="fas fa-check-circle mr-2"></i>Conferma e Invia Ordine</button>
             `;
 
-            // NUOVA MODIFICA [2] - Forza l'aggiornamento del testo del pulsante Satispay se è già selezionato
+            // Forza l'aggiornamento del testo del pulsante Satispay se è già selezionato
             const selectedPayment = document.querySelector('input[name="payment-method"]:checked');
             if (selectedPayment) {
                 handlePaymentChange(selectedPayment);
@@ -715,7 +739,6 @@
                         </li>`;
                 }).join('');
                 
-                // NUOVA MODIFICA [1] - Ripristinato 'allergies' in 'notesHtml'
                 const notesHtml = `
                     ${order.allergies ? `<p class="text-xs text-red-700 mt-2 pl-4 border-l-2 border-red-300"><b>Allergie:</b> ${order.allergies}</p>` : ''}
                     ${order.cutlery ? `<p class="text-xs text-secondary-800 mt-2 pl-4 border-l-2 border-secondary-light"><b><i class="fas fa-utensils"></i> Posate richieste</b></p>` : ''}
@@ -757,7 +780,6 @@
             dom.grandTotalEl.textContent = `€${grandTotal.toFixed(2)}`;
         }
 
-        // NUOVA MODIFICA [2] - Nuova funzione per gestire il cambio di metodo di pagamento
         function handlePaymentChange(target) {
             const confirmBtn = document.getElementById('confirm-order-btn');
             if (!confirmBtn) return;
@@ -829,7 +851,6 @@
                     priceElement.textContent = `€${parseFloat(price).toFixed(2)}`;
                 }
             }
-            // NUOVA MODIFICA [2] - Aggiunto handler per il cambio di pagamento
             else if (event.type === 'change' && target.matches('input[name="payment-method"]')) { 
                 handlePaymentChange(target);
             }
@@ -854,7 +875,24 @@
             const panini = state.menuData.filter(m => m.category === 'Panini' && !m.name.toLowerCase().includes("5 cereali"));
             dom.comboPaninoSelect.innerHTML = panini.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
 
-            const drinks = ['Acqua naturale', 'Acqua frizzante', 'Coca Cola', 'Fanta', 'Tè freddo'];
+            let drinks = [];
+            const drinkLabel = dom.comboDrinkLabel; // Usa l'elemento DOM memorizzato
+
+            if (item.comboType === 'panino_acqua_50cl') {
+                drinks = ['Acqua naturale 50cl', 'Acqua frizzante 50cl'];
+                drinkLabel.textContent = 'Scegli l\'Acqua (50cl):';
+            } else if (item.comboType === 'panino_33cl') {
+                drinks = ['Coca Cola 33cl', 'Fanta 33cl', 'Tè freddo 33cl'];
+                drinkLabel.textContent = 'Scegli la Bevanda (33cl):';
+            } else if (item.comboType === 'panino_bevanda_50cl') {
+                drinks = ['Coca Cola 50cl', 'Fanta 50cl', 'Tè freddo 50cl']; // Assunzione
+                drinkLabel.textContent = 'Scegli la Bevanda (50cl):';
+            } else {
+                // Fallback
+                drinks = ['Acqua naturale', 'Acqua frizzante', 'Coca Cola', 'Fanta', 'Tè freddo'];
+                drinkLabel.textContent = 'Scegli la Bevanda:';
+            }
+
             dom.comboDrinkSelect.innerHTML = drinks.map(d => `<option value="${d}">${d}</option>`).join('');
 
             dom.comboModal.classList.remove('hidden');
@@ -869,7 +907,6 @@
              if (button.matches('.nav-btn')) {
                  navigate(button.dataset.view);
              }
-             // NUOVA MODIFICA [2] - Aggiunto handler per chiudere il modal Satispay
              else if (button.id === 'satispay-close-btn') {
                 dom.satispayModal.classList.add('hidden');
              }
@@ -1025,7 +1062,6 @@
                      return; 
                  }
 
-                 // NUOVA MODIFICA [1] - Ripristinata lettura 'allergies'
                  const allergies = document.getElementById('allergies-input').value.trim();
                  const cutlery = document.getElementById('cutlery-checkbox').checked;
                  const paymentMethod = document.querySelector('input[name="payment-method"]:checked')?.value;
@@ -1041,14 +1077,13 @@
                      details: item.details || null
                  }));
 
-                 // NUOVA MODIFICA [1] - Ripristinato 'allergies' in 'orderData'
                  const orderData = {
                      user: state.currentUser.name,
                      uid: state.currentUser.uid,
                      email: state.currentUser.email,
                      items: itemsToSave,
                      total,
-                     allergies, // Ripristinato
+                     allergies,
                      cutlery,
                      paymentMethod,
                      createdAt: serverTimestamp(),
@@ -1059,7 +1094,6 @@
                  try {
                      await addDoc(ordersCollectionRef, orderData);
                      
-                     // NUOVA MODIFICA [2] - Mostra il modal Satispay DOPO aver inviato l'ordine
                      if (orderData.paymentMethod === 'Satispay') {
                          dom.satispayModal.classList.remove('hidden');
                      }
@@ -1075,9 +1109,10 @@
              else if (button.id === 'copy-summary-btn') {
                  const today = new Date();
                  today.setHours(0, 0, 0, 0);
+
                  const todaysOrders = state.allOrders
                      .filter(order => order.createdAt && order.createdAt.toDate() >= today)
-                     .sort((a, b) => a.user.localeCompare(b.user));
+                     .sort((a, b) => a.createdAt.toDate() - b.createdAt.toDate());
 
                  if (todaysOrders.length === 0) {
                      showToast("Nessun ordine da copiare per oggi.");
@@ -1102,10 +1137,8 @@
                              userNote += ` (x${item.quantity})`;
                          }
                          
-                         // NUOVA MODIFICA [1] - Ripristinato 'allergies' in 'combinedNotes'
                          let combinedNotes = [];
                          if(order.allergies) combinedNotes.push(`ALLERGIA: ${order.allergies}`);
-                         if(order.notes) combinedNotes.push(order.notes); // 'notes' era già stato rimosso, ma lo lascio qui nel caso
                          if(combinedNotes.length > 0) userNote += ` [${combinedNotes.join('; ')}]`;
 
                          prepItems[itemName].users.push(userNote);
@@ -1121,7 +1154,7 @@
 
                  let ordersText = "--- 💵 RIEPILOGO ORDINI E PAGAMENTI ---\n\n";
                  let grandTotal = 0;
-                 todaysOrders.forEach(order => {
+                 todaysOrders.forEach(order => { 
                      ordersText += `*${order.user}* - Totale: €${order.total.toFixed(2)}\n`;
                      ordersText += `  - Pagamento: ${PAYMENT_METHODS[order.paymentMethod]?.name || order.paymentMethod}\n`;
                      order.items.forEach(item => {
@@ -1132,12 +1165,9 @@
                          ordersText += `  - ${item.quantity}x ${itemText}\n`;
                      });
                      
-                     // NUOVA MODIFICA [1] - Ripristinato 'allergies' in 'ordersText'
                      if (order.allergies) {
                          ordersText += `  - ❗ ALLERGIA: ${order.allergies}\n`;
                      }
-                     // if (order.notes) { ... }
-                     // if (order.alternative) { ... }
 
                       if (order.cutlery) {
                          ordersText += `  - 🍴 Posate: Sì\n`;
@@ -1182,7 +1212,6 @@
                          return stringField.includes(';') ? `"${stringField}"` : stringField;
                      };
 
-                     // NUOVA MODIFICA [1] - Ripristinato 'Allergie' nell'header CSV
                      const header = [
                          'OrderID', 'TimestampISO8601', 'DataLeggibile', 'UserID', 'Utente',
                          'EmailUtente', 'Prodotto', 'Dettagli', 'CategoriaProdotto', 'Quantita',
@@ -1200,7 +1229,6 @@
                                  category = menuItem ? menuItem.category : 'Sconosciuta';
                              }
 
-                             // NUOVA MODIFICA [1] - Ripristinato 'allergies' nella riga CSV
                              const row = [
                                  escapeCsvField(order.id),
                                  escapeCsvField(order.createdAt ? order.createdAt.toDate().toISOString() : 'N/D'),
@@ -1215,7 +1243,7 @@
                                  escapeCsvField(item.price ? item.price.toFixed(2).replace('.', ',') : '0,00'),
                                  escapeCsvField(item.price ? (item.quantity * item.price).toFixed(2).replace('.', ',') : '0,00'),
                                  escapeCsvField(order.paymentMethod),
-                                 escapeCsvField(order.allergies || ''), // Ripristinato
+                                 escapeCsvField(order.allergies || ''),
                                  escapeCsvField(order.cutlery ? 'Si' : 'No'),
                                  escapeCsvField('Web'), 
                                  escapeCsvField(order.paid ? 'Pagato' : 'Da Pagare'),
@@ -1276,6 +1304,7 @@
                 comboModal: document.getElementById('combo-modal'),
                 comboPaninoSelect: document.getElementById('combo-panino-select'),
                 comboDrinkSelect: document.getElementById('combo-drink-select'),
+                comboDrinkLabel: document.getElementById('combo-drink-label'),
                 ingredientsList: document.getElementById('ingredients-list'),
                 selectedIngredientsList: document.getElementById('selected-ingredients-list'),
                 sandwichTotalPrice: document.getElementById('sandwich-total-price'),
@@ -1286,7 +1315,7 @@
                 subtypeOptions: document.getElementById('subtype-options'),
                 sandwichBaseSummary: document.getElementById('sandwich-base-summary'),
                 extraChargeNotice: document.getElementById('extra-charge-notice'),
-                satispayModal: document.getElementById('satispay-modal'), // NUOVA MODIFICA [2] - Aggiunto modal Satispay al DOM
+                satispayModal: document.getElementById('satispay-modal'),
             });
             document.body.addEventListener('click', handleEvents);
             document.body.addEventListener('change', handleEvents);
