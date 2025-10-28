@@ -254,10 +254,7 @@
         const ALLERGENS = { G: { name: "Glutine", icon: "fa-wheat-awn" }, L: { name: "Latticini", icon: "fa-cheese" }, C: { name: "Crostacei", icon: "fa-shrimp" }, P: { name: "Pesce", icon: "fa-fish-fins" }};
         const DIETS = { vegetariano: { name: "Vegetariano", icon: "🧀" }, vegano: { name: "Vegano", icon: "🌱" }, "carne/pesce": { name: "Carne/🐟Pesce", icon: "🥩" } };
         const PAYMENT_METHODS = {
-            Satispay: { name: "Satispay", icon: "fa-mobile-alt", note: "Pagamento da effettuare entro le 11:30." },
-            Contanti: { name: "Contanti", icon: "fa-money-bill-wave", note: "Pagamento alla consegna." },
-            CarteBancomat: { name: "Carte e bancomat", icon: "fa-credit-card", note: "Pagamento alla consegna." },
-            Edenred: { name: "Buoni Pasto Edenred", icon: "fa-ticket-alt", note: "È richiesto il saldo in negozio entro fine settimana." }
+            Satispay: { name: "Satispay", icon: "fa-mobile-alt", note: "Pagamento da effettuare entro le 11:30." }
         };
         const CATEGORY_ORDER = ["Menù Combinati", "Panini", "Pizze", "Gastronomia", "Insalatone", "Verdure", "Fritti", "Dessert"];
 
@@ -578,18 +575,7 @@
                 </div>`;
             }).join('');
 
-            const paymentOptionsHtml = Object.entries(PAYMENT_METHODS).map(([key, {name, icon, note}], index) => {
-                const noteHtml = note ? `<span class="block text-xs text-text-main/60 mt-1 font-normal">${note}</span>` : '';
-                return `
-                <div class="flex-1">
-                    <input type="radio" id="payment-${key}" name="payment-method" value="${key}" class="hidden payment-radio" ${index === 0 ? 'checked' : ''}>
-                    <label for="payment-${key}" class="block border-2 border-gray-200 rounded-lg p-3 text-center cursor-pointer transition-all duration-300 hover:border-primary-light h-full">
-                        <i class="fas ${icon} text-2xl text-primary"></i>
-                        <span class="block text-sm font-semibold mt-2">${name}</span>
-                        ${noteHtml}
-                    </label>
-                </div>
-            `}).join('');
+            // Blocco 'paymentOptionsHtml' e blocco blu rimossi.
 
             dom.myOrderContentEl.innerHTML = `
                 <div class="space-y-4 mb-4">${itemsHtml}</div>
@@ -609,44 +595,41 @@
                     </div>
                 </div>
 
-                <div class="mt-6 mb-4 p-4 bg-blue-50 border-l-4 border-blue-400 rounded-md">
-                    <h4 class="font-bold text-blue-800"><i class="fas fa-info-circle mr-2"></i>Aggiornamento Metodi di Pagamento</h4>
-                    <p class="text-sm text-blue-700 mt-2">
-                        Per esigenze organizzative, <strong>dal 27 Ottobre accetteremo solo pagamenti con Satispay</strong>.
-                        <a href="https://www.satispay.com/it-it/privati/pagare/online/" target="_blank" class="font-semibold underline hover:text-blue-900">Maggiori informazioni <i class="fas fa-external-link-alt text-xs"></i></a>
-                    </p>
+                <a href="https://www.satispay.com/it-it/privati/" target="_blank" 
+                    class="block mt-4 p-3 rounded-lg shadow-sm bg-primary-100 border-2 border-primary">
                     
-                    <a href="https://www.satispay.com/it-it/privati/" target="_blank" 
-                       class="block mt-4 p-3 rounded-lg shadow-sm bg-primary-100 border-2 border-primary">
-                       
-                        <div class="flex items-center justify-center gap-3 sm:gap-4">
-                            <div class="text-left text-primary-800 flex-1">
-                                <p class="font-bold text-lg leading-tight">Scarica l'app e</p>
-                                <p class="font-bold text-lg leading-tight">ottieni 5€</p>
-                                <p class="font-semibold text-base mt-1">con il codice: <span class="font-extrabold">WEB</span></p>
-                            </div>
-                            <div class="flex-shrink-0 w-24 h-24 sm:w-28 sm:h-28">
-                                <img src="https://www.satispay.com/_next/image/?url=https%3A%2F%2Fwww.datocms-assets.com%2F133951%2F1737978066-qr_code_svg_giftcard_mainpage.svg&w=640&q=75" 
-                                     alt="QR Code Satispay" 
-                                     class="w-full h-full object-cover rounded-md bg-white p-1">
-                            </div>
+                    <div class="flex items-center justify-center gap-3 sm:gap-4">
+                        <div class="text-left text-primary-800 flex-1">
+                            <p class="font-bold text-lg leading-tight">Scarica l'app e</p>
+                            <p class="font-bold text-lg leading-tight">ottieni 5€</p>
+                            <p class="font-semibold text-base mt-1">con il codice: <span class="font-extrabold">WEB</span></p>
                         </div>
-                    </a>
-                </div>
+                        <div class="flex-shrink-0 w-24 h-24 sm:w-28 sm:h-28">
+                            <img src="https://www.satispay.com/_next/image/?url=https%3A%2F%2Fwww.datocms-assets.com%2F133951%2F1737978066-qr_code_svg_giftcard_mainpage.svg" 
+                                alt="QR Code Satispay" 
+                                class="w-full h-full object-cover rounded-md bg-white p-1">
+                        </div>
+                    </div>
+                </a>
+                
                 <div class="mt-6">
                     <h4 class="block mb-2 font-semibold">Metodo di Pagamento</h4>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">${paymentOptionsHtml}</div>
+                    <div class="mt-2">
+                        <input type="radio" id="payment-Satispay" name="payment-method" value="Satispay" class="hidden payment-radio" checked disabled>
+                        <label for="payment-Satispay" class="block border-2 border-primary rounded-lg p-3 text-center cursor-not-allowed opacity-100" style="box-shadow: 0 0 0 2px rgba(214, 128, 79, 0.4);">
+                            <i class="fas fa-mobile-alt text-2xl text-primary"></i>
+                            <span class="block text-sm font-semibold mt-2">Satispay</span>
+                            <span class="block text-xs text-text-main/60 mt-1 font-normal">Pagamento da effettuare entro le 11:30.</span>
+                        </label>
+                    </div>
                 </div>
 
                 <div class="text-right font-bold text-2xl mt-6">Totale: €${total.toFixed(2)}</div>
-                <button id="confirm-order-btn" class="w-full mt-4 bg-secondary hover:bg-secondary-dark text-white font-bold py-3 px-4 rounded-lg transition-all duration-300"><i class="fas fa-check-circle mr-2"></i>Conferma e Invia Ordine</button>
+                
+                <button id="confirm-order-btn" class="w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300">
+                    <i class="fab fa-satispay mr-2"></i>Paga ora e Invia Ordine
+                </button>
             `;
-
-            // Forza l'aggiornamento del testo del pulsante Satispay se è già selezionato
-            const selectedPayment = document.querySelector('input[name="payment-method"]:checked');
-            if (selectedPayment) {
-                handlePaymentChange(selectedPayment);
-            }
         }
 
         function renderCustomSandwichBuilder() {
@@ -783,16 +766,6 @@
         function handlePaymentChange(target) {
             const confirmBtn = document.getElementById('confirm-order-btn');
             if (!confirmBtn) return;
-            
-            if (target.value === 'Satispay') {
-                confirmBtn.innerHTML = '<i class="fab fa-satispay mr-2"></i>Paga ora e Invia Ordine';
-                confirmBtn.classList.remove('bg-secondary', 'hover:bg-secondary-dark');
-                confirmBtn.classList.add('bg-blue-500', 'hover:bg-blue-600'); // Satispay blue
-            } else {
-                confirmBtn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Conferma e Invia Ordine';
-                confirmBtn.classList.remove('bg-blue-500', 'hover:bg-blue-600');
-                confirmBtn.classList.add('bg-secondary', 'hover:bg-secondary-dark');
-            }
         }
 
         function handleEvents(event) {
@@ -850,9 +823,6 @@
                 if (priceElement) {
                     priceElement.textContent = `€${parseFloat(price).toFixed(2)}`;
                 }
-            }
-            else if (event.type === 'change' && target.matches('input[name="payment-method"]')) { 
-                handlePaymentChange(target);
             }
             else if (event.type === 'change' && target.matches('select')) {
                 handleSelectChange(target);
