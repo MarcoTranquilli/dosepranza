@@ -165,30 +165,30 @@
 
             <section id="all-orders-view" class="view">
                  <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-                    <h2 id="Tutti gli Ordini" class="text-3xl font-extrabold">Riepilogo Ordini di Oggi</h2>
-                    <div class="flex gap-2">
-                        <button id="export-history-btn" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg hidden transition-all duration-300"><i class="fas fa-download mr-2"></i> Esporta Storico</button>
-                        <button id="copy-summary-btn" class="bg-secondary hover:bg-secondary-dark text-white font-bold py-2 px-4 rounded-lg transition-all duration-300"><i class="fas fa-copy mr-2"></i> Copia Riepilogo</button>
-                    </div>
-                </div>
-                <div id="satispay-details" class="bg-white p-4 rounded-xl shadow-md mb-6 flex flex-col md:flex-row items-center gap-4">
-                    <div class="flex-shrink-0">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" alt="QR Code Satispay" class="rounded-lg">
-                    </div>
-                    <div class="text-center md:text-left">
-                        <h3 class="text-xl font-bold">Paga con Satispay</h3>
-                        <p class="text-text-main/80">Inquadra il QR Code o usa il link per pagare l'importo del tuo ordine a <strong>Alimentari Russo</strong>.</p>
-                        <p class="text-primary-800 font-semibold text-sm mt-1">Il pagamento va effettuato entro le 11:30.</p>
-                        <a href="https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" target="_blank" class="mt-2 inline-block bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg transition-all duration-300">
-                            <i class="fas fa-external-link-alt mr-2"></i>Vai a Satispay
-                        </a>
-                    </div>
-                </div>
-                <div id="all-orders-list" class="space-y-4"></div>
-                 <div class="mt-6 bg-white p-4 rounded-xl shadow-lg text-right">
-                    <span class="text-xl font-bold">Totale Complessivo:</span>
-                    <span id="grand-total" class="text-2xl font-bold text-primary ml-2">€0.00</span>
-                </div>
+                     <h2 id="Tutti gli Ordini" class="text-3xl font-extrabold">Riepilogo Ordini di Oggi</h2>
+                     <div class="flex gap-2">
+                         <button id="export-history-btn" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg hidden transition-all duration-300"><i class="fas fa-download mr-2"></i> Esporta Storico</button>
+                         <button id="copy-summary-btn" class="bg-secondary hover:bg-secondary-dark text-white font-bold py-2 px-4 rounded-lg transition-all duration-300"><i class="fas fa-copy mr-2"></i> Copia Riepilogo</button>
+                     </div>
+                 </div>
+                 <div id="satispay-details" class="bg-white p-4 rounded-xl shadow-md mb-6 flex flex-col md:flex-row items-center gap-4">
+                     <div class="flex-shrink-0">
+                         <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" alt="QR Code Satispay" class="rounded-lg">
+                     </div>
+                     <div class="text-center md:text-left">
+                         <h3 class="text-xl font-bold">Paga con Satispay</h3>
+                         <p class="text-text-main/80">Inquadra il QR Code o usa il link per pagare l'importo del tuo ordine a <strong>Alimentari Russo</strong>.</p>
+                         <p class="text-primary-800 font-semibold text-sm mt-1">Il pagamento va effettuato entro le 11:30.</p>
+                         <a href="https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" target="_blank" class="mt-2 inline-block bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg transition-all duration-300">
+                             <i class="fas fa-external-link-alt mr-2"></i>Vai a Satispay
+                         </a>
+                     </div>
+                 </div>
+                 <div id="all-orders-list" class="space-y-4"></div>
+                  <div class="mt-6 bg-white p-4 rounded-xl shadow-lg text-right">
+                     <span class="text-xl font-bold">Totale Complessivo:</span>
+                     <span id="grand-total" class="text-2xl font-bold text-primary ml-2">€0.00</span>
+                 </div>
             </section>
         </main>
     </div>
@@ -258,23 +258,25 @@
         };
         const CATEGORY_ORDER = ["Menù Combinati", "Panini", "Pizze", "Gastronomia", "Insalatone", "Verdure", "Fritti", "Dessert"];
 
+        // --- LOGICA BASI AGGIORNATA ---
         const BASE_OPTIONS = {
-            panino: { name: 'Panino', subtypes: ['Pane Classico', 'Focaccia'] },
-            pizza: { name: 'Pizza Ripiena', subtypes: ['Pizza Classica'] }
+            panino: { name: 'Panino', subtypes: ['Pane arabo', 'Ciabattina', 'Medaglione ai 5 cereali', 'Ciabattina integrale'] },
+            pizza: { name: 'Pizza Ripiena', subtypes: ['Pizza classica'] }
         };
 
         const CUSTOM_PRODUCT_BASE_PRICE = 3.50;
         const CUSTOM_PRODUCT_EXTRA_INGREDIENT_PRICE = 1.00;
         const CUSTOM_PRODUCT_INCLUDED_INGREDIENTS = 3;
 
+        // --- LOGICA INGREDIENTI AGGIORNATA ---
+        // Rimossi 'Salmone', 'Tonno', 'Cotoletta di Pollo', 'Brasato di Manzo'
         const SANDWICH_INGREDIENTS = [
             // Salumi & Carni
             { id: 'p-crudo', name: 'Prosciutto Crudo' }, { id: 'p-cotto', name: 'Prosciutto Cotto' },
             { id: 'salame', name: 'Salame' }, { id: 'mortadella', name: 'Mortadella' },
             { id: 'porchetta', name: 'Porchetta' }, { id: 'tacchino', name: 'Tacchino Arrosto' },
             { id: 'bresaola', name: 'Bresaola' }, { id: 'speck', name: 'Speck' },
-            { id: 'capocollo', name: 'Capocollo' }, { id: 'salmone', name: 'Salmone' }, { id: 'tonno', name: 'Tonno' },
-            { id: 'cotoletta', name: 'Cotoletta di Pollo' }, { id: 'brasato', name: 'Brasato di Manzo' },
+            { id: 'capocollo', name: 'Capocollo' },
             // Formaggi
             { id: 'mozzarella', name: 'Mozzarella' }, { id: 'scamorza', name: 'Scamorza' },
             { id: 'stracchino', name: 'Stracchino' }, { id: 'parmigiano', name: 'Parmigiano' },
@@ -291,6 +293,7 @@
         ].sort((a, b) => a.name.localeCompare(b.name));
 
 
+        // --- RAW_MENU AGGIORNATO ---
         const RAW_MENU = {
             "menù combinati": [
                 { name: "Panino + bottiglia acqua 50 cl", price: 4.00, isCombo: true, comboType: 'panino_acqua_50cl', ingredients: ["Un panino a scelta", "Una bottiglietta di acqua naturale o frizzante da 50 cl"], diet: ["carne/pesce", "vegetariano", "vegano"], allergens: ["G", "L", "P"] },
@@ -318,18 +321,26 @@
                 { name: "Brasato di manzo e verdura cotta", allergens: ["G"], diet: ["carne/pesce"], calories: 620, ingredients: ["Brasato di manzo", "Verdura cotta di stagione (broccoletti/cicoria/scarola)"] }
             ],
             pizze: [
+                { name: "Pizza con insalata di pollo con maionese", allergens: ["G"], diet: ["carne/pesce"], calories: 560, ingredients: ["Insalata di pollo con maionese"] },
+                { name: "Pizza classica con bresaola, filadelfia e rughetta", price: 3.50, allergens: ["G", "L"], diet: ["carne/pesce"], calories: 570, ingredients: ["Bresaola", "Filadelfia", "Rughetta"] },
+                { name: "Pizza con tacchino e verdure", price: 3.50, allergens: ["G"], diet: ["carne/pesce"], calories: 490, ingredients: ["Tacchino arrosto", "Verdure di stagione"] },
                 { name: "Crudo e mozzarella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 600, ingredients: ["Prosciutto crudo", "Mozzarella"] },
                 { name: "Speck stracchino e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 650, ingredients: ["Speck", "Stracchino", "Rucola"] },
                 { name: "Cotto arrosto e melanzane", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580, ingredients: ["Prosciutto cotto", "Melanzane"] },
                 { name: "Mortadella e stracciatella", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 700, ingredients: ["Mortadella", "Stracciatella"] },
                 { name: "Frittata e zucchine", allergens: ["G", "L"], diet: ["vegetariano"], calories: 550, ingredients: ["Frittata", "Zucchine"] },
                 { name: "Bresaola e formaggio", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580, ingredients: ["Bresaola", "Formaggio"] },
-                { name: "Insalata di pollo", allergens: ["G"], diet: ["carne/pesce"], calories: 560, ingredients: ["Insalata di pollo"] },
                 { name: "Cotto e stracchino", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 620, ingredients: ["Prosciutto cotto", "Stracchino"] },
-                { name: "Pizza ai 5 cereali bresaola formaggio spalmabile e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 590, ingredients: ["Pizza 5 cereali", "Bresaola", "Formaggio spalmabile", "Rucola"] },
-                { name: "Pizza ai 5 cereali con insalata di pollo", allergens: ["G"], diet: ["carne/pesce"], calories: 570, ingredients: ["Pizza 5 cereali", "Insalata di pollo"] }
+                // Pizze Rustiche Aggiunte
+                { name: "Pizza Rustica: Scarola e olive", price: 8.00, isCustomPriced: true, pricingOptions: [ { text: 'Intera - 8.00€', value: '8.00' }, { text: 'Mezza - 4.00€', value: '4.00' }, { text: '1/4 - 2.00€', value: '2.00' } ], allergens: ["G"], diet: ["vegetariano", "vegano"], ingredients: ["Scarola", "Olive"], calories: 500 },
+                { name: "Pizza Rustica: Cicoria e pachino", price: 8.00, isCustomPriced: true, pricingOptions: [ { text: 'Intera - 8.00€', value: '8.00' }, { text: 'Mezza - 4.00€', value: '4.00' }, { text: '1/4 - 2.00€', value: '2.00' } ], allergens: ["G"], diet: ["vegetariano", "vegano"], ingredients: ["Cicoria", "Pomodorini Pachino"], calories: 480 },
+                { name: "Pizza Rustica: Broccoli e salsiccia", price: 8.00, isCustomPriced: true, pricingOptions: [ { text: 'Intera - 8.00€', value: '8.00' }, { text: 'Mezza - 4.00€', value: '4.00' }, { text: '1/4 - 2.00€', value: '2.00' } ], allergens: ["G"], diet: ["carne/pesce"], ingredients: ["Broccoli", "Salsiccia"], calories: 620 }
             ],
             gastronomia: [
+                // Monoporzioni Aggiunte
+                { name: "Melanzane alla parmigiana (grigliate, 250-300g)", price: 6.00, allergens: ["L"], diet: ["vegetariano"], calories: 350, ingredients: ["Melanzane grigliate", "Pomodoro", "Parmigiano"] },
+                { name: "Lasagna classica al ragù (250-300g)", price: 6.00, allergens: ["G", "L"], diet: ["carne/pesce"], calories: 550, ingredients: ["Sfoglia all'uovo", "Ragù di carne", "Besciamella"] },
+                // Esistenti
                 { name: "Cous cous vegetale con pollo", allergens: ["G"], diet: ["carne/pesce"], calories: 450, ingredients: ["Cous cous", "Verdure miste", "Pollo"] },
                 { name: "Cous cous vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 350, ingredients: ["Cous cous", "Verdure miste"] },
                 { name: "Farro vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 380, ingredients: ["Farro", "Verdure miste"] },
@@ -354,8 +365,15 @@
                 { name: "Supplì", allergens: ["G", "L"], diet: ["vegetariano"], calories: 250, ingredients: ["Riso", "Pomodoro", "Mozzarella", "Pangrattato"] },
                 { name: "Polpetta di melanzane", allergens: ["G", "L"], diet: ["vegetariano"], calories: 180, ingredients: ["Melanzane", "Parmigiano", "Uova", "Pangrattato"] }
             ],
-            dessert: [ { name: "Macedonia", allergens: [], diet: ["vegetariano", "vegano"], calories: 120, ingredients: ["Frutta fresca di stagione"] } ]
+            dessert: [
+                { name: "Macedonia", allergens: [], diet: ["vegetariano", "vegano"], calories: 120, ingredients: ["Frutta fresca di stagione"] },
+                // Pasticceria Aggiunta
+                { name: "Crostatina alla marmellata", price: 1.50, allergens: ["G"], diet: ["vegetariano"], calories: 220, ingredients: ["Pasta frolla", "Marmellata"] },
+                { name: "Lingue di gatto e ferretti glassati", price: 0.00, allergens: ["G", "L"], diet: ["vegetariano"], calories: 150, ingredients: ["Biscotti secchi", "Cioccolato"], note: "Prezzo da definire" }
+            ]
         };
+        // --- FINE MENU AGGIORNATO ---
+
 
         const state = {
             currentUser: null,
@@ -463,8 +481,14 @@
                 const allergenHtml = (item.allergens || []).map(key => `<i class="fas ${ALLERGENS[key]?.icon || 'fa-question-circle'}" title="${ALLERGENS[key]?.name || 'Allergene sconosciuto'}"></i>`).join(' ');
 
                 let priceOrPortionSelectorHtml = `<span class="font-semibold text-lg">€${item.price.toFixed(2)}</span>`;
+                
+                // --- Gestione Prezzo da Definire ---
+                if (item.price === 0.00 && item.note) {
+                     priceOrPortionSelectorHtml = `<span class="font-semibold text-sm text-red-500">Prezzo da definire</span>`;
+                }
+                // --- Fine Gestione ---
 
-                if (item.category === 'Verdure' || item.isCustomPriced) {
+                if ((item.category === 'Verdure' || item.isCustomPriced) && !(item.price === 0.00 && item.note)) {
                     let options;
                     if (item.category === 'Verdure') {
                         options = [
@@ -489,6 +513,11 @@
                     `;
                 }
 
+                const noteHtml = item.note ? `<p class="text-xs text-red-500 ml-9 mt-1">${item.note}</p>` : '';
+                const addButtonDisabled = (item.price === 0.00 && item.note) ? 'disabled' : '';
+                const addButtonClass = (item.price === 0.00 && item.note) ? 'bg-gray-400 cursor-not-allowed' : 'bg-primary hover:bg-primary-dark';
+
+
                 menuHtml += `
                 <div class="bg-white p-4 rounded-xl shadow-md flex flex-col hover:shadow-lg transition-all duration-300">
                     <div class="flex-grow">
@@ -500,6 +529,7 @@
                             </div>
                         </div>
                         <p class="text-xs text-text-main/80 ml-9 mt-1"><span class="font-semibold">Ingredienti:</span> ${item.ingredients ? item.ingredients.join(', ') : 'Non specificati'}</p>
+                        ${noteHtml}
                     </div>
                     <div class="flex justify-between items-center mt-4">
                         <div class="flex gap-3 text-lg items-center text-text-main/70">${allergenHtml}</div>
@@ -508,7 +538,7 @@
                     <p class="calorie-info text-xs text-text-main/70 text-right mt-1" style="display: ${state.caloriesVisible ? 'flex' : 'none'}; justify-content: flex-end; align-items: center;">
                         ~${item.calories || 'N/A'} kcal <i class="fas fa-question-circle text-primary ml-1 cursor-pointer calorie-info-icon"></i>
                     </p>
-                    <button data-id="${item.id}" class="add-to-cart-btn w-full mt-4 bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg transition-all duration-300"><i class="fas fa-plus mr-2"></i> Aggiungi</button>
+                    <button data-id="${item.id}" class="add-to-cart-btn w-full mt-4 ${addButtonClass} text-white font-bold py-2 px-4 rounded-lg transition-all duration-300" ${addButtonDisabled}><i class="fas fa-plus mr-2"></i> Aggiungi</button>
                 </div>`;
             });
             dom.menuItemsContainer.innerHTML = menuHtml;
@@ -597,7 +627,7 @@
 
                 <a href="https://www.satispay.com/it-it/privati/" target="_blank" 
                     class="block mt-4 p-3 rounded-lg shadow-sm bg-primary-100 border-2 border-primary">
-                    
+                   
                     <div class="flex items-center justify-center gap-3 sm:gap-4">
                         <div class="text-left text-primary-800 flex-1">
                             <p class="font-bold text-lg leading-tight">Scarica l'app e</p>
@@ -877,30 +907,40 @@
              if (button.matches('.nav-btn')) {
                  navigate(button.dataset.view);
              }
+             // --- SNIPPET SATISPAY CLOSE AGGIORNATO ---
              else if (button.id === 'satispay-close-btn') {
-                dom.satispayModal.classList.add('hidden');
+                // Nasconde il modale di Satispay
+                if (dom.satispayModal) {
+                    dom.satispayModal.classList.add('hidden');
+                }
+                
+                // Opzionale: puoi also reindirizzare l'utente 
+                // alla pagina "I miei ordini" o alla home,
+                // dato che l'ordine è già stato confermato.
+                // navigate('my-order'); 
              }
+             // --- FINE SNIPPET ---
              else if (button.matches('.add-to-cart-btn')) {
-                 const item = { ...state.menuData.find(i => i.id === parseInt(button.dataset.id))};
-                 if (!item) return;
+                  const item = { ...state.menuData.find(i => i.id === parseInt(button.dataset.id))};
+                  if (!item) return;
 
-                 if (item.isCombo) {
-                      openComboModal(item);
-                      return;
-                 }
+                  if (item.isCombo) {
+                       openComboModal(item);
+                       return;
+                  }
 
-                 const portionSelect = document.querySelector(`.portion-select[data-id="${item.id}"]`);
-                 if (portionSelect) {
-                     const selectedOption = portionSelect.options[portionSelect.selectedIndex];
-                     item.price = parseFloat(portionSelect.value);
-                     const portionText = selectedOption.text.split(' - ')[0]; // Get only the portion text e.g., "100g"
-                     item.name = `${item.name.split(' (')[0]} (${portionText})`; // Update name to include portion
-                 }
+                  const portionSelect = document.querySelector(`.portion-select[data-id="${item.id}"]`);
+                  if (portionSelect) {
+                      const selectedOption = portionSelect.options[portionSelect.selectedIndex];
+                      item.price = parseFloat(portionSelect.value);
+                      const portionText = selectedOption.text.split(' - ')[0]; // Get only the portion text e.g., "100g"
+                      item.name = `${item.name.split(' (')[0]} (${portionText})`; // Update name to include portion
+                  }
 
-                 const cartItem = { ...item, cartId: Date.now(), quantity: 1 };
-                 state.cart.push(cartItem);
-                 renderMyOrder();
-                 showToast(`${item.name} aggiunto!`);
+                  const cartItem = { ...item, cartId: Date.now(), quantity: 1 };
+                  state.cart.push(cartItem);
+                  renderMyOrder();
+                  showToast(`${item.name} aggiunto!`);
              }
              else if (button.id === 'add-sandwich-to-cart-btn') {
                  const { ingredients, totalPrice, subtype, base } = state.customSandwich;
@@ -1064,6 +1104,33 @@
                  try {
                      await addDoc(ordersCollectionRef, orderData);
                      
+                     // --- SNIPPET SLACK AGGIUNTO ---
+                     const slackWebhookUrl = 'https://hooks.slack.com/triggers/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'; 
+
+                     const slackPayload = {
+                         user_email: orderData.email,
+                         user_name: orderData.user,
+                         order_details: orderData.items.map(item => `${item.quantity}x ${item.name}`).join(', '),
+                         order_total: orderData.total.toFixed(2),
+                         allergies: orderData.allergies || 'Nessuna',
+                         cutlery: orderData.cutlery ? 'Sì' : 'No'
+                     };
+
+                     try {
+                         await fetch(slackWebhookUrl, {
+                             method: 'POST',
+                             headers: {
+                                 'Content-Type': 'application/json',
+                             },
+                             body: JSON.stringify(slackPayload),
+                         });
+                     } catch (slackError) {
+                         console.error("Errore durante l'invio della notifica a Slack: ", slackError);
+                         // Non blocchiamo l'ordine dell'utente se Slack fallisce,
+                         // registriamo solo l'errore in console.
+                     }
+                     // --- FINE SNIPPET SLACK ---
+
                      if (orderData.paymentMethod === 'Satispay') {
                          dom.satispayModal.classList.remove('hidden');
                      }
@@ -1239,7 +1306,7 @@
                      showToast("Esportazione fallita. Controlla la console.");
                  }
              }
-         }
+        }
 
         function updateAdminControlsVisibility() {
             const exportBtn = document.getElementById('export-history-btn');
