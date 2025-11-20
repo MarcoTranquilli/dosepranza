@@ -51,7 +51,7 @@
         }
         .toggle-checkbox:checked { right: 0; border-color: #709460; }
         .toggle-checkbox:checked + .toggle-label { background-color: #709460; }
-        .ingredient-card.selected, .choice-btn.selected {
+        .ingredient-card.selected {
             border-color: #D6804F;
             box-shadow: 0 0 0 3px rgba(214, 128, 79, 0.5);
             transform: translateY(-4px);
@@ -115,7 +115,7 @@
                     <div id="base-choice-container" class="flex gap-4">
                         <button data-type="panino" class="choice-btn flex-1 p-4 bg-gray-50 rounded-lg shadow-sm border-2 border-transparent transition-all duration-200 flex flex-col items-center">
                             <i class="fas fa-bread-slice text-2xl text-primary mb-2"></i>
-                            <span class="font-semibold">Panino</span>
+                            <span class="font-semibold">Panino ripieno</span>
                         </button>
                         <button data-type="pizza" class="choice-btn flex-1 p-4 bg-gray-50 rounded-lg shadow-sm border-2 border-transparent transition-all duration-200 flex flex-col items-center">
                             <i class="fas fa-pizza-slice text-2xl text-primary mb-2"></i>
@@ -132,7 +132,7 @@
 
                 <div id="ingredients-step-container" class="hidden">
                     <h3 class="text-xl font-bold mb-3 text-center">3. Aggiungi gli ingredienti</h3>
-                    <p class="text-center text-text-main/80 mb-4">Il prezzo base di **3,50€** include fino a 3 ingredienti. Dal 4° in poi si applica un supplemento di **1,00€** per ogni ingrediente.</p>
+                    <p class="text-center text-text-main/80 mb-4">Il prezzo base di **3,50€** include fino a 3 ingredienti. Dal 4° in poi si applica un supplemento di **1,00€** per ogni ingrediente. Puoi selezionare un ingrediente più volte per aumentare la quantità.</p>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div id="ingredients-list" class="md:col-span-2 grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -257,11 +257,19 @@
         const PAYMENT_METHODS = {
             Satispay: { name: "Satispay", icon: "fa-mobile-alt", note: "Pagamento da effettuare entro le 11:30." }
         };
-        const CATEGORY_ORDER = ["Menù Combinati", "Panini", "Pizze", "Gastronomia", "Insalatone", "Verdure", "Fritti", "Dessert"];
+        // Ordine delle categorie: Gastronomia prima, Menù Combinati alla fine.
+        const CATEGORY_ORDER = ["Gastronomia", "Insalatone", "Verdure", "Fritti", "Panini", "Pizze", "Dessert", "Menù Combinati"];
 
-        // --- LOGICA BASI AGGIORNATA ---
+        // URL del QR code per scaricare l'app (come richiesto)
+        const SATISPAY_DOWNLOAD_QR = "https://www.datocms-assets.com/133951/1745419747-qr-code-scarica-app.svg";
+
+        // URL del QR code per il pagamento (rimane invariato)
+        const SATISPAY_PAYMENT_QR = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0";
+
+
         const BASE_OPTIONS = {
-            panino: { name: 'Panino', subtypes: ['Pane arabo', 'Ciabattina', 'Medaglione ai 5 cereali', 'Ciabattina integrale'] },
+            // "Panino" è diventato "Panino ripieno"
+            panino: { name: 'Panino ripieno', subtypes: ['Pane arabo', 'Ciabattina', 'Medaglione ai 5 cereali', 'Ciabattina integrale'] },
             pizza: { name: 'Pizza Ripiena', subtypes: ['Pizza classica'] }
         };
 
@@ -270,7 +278,6 @@
         const CUSTOM_PRODUCT_INCLUDED_INGREDIENTS = 3;
 
         // --- LOGICA INGREDIENTI AGGIORNATA ---
-        // Rimossi 'Salmone', 'Tonno', 'Cotoletta di Pollo', 'Brasato di Manzo'
         const SANDWICH_INGREDIENTS = [
             // Salumi & Carni
             { id: 'p-crudo', name: 'Prosciutto Crudo' }, { id: 'p-cotto', name: 'Prosciutto Cotto' },
@@ -310,7 +317,9 @@
                 { name: "Speck Brie e pomodori secchi", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 610, ingredients: ["Speck", "Brie", "Pomodori secchi"] },
                 { name: "Porchetta", allergens: ["G"], diet: ["carne/pesce"], calories: 650, ingredients: ["Porchetta di Ariccia"] },
                 { name: "Vegetariano melanzane zucchine e peperoni", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 450, ingredients: ["Melanzane", "Zucchine", "Peperoni grigliati"] },
-                { name: "Tacchino e verdura", allergens: ["G"], diet: ["carne/pesce"], calories: 480, ingredients: ["Tacchino arrosto", "Verdura di stagione"] },
+                { name: "Tacchino arrosto e verdura", allergens: ["G"], diet: ["carne/pesce"], calories: 480, ingredients: ["Tacchino arrosto", "Verdura di stagione"] },
+                // CORREZIONE REFUSO: "Fesa di tacchino e verdura"
+                { name: "Fesa di tacchino e verdura", allergens: ["G"], diet: ["carne/pesce"], calories: 480, ingredients: ["Tacchino arrosto", "Verdura di stagione"] },
                 { name: "Bresaola parmigiano e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 500, ingredients: ["Bresaola", "Parmigiano a scaglie", "Rucola"] },
                 { name: "Bresaola primo sale e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 470, ingredients: ["Bresaola", "Primo sale", "Rucola"] },
                 { name: "Salmone e formaggio", allergens: ["G", "L", "P"], diet: ["carne/pesce"], calories: 530, ingredients: ["Salmone affumicato", "Formaggio spalmabile"] },
@@ -319,7 +328,8 @@
                 { name: "Pane ai 5 cereali con formaggio spalmabile e salmone", allergens: ["G", "L", "P"], diet: ["carne/pesce"], calories: 540, ingredients: ["Pane 5 cereali", "Salmone affumicato", "Formaggio spalmabile"] },
                 { name: "Pane ai 5 cereali con tacchino e zucchine o scarola", allergens: ["G"], diet: ["carne/pesce"], calories: 490, ingredients: ["Pane 5 cereali", "Tacchino arrosto", "Verdura di stagione"] },
                 { name: "Cotoletta di pollo lattuga e pomodoro", allergens: ["G"], diet: ["carne/pesce"], calories: 580, ingredients: ["Cotoletta di pollo", "Lattuga", "Pomodoro"] },
-                { name: "Brasato di manzo e verdura cotta", allergens: ["G"], diet: ["carne/pesce"], calories: 620, ingredients: ["Brasato di manzo", "Verdura cotta di stagione (broccoletti/cicoria/scarola)"] }
+                // MODIFICA: Rimosso "cotta" dal nome del prodotto
+                { name: "Brasato di manzo e verdura", allergens: ["G"], diet: ["carne/pesce"], calories: 620, ingredients: ["Brasato di manzo", "Verdura cotta di stagione (broccoletti/cicoria/scarola)"] }
             ],
             pizze: [
                 { name: "Pizza con insalata di pollo con maionese", allergens: ["G"], diet: ["carne/pesce"], calories: 560, ingredients: ["Insalata di pollo con maionese"] },
@@ -370,7 +380,9 @@
                 { name: "Macedonia", allergens: [], diet: ["vegetariano", "vegano"], calories: 120, ingredients: ["Frutta fresca di stagione"] },
                 // Pasticceria Aggiunta
                 { name: "Crostatina alla marmellata", price: 1.50, allergens: ["G"], diet: ["vegetariano"], calories: 220, ingredients: ["Pasta frolla", "Marmellata"] },
-                { name: "Lingue di gatto e ferretti glassati", price: 0.00, allergens: ["G", "L"], diet: ["vegetariano"], calories: 150, ingredients: ["Biscotti secchi", "Cioccolato"], note: "Prezzo da definire" }
+                // Aggiornati i prezzi
+                { name: "Lingue di gatto (1pz)", price: 1.00, allergens: ["G", "L"], diet: ["vegetariano"], calories: 75, ingredients: ["Biscotti secchi", "Cioccolato"] },
+                { name: "Ferretti glassati (1pz)", price: 2.00, allergens: ["G", "L"], diet: ["vegetariano"], calories: 120, ingredients: ["Biscotti secchi", "Glaze"] }
             ]
         };
         // --- FINE MENU AGGIORNATO ---
@@ -390,7 +402,8 @@
             customSandwich: {
                 base: null,
                 subtype: null,
-                ingredients: [],
+                // Ingredienti salvati come oggetti { id: 'ing-id', name: 'Nome Ingrediente', uid: 'timestamp' }
+                ingredients: [], 
                 basePrice: CUSTOM_PRODUCT_BASE_PRICE,
                 totalPrice: 0
             }
@@ -450,9 +463,10 @@
 
         function renderFilters() {
             let catSelectHtml = `<option value="all">Tutte le Categorie</option>`;
+            // Ordine modificato
             CATEGORY_ORDER.forEach(catKey => {
                  const catName = catKey.charAt(0).toUpperCase() + catKey.slice(1);
-                 catSelectHtml += `<option value="${catKey.toLowerCase()}">${catName}</option>`;
+                 catSelectHtml += `<option value="${catKey.toLowerCase()}" ${catKey.toLowerCase() === state.activeCategoryFilter ? 'selected' : ''}>${catName}</option>`;
              });
             dom.categorySelect.innerHTML = catSelectHtml;
 
@@ -471,6 +485,7 @@
 
             let currentCategory = '';
             let menuHtml = '';
+            // Ordine di visualizzazione basato sul nuovo CATEGORY_ORDER
             const sortedItems = filtered.sort((a, b) => CATEGORY_ORDER.indexOf(a.category) - CATEGORY_ORDER.indexOf(b.category));
 
             sortedItems.forEach(item => {
@@ -636,8 +651,8 @@
                             <p class="font-semibold text-base mt-1">con il codice: <span class="font-extrabold">WEB</span></p>
                         </div>
                         <div class="flex-shrink-0 w-24 h-24 sm:w-28 sm:h-28">
-                            <img src="https://www.satispay.com/_next/image/?url=https%3A%2F%2Fwww.datocms-assets.com%2F133951%2F1737978066-qr_code_svg_giftcard_mainpage.svg" 
-                                alt="QR Code Satispay" 
+                            <img src="${SATISPAY_DOWNLOAD_QR}" 
+                                alt="QR Code Satispay Download App" 
                                 class="w-full h-full object-cover rounded-md bg-white p-1">
                         </div>
                     </div>
@@ -664,17 +679,24 @@
         }
 
         function renderCustomSandwichBuilder() {
+            // Reset state
             state.customSandwich = { base: null, subtype: null, ingredients: [], basePrice: CUSTOM_PRODUCT_BASE_PRICE, totalPrice: 0 };
 
             dom.baseChoiceContainer.querySelectorAll('.choice-btn').forEach(btn => btn.classList.remove('selected'));
             dom.subtypeChoiceContainer.classList.add('hidden');
             dom.ingredientsStepContainer.classList.add('hidden');
 
-            const ingredientsHtml = SANDWICH_INGREDIENTS.map(ing => `
-                <div data-id="${ing.id}" class="ingredient-card bg-white p-3 rounded-lg shadow-sm cursor-pointer border-2 border-transparent transition-all duration-200 flex flex-col justify-center items-center text-center">
+            // Render ingredients. The card will handle clicks to add/remove.
+            const ingredientsHtml = SANDWICH_INGREDIENTS.map(ing => {
+                const count = state.customSandwich.ingredients.filter(i => i.id === ing.id).length;
+                const countDisplay = count > 0 ? `<span class="absolute top-0 right-0 bg-primary text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center transform translate-x-1/2 -translate-y-1/2">${count}</span>` : '';
+                return `
+                <div data-id="${ing.id}" class="ingredient-card bg-white p-3 rounded-lg shadow-sm cursor-pointer border-2 border-transparent transition-all duration-200 flex flex-col justify-center items-center text-center relative">
                     <p class="font-semibold text-sm">${ing.name}</p>
+                    ${countDisplay}
                 </div>
-            `).join('');
+            `;
+            }).join('');
             dom.ingredientsList.innerHTML = ingredientsHtml;
             updateSandwichSummary();
         }
@@ -699,10 +721,52 @@
 
             dom.extraChargeNotice.textContent = extraIngredientsCount > 0 ? `Supplemento: +€${(extraIngredientsCount * CUSTOM_PRODUCT_EXTRA_INGREDIENT_PRICE).toFixed(2)}` : '';
 
-            const listHtml = ingredients.map((ing, index) => {
-                const priceText = index < CUSTOM_PRODUCT_INCLUDED_INGREDIENTS ? '(incluso)' : `+€${CUSTOM_PRODUCT_EXTRA_INGREDIENT_PRICE.toFixed(2)}`;
-                return `<li class="flex justify-between"><span>${ing.name}</span> <span class="text-gray-500">${priceText}</span></li>`;
-            }).join('');
+            // Group ingredients to display quantity and price
+            const ingredientCounts = ingredients.reduce((acc, ing) => {
+                const count = acc[ing.id] ? acc[ing.id].count + 1 : 1;
+                return { ...acc, [ing.id]: { name: ing.name, count } };
+            }, {});
+
+            let listHtml = '';
+            let totalIngredientIndex = 0; // Contatore per il calcolo del prezzo
+
+            Object.keys(ingredientCounts).sort((a, b) => {
+                // Ordina per l'ordine di selezione originale, ma qui usiamo l'id per semplicità
+                const nameA = ingredientCounts[a].name;
+                const nameB = ingredientCounts[b].name;
+                return nameA.localeCompare(nameB);
+            }).forEach(id => {
+                const item = ingredientCounts[id];
+                for (let i = 0; i < item.count; i++) {
+                    const priceText = totalIngredientIndex < CUSTOM_PRODUCT_INCLUDED_INGREDIENTS 
+                                        ? '(incluso)' 
+                                        : `+€${CUSTOM_PRODUCT_EXTRA_INGREDIENT_PRICE.toFixed(2)}`;
+                    
+                    // Solo la prima occorrenza mostra la quantità totale nel nome
+                    const displayName = i === 0 
+                        ? (item.count > 1 ? `${item.name} (x${item.count})` : item.name)
+                        : null;
+                        
+                    if(displayName) {
+                        // Calcola il costo totale di questo ingrediente (inclusi gli extra)
+                        let totalCost = 0;
+                        for(let j=0; j < item.count; j++) {
+                           if(totalIngredientIndex + j >= CUSTOM_PRODUCT_INCLUDED_INGREDIENTS) {
+                                totalCost += CUSTOM_PRODUCT_EXTRA_INGREDIENT_PRICE;
+                           }
+                        }
+                        
+                        const costDisplay = totalCost > 0 
+                            ? `+€${totalCost.toFixed(2)}`
+                            : (item.count <= CUSTOM_PRODUCT_INCLUDED_INGREDIENTS ? `(inclusi)` : '(inclusi + extra)');
+
+                        // Aggiunge la riga riassuntiva
+                        listHtml += `<li class="flex justify-between"><span>${displayName}</span> <span class="text-gray-500">${costDisplay}</span></li>`;
+                    }
+                    totalIngredientIndex++;
+                }
+            });
+
 
             if (ingredients.length === 0) {
                 dom.selectedIngredientsList.innerHTML = `<li class="text-gray-400">Seleziona fino a 3 ingredienti inclusi...</li>`;
@@ -715,9 +779,24 @@
 
             dom.addSandwichBtn.disabled = ingredients.length < 1;
 
+            // Update ingredient cards (show count, selected class for cards with count > 0)
             document.querySelectorAll('.ingredient-card').forEach(card => {
                 const cardId = card.dataset.id;
-                card.classList.toggle('selected', ingredients.some(ing => ing.id === cardId));
+                const count = ingredientCounts[cardId]?.count || 0;
+                
+                card.classList.toggle('selected', count > 0);
+                
+                let countDisplay = card.querySelector('span.rounded-full');
+                if (count > 0) {
+                    if (!countDisplay) {
+                        countDisplay = document.createElement('span');
+                        countDisplay.className = "absolute top-0 right-0 bg-primary text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center transform translate-x-1/2 -translate-y-1/2";
+                        card.appendChild(countDisplay);
+                    }
+                    countDisplay.textContent = count;
+                } else if (countDisplay) {
+                    countDisplay.remove();
+                }
             });
         }
 
@@ -820,6 +899,7 @@
                     const type = choiceBtn.dataset.type;
                     state.customSandwich.base = type;
                     state.customSandwich.subtype = null; // Reset subtype
+                    state.customSandwich.ingredients = []; // Reset ingredients
 
                     dom.baseChoiceContainer.querySelectorAll('.choice-btn').forEach(btn => btn.classList.remove('selected'));
                     choiceBtn.classList.add('selected');
@@ -833,15 +913,18 @@
                 updateSandwichSummary();
             }
             else if (ingredientCard) {
+                // MODIFICA: Permette la selezione multipla dell'ingrediente
                 const ingredientId = ingredientCard.dataset.id;
                 const selectedIngredient = SANDWICH_INGREDIENTS.find(ing => ing.id === ingredientId);
-                const index = state.customSandwich.ingredients.findIndex(ing => ing.id === ingredientId);
 
-                if (index > -1) {
-                    state.customSandwich.ingredients.splice(index, 1);
-                } else {
-                    state.customSandwich.ingredients.push(selectedIngredient);
-                }
+                // Aggiungi sempre l'ingrediente. Non c'è più la rimozione con un click.
+                // Aggiungiamo un UID per distinguerli nell'array, anche se con lo stesso ID
+                state.customSandwich.ingredients.push({ 
+                    ...selectedIngredient, 
+                    uid: Date.now() + Math.random().toString(36).substring(7) 
+                });
+
+                showToast(`Aggiunto: ${selectedIngredient.name}`);
                 updateSandwichSummary();
             }
             else if (event.type === 'click' && button) {
@@ -862,7 +945,28 @@
                 updateFilterCounter();
                 renderMenu();
             }
+            else if (event.type === 'click' && target.matches('#selected-ingredients-list li')) {
+                // Gestione click per la rimozione, se necessario.
+                // Per ora, lascio il click per l'aggiunta sull'ingrediente principale. 
+                // La rimozione è più complessa dato il click per l'aggiunta.
+            }
         }
+        
+        // Funzione per gestire i click sull'ingrediente nel riepilogo (rimozione)
+        document.addEventListener('click', (event) => {
+            const removeBtn = event.target.closest('.remove-ingredient-btn');
+            if (removeBtn) {
+                const ingredientId = removeBtn.dataset.id;
+                const indexToRemove = state.customSandwich.ingredients.findIndex(ing => ing.uid === ingredientId);
+                
+                if (indexToRemove > -1) {
+                    const removedName = state.customSandwich.ingredients[indexToRemove].name;
+                    state.customSandwich.ingredients.splice(indexToRemove, 1);
+                    showToast(`Rimosso: ${removedName}`);
+                    updateSandwichSummary();
+                }
+            }
+        });
 
         function handleSelectChange(target) {
             if (target.id === 'category-select') state.activeCategoryFilter = target.value;
@@ -914,11 +1018,6 @@
                 if (dom.satispayModal) {
                     dom.satispayModal.classList.add('hidden');
                 }
-                
-                // Opzionale: puoi also reindirizzare l'utente 
-                // alla pagina "I miei ordini" o alla home,
-                // dato che l'ordine è già stato confermato.
-                // navigate('my-order'); 
              }
              // --- FINE SNIPPET ---
              else if (button.matches('.add-to-cart-btn')) {
@@ -947,8 +1046,17 @@
                  const { ingredients, totalPrice, subtype, base } = state.customSandwich;
                  if (ingredients.length < 1 || !base || !subtype) return; // Ensure base and subtype are selected
 
-                 const ingredientNames = ingredients.map(ing => ing.name);
-                 const sandwichName = `${subtype} personalizzato`;
+                 // Raggruppa gli ingredienti per nome per una descrizione chiara
+                 const ingredientCounts = ingredients.reduce((acc, ing) => {
+                     acc[ing.name] = (acc[ing.name] || 0) + 1;
+                     return acc;
+                 }, {});
+
+                 const ingredientNames = Object.entries(ingredientCounts)
+                    .map(([name, count]) => count > 1 ? `${name} (x${count})` : name)
+                    .join(', ');
+
+                 const sandwichName = `${BASE_OPTIONS[base].name} (${subtype}) personalizzato`;
 
                  state.cart.push({
                      cartId: Date.now(),
@@ -956,9 +1064,12 @@
                      price: totalPrice,
                      quantity: 1,
                      isCustom: true,
-                     details: ingredientNames.join(', '),
+                     details: ingredientNames,
                      category: base === 'panino' ? 'Panini' : 'Pizze', // Use base type for category
                  });
+
+                 // Reset custom sandwich builder state and UI
+                 renderCustomSandwichBuilder();
 
                  showToast('Prodotto personalizzato aggiunto!');
                  navigate('my-order'); // Go to cart after adding
@@ -1049,7 +1160,7 @@
                  } else if (!name) {
                      showToast("Per favore, inserisci il tuo nome.");
                  } else {
-                     showToast("Per favore, inserisci un'email valida.");
+                     showToast("Per favor1e, inserisci un'email valida.");
                  }
              }
              else if (button.id === 'toggle-calories') {
@@ -1127,8 +1238,6 @@
                          });
                      } catch (slackError) {
                          console.error("Errore durante l'invio della notifica a Slack: ", slackError);
-                         // Non blocchiamo l'ordine dell'utente se Slack fallisce,
-                         // registriamo solo l'errore in console.
                      }
                      // --- FINE SNIPPET SLACK ---
 
