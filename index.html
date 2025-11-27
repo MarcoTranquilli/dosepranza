@@ -56,6 +56,11 @@
             box-shadow: 0 0 0 3px rgba(214, 128, 79, 0.5);
             transform: translateY(-4px);
         }
+        /* Stile per Satispay - reso più prominente */
+        #payment-Satispay + label {
+            border-color: #D6804F !important;
+            box-shadow: 0 0 0 2px rgba(214, 128, 79, 0.4) !important;
+        }
     </style>
 </head>
 <body class="bg-background text-text-main">
@@ -73,7 +78,7 @@
             </div>
         </header>
 
-        <nav class="flex justify-center bg-white/70 backdrop-blur-sm p-2 rounded-xl shadow-md mb-6 sticky top-4 z-40">
+        <nav id="main-nav" class="flex justify-center bg-white/70 backdrop-blur-sm p-2 rounded-xl shadow-md mb-6 sticky top-4 z-40">
             <a href="#menu-view" data-view="menu" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold text-text-main transition-all duration-300"><i class="fas fa-utensils mr-2"></i>Menù</a>
             <a href="#custom-sandwich-view" data-view="custom-sandwich" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold text-text-main transition-all duration-300"><i class="fas fa-plus-circle mr-2"></i>Crea Prodotto</a>
             <a href="#my-order-view" data-view="my-order" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold text-text-main transition-all duration-300"><i class="fas fa-shopping-basket mr-2"></i>Il Mio Ordine <span id="cart-count" class="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 inline-flex items-center justify-center ml-1">0</span></a>
@@ -197,10 +202,14 @@
     <div id="user-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
         <div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md text-center">
             <h3 class="text-2xl font-bold mb-4">Benvenuto!</h3>
-            <p class="text-gray-600 mb-6">Per iniziare, inserisci i tuoi dati.</p>
-            <input type="text" id="username-input" placeholder="Es. Marco Rossi" class="w-full p-3 border rounded-lg mb-3">
-            <input type="email" id="user-email-input" placeholder="Es. marco.rossi@email.com" class="w-full p-3 border rounded-lg">
-            <button id="save-username-btn" class="w-full mt-4 bg-primary hover:bg-primary-dark text-white font-bold py-3 px-4 rounded-lg transition-all duration-300">Salva</button>
+            <p class="text-gray-600 mb-6">Seleziona il tuo nome dalla lista.</p>
+            
+            <input list="users-datalist" id="username-input" placeholder="Cerca il tuo nome..." class="w-full p-3 border rounded-lg mb-3">
+            <datalist id="users-datalist"></datalist>
+
+            <input type="email" id="user-email-input" placeholder="L'email apparirà qui..." class="w-full p-3 border rounded-lg bg-gray-100" readonly>
+            
+            <button id="save-username-btn" class="w-full mt-4 bg-primary hover:bg-primary-dark text-white font-bold py-3 px-4 rounded-lg transition-all duration-300">Salva e Continua</button>
         </div>
     </div>
 
@@ -260,10 +269,10 @@
         // Ordine delle categorie: Gastronomia prima, Menù Combinati alla fine.
         const CATEGORY_ORDER = ["Gastronomia", "Insalatone", "Verdure", "Fritti", "Panini", "Pizze", "Dessert", "Menù Combinati"];
 
-        // URL del QR code per scaricare l'app (come richiesto)
+        // URL del QR code per scaricare l'app
         const SATISPAY_DOWNLOAD_QR = "https://www.datocms-assets.com/133951/1745419747-qr-code-scarica-app.svg";
 
-        // URL del QR code per il pagamento (rimane invariato)
+        // URL del QR code per il pagamento
         const SATISPAY_PAYMENT_QR = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0";
 
 
@@ -397,6 +406,7 @@
             cart: [],
             allOrders: [],
             menuData: [],
+            allUsersData: [], // Dati utenti per autocompletamento
             caloriesVisible: false,
             currentComboItem: null,
             customSandwich: {
@@ -621,8 +631,6 @@
                 </div>`;
             }).join('');
 
-            // Blocco 'paymentOptionsHtml' e blocco blu rimossi.
-
             dom.myOrderContentEl.innerHTML = `
                 <div class="space-y-4 mb-4">${itemsHtml}</div>
                 <div class="mt-6 space-y-4">
@@ -643,7 +651,7 @@
 
                 <a href="https://www.satispay.com/it-it/privati/" target="_blank" 
                     class="block mt-4 p-3 rounded-lg shadow-sm bg-primary-100 border-2 border-primary">
-                   
+                    
                     <div class="flex items-center justify-center gap-3 sm:gap-4">
                         <div class="text-left text-primary-800 flex-1">
                             <p class="font-bold text-lg leading-tight">Scarica l'app e</p>
@@ -739,8 +747,8 @@
                 const item = ingredientCounts[id];
                 for (let i = 0; i < item.count; i++) {
                     const priceText = totalIngredientIndex < CUSTOM_PRODUCT_INCLUDED_INGREDIENTS 
-                                        ? '(incluso)' 
-                                        : `+€${CUSTOM_PRODUCT_EXTRA_INGREDIENT_PRICE.toFixed(2)}`;
+                                            ? '(incluso)' 
+                                            : `+€${CUSTOM_PRODUCT_EXTRA_INGREDIENT_PRICE.toFixed(2)}`;
                     
                     // Solo la prima occorrenza mostra la quantità totale nel nome
                     const displayName = i === 0 
@@ -1160,7 +1168,7 @@
                  } else if (!name) {
                      showToast("Per favore, inserisci il tuo nome.");
                  } else {
-                     showToast("Per favor1e, inserisci un'email valida.");
+                     showToast("Per favore, inserisci un'email valida.");
                  }
              }
              else if (button.id === 'toggle-calories') {
@@ -1318,7 +1326,7 @@
 
                       if (order.cutlery) {
                          ordersText += `  - 🍴 Posate: Sì\n`;
-                     }
+                      }
                      ordersText += `\n`;
                      grandTotal += order.total;
                  });
@@ -1433,6 +1441,24 @@
             }
         }
 
+        // NUOVA FUNZIONE: Carica gli utenti per il dropdown
+        async function loadUsers() {
+            try {
+                const usersCol = collection(db, 'users');
+                const userSnapshot = await getDocs(usersCol);
+                state.allUsersData = userSnapshot.docs.map(doc => doc.data());
+                
+                const datalist = document.getElementById('users-datalist');
+                if(datalist) {
+                    datalist.innerHTML = state.allUsersData
+                        .map(u => `<option value="${u.name}">`) 
+                        .join('');
+                }
+            } catch (e) {
+                console.error("Errore caricamento utenti:", e);
+            }
+        }
+
         function init() {
             state.menuData = processMenuData(RAW_MENU, PRICES);
             Object.assign(dom, {
@@ -1467,6 +1493,30 @@
             document.body.addEventListener('click', handleEvents);
             document.body.addEventListener('change', handleEvents);
             document.body.addEventListener('input', handleEvents);
+
+            // Listener per autocompletamento Email
+            const nameInput = document.getElementById('username-input');
+            const emailInput = document.getElementById('user-email-input');
+            
+            if(nameInput) {
+                const fillEmail = (val) => {
+                    // Cerca se il nome inserito corrisponde esattamente a un utente
+                    const foundUser = state.allUsersData.find(u => u.name.toLowerCase() === val.toLowerCase());
+                    
+                    if(foundUser) {
+                        emailInput.value = foundUser.email;
+                        emailInput.classList.remove('bg-red-50');
+                        emailInput.classList.add('bg-green-50');
+                    } else {
+                        emailInput.value = ""; // Pulisci se il nome non è valido
+                        emailInput.classList.remove('bg-green-50');
+                    }
+                };
+
+                nameInput.addEventListener('input', (e) => fillEmail(e.target.value));
+                nameInput.addEventListener('change', (e) => fillEmail(e.target.value));
+            }
+
             renderFilters();
 
             dom.views.forEach(v => {
@@ -1483,6 +1533,8 @@
             state.currentView = 'menu'; 
 
             renderMenu(); 
+            
+            loadUsers(); // Carica utenti all'avvio
         }
 
         onAuthStateChanged(auth, (user) => {
@@ -1493,7 +1545,6 @@
                     email: localStorage.getItem('dosepranza-useremail')
                 };
                 if (!state.currentUser.name || !state.currentUser.email) {
-                    // Pre-popola l'email se è nel localStorage
                     dom.userEmailInput.value = state.currentUser.email || '';
                     dom.usernameInput.value = state.currentUser.name || '';
                     dom.userModal.classList.remove('hidden');
