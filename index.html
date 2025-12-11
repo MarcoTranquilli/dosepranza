@@ -191,7 +191,7 @@
                      </div>
                  </div>
                  <div id="all-orders-list" class="space-y-4"></div>
-                  <div class="mt-6 bg-white p-4 rounded-xl shadow-lg text-right">
+                 <div class="mt-6 bg-white p-4 rounded-xl shadow-lg text-right">
                      <span class="text-xl font-bold">Totale Complessivo:</span>
                      <span id="grand-total" class="text-2xl font-bold text-primary ml-2">€0.00</span>
                  </div>
@@ -240,7 +240,7 @@
         <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-md text-center relative">
             <button id="satispay-close-btn" class="absolute top-2 right-4 text-3xl text-gray-400 hover:text-gray-700">&times;</button>
             <h3 class="text-2xl font-bold mb-4">Paga con Satispay</h3>
-            <p class="text-text-main/80 mb-4">Il tuo ordine è stato inviato! <br> Inquadra il QR Code o usa il link per pagare <strong>Alimentari Russo</strong>.</p>
+            <p class="text-text-main/80 mb-4">Il tuo ordine è stato inviato!<br> Inquadra il QR Code o usa il link per pagare <strong>Alimentari Russo</strong>.</p>
             <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" alt="QR Code Satispay" class="rounded-lg mx-auto w-64 h-64">
             <a href="https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" target="_blank" class="mt-6 inline-block w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300">
                 <i class="fas fa-external-link-alt mr-2"></i>Apri Satispay
@@ -253,39 +253,31 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, deleteDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
         const firebaseConfig = { apiKey: "AIzaSyCQJsNbgaR89gF_1vLe6H4DPboOhQvm9nI", authDomain: "app-ordini-pranzo-alimentari.firebaseapp.com", projectId: "app-ordini-pranzo-alimentari", storageBucket: "app-ordini-pranzo-alimentari.appspot.com", messagingSenderId: "553169964686", appId: "1:553169964686:web:7f8ca6f32a301949e4c3df" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const ordersCollectionRef = collection(db, "orders");
-
         const PRICES = { gastronomia: 4.00, verdure: 4.00, panini: 3.50, pizze: 3.50, fritti: 1.50, dessert: 3.00, "menù combinati": 0, insalatone: 5.00 };
         const ALLERGENS = { G: { name: "Glutine", icon: "fa-wheat-awn" }, L: { name: "Latticini", icon: "fa-cheese" }, C: { name: "Crostacei", icon: "fa-shrimp" }, P: { name: "Pesce", icon: "fa-fish-fins" }};
         const DIETS = { vegetariano: { name: "Vegetariano", icon: "🧀" }, vegano: { name: "Vegano", icon: "🌱" }, "carne/pesce": { name: "Carne/🐟Pesce", icon: "🥩" } };
         const PAYMENT_METHODS = {
-            Satispay: { name: "Satispay", icon: "fa-mobile-alt", note: "Pagamento da effettuare entro le 11:30." }
+            Satispay: { name: "Satispay", icon: "fa-mobile-alt", note: "Pagamento da effettuare entro le 11:30."}
         };
         // Ordine delle categorie: Gastronomia prima, Menù Combinati alla fine.
         const CATEGORY_ORDER = ["Gastronomia", "Insalatone", "Verdure", "Fritti", "Panini", "Pizze", "Dessert", "Menù Combinati"];
-
         // URL del QR code per scaricare l'app
         const SATISPAY_DOWNLOAD_QR = "https://www.datocms-assets.com/133951/1745419747-qr-code-scarica-app.svg";
-
         // URL del QR code per il pagamento
         const SATISPAY_PAYMENT_QR = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0";
-
-
         const BASE_OPTIONS = {
             // "Panino" è diventato "Panino ripieno"
             panino: { name: 'Panino ripieno', subtypes: ['Pane arabo', 'Ciabattina', 'Medaglione ai 5 cereali', 'Ciabattina integrale'] },
             pizza: { name: 'Pizza Ripiena', subtypes: ['Pizza classica'] }
         };
-
         const CUSTOM_PRODUCT_BASE_PRICE = 3.50;
         const CUSTOM_PRODUCT_EXTRA_INGREDIENT_PRICE = 1.00;
         const CUSTOM_PRODUCT_INCLUDED_INGREDIENTS = 3;
-
         // --- LOGICA INGREDIENTI AGGIORNATA ---
         const SANDWICH_INGREDIENTS = [
             // Salumi & Carni
@@ -308,8 +300,6 @@
             { id: 'lattuga', name: 'Lattuga' }, { id: 'broccoletti', name: 'Broccoletti' },
             { id: 'cicoria', name: 'Cicoria' }, { id: 'scarola', name: 'Scarola' }
         ].sort((a, b) => a.name.localeCompare(b.name));
-
-
         // --- RAW_MENU AGGIORNATO ---
         const RAW_MENU = {
             "menù combinati": [
@@ -360,11 +350,19 @@
                 // Monoporzioni Aggiunte
                 { name: "Melanzane alla parmigiana (grigliate, 250-300g)", price: 6.00, allergens: ["L"], diet: ["vegetariano"], calories: 350, ingredients: ["Melanzane grigliate", "Pomodoro", "Parmigiano"] },
                 { name: "Lasagna classica al ragù (250-300g)", price: 6.00, allergens: ["G", "L"], diet: ["carne/pesce"], calories: 550, ingredients: ["Sfoglia all'uovo", "Ragù di carne", "Besciamella"] },
+                
+                // NUOVO: Lasagne Bianche
+                { name: "Lasagna bianca vegetariana ai carciofi (250-300g)", price: 6.00, allergens: ["G", "L"], diet: ["vegetariano"], calories: 500, ingredients: ["Sfoglia all'uovo", "Besciamella", "Carciofi", "Parmigiano"] },
+                { name: "Lasagna bianca funghi piselli e salsiccia (250-300g)", price: 6.00, allergens: ["G", "L"], diet: ["carne/pesce"], calories: 600, ingredients: ["Sfoglia all'uovo", "Besciamella", "Funghi", "Piselli", "Salsiccia"] },
+
                 // Esistenti
                 { name: "Cous cous vegetale con pollo", allergens: ["G"], diet: ["carne/pesce"], calories: 450, ingredients: ["Cous cous", "Verdure miste", "Pollo"] },
                 { name: "Cous cous vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 350, ingredients: ["Cous cous", "Verdure miste"] },
-                { name: "Farro vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 380, ingredients: ["Farro", "Verdure miste"] },
-                { name: "Farro vegetale con salmone", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 480, ingredients: ["Farro", "Verdure miste", "Salmone"] },
+                
+                // MOMENTANEAMENTE RIMOSSI DALL'OFFERTA (FARRO)
+                // { name: "Farro vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 380, ingredients: ["Farro", "Verdure miste"] },
+                // { name: "Farro vegetale con salmone", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 480, ingredients: ["Farro", "Verdure miste", "Salmone"] },
+                
                 { name: "Riso Venere con gamberi e zucchine", allergens: ["C"], diet: ["carne/pesce"], calories: 420, ingredients: ["Riso Venere", "Gamberi", "Zucchine"] },
                 { name: "Insalata di riso", allergens: [], diet: ["carne/pesce"], calories: 400, ingredients: ["Riso", "Wurstel", "Uova", "Verdure sott'olio"] },
                 { name: "Pasta fredda con tonno pomodori e olive", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 450, ingredients: ["Pasta", "Tonno", "Pomodorini", "Olive"] },
@@ -419,7 +417,6 @@
             }
         };
         const dom = { };
-
         function updateIngredientsWithOlives(menu) {
             for (const category in menu) {
                 menu[category].forEach(item => {
@@ -451,13 +448,13 @@
             if (viewName === 'my-order') renderMyOrder();
             if (viewName === 'all-orders') renderAllOrders();
             if (viewName === 'custom-sandwich') renderCustomSandwichBuilder();
-
             // Scrolling behavior
             const targetElement = document.getElementById(viewName + "-view");
             if (targetElement) {
                 const navHeight = dom.navEl.offsetHeight;
                 const targetOffsetTop = targetElement.getBoundingClientRect().top + window.scrollY;
-                const finalPosition = targetOffsetTop - navHeight - 32; // 32px padding (adjust as needed)
+                const finalPosition = targetOffsetTop - navHeight - 32;
+                // 32px padding (adjust as needed)
 
                 window.scrollTo({
                     top: finalPosition,
@@ -467,7 +464,8 @@
         }
 
         function updateFilterCounter() {
-            let count = 0; if (state.activeCategoryFilter !== 'all') count++; if (state.activeDietFilter !== 'all') count++; if(state.searchTerm) count++;
+            let count = 0;
+            if (state.activeCategoryFilter !== 'all') count++; if (state.activeDietFilter !== 'all') count++; if(state.searchTerm) count++;
             dom.filterCounterContainer.innerHTML = count > 0 ? `<i class="fas fa-filter text-primary"></i> ${count} ${count === 1 ? 'filtro applicato' : 'filtri applicati'}` : '';
         }
 
@@ -480,14 +478,15 @@
              });
             dom.categorySelect.innerHTML = catSelectHtml;
 
-            let dietSelectHtml = `<option value="all">Tutti i Regimi</option>`; Object.entries(DIETS).forEach(([key, info]) => { dietSelectHtml += `<option value="${key}">${info.icon} ${info.name}</option>`; }); dom.dietSelect.innerHTML = dietSelectHtml;
-            let legendHtml = ''; Object.values(ALLERGENS).forEach(info => { legendHtml += `<p class="flex items-center text-base mb-1"><i class="fas ${info.icon} mr-2 text-gray-600"></i> ${info.name}</p>`; }); dom.allergenModalContent.innerHTML = legendHtml;
+            let dietSelectHtml = `<option value="all">Tutti i Regimi</option>`; Object.entries(DIETS).forEach(([key, info]) => { dietSelectHtml += `<option value="${key}">${info.icon} ${info.name}</option>`; });
+            dom.dietSelect.innerHTML = dietSelectHtml;
+            let legendHtml = ''; Object.values(ALLERGENS).forEach(info => { legendHtml += `<p class="flex items-center text-base mb-1"><i class="fas ${info.icon} mr-2 text-gray-600"></i> ${info.name}</p>`; });
+            dom.allergenModalContent.innerHTML = legendHtml;
         }
 
         function renderMenu() {
             const term = state.searchTerm.toLowerCase();
             const filtered = state.menuData.filter(item => (item.name.toLowerCase().includes(term)) && (state.activeCategoryFilter === 'all' || item.category.toLowerCase() === state.activeCategoryFilter) && (state.activeDietFilter === 'all' || (item.diet && item.diet.includes(state.activeDietFilter))));
-
             if (filtered.length === 0) {
                  dom.menuItemsContainer.innerHTML = `<div class="text-center p-8 col-span-full bg-white rounded-xl shadow"><p class="text-gray-500">Nessun piatto trovato.</p></div>`;
                  return;
@@ -497,7 +496,6 @@
             let menuHtml = '';
             // Ordine di visualizzazione basato sul nuovo CATEGORY_ORDER
             const sortedItems = filtered.sort((a, b) => CATEGORY_ORDER.indexOf(a.category) - CATEGORY_ORDER.indexOf(b.category));
-
             sortedItems.forEach(item => {
                 if (item.category !== currentCategory) {
                     currentCategory = item.category;
@@ -528,7 +526,6 @@
 
                     const initialPrice = options[0].value;
                     const optionsHtml = options.map(opt => `<option value="${opt.value}" ${opt.value === initialPrice ? 'selected' : ''}>${opt.text}</option>`).join('');
-
                     priceOrPortionSelectorHtml = `
                         <div class="flex items-center gap-2">
                             <select data-id="${item.id}" class="portion-select bg-gray-50 border border-gray-300 text-sm rounded-lg p-2">
@@ -542,8 +539,6 @@
                 const noteHtml = item.note ? `<p class="text-xs text-red-500 ml-9 mt-1">${item.note}</p>` : '';
                 const addButtonDisabled = (item.price === 0.00 && item.note) ? 'disabled' : '';
                 const addButtonClass = (item.price === 0.00 && item.note) ? 'bg-gray-400 cursor-not-allowed' : 'bg-primary hover:bg-primary-dark';
-
-
                 menuHtml += `
                 <div class="bg-white p-4 rounded-xl shadow-md flex flex-col hover:shadow-lg transition-all duration-300">
                     <div class="flex-grow">
@@ -574,22 +569,18 @@
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             const todaysUserOrder = state.allOrders.find(order => order.uid === state.currentUser?.uid && order.createdAt && order.createdAt.toDate() >= today);
-
             if (todaysUserOrder) {
                 const itemsHtml = todaysUserOrder.items.map(item => `<li class="flex justify-between items-center text-sm"><span>${item.quantity} x ${item.name}</span><span class="font-medium">€${(item.price * item.quantity).toFixed(2)}</span></li>`).join('');
-                
                 const notesHtml = `
                     ${todaysUserOrder.allergies ? `<p class="text-sm mt-2 p-2 bg-red-50 border-l-4 border-red-400"><b class="text-red-700">Allergie:</b> ${todaysUserOrder.allergies}</p>` : ''}
                     ${todaysUserOrder.cutlery ? `<p class="text-sm mt-2 p-2 bg-green-50 border-l-4 border-green-400"><b>Posate richieste.</b></p>` : ''}
                 `;
-
                 const responseHtml = todaysUserOrder.restaurateurResponse
                     ? `<div id="restaurateur-response" class="mt-4 p-3 rounded-lg bg-yellow-100 border-l-4 border-yellow-400">
                             <p class="font-bold text-yellow-800"><i class="fas fa-comment-dots mr-2"></i>Messaggio dal ristoratore:</p>
                             <p class="text-yellow-700">${todaysUserOrder.restaurateurResponse}</p>
                         </div>`
                     : '';
-
                 dom.myOrderContentEl.innerHTML = `
                     <p class="mb-4">Hai già inviato il tuo ordine per oggi. Ecco il riepilogo:</p>
                     <ul class="space-y-2 border-t border-b py-4">${itemsHtml}</ul>
@@ -610,7 +601,6 @@
             }
 
             const total = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
             const itemsHtml = state.cart.map(item => {
                 let detailsHtml = (item.isCustom || item.isCombo)
                     ? `<p class="text-xs text-gray-500 mt-1">${item.details}</p>`
@@ -689,7 +679,6 @@
         function renderCustomSandwichBuilder() {
             // Reset state
             state.customSandwich = { base: null, subtype: null, ingredients: [], basePrice: CUSTOM_PRODUCT_BASE_PRICE, totalPrice: 0 };
-
             dom.baseChoiceContainer.querySelectorAll('.choice-btn').forEach(btn => btn.classList.remove('selected'));
             dom.subtypeChoiceContainer.classList.add('hidden');
             dom.ingredientsStepContainer.classList.add('hidden');
@@ -711,7 +700,6 @@
 
         function updateSandwichSummary() {
             const { ingredients, basePrice, base, subtype } = state.customSandwich;
-
             if (!base || !subtype) {
                 dom.sandwichTotalPrice.textContent = `€0.00`;
                 dom.addSandwichBtn.disabled = true;
@@ -722,19 +710,15 @@
             }
 
             dom.sandwichBaseSummary.textContent = `${BASE_OPTIONS[base].name} (${subtype})`;
-
             let currentPrice = basePrice;
             const extraIngredientsCount = Math.max(0, ingredients.length - CUSTOM_PRODUCT_INCLUDED_INGREDIENTS);
             currentPrice += extraIngredientsCount * CUSTOM_PRODUCT_EXTRA_INGREDIENT_PRICE;
-
             dom.extraChargeNotice.textContent = extraIngredientsCount > 0 ? `Supplemento: +€${(extraIngredientsCount * CUSTOM_PRODUCT_EXTRA_INGREDIENT_PRICE).toFixed(2)}` : '';
-
             // Group ingredients to display quantity and price
             const ingredientCounts = ingredients.reduce((acc, ing) => {
                 const count = acc[ing.id] ? acc[ing.id].count + 1 : 1;
                 return { ...acc, [ing.id]: { name: ing.name, count } };
             }, {});
-
             let listHtml = '';
             let totalIngredientIndex = 0; // Contatore per il calcolo del prezzo
 
@@ -754,28 +738,24 @@
                     const displayName = i === 0 
                         ? (item.count > 1 ? `${item.name} (x${item.count})` : item.name)
                         : null;
-                        
                     if(displayName) {
                         // Calcola il costo totale di questo ingrediente (inclusi gli extra)
                         let totalCost = 0;
                         for(let j=0; j < item.count; j++) {
                            if(totalIngredientIndex + j >= CUSTOM_PRODUCT_INCLUDED_INGREDIENTS) {
                                 totalCost += CUSTOM_PRODUCT_EXTRA_INGREDIENT_PRICE;
-                           }
+                            }
                         }
                         
                         const costDisplay = totalCost > 0 
                             ? `+€${totalCost.toFixed(2)}`
                             : (item.count <= CUSTOM_PRODUCT_INCLUDED_INGREDIENTS ? `(inclusi)` : '(inclusi + extra)');
-
                         // Aggiunge la riga riassuntiva
                         listHtml += `<li class="flex justify-between"><span>${displayName}</span> <span class="text-gray-500">${costDisplay}</span></li>`;
                     }
                     totalIngredientIndex++;
                 }
             });
-
-
             if (ingredients.length === 0) {
                 dom.selectedIngredientsList.innerHTML = `<li class="text-gray-400">Seleziona fino a 3 ingredienti inclusi...</li>`;
             } else {
@@ -784,7 +764,6 @@
 
             state.customSandwich.totalPrice = currentPrice;
             dom.sandwichTotalPrice.textContent = `€${currentPrice.toFixed(2)}`;
-
             dom.addSandwichBtn.disabled = ingredients.length < 1;
 
             // Update ingredient cards (show count, selected class for cards with count > 0)
@@ -812,10 +791,8 @@
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             const todaysOrders = state.allOrders.filter(order => order.createdAt && order.createdAt.toDate() >= today).sort((a, b) => a.user.localeCompare(b.user));
-
             const now = new Date();
             const isBeforeCutoff = now.getHours() < 11 || (now.getHours() === 11 && now.getMinutes() < 30);
-
             if (todaysOrders.length === 0) {
                 dom.allOrdersListEl.innerHTML = `<div class="text-center p-8 bg-white rounded-xl shadow"><p class="text-gray-500">Nessun ordine per oggi.</p></div>`;
                 dom.grandTotalEl.textContent = '€0.00';
@@ -845,11 +822,9 @@
                     ${order.cutlery ? `<p class="text-xs text-secondary-800 mt-2 pl-4 border-l-2 border-secondary-light"><b><i class="fas fa-utensils"></i> Posate richieste</b></p>` : ''}
                 `;
                 const paymentInfo = PAYMENT_METHODS[order.paymentMethod] || { name: order.paymentMethod, icon: 'fa-credit-card' };
-
                 const deleteButtonHtml = (state.currentUser?.uid === order.uid && isBeforeCutoff)
                     ? `<button data-id="${order.id}" class="delete-order-btn text-red-500 hover:text-red-700 ml-2 text-sm" title="Elimina ordine"><i class="fas fa-trash-alt"></i></button>`
                     : `<button class="text-gray-300 ml-2 text-sm cursor-not-allowed" disabled title="Eliminazione bloccata dopo le 11:30 o non sei il proprietario"><i class="fas fa-trash-alt"></i></button>`;
-
                 const restaurateurResponseHtml = `
                     <div class="mt-3 pt-3 border-t">
                         <label for="response-input-${order.id}" class="text-xs font-semibold">Risposta del ristoratore:</label>
@@ -859,7 +834,6 @@
                         </div>
                     </div>
                 `;
-
                 return `
                     <div id="order-${order.id}" class="bg-white p-4 rounded-xl shadow-md transition-all duration-300 ${order.paid ? 'paid-order' : ''}">
                         <div class="flex justify-between items-start border-b pb-2 mb-2">
@@ -892,7 +866,6 @@
             const navLink = target.closest('a.nav-btn');
             const ingredientCard = target.closest('.ingredient-card');
             const choiceBtn = target.closest('.choice-btn');
-
             if (navLink) {
                 event.preventDefault();
                 navigate(navLink.dataset.view);
@@ -907,14 +880,14 @@
                     const type = choiceBtn.dataset.type;
                     state.customSandwich.base = type;
                     state.customSandwich.subtype = null; // Reset subtype
-                    state.customSandwich.ingredients = []; // Reset ingredients
+                    state.customSandwich.ingredients = [];
+                    // Reset ingredients
 
                     dom.baseChoiceContainer.querySelectorAll('.choice-btn').forEach(btn => btn.classList.remove('selected'));
                     choiceBtn.classList.add('selected');
 
                     const subtypes = BASE_OPTIONS[type].subtypes;
                     dom.subtypeOptions.innerHTML = subtypes.map(st => `<button data-subtype="${st}" class="choice-btn subtype-choice-btn flex-1 p-3 bg-gray-50 rounded-lg shadow-sm border-2 border-transparent transition-all duration-200">${st}</button>`).join('');
-
                     dom.subtypeChoiceContainer.classList.remove('hidden');
                     dom.ingredientsStepContainer.classList.add('hidden'); // Hide ingredients until subtype is selected
                 }
@@ -931,7 +904,6 @@
                     ...selectedIngredient, 
                     uid: Date.now() + Math.random().toString(36).substring(7) 
                 });
-
                 showToast(`Aggiunto: ${selectedIngredient.name}`);
                 updateSandwichSummary();
             }
@@ -955,7 +927,7 @@
             }
             else if (event.type === 'click' && target.matches('#selected-ingredients-list li')) {
                 // Gestione click per la rimozione, se necessario.
-                // Per ora, lascio il click per l'aggiunta sull'ingrediente principale. 
+                // Per ora, lascio il click per l'aggiunta sull'ingrediente principale.
                 // La rimozione è più complessa dato il click per l'aggiunta.
             }
         }
@@ -965,6 +937,7 @@
             const removeBtn = event.target.closest('.remove-ingredient-btn');
             if (removeBtn) {
                 const ingredientId = removeBtn.dataset.id;
+        
                 const indexToRemove = state.customSandwich.ingredients.findIndex(ing => ing.uid === ingredientId);
                 
                 if (indexToRemove > -1) {
@@ -975,7 +948,6 @@
                 }
             }
         });
-
         function handleSelectChange(target) {
             if (target.id === 'category-select') state.activeCategoryFilter = target.value;
             else if (target.id === 'diet-select') state.activeDietFilter = target.value;
@@ -987,7 +959,6 @@
             state.currentComboItem = item;
             const panini = state.menuData.filter(m => m.category === 'Panini' && !m.name.toLowerCase().includes("5 cereali"));
             dom.comboPaninoSelect.innerHTML = panini.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
-
             let drinks = [];
             const drinkLabel = dom.comboDrinkLabel; // Usa l'elemento DOM memorizzato
 
@@ -998,7 +969,8 @@
                 drinks = ['Coca Cola 33cl', 'Fanta 33cl', 'Tè freddo 33cl'];
                 drinkLabel.textContent = 'Scegli la Bevanda (33cl):';
             } else if (item.comboType === 'panino_bevanda_50cl') {
-                drinks = ['Coca Cola 50cl', 'Fanta 50cl', 'Tè freddo 50cl']; // Assunzione
+                drinks = ['Coca Cola 50cl', 'Fanta 50cl', 'Tè freddo 50cl'];
+                // Assunzione
                 drinkLabel.textContent = 'Scegli la Bevanda (50cl):';
             } else {
                 // Fallback
@@ -1007,7 +979,6 @@
             }
 
             dom.comboDrinkSelect.innerHTML = drinks.map(d => `<option value="${d}">${d}</option>`).join('');
-
             dom.comboModal.classList.remove('hidden');
         }
 
@@ -1019,7 +990,7 @@
         async function handleClicks(button) {
              if (button.matches('.nav-btn')) {
                  navigate(button.dataset.view);
-             }
+            }
              // --- SNIPPET SATISPAY CLOSE AGGIORNATO ---
              else if (button.id === 'satispay-close-btn') {
                 // Nasconde il modale di Satispay
@@ -1056,14 +1027,13 @@
 
                  // Raggruppa gli ingredienti per nome per una descrizione chiara
                  const ingredientCounts = ingredients.reduce((acc, ing) => {
-                     acc[ing.name] = (acc[ing.name] || 0) + 1;
+                      acc[ing.name] = (acc[ing.name] || 0) + 1;
                      return acc;
                  }, {});
 
                  const ingredientNames = Object.entries(ingredientCounts)
                     .map(([name, count]) => count > 1 ? `${name} (x${count})` : name)
                     .join(', ');
-
                  const sandwichName = `${BASE_OPTIONS[base].name} (${subtype}) personalizzato`;
 
                  state.cart.push({
@@ -1075,16 +1045,13 @@
                      details: ingredientNames,
                      category: base === 'panino' ? 'Panini' : 'Pizze', // Use base type for category
                  });
-
                  // Reset custom sandwich builder state and UI
                  renderCustomSandwichBuilder();
-
                  showToast('Prodotto personalizzato aggiunto!');
                  navigate('my-order'); // Go to cart after adding
              }
              else if (button.id === 'combo-add-btn') {
                  if (!state.currentComboItem) return;
-
                  const selectedPanino = dom.comboPaninoSelect.value;
                  const selectedDrink = dom.comboDrinkSelect.value;
                  const baseItem = state.currentComboItem;
@@ -1101,24 +1068,24 @@
                      isCombo: true,
                      category: baseItem.category,
                  });
-
                  renderMyOrder();
                  showToast('Menù aggiunto al carrello!');
                  closeComboModal();
              }
              else if (button.id === 'combo-cancel-btn') {
                  closeComboModal();
-             }
+            }
              else if (button.matches('.cart-qty-btn')) {
                  const cartId = parseInt(button.dataset.id);
                  const itemInCart = state.cart.find(i => i.cartId === cartId);
                  if (itemInCart) {
                      if (button.dataset.action === 'increase') itemInCart.quantity++;
                      else if (button.dataset.action === 'decrease' && itemInCart.quantity > 1) itemInCart.quantity--;
-                     else state.cart = state.cart.filter(i => i.cartId !== cartId); // Remove if quantity becomes 0
+                     else state.cart = state.cart.filter(i => i.cartId !== cartId);
+                     // Remove if quantity becomes 0
                  }
                  renderMyOrder();
-             }
+            }
              else if (button.matches('.cart-remove-btn')) {
                  state.cart = state.cart.filter(i => i.cartId !== parseInt(button.dataset.id));
                  renderMyOrder();
@@ -1175,19 +1142,21 @@
                  state.caloriesVisible = !state.caloriesVisible;
                  button.querySelector('span').textContent = state.caloriesVisible ? 'Nascondi Calorie' : 'Mostra Calorie';
                  button.querySelector('i').className = `fas ${state.caloriesVisible ? 'fa-toggle-on' : 'fa-toggle-off'} mr-2`;
-                 renderMenu(); // Re-render menu to show/hide calories
+                 renderMenu();
+                 // Re-render menu to show/hide calories
              }
              else if (button.id === 'show-allergens-btn') {
                  dom.allergenModal.classList.remove('hidden');
-             }
+            }
              else if (button.id === 'close-allergen-modal-btn') {
                  dom.allergenModal.classList.add('hidden');
-             }
+            }
              else if (button.id === 'confirm-order-btn') {
-                 if (state.cart.length === 0) { showToast("Il tuo carrello è vuoto."); return; }
+                 if (state.cart.length === 0) { showToast("Il tuo carrello è vuoto.");
+                 return; }
                  
                  if (!state.currentUser || !state.currentUser.name || !state.currentUser.email) { 
-                     showToast("Per favore, inserisci nome ed email."); 
+                     showToast("Per favore, inserisci nome ed email.");
                      dom.userModal.classList.remove('hidden'); 
                      return; 
                  }
@@ -1195,10 +1164,10 @@
                  const allergies = document.getElementById('allergies-input').value.trim();
                  const cutlery = document.getElementById('cutlery-checkbox').checked;
                  const paymentMethod = document.querySelector('input[name="payment-method"]:checked')?.value;
-                 if (!paymentMethod) { showToast("Seleziona un metodo di pagamento."); return; }
+                 if (!paymentMethod) { showToast("Seleziona un metodo di pagamento."); return;
+                 }
 
                  const total = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
                  const itemsToSave = state.cart.map(item => ({
                      name: item.name,
                      category: item.category,
@@ -1206,7 +1175,6 @@
                      price: item.price,
                      details: item.details || null
                  }));
-
                  const orderData = {
                      user: state.currentUser.name,
                      uid: state.currentUser.uid,
@@ -1220,13 +1188,10 @@
                      paid: false,
                      restaurateurResponse: ""
                  };
-
                  try {
                      await addDoc(ordersCollectionRef, orderData);
-                     
                      // --- SNIPPET SLACK AGGIUNTO ---
-                     const slackWebhookUrl = 'https://hooks.slack.com/triggers/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'; 
-
+                     const slackWebhookUrl = 'https://hooks.slack.com/triggers/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';
                      const slackPayload = {
                          user_email: orderData.email,
                          user_name: orderData.user,
@@ -1235,27 +1200,27 @@
                          allergies: orderData.allergies || 'Nessuna',
                          cutlery: orderData.cutlery ? 'Sì' : 'No'
                      };
-
                      try {
                          await fetch(slackWebhookUrl, {
                              method: 'POST',
                              headers: {
-                                 'Content-Type': 'application/json',
+                                  'Content-Type': 'application/json',
                              },
                              body: JSON.stringify(slackPayload),
                          });
                      } catch (slackError) {
                          console.error("Errore durante l'invio della notifica a Slack: ", slackError);
-                     }
+                    }
                      // --- FINE SNIPPET SLACK ---
 
                      if (orderData.paymentMethod === 'Satispay') {
                          dom.satispayModal.classList.remove('hidden');
-                     }
+                    }
 
                      showToast("Ordine confermato con successo!");
                      state.cart = []; // Clear cart
-                     navigate('my-order'); // Navigate to confirmation/order view
+                     navigate('my-order');
+                     // Navigate to confirmation/order view
                  } catch (error) {
                      console.error("Errore nell'invio dell'ordine: ", error);
                      showToast("Si è verificato un errore. Riprova.", 4000);
@@ -1268,7 +1233,6 @@
                  const todaysOrders = state.allOrders
                      .filter(order => order.createdAt && order.createdAt.toDate() >= today)
                      .sort((a, b) => a.createdAt.toDate() - b.createdAt.toDate());
-
                  if (todaysOrders.length === 0) {
                      showToast("Nessun ordine da copiare per oggi.");
                      return;
@@ -1306,7 +1270,6 @@
                      prepText += `*${itemDetails.quantity}x ${itemName}*\n`;
                      prepText += `  - Per: ${itemDetails.users.join(', ')}\n\n`;
                  });
-
                  let ordersText = "--- 💵 RIEPILOGO ORDINI E PAGAMENTI ---\n\n";
                  let grandTotal = 0;
                  todaysOrders.forEach(order => { 
@@ -1326,16 +1289,14 @@
 
                       if (order.cutlery) {
                          ordersText += `  - 🍴 Posate: Sì\n`;
-                      }
+                     }
                      ordersText += `\n`;
                      grandTotal += order.total;
                  });
-
                  ordersText += `-------------------------------------\n`;
                  ordersText += `TOTALE COMPLESSIVO: €${grandTotal.toFixed(2)}`;
 
                  const finalSummary = prepText + "\n\n" + ordersText;
-
                  navigator.clipboard.writeText(finalSummary)
                      .then(() => {
                          showToast("Riepilogo ottimizzato copiato negli appunti!");
@@ -1344,15 +1305,13 @@
                          console.error('Errore durante la copia:', err);
                          showToast("Errore: impossibile copiare il riepilogo.");
                      });
-             }
+            }
              else if (button.id === 'export-history-btn') {
                  showToast("Esportazione in corso...");
-
                  try {
                      const allOrdersQuery = query(ordersCollectionRef, orderBy("createdAt", "desc"));
                      const querySnapshot = await getDocs(allOrdersQuery);
                      const allOrdersHistory = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
-
                      if (allOrdersHistory.length === 0) {
                          showToast("Nessun ordine nello storico da esportare.");
                          return;
@@ -1373,7 +1332,6 @@
                          'PrezzoUnitario', 'TotaleRiga', 'MetodoPagamento',
                          'Allergie', 'Posate', 'CanaleOrdine', 'StatoPagamento', 'RispostaRistoratore'
                      ];
-
                      let csvRows = [header.join(';')];
 
                      allOrdersHistory.forEach(order => {
@@ -1409,7 +1367,8 @@
                      });
 
                      const csvContent = csvRows.join('\n');
-                     const blob = new Blob([`\uFEFF${csvContent}`], { type: 'text/csv;charset=utf-8;' }); // Added BOM for Excel
+                     const blob = new Blob([`\uFEFF${csvContent}`], { type: 'text/csv;charset=utf-8;' });
+                     // Added BOM for Excel
                      const url = URL.createObjectURL(blob);
                      const a = document.createElement('a');
                      a.setAttribute('href', url);
@@ -1418,7 +1377,6 @@
                      a.click();
                      document.body.removeChild(a);
                      URL.revokeObjectURL(url);
-
                  } catch (error) {
                      console.error("Errore durante l'esportazione: ", error);
                      showToast("Esportazione fallita. Controlla la console.");
@@ -1502,23 +1460,21 @@
                 const fillEmail = (val) => {
                     // Cerca se il nome inserito corrisponde esattamente a un utente
                     const foundUser = state.allUsersData.find(u => u.name.toLowerCase() === val.toLowerCase());
-                    
                     if(foundUser) {
                         emailInput.value = foundUser.email;
                         emailInput.classList.remove('bg-red-50');
                         emailInput.classList.add('bg-green-50');
                     } else {
-                        emailInput.value = ""; // Pulisci se il nome non è valido
+                        emailInput.value = "";
+                        // Pulisci se il nome non è valido
                         emailInput.classList.remove('bg-green-50');
                     }
                 };
-
                 nameInput.addEventListener('input', (e) => fillEmail(e.target.value));
                 nameInput.addEventListener('change', (e) => fillEmail(e.target.value));
             }
 
             renderFilters();
-
             dom.views.forEach(v => {
                 if (v.id === 'menu-view') {
                     v.classList.add('active'); 
