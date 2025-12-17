@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>dosemagna</title>
-    <link rel="icon" type="dosepranza/favicondosepranza.png" href="favicondosepranza.png">
+    <link rel="icon" href="data:;base64,=">
     <script src="https://cdn.tailwindcss.com/3.4.3"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,26 +14,11 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Poppins', 'sans-serif'],
-                    },
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
                     colors: {
-                        primary: {
-                            light: '#e8b39a',
-                            DEFAULT: '#D6804F',
-                            dark: '#c0673a',
-                            '100': '#fef4ef',
-                            '800': '#8c502f'
-                        },
-                        secondary: {
-                            light: '#a1bb96',
-                            DEFAULT: '#709460',
-                            dark: '#5a794d',
-                            '100': '#eef4ec',
-                            '800': '#415738'
-                        },
-                        background: '#F3F1E7',
-                        'text-main': '#3B3F2F',
+                        primary: { light: '#e8b39a', DEFAULT: '#D6804F', dark: '#c0673a', '100': '#fef4ef', '800': '#8c502f' },
+                        secondary: { light: '#a1bb96', DEFAULT: '#709460', dark: '#5a794d', '100': '#eef4ec', '800': '#415738' },
+                        background: '#F3F1E7', 'text-main': '#3B3F2F',
                     }
                 }
             }
@@ -41,123 +26,98 @@
     </script>
     <style>
         html { scroll-behavior: smooth; }
-        body { font-family: 'Poppins', sans-serif; }
+        body { font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
         .view { display: none; }
         .view.active { display: block; }
         .paid-order { opacity: 0.7; }
-        .payment-radio:checked + label {
-            border-color: #D6804F;
-            box-shadow: 0 0 0 2px rgba(214, 128, 79, 0.4);
-        }
+        .payment-radio:checked + label { border-color: #D6804F; box-shadow: 0 0 0 2px rgba(214, 128, 79, 0.4); }
         .toggle-checkbox:checked { right: 0; border-color: #709460; }
         .toggle-checkbox:checked + .toggle-label { background-color: #709460; }
-        .ingredient-card.selected {
-            border-color: #D6804F;
-            box-shadow: 0 0 0 3px rgba(214, 128, 79, 0.5);
-            transform: translateY(-4px);
-        }
-        /* Stile per Satispay - reso più prominente */
-        #payment-Satispay + label {
-            border-color: #D6804F !important;
-            box-shadow: 0 0 0 2px rgba(214, 128, 79, 0.4) !important;
-        }
+        .ingredient-card.selected { border-color: #D6804F; box-shadow: 0 0 0 3px rgba(214, 128, 79, 0.5); transform: translateY(-4px); }
+        #payment-Satispay + label { border-color: #D6804F !important; box-shadow: 0 0 0 2px rgba(214, 128, 79, 0.4) !important; }
+        
+        /* FIX MOBILE: Nasconde la freccia del datalist per forzare l'apertura della tastiera */
+        input::-webkit-calendar-picker-indicator { display: none !important; opacity: 0; }
     </style>
 </head>
-<body class="bg-background text-text-main">
+<body class="bg-background text-text-main pb-20">
 
     <div id="app" class="max-w-4xl mx-auto p-4 md:p-6">
         <header class="mb-6 flex flex-col items-center">
             <div class="flex flex-col items-center">
-                <img src="https://i.postimg.cc/L6H20zfp/logo-dosepranza-People-About-Food.png" alt="Dosepranza Logo" class="w-80 md:w-96 mx-auto">
+                <img src="https://i.postimg.cc/L6H20zfp/logo-dosepranza-People-About-Food.png" alt="Dosepranza Logo" class="w-64 md:w-96 mx-auto">
             </div>
-
-            <div class="bg-primary-100 border-l-4 border-primary text-primary-800 p-4 rounded-md my-4 w-full mt-6" role="alert">
-                <p class="font-bold">Attenzione: L'ordine deve essere completato entro le 11:30.</p>
-                <p>La consegna è stimata intorno alle 12:30.</p>
-                <p>La consegna è <strong>gratuita</strong>.</p>
+            <div class="bg-primary-100 border-l-4 border-primary text-primary-800 p-4 rounded-md my-4 w-full mt-6 shadow-sm" role="alert">
+                <p class="font-bold text-sm md:text-base">Attenzione: Ordine entro le 11:30.</p>
+                <p class="text-sm md:text-base">Consegna gratuita stimata ore 12:30.</p>
             </div>
         </header>
 
-        <nav id="main-nav" class="flex justify-center bg-white/70 backdrop-blur-sm p-2 rounded-xl shadow-md mb-6 sticky top-4 z-40">
-            <a href="#menu-view" data-view="menu" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold text-text-main transition-all duration-300"><i class="fas fa-utensils mr-2"></i>Menù</a>
-            <a href="#custom-sandwich-view" data-view="custom-sandwich" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold text-text-main transition-all duration-300"><i class="fas fa-plus-circle mr-2"></i>Crea Prodotto</a>
-            <a href="#my-order-view" data-view="my-order" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold text-text-main transition-all duration-300"><i class="fas fa-shopping-basket mr-2"></i>Il Mio Ordine <span id="cart-count" class="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 inline-flex items-center justify-center ml-1">0</span></a>
-            <a href="#all-orders-view" data-view="all-orders" class="nav-btn flex-1 text-center py-2 px-4 rounded-lg font-semibold text-text-main transition-all duration-300"><i class="fas fa-users mr-2"></i>Tutti gli Ordini</a>
+        <nav id="main-nav" class="grid grid-cols-2 md:flex md:justify-center gap-2 bg-white/80 backdrop-blur-md p-3 rounded-xl shadow-lg mb-6 sticky top-2 z-40 border border-white/50">
+            <a href="#menu-view" data-view="menu" class="nav-btn flex items-center justify-center text-center py-3 px-2 rounded-lg font-semibold text-sm md:text-base text-text-main transition-all duration-300 active:scale-95"><i class="fas fa-utensils mr-2"></i>Menù</a>
+            <a href="#custom-sandwich-view" data-view="custom-sandwich" class="nav-btn flex items-center justify-center text-center py-3 px-2 rounded-lg font-semibold text-sm md:text-base text-text-main transition-all duration-300 active:scale-95"><i class="fas fa-plus-circle mr-2"></i>Crea</a>
+            <a href="#my-order-view" data-view="my-order" class="nav-btn flex items-center justify-center text-center py-3 px-2 rounded-lg font-semibold text-sm md:text-base text-text-main transition-all duration-300 active:scale-95"><i class="fas fa-shopping-basket mr-2"></i>Ordine <span id="cart-count" class="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 inline-flex items-center justify-center ml-1 shadow-sm">0</span></a>
+            <a href="#all-orders-view" data-view="all-orders" class="nav-btn flex items-center justify-center text-center py-3 px-2 rounded-lg font-semibold text-sm md:text-base text-text-main transition-all duration-300 active:scale-95"><i class="fas fa-users mr-2"></i>Tutti</a>
         </nav>
 
         <main>
             <section id="menu-view" class="view">
-                <h2 id="Menù" class="text-3xl font-extrabold mb-4">Scegli cosa ordinare</h2>
-
+                <h2 class="text-2xl md:text-3xl font-extrabold mb-4 text-text-main">Scegli cosa ordinare</h2>
                 <div class="flex flex-col sm:flex-row gap-3 mb-4 items-center flex-wrap">
                     <div class="relative w-full sm:flex-grow">
-                        <input type="search" id="search-input" placeholder="Cerca un piatto..." class="w-full p-3 pl-10 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-primary transition-all duration-300">
+                        <input type="search" id="search-input" placeholder="Cerca un piatto..." class="w-full p-3 pl-10 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-primary transition-all text-base">
                         <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
                     </div>
-                    <select id="category-select" class="w-full sm:w-auto p-3 border border-gray-300 rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-primary transition-all duration-300"></select>
-                    <select id="diet-select" class="w-full sm:w-auto p-3 border border-gray-300 rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-primary transition-all duration-300"></select>
+                    <select id="category-select" class="w-full sm:w-auto p-3 border border-gray-300 rounded-xl bg-white shadow-sm focus:ring-2 focus:ring-primary"></select>
+                    <select id="diet-select" class="w-full sm:w-auto p-3 border border-gray-300 rounded-xl bg-white shadow-sm focus:ring-2 focus:ring-primary"></select>
                 </div>
-
-                <div class="flex justify-between items-center mb-4">
-                    <div id="filter-counter-container" class="text-sm"></div>
+                <div class="flex justify-between items-center mb-4 px-1">
+                    <div id="filter-counter-container" class="text-sm font-medium text-primary-dark"></div>
                     <div class="flex gap-2">
-                        <button id="show-allergens-btn" class="bg-gray-200 hover:bg-gray-300 text-text-main font-bold py-2 px-4 rounded-lg flex items-center text-sm transition-all duration-300"><i class="fas fa-info-circle mr-2"></i> Mostra Allergeni</button>
-                        <button id="toggle-calories" class="bg-gray-200 hover:bg-gray-300 text-text-main font-bold py-2 px-4 rounded-lg flex items-center text-sm transition-all duration-300">
-                            <i class="fas fa-toggle-off mr-2"></i>
-                            <span id="toggle-calories-text">Mostra Calorie</span>
+                        <button id="show-allergens-btn" class="bg-white hover:bg-gray-100 text-text-main border border-gray-200 font-semibold py-2 px-3 rounded-lg flex items-center text-xs md:text-sm shadow-sm"><i class="fas fa-info-circle mr-2 text-primary"></i> Allergeni</button>
+                        <button id="toggle-calories" class="bg-white hover:bg-gray-100 text-text-main border border-gray-200 font-semibold py-2 px-3 rounded-lg flex items-center text-xs md:text-sm shadow-sm">
+                            <i class="fas fa-toggle-off mr-2 text-primary"></i><span>Calorie</span>
                         </button>
                     </div>
                 </div>
-
-                <div id="menu-items" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                <div id="menu-items" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-10"></div>
             </section>
 
             <section id="custom-sandwich-view" class="view">
-                <h2 id="Crea Prodotto" class="text-3xl font-extrabold mb-4">Crea il Tuo Prodotto</h2>
-
-                <div class="bg-white p-4 rounded-xl shadow-md mb-6">
-                    <h3 class="text-xl font-bold mb-3 text-center">1. Scegli la base</h3>
+                <h2 class="text-2xl md:text-3xl font-extrabold mb-4">Crea il Tuo Prodotto</h2>
+                <div class="bg-white p-4 md:p-6 rounded-2xl shadow-md mb-6">
+                    <h3 class="text-lg md:text-xl font-bold mb-3 text-center">1. Scegli la base</h3>
                     <div id="base-choice-container" class="flex gap-4">
-                        <button data-type="panino" class="choice-btn flex-1 p-4 bg-gray-50 rounded-lg shadow-sm border-2 border-transparent transition-all duration-200 flex flex-col items-center">
-                            <i class="fas fa-bread-slice text-2xl text-primary mb-2"></i>
-                            <span class="font-semibold">Panino ripieno</span>
+                        <button data-type="panino" class="choice-btn flex-1 p-4 bg-gray-50 rounded-xl shadow-sm border-2 border-transparent transition-all hover:bg-orange-50 active:scale-95 flex flex-col items-center">
+                            <i class="fas fa-bread-slice text-3xl text-primary mb-2"></i><span class="font-semibold text-sm md:text-base">Panino ripieno</span>
                         </button>
-                        <button data-type="pizza" class="choice-btn flex-1 p-4 bg-gray-50 rounded-lg shadow-sm border-2 border-transparent transition-all duration-200 flex flex-col items-center">
-                            <i class="fas fa-pizza-slice text-2xl text-primary mb-2"></i>
-                            <span class="font-semibold">Pizza Ripiena</span>
+                        <button data-type="pizza" class="choice-btn flex-1 p-4 bg-gray-50 rounded-xl shadow-sm border-2 border-transparent transition-all hover:bg-orange-50 active:scale-95 flex flex-col items-center">
+                            <i class="fas fa-pizza-slice text-3xl text-primary mb-2"></i><span class="font-semibold text-sm md:text-base">Pizza Ripiena</span>
                         </button>
                     </div>
                 </div>
-
-                <div id="subtype-choice-container" class="bg-white p-4 rounded-xl shadow-md mb-6 hidden">
-                    <h3 class="text-xl font-bold mb-3 text-center">2. Scegli la variante</h3>
-                    <div id="subtype-options" class="flex flex-wrap gap-4 justify-center">
-                    </div>
+                <div id="subtype-choice-container" class="bg-white p-4 md:p-6 rounded-2xl shadow-md mb-6 hidden">
+                    <h3 class="text-lg md:text-xl font-bold mb-3 text-center">2. Scegli la variante</h3>
+                    <div id="subtype-options" class="grid grid-cols-2 gap-3"></div>
                 </div>
-
                 <div id="ingredients-step-container" class="hidden">
-                    <h3 class="text-xl font-bold mb-3 text-center">3. Aggiungi gli ingredienti</h3>
-                    <p class="text-center text-text-main/80 mb-4">Il prezzo base di **3,50€** include fino a 3 ingredienti. Dal 4° in poi si applica un supplemento di **1,00€** per ogni ingrediente. Puoi selezionare un ingrediente più volte per aumentare la quantità.</p>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div id="ingredients-list" class="md:col-span-2 grid grid-cols-2 sm:grid-cols-3 gap-4">
-                        </div>
-
+                    <h3 class="text-lg md:text-xl font-bold mb-3 text-center">3. Aggiungi gli ingredienti</h3>
+                    <p class="text-center text-sm text-text-main/80 mb-4 bg-yellow-50 p-2 rounded-lg border border-yellow-200">Base: <strong>3,50€</strong> (fino a 3 ingr.) - Extra: <strong>+1,00€</strong></p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+                        <div id="ingredients-list" class="md:col-span-2 grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
                         <div id="sandwich-summary" class="md:col-span-1">
-                            <div class="bg-white p-4 rounded-xl shadow-md sticky top-24">
+                            <div class="bg-white p-5 rounded-2xl shadow-lg border border-gray-100 sticky top-24 z-30">
                                 <h3 class="font-bold text-lg border-b pb-2 mb-3">Riepilogo</h3>
-                                <div class="mb-3">
-                                    <p class="font-semibold" id="sandwich-base-summary">Seleziona una base...</p>
+                                <p class="font-semibold text-primary mb-3" id="sandwich-base-summary">Seleziona una base...</p>
+                                <ul id="selected-ingredients-list" class="space-y-2 text-sm mb-4 min-h-[60px] max-h-[200px] overflow-y-auto pr-1"></ul>
+                                <div class="border-t pt-3 bg-gray-50 -mx-5 px-5 -mb-5 pb-5 rounded-b-2xl">
+                                    <p id="extra-charge-notice" class="text-xs text-red-500 mb-2 h-4 font-semibold text-right"></p>
+                                    <div class="flex justify-between items-end">
+                                        <span class="text-gray-600 font-medium">Totale:</span>
+                                        <p class="text-3xl font-extrabold text-primary" id="sandwich-total-price">€0.00</p>
+                                    </div>
+                                    <button id="add-sandwich-to-cart-btn" class="w-full mt-4 bg-secondary hover:bg-secondary-dark text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all active:scale-95 disabled:opacity-50">Aggiungi al Carrello</button>
                                 </div>
-                                <ul id="selected-ingredients-list" class="space-y-2 text-sm mb-4 min-h-[60px]">
-                                </ul>
-                                <div class="border-t pt-3">
-                                    <p id="extra-charge-notice" class="text-xs text-red-500 mb-2 h-4"></p>
-                                    <p class="text-right text-2xl font-bold text-primary" id="sandwich-total-price">€0.00</p>
-                                </div>
-                                <button id="add-sandwich-to-cart-btn" class="w-full mt-4 bg-secondary hover:bg-secondary-dark text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                                    <i class="fas fa-plus-circle mr-2"></i>Aggiungi al Carrello
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -165,142 +125,126 @@
             </section>
 
             <section id="my-order-view" class="view">
-                <h2 id="Il Mio Ordine" class="text-3xl font-extrabold mb-4">Riepilogo del Tuo Ordine</h2>
-                <div id="my-order-content" class="bg-white p-6 rounded-xl shadow-md"></div>
+                <h2 class="text-2xl md:text-3xl font-extrabold mb-4">Riepilogo Ordine</h2>
+                <div id="my-order-content" class="bg-white p-4 md:p-6 rounded-2xl shadow-md"></div>
             </section>
 
             <section id="all-orders-view" class="view">
                  <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-                     <h2 id="Tutti gli Ordini" class="text-3xl font-extrabold">Riepilogo Ordini di Oggi</h2>
-                     <div class="flex gap-2">
-                         <button id="export-history-btn" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg hidden transition-all duration-300"><i class="fas fa-download mr-2"></i> Esporta Storico</button>
-                         <button id="copy-summary-btn" class="bg-secondary hover:bg-secondary-dark text-white font-bold py-2 px-4 rounded-lg transition-all duration-300"><i class="fas fa-copy mr-2"></i> Copia Riepilogo</button>
+                     <h2 class="text-2xl md:text-3xl font-extrabold">Ordini di Oggi</h2>
+                     <div class="flex gap-2 w-full md:w-auto">
+                         <button id="export-history-btn" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg hidden text-sm flex-1 md:flex-none justify-center"><i class="fas fa-download mr-2"></i> Export</button>
+                         <button id="copy-summary-btn" class="bg-secondary hover:bg-secondary-dark text-white font-bold py-2 px-4 rounded-lg text-sm flex-1 md:flex-none justify-center"><i class="fas fa-copy mr-2"></i> Copia Riepilogo</button>
                      </div>
                  </div>
-                 <div id="satispay-details" class="bg-white p-4 rounded-xl shadow-md mb-6 flex flex-col md:flex-row items-center gap-4">
-                     <div class="flex-shrink-0">
-                         <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" alt="QR Code Satispay" class="rounded-lg">
-                     </div>
+                 <div id="satispay-details" class="bg-white p-4 rounded-2xl shadow-md mb-6 flex flex-col md:flex-row items-center gap-4 border border-gray-100">
+                     <div class="flex-shrink-0"><img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" alt="QR Code Satispay" class="rounded-lg shadow-sm"></div>
                      <div class="text-center md:text-left">
                          <h3 class="text-xl font-bold">Paga con Satispay</h3>
-                         <p class="text-text-main/80">Inquadra il QR Code o usa il link per pagare l'importo del tuo ordine a <strong>Alimentari Russo</strong>.</p>
-                         <p class="text-primary-800 font-semibold text-sm mt-1">Il pagamento va effettuato entro le 11:30.</p>
-                         <a href="https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" target="_blank" class="mt-2 inline-block bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg transition-all duration-300">
-                             <i class="fas fa-external-link-alt mr-2"></i>Vai a Satispay
-                         </a>
+                         <p class="text-text-main/80 text-sm">Paga a <strong>Alimentari Russo</strong> entro le 11:30.</p>
+                         <a href="https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" target="_blank" class="mt-3 block w-full md:inline-block md:w-auto bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg text-center"><i class="fas fa-external-link-alt mr-2"></i>Paga Ora</a>
                      </div>
                  </div>
                  <div id="all-orders-list" class="space-y-4"></div>
-                 <div class="mt-6 bg-white p-4 rounded-xl shadow-lg text-right">
-                     <span class="text-xl font-bold">Totale Complessivo:</span>
-                     <span id="grand-total" class="text-2xl font-bold text-primary ml-2">€0.00</span>
+                 <div class="mt-6 bg-white p-5 rounded-2xl shadow-lg text-right border-t-4 border-primary">
+                     <span class="text-lg font-bold text-gray-600">Totale:</span><span id="grand-total" class="text-3xl font-extrabold text-primary ml-2 block md:inline">€0.00</span>
                  </div>
             </section>
         </main>
     </div>
 
-    <div id="user-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
-        <div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md text-center">
-            <h3 class="text-2xl font-bold mb-4">Benvenuto!</h3>
-            <p class="text-gray-600 mb-6">Seleziona il tuo nome dalla lista.</p>
-            
-            <input list="users-datalist" id="username-input" placeholder="Cerca il tuo nome..." class="w-full p-3 border rounded-lg mb-3">
-            <datalist id="users-datalist"></datalist>
-
-            <input type="email" id="user-email-input" placeholder="L'email apparirà qui..." class="w-full p-3 border rounded-lg bg-gray-100" readonly>
-            
-            <button id="save-username-btn" class="w-full mt-4 bg-primary hover:bg-primary-dark text-white font-bold py-3 px-4 rounded-lg transition-all duration-300">Salva e Continua</button>
+    <div id="user-modal" class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-md text-center transform transition-all">
+            <h3 class="text-2xl font-bold mb-2 text-text-main">Benvenuto!</h3>
+            <p class="text-gray-500 mb-6 text-sm">Per iniziare, abbiamo bisogno del tuo nome.</p>
+            <div class="text-left mb-1"><label class="text-xs font-bold text-gray-600 uppercase ml-1">Nome e Cognome</label></div>
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i class="fas fa-pen text-gray-400 text-sm"></i></div>
+                <input type="text" list="users-datalist" id="username-input" placeholder="Digita qui il tuo nome..." autocomplete="off" class="w-full pl-9 p-3 border-2 border-gray-200 rounded-xl mb-1 focus:border-primary focus:outline-none transition-colors font-medium text-gray-800 placeholder-gray-400">
+                <datalist id="users-datalist"></datalist>
+            </div>
+            <p class="text-xs text-gray-400 text-left mb-4 ml-1 italic">Scrivi il nome o selezionalo se esiste già.</p>
+            <div class="text-left mb-1"><label class="text-xs font-bold text-gray-600 uppercase ml-1">Email</label></div>
+            <input type="email" id="user-email-input" placeholder="La tua email..." class="w-full p-3 border-2 border-gray-200 rounded-xl mb-6 focus:border-primary focus:outline-none transition-colors text-gray-700">
+            <button id="save-username-btn" class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3.5 px-4 rounded-xl shadow-lg active:scale-95">Salva e Inizia <i class="fas fa-arrow-right ml-2"></i></button>
         </div>
     </div>
 
-    <div id="allergen-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden"><div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md relative"><button id="close-allergen-modal-btn" class="absolute top-2 right-4 text-2xl text-gray-500 hover:text-gray-800">&times;</button><h3 class="text-2xl font-bold mb-4">Legenda Allergeni</h3><div id="allergen-modal-content" class="text-gray-600 text-sm space-y-2"></div></div></div>
-    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 bg-text-main text-white py-3 px-6 rounded-full shadow-xl z-50 opacity-0 transition-opacity"><p id="toast-message"></p></div>
+    <div id="allergen-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-md relative">
+            <button id="close-allergen-modal-btn" class="absolute top-3 right-4 text-2xl text-gray-400 hover:text-gray-800">&times;</button>
+            <h3 class="text-xl font-bold mb-4 flex items-center"><i class="fas fa-exclamation-circle text-primary mr-2"></i> Legenda Allergeni</h3>
+            <div id="allergen-modal-content" class="text-gray-600 text-sm space-y-3"></div>
+        </div>
+    </div>
     
-    <div id="combo-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
-        <div class="bg-white p-8 rounded-xl shadow-2xl w-11/12 max-w-md">
-            <h3 class="text-2xl font-bold mb-4">Scegli il tuo menù</h3>
+    <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 bg-gray-800 text-white py-3 px-6 rounded-full shadow-2xl z-[60] opacity-0 transition-opacity duration-300 flex items-center gap-2 pointer-events-none w-max max-w-[90%]">
+        <i class="fas fa-check-circle text-green-400"></i><p id="toast-message" class="text-sm font-medium truncate"></p>
+    </div>
+    
+    <div id="combo-modal" class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-md">
+            <h3 class="text-xl font-bold mb-4 text-center">Configura il Menù</h3>
             <div class="space-y-4">
-                <div>
-                    <label for="combo-panino-select" class="block mb-2 font-semibold">Scegli il Panino:</label>
-                    <select id="combo-panino-select" class="w-full p-3 border border-gray-300 rounded-lg"></select>
-                </div>
-                <div>
-                    <label for="combo-drink-select" id="combo-drink-label" class="block mb-2 font-semibold">Scegli la Bevanda:</label>
-                    <select id="combo-drink-select" class="w-full p-3 border border-gray-300 rounded-lg"></select>
-                </div>
+                <div><label class="block mb-2 font-semibold text-sm text-gray-600">Scegli il Panino:</label><select id="combo-panino-select" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary"></select></div>
+                <div><label id="combo-drink-label" class="block mb-2 font-semibold text-sm text-gray-600">Scegli la Bevanda:</label><select id="combo-drink-select" class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary"></select></div>
             </div>
-            <div class="flex justify-end gap-4 mt-6">
-                <button id="combo-cancel-btn" class="bg-gray-200 hover:bg-gray-300 font-bold py-2 px-4 rounded-lg">Annulla</button>
-                <button id="combo-add-btn" class="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg">Aggiungi al Carrello</button>
+            <div class="grid grid-cols-2 gap-4 mt-6">
+                <button id="combo-cancel-btn" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 px-4 rounded-xl">Annulla</button>
+                <button id="combo-add-btn" class="bg-primary hover:bg-primary-dark text-white font-bold py-3 px-4 rounded-xl shadow-md">Aggiungi</button>
             </div>
         </div>
     </div>
 
-    <div id="satispay-modal" class="fixed inset-0 bg-gray-900 bg-opacity-90 flex items-center justify-center z-50 hidden p-4">
-        <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-md text-center relative">
+    <div id="satispay-modal" class="fixed inset-0 bg-gray-900/90 backdrop-blur-md flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl w-full max-w-md text-center relative">
             <button id="satispay-close-btn" class="absolute top-2 right-4 text-3xl text-gray-400 hover:text-gray-700">&times;</button>
-            <h3 class="text-2xl font-bold mb-4">Paga con Satispay</h3>
-            <p class="text-text-main/80 mb-4">Il tuo ordine è stato inviato!<br> Inquadra il QR Code o usa il link per pagare <strong>Alimentari Russo</strong>.</p>
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" alt="QR Code Satispay" class="rounded-lg mx-auto w-64 h-64">
-            <a href="https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" target="_blank" class="mt-6 inline-block w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300">
-                <i class="fas fa-external-link-alt mr-2"></i>Apri Satispay
-            </a>
+            <h3 class="text-2xl font-bold mb-2 text-text-main">Ordine Inviato!</h3>
+            <p class="text-gray-600 mb-6 text-sm">Completa il pagamento a <strong>Alimentari Russo</strong>.</p>
+            <div class="bg-white p-2 rounded-xl border-2 border-primary inline-block mb-4 shadow-inner">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" alt="QR Code Satispay" class="w-48 h-48 md:w-56 md:h-56 rounded-lg">
+            </div>
+            <a href="https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" target="_blank" class="block w-full bg-[#E52230] hover:bg-[#c71d29] text-white font-bold py-3.5 px-4 rounded-xl shadow-lg active:scale-95"><i class="fas fa-external-link-alt mr-2"></i>Apri App Satispay</a>
+            <button onclick="document.getElementById('satispay-modal').classList.add('hidden')" class="mt-3 text-gray-400 text-sm underline hover:text-gray-600">Chiudi</button>
         </div>
     </div>
-
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, deleteDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
         const firebaseConfig = { apiKey: "AIzaSyCQJsNbgaR89gF_1vLe6H4DPboOhQvm9nI", authDomain: "app-ordini-pranzo-alimentari.firebaseapp.com", projectId: "app-ordini-pranzo-alimentari", storageBucket: "app-ordini-pranzo-alimentari.appspot.com", messagingSenderId: "553169964686", appId: "1:553169964686:web:7f8ca6f32a301949e4c3df" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const ordersCollectionRef = collection(db, "orders");
+        const usersCollectionRef = collection(db, "users");
+
         const PRICES = { gastronomia: 4.00, verdure: 4.00, panini: 3.50, pizze: 3.50, fritti: 1.50, dessert: 3.00, "menù combinati": 0, insalatone: 5.00 };
         const ALLERGENS = { G: { name: "Glutine", icon: "fa-wheat-awn" }, L: { name: "Latticini", icon: "fa-cheese" }, C: { name: "Crostacei", icon: "fa-shrimp" }, P: { name: "Pesce", icon: "fa-fish-fins" }};
         const DIETS = { vegetariano: { name: "Vegetariano", icon: "🧀" }, vegano: { name: "Vegano", icon: "🌱" }, "carne/pesce": { name: "Carne/🐟Pesce", icon: "🥩" } };
-        const PAYMENT_METHODS = {
-            Satispay: { name: "Satispay", icon: "fa-mobile-alt", note: "Pagamento da effettuare entro le 11:30."}
-        };
-        // Ordine delle categorie: Gastronomia prima, Menù Combinati alla fine.
+        const PAYMENT_METHODS = { Satispay: { name: "Satispay", icon: "fa-mobile-alt", note: "Pagamento da effettuare entro le 11:30."} };
         const CATEGORY_ORDER = ["Gastronomia", "Insalatone", "Verdure", "Fritti", "Panini", "Pizze", "Dessert", "Menù Combinati"];
-        // URL del QR code per scaricare l'app
         const SATISPAY_DOWNLOAD_QR = "https://www.datocms-assets.com/133951/1745419747-qr-code-scarica-app.svg";
-        // URL del QR code per il pagamento
-        const SATISPAY_PAYMENT_QR = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0";
-        const BASE_OPTIONS = {
-            // "Panino" è diventato "Panino ripieno"
-            panino: { name: 'Panino ripieno', subtypes: ['Pane arabo', 'Ciabattina', 'Medaglione ai 5 cereali', 'Ciabattina integrale'] },
-            pizza: { name: 'Pizza Ripiena', subtypes: ['Pizza classica'] }
-        };
+        const BASE_OPTIONS = { panino: { name: 'Panino ripieno', subtypes: ['Pane arabo', 'Ciabattina', 'Medaglione ai 5 cereali', 'Ciabattina integrale'] }, pizza: { name: 'Pizza Ripiena', subtypes: ['Pizza classica'] } };
         const CUSTOM_PRODUCT_BASE_PRICE = 3.50;
         const CUSTOM_PRODUCT_EXTRA_INGREDIENT_PRICE = 1.00;
         const CUSTOM_PRODUCT_INCLUDED_INGREDIENTS = 3;
-        // --- LOGICA INGREDIENTI AGGIORNATA ---
+
         const SANDWICH_INGREDIENTS = [
-            // Salumi & Carni
-            { id: 'p-crudo', name: 'Prosciutto Crudo' }, { id: 'p-cotto', name: 'Prosciutto Cotto' },
-            { id: 'salame', name: 'Salame' }, { id: 'mortadella', name: 'Mortadella' },
-            { id: 'porchetta', name: 'Porchetta' }, { id: 'tacchino', name: 'Tacchino Arrosto' },
-            { id: 'bresaola', name: 'Bresaola' }, { id: 'speck', name: 'Speck' },
-            { id: 'capocollo', name: 'Capocollo' },
-            // Formaggi
-            { id: 'mozzarella', name: 'Mozzarella' }, { id: 'scamorza', name: 'Scamorza' },
-            { id: 'stracchino', name: 'Stracchino' }, { id: 'parmigiano', name: 'Parmigiano' },
-            { id: 'pecorino', name: 'Pecorino' }, { id: 'brie', name: 'Brie' },
-            { id: 'primo-sale', name: 'Primo Sale' }, { id: 'stracciatella', name: 'Stracciatella' },
-            // Verdure e Altro
-            { id: 'pomodoro', name: 'Pomodoro' }, { id: 'pom-secchi', name: 'Pomodori Secchi' },
-            { id: 'rucola', name: 'Rucola' }, { id: 'melanzane', name: 'Melanzane Grigliate' },
-            { id: 'zucchine', name: 'Zucchine Grigliate' }, { id: 'peperoni', name: 'Peperoni Grigliati' },
-            { id: 'carciofini', name: 'Carciofini' }, { id: 'frittata', name: 'Frittata' },
-            { id: 'insalata', name: 'Insalata' }, { id: 'olive', name: 'Olive' },
-            { id: 'lattuga', name: 'Lattuga' }, { id: 'broccoletti', name: 'Broccoletti' },
-            { id: 'cicoria', name: 'Cicoria' }, { id: 'scarola', name: 'Scarola' }
+            { id: 'p-crudo', name: 'Prosciutto Crudo' }, { id: 'p-cotto', name: 'Prosciutto Cotto' }, { id: 'salame', name: 'Salame' },
+            { id: 'mortadella', name: 'Mortadella' }, { id: 'porchetta', name: 'Porchetta' }, { id: 'tacchino', name: 'Tacchino Arrosto' },
+            { id: 'bresaola', name: 'Bresaola' }, { id: 'speck', name: 'Speck' }, { id: 'capocollo', name: 'Capocollo' },
+            { id: 'mozzarella', name: 'Mozzarella' }, { id: 'scamorza', name: 'Scamorza' }, { id: 'stracchino', name: 'Stracchino' },
+            { id: 'parmigiano', name: 'Parmigiano' }, { id: 'pecorino', name: 'Pecorino' }, { id: 'brie', name: 'Brie' },
+            { id: 'primo-sale', name: 'Primo Sale' }, { id: 'stracciatella', name: 'Stracciatella' }, { id: 'pomodoro', name: 'Pomodoro' },
+            { id: 'pom-secchi', name: 'Pomodori Secchi' }, { id: 'rucola', name: 'Rucola' }, { id: 'melanzane', name: 'Melanzane Grigliate' },
+            { id: 'zucchine', name: 'Zucchine Grigliate' }, { id: 'peperoni', name: 'Peperoni Grigliati' }, { id: 'carciofini', name: 'Carciofini' },
+            { id: 'frittata', name: 'Frittata' }, { id: 'insalata', name: 'Insalata' }, { id: 'olive', name: 'Olive' },
+            { id: 'lattuga', name: 'Lattuga' }, { id: 'broccoletti', name: 'Broccoletti' }, { id: 'cicoria', name: 'Cicoria' }, { id: 'scarola', name: 'Scarola' }
         ].sort((a, b) => a.name.localeCompare(b.name));
-        // --- RAW_MENU AGGIORNATO ---
+
         const RAW_MENU = {
             "menù combinati": [
                 { name: "Panino + bottiglia acqua 50 cl", price: 4.00, isCombo: true, comboType: 'panino_acqua_50cl', ingredients: ["Un panino a scelta", "Una bottiglietta di acqua naturale o frizzante da 50 cl"], diet: ["carne/pesce", "vegetariano", "vegano"], allergens: ["G", "L", "P"] },
@@ -317,7 +261,6 @@
                 { name: "Porchetta", allergens: ["G"], diet: ["carne/pesce"], calories: 650, ingredients: ["Porchetta di Ariccia"] },
                 { name: "Vegetariano melanzane zucchine e peperoni", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 450, ingredients: ["Melanzane", "Zucchine", "Peperoni grigliati"] },
                 { name: "Tacchino arrosto e verdura", allergens: ["G"], diet: ["carne/pesce"], calories: 480, ingredients: ["Tacchino arrosto", "Verdura di stagione"] },
-                // CORREZIONE REFUSO: "Fesa di tacchino e verdura"
                 { name: "Fesa di tacchino e verdura", allergens: ["G"], diet: ["carne/pesce"], calories: 480, ingredients: ["Tacchino arrosto", "Verdura di stagione"] },
                 { name: "Bresaola parmigiano e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 500, ingredients: ["Bresaola", "Parmigiano a scaglie", "Rucola"] },
                 { name: "Bresaola primo sale e rughetta", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 470, ingredients: ["Bresaola", "Primo sale", "Rucola"] },
@@ -327,7 +270,6 @@
                 { name: "Pane ai 5 cereali con formaggio spalmabile e salmone", allergens: ["G", "L", "P"], diet: ["carne/pesce"], calories: 540, ingredients: ["Pane 5 cereali", "Salmone affumicato", "Formaggio spalmabile"] },
                 { name: "Pane ai 5 cereali con tacchino e zucchine o scarola", allergens: ["G"], diet: ["carne/pesce"], calories: 490, ingredients: ["Pane 5 cereali", "Tacchino arrosto", "Verdura di stagione"] },
                 { name: "Cotoletta di pollo lattuga e pomodoro", allergens: ["G"], diet: ["carne/pesce"], calories: 580, ingredients: ["Cotoletta di pollo", "Lattuga", "Pomodoro"] },
-                // MODIFICA: Rimosso "cotta" dal nome del prodotto
                 { name: "Brasato di manzo e verdura", allergens: ["G"], diet: ["carne/pesce"], calories: 620, ingredients: ["Brasato di manzo", "Verdura cotta di stagione (broccoletti/cicoria/scarola)"] }
             ],
             pizze: [
@@ -341,28 +283,17 @@
                 { name: "Frittata e zucchine", allergens: ["G", "L"], diet: ["vegetariano"], calories: 550, ingredients: ["Frittata", "Zucchine"] },
                 { name: "Bresaola e formaggio", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580, ingredients: ["Bresaola", "Formaggio"] },
                 { name: "Cotto e stracchino", allergens: ["G", "L"], diet: ["carne/pesce"], calories: 620, ingredients: ["Prosciutto cotto", "Stracchino"] },
-                // Pizze Rustiche Aggiunte
                 { name: "Pizza Rustica: Scarola e olive", price: 8.00, isCustomPriced: true, pricingOptions: [ { text: 'Intera - 8.00€', value: '8.00' }, { text: 'Mezza - 4.00€', value: '4.00' }, { text: '1/4 - 2.00€', value: '2.00' } ], allergens: ["G"], diet: ["vegetariano", "vegano"], ingredients: ["Scarola", "Olive"], calories: 500 },
                 { name: "Pizza Rustica: Cicoria e pachino", price: 8.00, isCustomPriced: true, pricingOptions: [ { text: 'Intera - 8.00€', value: '8.00' }, { text: 'Mezza - 4.00€', value: '4.00' }, { text: '1/4 - 2.00€', value: '2.00' } ], allergens: ["G"], diet: ["vegetariano", "vegano"], ingredients: ["Cicoria", "Pomodorini Pachino"], calories: 480 },
                 { name: "Pizza Rustica: Broccoli e salsiccia", price: 8.00, isCustomPriced: true, pricingOptions: [ { text: 'Intera - 8.00€', value: '8.00' }, { text: 'Mezza - 4.00€', value: '4.00' }, { text: '1/4 - 2.00€', value: '2.00' } ], allergens: ["G"], diet: ["carne/pesce"], ingredients: ["Broccoli", "Salsiccia"], calories: 620 }
             ],
             gastronomia: [
-                // Monoporzioni Aggiunte
                 { name: "Melanzane alla parmigiana (grigliate, 250-300g)", price: 6.00, allergens: ["L"], diet: ["vegetariano"], calories: 350, ingredients: ["Melanzane grigliate", "Pomodoro", "Parmigiano"] },
                 { name: "Lasagna classica al ragù (250-300g)", price: 6.00, allergens: ["G", "L"], diet: ["carne/pesce"], calories: 550, ingredients: ["Sfoglia all'uovo", "Ragù di carne", "Besciamella"] },
-                
-                // NUOVO: Lasagne Bianche
                 { name: "Lasagna bianca vegetariana ai carciofi (250-300g)", price: 6.00, allergens: ["G", "L"], diet: ["vegetariano"], calories: 500, ingredients: ["Sfoglia all'uovo", "Besciamella", "Carciofi", "Parmigiano"] },
                 { name: "Lasagna bianca funghi piselli e salsiccia (250-300g)", price: 6.00, allergens: ["G", "L"], diet: ["carne/pesce"], calories: 600, ingredients: ["Sfoglia all'uovo", "Besciamella", "Funghi", "Piselli", "Salsiccia"] },
-
-                // Esistenti
                 { name: "Cous cous vegetale con pollo", allergens: ["G"], diet: ["carne/pesce"], calories: 450, ingredients: ["Cous cous", "Verdure miste", "Pollo"] },
                 { name: "Cous cous vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 350, ingredients: ["Cous cous", "Verdure miste"] },
-                
-                // MOMENTANEAMENTE RIMOSSI DALL'OFFERTA (FARRO)
-                // { name: "Farro vegetale", allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 380, ingredients: ["Farro", "Verdure miste"] },
-                // { name: "Farro vegetale con salmone", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 480, ingredients: ["Farro", "Verdure miste", "Salmone"] },
-                
                 { name: "Riso Venere con gamberi e zucchine", allergens: ["C"], diet: ["carne/pesce"], calories: 420, ingredients: ["Riso Venere", "Gamberi", "Zucchine"] },
                 { name: "Insalata di riso", allergens: [], diet: ["carne/pesce"], calories: 400, ingredients: ["Riso", "Wurstel", "Uova", "Verdure sott'olio"] },
                 { name: "Pasta fredda con tonno pomodori e olive", allergens: ["G", "P"], diet: ["carne/pesce"], calories: 450, ingredients: ["Pasta", "Tonno", "Pomodorini", "Olive"] },
@@ -385,15 +316,11 @@
             ],
             dessert: [
                 { name: "Macedonia", allergens: [], diet: ["vegetariano", "vegano"], calories: 120, ingredients: ["Frutta fresca di stagione"] },
-                // Pasticceria Aggiunta
                 { name: "Crostatina alla marmellata", price: 1.50, allergens: ["G"], diet: ["vegetariano"], calories: 220, ingredients: ["Pasta frolla", "Marmellata"] },
-                // Aggiornati i prezzi
                 { name: "Lingue di gatto (1pz)", price: 1.00, allergens: ["G", "L"], diet: ["vegetariano"], calories: 75, ingredients: ["Biscotti secchi", "Cioccolato"] },
                 { name: "Ferretti glassati (1pz)", price: 2.00, allergens: ["G", "L"], diet: ["vegetariano"], calories: 120, ingredients: ["Biscotti secchi", "Glaze"] }
             ]
         };
-        // --- FINE MENU AGGIORNATO ---
-
 
         const state = {
             currentUser: null,
@@ -404,24 +331,17 @@
             cart: [],
             allOrders: [],
             menuData: [],
-            allUsersData: [], // Dati utenti per autocompletamento
+            allUsersData: [],
             caloriesVisible: false,
             currentComboItem: null,
-            customSandwich: {
-                base: null,
-                subtype: null,
-                // Ingredienti salvati come oggetti { id: 'ing-id', name: 'Nome Ingrediente', uid: 'timestamp' }
-                ingredients: [], 
-                basePrice: CUSTOM_PRODUCT_BASE_PRICE,
-                totalPrice: 0
-            }
+            customSandwich: { base: null, subtype: null, ingredients: [], basePrice: CUSTOM_PRODUCT_BASE_PRICE, totalPrice: 0 }
         };
         const dom = { };
+
         function updateIngredientsWithOlives(menu) {
             for (const category in menu) {
                 menu[category].forEach(item => {
-                    const hasSalad = item.name.toLowerCase().includes('insalata') ||
-                                     (item.ingredients && item.ingredients.some(ing => ing.toLowerCase().includes('insalata')));
+                    const hasSalad = item.name.toLowerCase().includes('insalata') || (item.ingredients && item.ingredients.some(ing => ing.toLowerCase().includes('insalata')));
                     if (hasSalad) {
                         if (!item.ingredients) item.ingredients = [];
                         const hasOlives = item.ingredients.some(ing => ing.toLowerCase().includes('olive'));
@@ -439,45 +359,47 @@
             return Object.entries(updatedMenu).flatMap(([cat, items]) => items.map(item => ({ id: id++, name: item.name, category: cat.charAt(0).toUpperCase() + cat.slice(1), price: item.price !== undefined ? item.price : (prices[cat] || 0), icon: icons[cat] || 'fa-utensils', ...item })))
         }
 
-        function showToast(message, duration = 3000) { dom.toastMessageEl.textContent = message; dom.toastEl.classList.remove('opacity-0'); setTimeout(() => dom.toastEl.classList.add('opacity-0'), duration); }
+        function showToast(message, duration = 3000) { 
+            dom.toastMessageEl.textContent = message; 
+            dom.toastEl.classList.remove('opacity-0'); 
+            setTimeout(() => dom.toastEl.classList.add('opacity-0'), duration); 
+        }
 
         function navigate(viewName) {
             state.currentView = viewName;
             dom.views.forEach(v => v.classList.toggle('active', v.id === `${viewName}-view`));
-            dom.navBtns.forEach(b => { b.classList.toggle('bg-primary', b.dataset.view === viewName); b.classList.toggle('text-white', b.dataset.view === viewName); });
+            dom.navBtns.forEach(b => {
+                const isActive = b.dataset.view === viewName;
+                b.classList.toggle('bg-primary', isActive);
+                b.classList.toggle('text-white', isActive);
+                if(isActive) b.classList.remove('text-text-main'); else b.classList.add('text-text-main');
+            });
             if (viewName === 'my-order') renderMyOrder();
             if (viewName === 'all-orders') renderAllOrders();
             if (viewName === 'custom-sandwich') renderCustomSandwichBuilder();
-            // Scrolling behavior
+            
             const targetElement = document.getElementById(viewName + "-view");
             if (targetElement) {
                 const navHeight = dom.navEl.offsetHeight;
                 const targetOffsetTop = targetElement.getBoundingClientRect().top + window.scrollY;
-                const finalPosition = targetOffsetTop - navHeight - 32;
-                // 32px padding (adjust as needed)
-
-                window.scrollTo({
-                    top: finalPosition,
-                    behavior: 'smooth'
-                });
+                const finalPosition = targetOffsetTop - navHeight - 120;
+                window.scrollTo({ top: finalPosition, behavior: 'smooth' });
             }
         }
 
         function updateFilterCounter() {
             let count = 0;
             if (state.activeCategoryFilter !== 'all') count++; if (state.activeDietFilter !== 'all') count++; if(state.searchTerm) count++;
-            dom.filterCounterContainer.innerHTML = count > 0 ? `<i class="fas fa-filter text-primary"></i> ${count} ${count === 1 ? 'filtro applicato' : 'filtri applicati'}` : '';
+            dom.filterCounterContainer.innerHTML = count > 0 ? `<i class="fas fa-filter text-primary"></i> ${count} filtri` : '';
         }
 
         function renderFilters() {
             let catSelectHtml = `<option value="all">Tutte le Categorie</option>`;
-            // Ordine modificato
             CATEGORY_ORDER.forEach(catKey => {
                  const catName = catKey.charAt(0).toUpperCase() + catKey.slice(1);
                  catSelectHtml += `<option value="${catKey.toLowerCase()}" ${catKey.toLowerCase() === state.activeCategoryFilter ? 'selected' : ''}>${catName}</option>`;
              });
             dom.categorySelect.innerHTML = catSelectHtml;
-
             let dietSelectHtml = `<option value="all">Tutti i Regimi</option>`; Object.entries(DIETS).forEach(([key, info]) => { dietSelectHtml += `<option value="${key}">${info.icon} ${info.name}</option>`; });
             dom.dietSelect.innerHTML = dietSelectHtml;
             let legendHtml = ''; Object.values(ALLERGENS).forEach(info => { legendHtml += `<p class="flex items-center text-base mb-1"><i class="fas ${info.icon} mr-2 text-gray-600"></i> ${info.name}</p>`; });
@@ -487,212 +409,104 @@
         function renderMenu() {
             const term = state.searchTerm.toLowerCase();
             const filtered = state.menuData.filter(item => (item.name.toLowerCase().includes(term)) && (state.activeCategoryFilter === 'all' || item.category.toLowerCase() === state.activeCategoryFilter) && (state.activeDietFilter === 'all' || (item.diet && item.diet.includes(state.activeDietFilter))));
-            if (filtered.length === 0) {
-                 dom.menuItemsContainer.innerHTML = `<div class="text-center p-8 col-span-full bg-white rounded-xl shadow"><p class="text-gray-500">Nessun piatto trovato.</p></div>`;
-                 return;
-            }
+            if (filtered.length === 0) { dom.menuItemsContainer.innerHTML = `<div class="text-center p-8 col-span-full bg-white rounded-xl shadow"><p class="text-gray-500">Nessun piatto trovato.</p></div>`; return; }
 
             let currentCategory = '';
             let menuHtml = '';
-            // Ordine di visualizzazione basato sul nuovo CATEGORY_ORDER
             const sortedItems = filtered.sort((a, b) => CATEGORY_ORDER.indexOf(a.category) - CATEGORY_ORDER.indexOf(b.category));
             sortedItems.forEach(item => {
                 if (item.category !== currentCategory) {
                     currentCategory = item.category;
-                    menuHtml += `<div class="col-span-full mt-6 mb-2"><h3 class="text-2xl font-bold border-b-2 border-primary-light pb-2">${currentCategory}</h3></div>`;
+                    menuHtml += `<div class="col-span-full mt-6 mb-2"><h3 class="text-xl md:text-2xl font-bold border-b-2 border-primary-light pb-2 text-text-main">${currentCategory}</h3></div>`;
                 }
-
                 const allergenHtml = (item.allergens || []).map(key => `<i class="fas ${ALLERGENS[key]?.icon || 'fa-question-circle'}" title="${ALLERGENS[key]?.name || 'Allergene sconosciuto'}"></i>`).join(' ');
-
-                let priceOrPortionSelectorHtml = `<span class="font-semibold text-lg">€${item.price.toFixed(2)}</span>`;
-                
-                // --- Gestione Prezzo da Definire ---
-                if (item.price === 0.00 && item.note) {
-                     priceOrPortionSelectorHtml = `<span class="font-semibold text-sm text-red-500">Prezzo da definire</span>`;
-                }
-                // --- Fine Gestione ---
-
+                let priceOrPortionSelectorHtml = `<span class="font-bold text-lg text-primary">€${item.price.toFixed(2)}</span>`;
+                if (item.price === 0.00 && item.note) { priceOrPortionSelectorHtml = `<span class="font-semibold text-sm text-red-500">Prezzo da definire</span>`; }
                 if ((item.category === 'Verdure' || item.isCustomPriced) && !(item.price === 0.00 && item.note)) {
                     let options;
-                    if (item.category === 'Verdure') {
-                        options = [
-                            { text: '100g - 2.00€', value: '2.00' },
-                            { text: '150g - 3.00€', value: '3.00' },
-                            { text: '200g - 4.00€', value: '4.00' }
-                        ];
-                    } else { // isCustomPriced
-                        options = item.pricingOptions;
-                    }
-
+                    if (item.category === 'Verdure') { options = [ { text: '100g - 2.00€', value: '2.00' }, { text: '150g - 3.00€', value: '3.00' }, { text: '200g - 4.00€', value: '4.00' } ]; } else { options = item.pricingOptions; }
                     const initialPrice = options[0].value;
                     const optionsHtml = options.map(opt => `<option value="${opt.value}" ${opt.value === initialPrice ? 'selected' : ''}>${opt.text}</option>`).join('');
-                    priceOrPortionSelectorHtml = `
-                        <div class="flex items-center gap-2">
-                            <select data-id="${item.id}" class="portion-select bg-gray-50 border border-gray-300 text-sm rounded-lg p-2">
-                                ${optionsHtml}
-                            </select>
-                            <span id="price-display-${item.id}" class="font-bold text-lg text-primary w-20 text-right">€${parseFloat(initialPrice).toFixed(2)}</span>
-                        </div>
-                    `;
+                    priceOrPortionSelectorHtml = `<div class="flex items-center gap-2"><select data-id="${item.id}" class="portion-select bg-gray-50 border border-gray-300 text-sm rounded-lg p-1.5 focus:ring-primary focus:border-primary">${optionsHtml}</select><span id="price-display-${item.id}" class="font-bold text-lg text-primary w-16 text-right">€${parseFloat(initialPrice).toFixed(2)}</span></div>`;
                 }
-
-                const noteHtml = item.note ? `<p class="text-xs text-red-500 ml-9 mt-1">${item.note}</p>` : '';
+                const noteHtml = item.note ? `<p class="text-xs text-red-500 mt-1 pl-1 border-l-2 border-red-300">${item.note}</p>` : '';
                 const addButtonDisabled = (item.price === 0.00 && item.note) ? 'disabled' : '';
-                const addButtonClass = (item.price === 0.00 && item.note) ? 'bg-gray-400 cursor-not-allowed' : 'bg-primary hover:bg-primary-dark';
+                const addButtonClass = (item.price === 0.00 && item.note) ? 'bg-gray-300 cursor-not-allowed text-gray-500' : 'bg-primary hover:bg-primary-dark text-white shadow-md active:scale-95';
+                
                 menuHtml += `
-                <div class="bg-white p-4 rounded-xl shadow-md flex flex-col hover:shadow-lg transition-all duration-300">
+                <div class="bg-white p-4 rounded-2xl shadow-sm flex flex-col hover:shadow-md transition-all duration-300 border border-transparent hover:border-gray-100">
                     <div class="flex-grow">
-                        <div class="flex items-start mb-2">
-                            <i class="fas ${item.icon} text-primary text-xl mr-3 w-6 text-center pt-1"></i>
-                            <div>
-                                <h3 class="font-bold text-lg">${item.name}</h3>
-                                <p class="text-text-main/70 text-sm">${item.category}</p>
-                            </div>
+                        <div class="flex items-start justify-between mb-1">
+                             <div class="flex items-start">
+                                <div class="bg-primary-100 p-2 rounded-full mr-3 text-primary shrink-0"><i class="fas ${item.icon} text-lg w-5 h-5 flex items-center justify-center"></i></div>
+                                <div><h3 class="font-bold text-base md:text-lg leading-tight text-gray-800">${item.name}</h3></div>
+                             </div>
                         </div>
-                        <p class="text-xs text-text-main/80 ml-9 mt-1"><span class="font-semibold">Ingredienti:</span> ${item.ingredients ? item.ingredients.join(', ') : 'Non specificati'}</p>
+                        <p class="text-xs text-gray-500 mb-2 pl-[3.25rem]">${item.ingredients ? item.ingredients.join(', ') : ''}</p>
                         ${noteHtml}
                     </div>
-                    <div class="flex justify-between items-center mt-4">
-                        <div class="flex gap-3 text-lg items-center text-text-main/70">${allergenHtml}</div>
-                        ${priceOrPortionSelectorHtml}
+                    <div class="mt-3 pt-3 border-t border-gray-50">
+                        <div class="flex justify-between items-center">
+                            <div class="flex gap-2 text-gray-400 text-sm h-6">${allergenHtml}</div>
+                            ${priceOrPortionSelectorHtml}
+                        </div>
+                        <p class="calorie-info text-xs text-gray-400 text-right mt-1" style="display: ${state.caloriesVisible ? 'block' : 'none'};">~${item.calories || 'N/A'} kcal</p>
+                        <button data-id="${item.id}" class="add-to-cart-btn w-full mt-3 ${addButtonClass} font-bold py-2.5 px-4 rounded-xl transition-all duration-200" ${addButtonDisabled}><i class="fas fa-plus mr-2"></i> Aggiungi</button>
                     </div>
-                    <p class="calorie-info text-xs text-text-main/70 text-right mt-1" style="display: ${state.caloriesVisible ? 'flex' : 'none'}; justify-content: flex-end; align-items: center;">
-                        ~${item.calories || 'N/A'} kcal <i class="fas fa-question-circle text-primary ml-1 cursor-pointer calorie-info-icon"></i>
-                    </p>
-                    <button data-id="${item.id}" class="add-to-cart-btn w-full mt-4 ${addButtonClass} text-white font-bold py-2 px-4 rounded-lg transition-all duration-300" ${addButtonDisabled}><i class="fas fa-plus mr-2"></i> Aggiungi</button>
                 </div>`;
             });
             dom.menuItemsContainer.innerHTML = menuHtml;
         }
 
         function renderMyOrder() {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
+            const today = new Date(); today.setHours(0, 0, 0, 0);
             const todaysUserOrder = state.allOrders.find(order => order.uid === state.currentUser?.uid && order.createdAt && order.createdAt.toDate() >= today);
+            
             if (todaysUserOrder) {
-                const itemsHtml = todaysUserOrder.items.map(item => `<li class="flex justify-between items-center text-sm"><span>${item.quantity} x ${item.name}</span><span class="font-medium">€${(item.price * item.quantity).toFixed(2)}</span></li>`).join('');
-                const notesHtml = `
-                    ${todaysUserOrder.allergies ? `<p class="text-sm mt-2 p-2 bg-red-50 border-l-4 border-red-400"><b class="text-red-700">Allergie:</b> ${todaysUserOrder.allergies}</p>` : ''}
-                    ${todaysUserOrder.cutlery ? `<p class="text-sm mt-2 p-2 bg-green-50 border-l-4 border-green-400"><b>Posate richieste.</b></p>` : ''}
-                `;
-                const responseHtml = todaysUserOrder.restaurateurResponse
-                    ? `<div id="restaurateur-response" class="mt-4 p-3 rounded-lg bg-yellow-100 border-l-4 border-yellow-400">
-                            <p class="font-bold text-yellow-800"><i class="fas fa-comment-dots mr-2"></i>Messaggio dal ristoratore:</p>
-                            <p class="text-yellow-700">${todaysUserOrder.restaurateurResponse}</p>
-                        </div>`
-                    : '';
-                dom.myOrderContentEl.innerHTML = `
-                    <p class="mb-4">Hai già inviato il tuo ordine per oggi. Ecco il riepilogo:</p>
-                    <ul class="space-y-2 border-t border-b py-4">${itemsHtml}</ul>
-                    <div class="text-right font-bold text-2xl mt-4">Totale: €${todaysUserOrder.total.toFixed(2)}</div>
-                    <div class="mt-2">${notesHtml}</div>
-                    ${responseHtml}
-                    <p class="text-xs text-gray-500 mt-4 text-center">Puoi modificare o eliminare l'ordine dalla sezione "Tutti gli Ordini" entro le 11:30.</p>
-                `;
-                dom.cartCountEl.textContent = '✓';
-                return;
+                const itemsHtml = todaysUserOrder.items.map(item => `<li class="flex justify-between items-center text-sm py-1 border-b border-gray-50 last:border-0"><span>${item.quantity} x ${item.name}</span><span class="font-medium">€${((item.price || 0) * item.quantity).toFixed(2)}</span></li>`).join('');
+                const notesHtml = `${todaysUserOrder.allergies ? `<p class="text-sm mt-3 p-2 bg-red-50 text-red-700 rounded-lg border border-red-100"><i class="fas fa-exclamation-triangle mr-1"></i> Allergie: ${todaysUserOrder.allergies}</p>` : ''}${todaysUserOrder.cutlery ? `<p class="text-sm mt-2 p-2 bg-green-50 text-green-700 rounded-lg border border-green-100"><i class="fas fa-utensils mr-1"></i> Posate richieste.</p>` : ''}`;
+                const responseHtml = todaysUserOrder.restaurateurResponse ? `<div id="restaurateur-response" class="mt-4 p-4 rounded-xl bg-yellow-50 border border-yellow-200 text-yellow-800 shadow-sm"><p class="font-bold flex items-center"><i class="fas fa-comment-dots mr-2"></i>Risposta Ristoratore:</p><p class="mt-1">${todaysUserOrder.restaurateurResponse}</p></div>` : '';
+                dom.myOrderContentEl.innerHTML = `<div class="text-center mb-6"><div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 text-green-500 rounded-full mb-3"><i class="fas fa-check text-2xl"></i></div><h3 class="text-xl font-bold">Ordine Inviato!</h3><p class="text-gray-500 text-sm">Ecco il riepilogo per oggi.</p></div><ul class="bg-gray-50 p-4 rounded-xl mb-4 space-y-1">${itemsHtml}</ul><div class="flex justify-between items-center font-bold text-xl px-2"><span>Totale:</span><span class="text-primary">€${(todaysUserOrder.total || 0).toFixed(2)}</span></div>${notesHtml}${responseHtml}<p class="text-xs text-gray-400 mt-6 text-center">Modifiche possibili entro le 11:30 in "Tutti gli Ordini".</p>`;
+                dom.cartCountEl.textContent = '✓'; dom.cartCountEl.classList.add('bg-green-500', 'text-white'); dom.cartCountEl.classList.remove('bg-red-500'); return;
             }
 
             const totalItems = state.cart.reduce((sum, item) => sum + item.quantity, 0);
-            dom.cartCountEl.textContent = totalItems;
-            if (state.cart.length === 0) {
-                dom.myOrderContentEl.innerHTML = `<p class="text-center text-gray-500 py-8">Il tuo carrello è vuoto.</p>`;
-                return;
+            dom.cartCountEl.textContent = totalItems; dom.cartCountEl.classList.remove('bg-green-500'); dom.cartCountEl.classList.add('bg-red-500');
+            
+            if (state.cart.length === 0) { 
+                dom.myOrderContentEl.innerHTML = `<div class="flex flex-col items-center justify-center py-12 text-gray-400"><i class="fas fa-shopping-basket text-4xl mb-3 opacity-50"></i><p>Il tuo carrello è vuoto.</p><button onclick="window.location.hash='#menu-view'" class="mt-4 text-primary font-semibold hover:underline">Vai al menù</button></div>`; 
+                return; 
             }
 
-            const total = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const total = state.cart.reduce((sum, item) => sum + ((item.price || 0) * item.quantity), 0);
             const itemsHtml = state.cart.map(item => {
-                let detailsHtml = (item.isCustom || item.isCombo)
-                    ? `<p class="text-xs text-gray-500 mt-1">${item.details}</p>`
-                    : '';
-
-                return `
-                <div class="py-4 border-b border-gray-200">
-                    <div class="flex justify-between items-start">
-                        <div><p class="font-semibold">${item.name}</p><p class="text-sm text-text-main/70">€${item.price.toFixed(2)}</p></div>
-                        <div class="flex items-center gap-3">
-                            <button data-id="${item.cartId}" data-action="decrease" class="cart-qty-btn bg-gray-200 rounded-full h-8 w-8 transition-all duration-300">-</button>
-                            <span class="font-bold text-lg">${item.quantity}</span>
-                            <button data-id="${item.cartId}" data-action="increase" class="cart-qty-btn bg-gray-200 rounded-full h-8 w-8 transition-all duration-300">+</button>
-                            <button data-id="${item.cartId}" class="cart-remove-btn text-red-500 text-lg flex-shrink-0 ml-4 transition-all duration-300"><i class="fas fa-trash-alt"></i></button>
-                        </div>
-                    </div>
-                    ${detailsHtml}
-                </div>`;
+                let detailsHtml = (item.isCustom || item.isCombo) ? `<p class="text-xs text-gray-500 mt-1 pl-4 border-l-2 border-gray-200">${item.details}</p>` : '';
+                // Fix: ensure item.price is a number
+                const price = item.price || 0;
+                return `<div class="py-4 border-b border-gray-100 last:border-0"><div class="flex justify-between items-start gap-3"><div class="flex-grow"><p class="font-semibold text-gray-800 leading-tight">${item.name}</p><p class="text-sm text-primary font-medium mt-1">€${price.toFixed(2)}</p></div><div class="flex items-center bg-gray-50 rounded-lg p-1 border border-gray-200"><button data-id="${item.cartId}" data-action="decrease" class="cart-qty-btn w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-white rounded-md transition-colors font-bold text-lg">-</button><span class="w-8 text-center font-semibold text-gray-800">${item.quantity}</span><button data-id="${item.cartId}" data-action="increase" class="cart-qty-btn w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-white rounded-md transition-colors font-bold text-lg">+</button></div><button data-id="${item.cartId}" class="cart-remove-btn text-red-400 hover:text-red-600 p-2 ml-1"><i class="fas fa-trash-alt"></i></button></div>${detailsHtml}</div>`;
             }).join('');
 
             dom.myOrderContentEl.innerHTML = `
-                <div class="space-y-4 mb-4">${itemsHtml}</div>
-                <div class="mt-6 space-y-4">
-                    
-                    <div>
-                        <label for="allergies-input" class="block mb-2 font-semibold text-red-700"><i class="fas fa-exclamation-triangle mr-2"></i>Segnalazione Allergie Importanti:</label>
-                        <textarea id="allergies-input" placeholder="Per favore, specifica qui eventuali allergie gravi." class="w-full p-3 border border-red-300 rounded-lg focus:ring-2 focus:ring-red-400"></textarea>
-                    </div>
-
-                    <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-                        <label for="cutlery-checkbox" class="font-semibold cursor-pointer">Hai bisogno di posate?</label>
-                        <div class="relative inline-block w-10 mr-2 align-middle select-none">
-                            <input type="checkbox" name="cutlery-checkbox" id="cutlery-checkbox" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300 ease-in-out"/>
-                            <label for="cutlery-checkbox" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
-                        </div>
-                    </div>
+                <div class="space-y-1 mb-6">${itemsHtml}</div>
+                <div class="bg-gray-50 p-4 rounded-xl space-y-4 border border-gray-100">
+                    <div><label class="block mb-2 font-semibold text-sm text-red-700 flex items-center"><i class="fas fa-exclamation-triangle mr-2"></i>Segnalazione Allergie:</label><textarea id="allergies-input" placeholder="Allergie gravi..." class="w-full p-3 border border-red-200 bg-white rounded-xl focus:ring-2 focus:ring-red-400 focus:outline-none text-sm"></textarea></div>
+                    <div class="flex items-center justify-between"><label for="cutlery-checkbox" class="font-semibold text-sm cursor-pointer text-gray-700">Vuoi le posate?</label><div class="relative inline-block w-12 align-middle select-none"><input type="checkbox" name="cutlery-checkbox" id="cutlery-checkbox" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300 ease-in-out top-0 left-0"/><label for="cutlery-checkbox" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label></div></div>
                 </div>
-
-                <a href="https://www.satispay.com/it-it/privati/" target="_blank" 
-                    class="block mt-4 p-3 rounded-lg shadow-sm bg-primary-100 border-2 border-primary">
-                    
-                    <div class="flex items-center justify-center gap-3 sm:gap-4">
-                        <div class="text-left text-primary-800 flex-1">
-                            <p class="font-bold text-lg leading-tight">Scarica l'app e</p>
-                            <p class="font-bold text-lg leading-tight">ottieni 5€</p>
-                            <p class="font-semibold text-base mt-1">con il codice: <span class="font-extrabold">WEB</span></p>
-                        </div>
-                        <div class="flex-shrink-0 w-24 h-24 sm:w-28 sm:h-28">
-                            <img src="${SATISPAY_DOWNLOAD_QR}" 
-                                alt="QR Code Satispay Download App" 
-                                class="w-full h-full object-cover rounded-md bg-white p-1">
-                        </div>
-                    </div>
-                </a>
-                
-                <div class="mt-6">
-                    <h4 class="block mb-2 font-semibold">Metodo di Pagamento</h4>
-                    <div class="mt-2">
-                        <input type="radio" id="payment-Satispay" name="payment-method" value="Satispay" class="hidden payment-radio" checked disabled>
-                        <label for="payment-Satispay" class="block border-2 border-primary rounded-lg p-3 text-center cursor-not-allowed opacity-100" style="box-shadow: 0 0 0 2px rgba(214, 128, 79, 0.4);">
-                            <i class="fas fa-mobile-alt text-2xl text-primary"></i>
-                            <span class="block text-sm font-semibold mt-2">Satispay</span>
-                            <span class="block text-xs text-text-main/60 mt-1 font-normal">Pagamento da effettuare entro le 11:30.</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="text-right font-bold text-2xl mt-6">Totale: €${total.toFixed(2)}</div>
-                
-                <button id="confirm-order-btn" class="w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300">
-                    <i class="fab fa-satispay mr-2"></i>Paga ora e Invia Ordine
-                </button>
-            `;
+                <a href="https://www.satispay.com/it-it/privati/" target="_blank" class="block mt-4 p-3 rounded-xl shadow-sm bg-orange-50 border border-orange-200"><div class="flex items-center justify-center gap-4"><div class="text-left text-primary-800 flex-1"><p class="font-bold text-sm leading-tight">Scarica Satispay</p><p class="font-bold text-lg leading-tight text-primary">Ottieni 5€</p><p class="font-medium text-xs mt-1">Codice: <span class="font-extrabold bg-white px-1 rounded text-primary">WEB</span></p></div><img src="${SATISPAY_DOWNLOAD_QR}" alt="QR" class="w-16 h-16 rounded bg-white p-1 shadow-sm"></div></a>
+                <div class="mt-6"><h4 class="block mb-3 font-semibold text-sm text-gray-600">Pagamento</h4><input type="radio" id="payment-Satispay" name="payment-method" value="Satispay" class="hidden payment-radio" checked disabled><label for="payment-Satispay" class="flex items-center gap-3 border-2 border-primary rounded-xl p-3 cursor-not-allowed bg-white"><div class="bg-primary-100 p-2 rounded-full text-primary"><i class="fas fa-mobile-alt text-xl"></i></div><div><span class="block font-bold text-gray-800">Satispay</span><span class="block text-xs text-gray-500">Paga entro le 11:30</span></div></label></div>
+                <div class="flex justify-between items-end mt-8 pt-4 border-t border-gray-100"><span class="text-gray-500 font-medium">Totale ordine:</span><span class="text-3xl font-extrabold text-primary">€${total.toFixed(2)}</span></div>
+                <button id="confirm-order-btn" class="w-full mt-4 bg-primary hover:bg-primary-dark text-white font-bold py-4 px-6 rounded-xl shadow-lg transition-all duration-300 active:scale-95 text-lg"><i class="fas fa-paper-plane mr-2"></i>Invia Ordine</button>`;
         }
 
         function renderCustomSandwichBuilder() {
-            // Reset state
             state.customSandwich = { base: null, subtype: null, ingredients: [], basePrice: CUSTOM_PRODUCT_BASE_PRICE, totalPrice: 0 };
-            dom.baseChoiceContainer.querySelectorAll('.choice-btn').forEach(btn => btn.classList.remove('selected'));
+            dom.baseChoiceContainer.querySelectorAll('.choice-btn').forEach(btn => btn.classList.remove('selected', 'border-primary', 'bg-orange-50'));
             dom.subtypeChoiceContainer.classList.add('hidden');
             dom.ingredientsStepContainer.classList.add('hidden');
-
-            // Render ingredients. The card will handle clicks to add/remove.
             const ingredientsHtml = SANDWICH_INGREDIENTS.map(ing => {
                 const count = state.customSandwich.ingredients.filter(i => i.id === ing.id).length;
-                const countDisplay = count > 0 ? `<span class="absolute top-0 right-0 bg-primary text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center transform translate-x-1/2 -translate-y-1/2">${count}</span>` : '';
-                return `
-                <div data-id="${ing.id}" class="ingredient-card bg-white p-3 rounded-lg shadow-sm cursor-pointer border-2 border-transparent transition-all duration-200 flex flex-col justify-center items-center text-center relative">
-                    <p class="font-semibold text-sm">${ing.name}</p>
-                    ${countDisplay}
-                </div>
-            `;
+                const countDisplay = count > 0 ? `<span class="absolute -top-2 -right-2 bg-primary text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center shadow-sm border-2 border-white">${count}</span>` : '';
+                return `<div data-id="${ing.id}" class="ingredient-card bg-white p-2 md:p-3 rounded-xl shadow-sm cursor-pointer border-2 border-transparent transition-all duration-200 flex flex-col justify-center items-center text-center relative hover:shadow-md active:scale-95 select-none h-20 md:h-24"><p class="font-semibold text-xs md:text-sm leading-tight">${ing.name}</p>${countDisplay}</div>`;
             }).join('');
             dom.ingredientsList.innerHTML = ingredientsHtml;
             updateSandwichSummary();
@@ -700,827 +514,232 @@
 
         function updateSandwichSummary() {
             const { ingredients, basePrice, base, subtype } = state.customSandwich;
-            if (!base || !subtype) {
-                dom.sandwichTotalPrice.textContent = `€0.00`;
-                dom.addSandwichBtn.disabled = true;
-                dom.selectedIngredientsList.innerHTML = `<li class="text-gray-400">Seleziona una base e una variante...</li>`;
-                dom.sandwichBaseSummary.textContent = `Seleziona una base...`;
-                dom.extraChargeNotice.textContent = '';
-                return;
-            }
+            if (!base || !subtype) { dom.sandwichTotalPrice.textContent = `€0.00`; dom.addSandwichBtn.disabled = true; dom.selectedIngredientsList.innerHTML = `<li class="text-gray-400 italic text-center py-4">Scegli base e variante...</li>`; dom.sandwichBaseSummary.textContent = `...`; dom.extraChargeNotice.textContent = ''; return; }
 
             dom.sandwichBaseSummary.textContent = `${BASE_OPTIONS[base].name} (${subtype})`;
             let currentPrice = basePrice;
             const extraIngredientsCount = Math.max(0, ingredients.length - CUSTOM_PRODUCT_INCLUDED_INGREDIENTS);
             currentPrice += extraIngredientsCount * CUSTOM_PRODUCT_EXTRA_INGREDIENT_PRICE;
-            dom.extraChargeNotice.textContent = extraIngredientsCount > 0 ? `Supplemento: +€${(extraIngredientsCount * CUSTOM_PRODUCT_EXTRA_INGREDIENT_PRICE).toFixed(2)}` : '';
-            // Group ingredients to display quantity and price
-            const ingredientCounts = ingredients.reduce((acc, ing) => {
-                const count = acc[ing.id] ? acc[ing.id].count + 1 : 1;
-                return { ...acc, [ing.id]: { name: ing.name, count } };
-            }, {});
-            let listHtml = '';
-            let totalIngredientIndex = 0; // Contatore per il calcolo del prezzo
-
-            Object.keys(ingredientCounts).sort((a, b) => {
-                // Ordina per l'ordine di selezione originale, ma qui usiamo l'id per semplicità
-                const nameA = ingredientCounts[a].name;
-                const nameB = ingredientCounts[b].name;
-                return nameA.localeCompare(nameB);
-            }).forEach(id => {
+            dom.extraChargeNotice.textContent = extraIngredientsCount > 0 ? `Extra: +€${(extraIngredientsCount * CUSTOM_PRODUCT_EXTRA_INGREDIENT_PRICE).toFixed(2)}` : '';
+            
+            const ingredientCounts = ingredients.reduce((acc, ing) => { const count = acc[ing.id] ? acc[ing.id].count + 1 : 1; return { ...acc, [ing.id]: { name: ing.name, count } }; }, {});
+            let listHtml = ''; let totalIngredientIndex = 0;
+            Object.keys(ingredientCounts).sort((a, b) => ingredientCounts[a].name.localeCompare(ingredientCounts[b].name)).forEach(id => {
                 const item = ingredientCounts[id];
                 for (let i = 0; i < item.count; i++) {
-                    const priceText = totalIngredientIndex < CUSTOM_PRODUCT_INCLUDED_INGREDIENTS 
-                                            ? '(incluso)' 
-                                            : `+€${CUSTOM_PRODUCT_EXTRA_INGREDIENT_PRICE.toFixed(2)}`;
-                    
-                    // Solo la prima occorrenza mostra la quantità totale nel nome
-                    const displayName = i === 0 
-                        ? (item.count > 1 ? `${item.name} (x${item.count})` : item.name)
-                        : null;
+                    const isExtra = totalIngredientIndex >= CUSTOM_PRODUCT_INCLUDED_INGREDIENTS;
+                    const priceText = isExtra ? `+€${CUSTOM_PRODUCT_EXTRA_INGREDIENT_PRICE.toFixed(2)}` : '✔';
+                    const displayName = i === 0 ? (item.count > 1 ? `<strong>${item.name}</strong> <span class="text-xs bg-gray-200 px-1.5 py-0.5 rounded-md ml-1">x${item.count}</span>` : item.name) : null;
                     if(displayName) {
-                        // Calcola il costo totale di questo ingrediente (inclusi gli extra)
-                        let totalCost = 0;
-                        for(let j=0; j < item.count; j++) {
-                           if(totalIngredientIndex + j >= CUSTOM_PRODUCT_INCLUDED_INGREDIENTS) {
-                                totalCost += CUSTOM_PRODUCT_EXTRA_INGREDIENT_PRICE;
-                            }
-                        }
-                        
-                        const costDisplay = totalCost > 0 
-                            ? `+€${totalCost.toFixed(2)}`
-                            : (item.count <= CUSTOM_PRODUCT_INCLUDED_INGREDIENTS ? `(inclusi)` : '(inclusi + extra)');
-                        // Aggiunge la riga riassuntiva
-                        listHtml += `<li class="flex justify-between"><span>${displayName}</span> <span class="text-gray-500">${costDisplay}</span></li>`;
+                        let totalCost = 0; for(let j=0; j < item.count; j++) { if(totalIngredientIndex + j >= CUSTOM_PRODUCT_INCLUDED_INGREDIENTS) totalCost += CUSTOM_PRODUCT_EXTRA_INGREDIENT_PRICE; }
+                        const costDisplay = totalCost > 0 ? `<span class="text-primary font-bold">+€${totalCost.toFixed(2)}</span>` : `<span class="text-green-500 text-xs font-bold uppercase">Incluso</span>`;
+                        listHtml += `<li class="flex justify-between items-center py-1 border-b border-gray-50 last:border-0"><span class="text-gray-700">${displayName}</span> ${costDisplay}</li>`;
                     }
                     totalIngredientIndex++;
                 }
             });
-            if (ingredients.length === 0) {
-                dom.selectedIngredientsList.innerHTML = `<li class="text-gray-400">Seleziona fino a 3 ingredienti inclusi...</li>`;
-            } else {
-                 dom.selectedIngredientsList.innerHTML = listHtml;
-            }
-
+            dom.selectedIngredientsList.innerHTML = ingredients.length === 0 ? `<li class="text-gray-400 italic text-center py-2 text-xs">Fino a 3 ingredienti inclusi</li>` : listHtml;
             state.customSandwich.totalPrice = currentPrice;
             dom.sandwichTotalPrice.textContent = `€${currentPrice.toFixed(2)}`;
             dom.addSandwichBtn.disabled = ingredients.length < 1;
 
-            // Update ingredient cards (show count, selected class for cards with count > 0)
             document.querySelectorAll('.ingredient-card').forEach(card => {
                 const cardId = card.dataset.id;
                 const count = ingredientCounts[cardId]?.count || 0;
-                
                 card.classList.toggle('selected', count > 0);
-                
-                let countDisplay = card.querySelector('span.rounded-full');
+                card.classList.toggle('bg-orange-50', count > 0);
+                let countDisplay = card.querySelector('span.absolute');
                 if (count > 0) {
-                    if (!countDisplay) {
-                        countDisplay = document.createElement('span');
-                        countDisplay.className = "absolute top-0 right-0 bg-primary text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center transform translate-x-1/2 -translate-y-1/2";
-                        card.appendChild(countDisplay);
-                    }
+                    if (!countDisplay) { countDisplay = document.createElement('span'); countDisplay.className = "absolute -top-2 -right-2 bg-primary text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center shadow-sm border-2 border-white"; card.appendChild(countDisplay); }
                     countDisplay.textContent = count;
-                } else if (countDisplay) {
-                    countDisplay.remove();
-                }
+                } else if (countDisplay) { countDisplay.remove(); }
             });
         }
 
         function renderAllOrders() {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
+            const today = new Date(); today.setHours(0, 0, 0, 0);
             const todaysOrders = state.allOrders.filter(order => order.createdAt && order.createdAt.toDate() >= today).sort((a, b) => a.user.localeCompare(b.user));
-            const now = new Date();
-            const isBeforeCutoff = now.getHours() < 11 || (now.getHours() === 11 && now.getMinutes() < 30);
-            if (todaysOrders.length === 0) {
-                dom.allOrdersListEl.innerHTML = `<div class="text-center p-8 bg-white rounded-xl shadow"><p class="text-gray-500">Nessun ordine per oggi.</p></div>`;
-                dom.grandTotalEl.textContent = '€0.00';
-                return;
-            }
+            const now = new Date(); const isBeforeCutoff = now.getHours() < 11 || (now.getHours() === 11 && now.getMinutes() < 30);
+            if (todaysOrders.length === 0) { dom.allOrdersListEl.innerHTML = `<div class="text-center p-8 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200"><p class="text-gray-400 font-medium">Nessun ordine ricevuto oggi.</p></div>`; dom.grandTotalEl.textContent = '€0.00'; return; }
 
             let grandTotal = 0;
             const ordersHtml = todaysOrders.map(order => {
                 grandTotal += order.total;
-
-                const itemsHtml = order.items.map(item => {
-                    let detailsHtml = item.details
-                        ? `<p class="text-xs text-gray-500 pl-4">${item.details}</p>`
-                        : '';
-                    return `
-                        <li class="text-sm py-1">
-                            <div class="flex justify-between items-center">
-                                <span>${item.quantity} x ${item.name}</span>
-                                <span class="font-medium">€${(item.price * item.quantity).toFixed(2)}</span>
-                            </div>
-                            ${detailsHtml}
-                        </li>`;
-                }).join('');
-                
-                const notesHtml = `
-                    ${order.allergies ? `<p class="text-xs text-red-700 mt-2 pl-4 border-l-2 border-red-300"><b>Allergie:</b> ${order.allergies}</p>` : ''}
-                    ${order.cutlery ? `<p class="text-xs text-secondary-800 mt-2 pl-4 border-l-2 border-secondary-light"><b><i class="fas fa-utensils"></i> Posate richieste</b></p>` : ''}
-                `;
-                const paymentInfo = PAYMENT_METHODS[order.paymentMethod] || { name: order.paymentMethod, icon: 'fa-credit-card' };
-                const deleteButtonHtml = (state.currentUser?.uid === order.uid && isBeforeCutoff)
-                    ? `<button data-id="${order.id}" class="delete-order-btn text-red-500 hover:text-red-700 ml-2 text-sm" title="Elimina ordine"><i class="fas fa-trash-alt"></i></button>`
-                    : `<button class="text-gray-300 ml-2 text-sm cursor-not-allowed" disabled title="Eliminazione bloccata dopo le 11:30 o non sei il proprietario"><i class="fas fa-trash-alt"></i></button>`;
-                const restaurateurResponseHtml = `
-                    <div class="mt-3 pt-3 border-t">
-                        <label for="response-input-${order.id}" class="text-xs font-semibold">Risposta del ristoratore:</label>
-                        <div class="flex gap-2 mt-1">
-                            <input type="text" id="response-input-${order.id}" class="flex-grow p-1 border rounded text-sm" value="${order.restaurateurResponse || ''}" placeholder="Invia un messaggio al cliente...">
-                            <button data-id="${order.id}" class="save-response-btn bg-secondary hover:bg-secondary-dark text-white text-xs px-3 rounded">Salva</button>
-                        </div>
-                    </div>
-                `;
-                return `
-                    <div id="order-${order.id}" class="bg-white p-4 rounded-xl shadow-md transition-all duration-300 ${order.paid ? 'paid-order' : ''}">
-                        <div class="flex justify-between items-start border-b pb-2 mb-2">
-                            <div>
-                                <h4 class="font-bold text-lg">${order.user}</h4>
-                                <span class="text-xs bg-gray-100 px-2 py-1 rounded-full"><i class="fas ${paymentInfo.icon} mr-2"></i>${paymentInfo.name}</span>
-                            </div>
-                            <div class="text-right flex items-center">
-                                <span class="font-bold text-primary text-lg">€${order.total.toFixed(2)}</span>
-                                ${deleteButtonHtml}
-                            </div>
-                        </div>
-                        <ul class="space-y-1">${itemsHtml}</ul>
-                        ${notesHtml}
-                        ${restaurateurResponseHtml}
-                    </div>`;
+                const itemsHtml = order.items.map(item => `<li class="text-sm py-1 flex justify-between"><span><span class="font-bold text-gray-700">${item.quantity}x</span> ${item.name}</span><span class="text-gray-500 text-xs">€${(item.price * item.quantity).toFixed(2)}</span></li>${item.details ? `<div class="text-xs text-gray-400 pl-5 mb-1">${item.details}</div>` : ''}`).join('');
+                const deleteButtonHtml = (state.currentUser?.uid === order.uid && isBeforeCutoff) ? `<button data-id="${order.id}" class="delete-order-btn text-red-400 hover:text-red-600 ml-3 text-sm p-1 rounded hover:bg-red-50 transition-colors" title="Elimina"><i class="fas fa-trash-alt"></i></button>` : '';
+                return `<div id="order-${order.id}" class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 transition-all ${order.paid ? 'opacity-60 grayscale-[50%]' : ''}"><div class="flex justify-between items-start border-b border-gray-100 pb-2 mb-2"><div><h4 class="font-bold text-lg text-gray-800">${order.user}</h4><span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full mt-1 inline-block"><i class="fas ${PAYMENT_METHODS[order.paymentMethod]?.icon} mr-1"></i>${PAYMENT_METHODS[order.paymentMethod]?.name}</span></div><div class="text-right flex items-center"><span class="font-bold text-primary text-lg">€${order.total.toFixed(2)}</span>${deleteButtonHtml}</div></div><ul class="space-y-0.5 mb-2">${itemsHtml}</ul>${order.allergies ? `<p class="text-xs text-red-600 bg-red-50 p-1.5 rounded-lg font-medium"><i class="fas fa-exclamation-circle mr-1"></i>${order.allergies}</p>` : ''}${order.cutlery ? `<p class="text-xs text-green-600 mt-1"><i class="fas fa-utensils mr-1"></i>Posate richieste</p>` : ''}<div class="mt-3 pt-2 border-t border-gray-50"><div class="flex gap-2"><input type="text" id="response-input-${order.id}" class="flex-grow p-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-secondary" value="${order.restaurateurResponse || ''}" placeholder="Rispondi..."><button data-id="${order.id}" class="save-response-btn bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs px-3 rounded-lg font-semibold transition-colors">Salva</button></div></div></div>`;
             }).join('');
-            dom.allOrdersListEl.innerHTML = ordersHtml;
-            dom.grandTotalEl.textContent = `€${grandTotal.toFixed(2)}`;
-        }
-
-        function handlePaymentChange(target) {
-            const confirmBtn = document.getElementById('confirm-order-btn');
-            if (!confirmBtn) return;
-        }
-
-        function handleEvents(event) {
-            const target = event.target;
-            const button = target.closest('button');
-            const navLink = target.closest('a.nav-btn');
-            const ingredientCard = target.closest('.ingredient-card');
-            const choiceBtn = target.closest('.choice-btn');
-            if (navLink) {
-                event.preventDefault();
-                navigate(navLink.dataset.view);
-            }
-            else if (choiceBtn) {
-                if (choiceBtn.classList.contains('subtype-choice-btn')) {
-                    state.customSandwich.subtype = choiceBtn.dataset.subtype;
-                    dom.subtypeOptions.querySelectorAll('.choice-btn').forEach(btn => btn.classList.remove('selected'));
-                    choiceBtn.classList.add('selected');
-                    dom.ingredientsStepContainer.classList.remove('hidden');
-                } else { // Base choice
-                    const type = choiceBtn.dataset.type;
-                    state.customSandwich.base = type;
-                    state.customSandwich.subtype = null; // Reset subtype
-                    state.customSandwich.ingredients = [];
-                    // Reset ingredients
-
-                    dom.baseChoiceContainer.querySelectorAll('.choice-btn').forEach(btn => btn.classList.remove('selected'));
-                    choiceBtn.classList.add('selected');
-
-                    const subtypes = BASE_OPTIONS[type].subtypes;
-                    dom.subtypeOptions.innerHTML = subtypes.map(st => `<button data-subtype="${st}" class="choice-btn subtype-choice-btn flex-1 p-3 bg-gray-50 rounded-lg shadow-sm border-2 border-transparent transition-all duration-200">${st}</button>`).join('');
-                    dom.subtypeChoiceContainer.classList.remove('hidden');
-                    dom.ingredientsStepContainer.classList.add('hidden'); // Hide ingredients until subtype is selected
-                }
-                updateSandwichSummary();
-            }
-            else if (ingredientCard) {
-                // MODIFICA: Permette la selezione multipla dell'ingrediente
-                const ingredientId = ingredientCard.dataset.id;
-                const selectedIngredient = SANDWICH_INGREDIENTS.find(ing => ing.id === ingredientId);
-
-                // Aggiungi sempre l'ingrediente. Non c'è più la rimozione con un click.
-                // Aggiungiamo un UID per distinguerli nell'array, anche se con lo stesso ID
-                state.customSandwich.ingredients.push({ 
-                    ...selectedIngredient, 
-                    uid: Date.now() + Math.random().toString(36).substring(7) 
-                });
-                showToast(`Aggiunto: ${selectedIngredient.name}`);
-                updateSandwichSummary();
-            }
-            else if (event.type === 'click' && button) {
-                handleClicks(button);
-            }
-            else if (event.type === 'change' && target.matches('.portion-select')) {
-                const price = target.value;
-                const itemId = target.dataset.id;
-                const priceElement = document.getElementById(`price-display-${itemId}`);
-                if (priceElement) {
-                    priceElement.textContent = `€${parseFloat(price).toFixed(2)}`;
-                }
-            }
-            else if (event.type === 'change' && target.matches('select')) {
-                handleSelectChange(target);
-            } else if (event.type === 'input' && target.id === 'search-input') {
-                state.searchTerm = target.value;
-                updateFilterCounter();
-                renderMenu();
-            }
-            else if (event.type === 'click' && target.matches('#selected-ingredients-list li')) {
-                // Gestione click per la rimozione, se necessario.
-                // Per ora, lascio il click per l'aggiunta sull'ingrediente principale.
-                // La rimozione è più complessa dato il click per l'aggiunta.
-            }
-        }
-        
-        // Funzione per gestire i click sull'ingrediente nel riepilogo (rimozione)
-        document.addEventListener('click', (event) => {
-            const removeBtn = event.target.closest('.remove-ingredient-btn');
-            if (removeBtn) {
-                const ingredientId = removeBtn.dataset.id;
-        
-                const indexToRemove = state.customSandwich.ingredients.findIndex(ing => ing.uid === ingredientId);
-                
-                if (indexToRemove > -1) {
-                    const removedName = state.customSandwich.ingredients[indexToRemove].name;
-                    state.customSandwich.ingredients.splice(indexToRemove, 1);
-                    showToast(`Rimosso: ${removedName}`);
-                    updateSandwichSummary();
-                }
-            }
-        });
-        function handleSelectChange(target) {
-            if (target.id === 'category-select') state.activeCategoryFilter = target.value;
-            else if (target.id === 'diet-select') state.activeDietFilter = target.value;
-            updateFilterCounter();
-            renderMenu();
-        }
-
-        function openComboModal(item) {
-            state.currentComboItem = item;
-            const panini = state.menuData.filter(m => m.category === 'Panini' && !m.name.toLowerCase().includes("5 cereali"));
-            dom.comboPaninoSelect.innerHTML = panini.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
-            let drinks = [];
-            const drinkLabel = dom.comboDrinkLabel; // Usa l'elemento DOM memorizzato
-
-            if (item.comboType === 'panino_acqua_50cl') {
-                drinks = ['Acqua naturale 50cl', 'Acqua frizzante 50cl'];
-                drinkLabel.textContent = 'Scegli l\'Acqua (50cl):';
-            } else if (item.comboType === 'panino_33cl') {
-                drinks = ['Coca Cola 33cl', 'Fanta 33cl', 'Tè freddo 33cl'];
-                drinkLabel.textContent = 'Scegli la Bevanda (33cl):';
-            } else if (item.comboType === 'panino_bevanda_50cl') {
-                drinks = ['Coca Cola 50cl', 'Fanta 50cl', 'Tè freddo 50cl'];
-                // Assunzione
-                drinkLabel.textContent = 'Scegli la Bevanda (50cl):';
-            } else {
-                // Fallback
-                drinks = ['Acqua naturale', 'Acqua frizzante', 'Coca Cola', 'Fanta', 'Tè freddo'];
-                drinkLabel.textContent = 'Scegli la Bevanda:';
-            }
-
-            dom.comboDrinkSelect.innerHTML = drinks.map(d => `<option value="${d}">${d}</option>`).join('');
-            dom.comboModal.classList.remove('hidden');
-        }
-
-        function closeComboModal() {
-            state.currentComboItem = null;
-            dom.comboModal.classList.add('hidden');
+            dom.allOrdersListEl.innerHTML = ordersHtml; dom.grandTotalEl.textContent = `€${grandTotal.toFixed(2)}`;
         }
 
         async function handleClicks(button) {
-             if (button.matches('.nav-btn')) {
-                 navigate(button.dataset.view);
-            }
-             // --- SNIPPET SATISPAY CLOSE AGGIORNATO ---
-             else if (button.id === 'satispay-close-btn') {
-                // Nasconde il modale di Satispay
-                if (dom.satispayModal) {
-                    dom.satispayModal.classList.add('hidden');
-                }
-             }
-             // --- FINE SNIPPET ---
+             if (button.matches('.nav-btn')) { navigate(button.dataset.view); }
+             else if (button.id === 'satispay-close-btn') { if (dom.satispayModal) dom.satispayModal.classList.add('hidden'); }
              else if (button.matches('.add-to-cart-btn')) {
-                  const item = { ...state.menuData.find(i => i.id === parseInt(button.dataset.id))};
-                  if (!item) return;
-
-                  if (item.isCombo) {
-                       openComboModal(item);
-                       return;
-                  }
-
-                  const portionSelect = document.querySelector(`.portion-select[data-id="${item.id}"]`);
-                  if (portionSelect) {
-                      const selectedOption = portionSelect.options[portionSelect.selectedIndex];
-                      item.price = parseFloat(portionSelect.value);
-                      const portionText = selectedOption.text.split(' - ')[0]; // Get only the portion text e.g., "100g"
-                      item.name = `${item.name.split(' (')[0]} (${portionText})`; // Update name to include portion
-                  }
-
-                  const cartItem = { ...item, cartId: Date.now(), quantity: 1 };
-                  state.cart.push(cartItem);
-                  renderMyOrder();
-                  showToast(`${item.name} aggiunto!`);
+                 const item = { ...state.menuData.find(i => i.id === parseInt(button.dataset.id))};
+                 if (!item) return;
+                 if (item.isCombo) { openComboModal(item); return; }
+                 const portionSelect = document.querySelector(`.portion-select[data-id="${item.id}"]`);
+                 if (portionSelect) { const selectedOption = portionSelect.options[portionSelect.selectedIndex]; item.price = parseFloat(portionSelect.value); item.name = `${item.name.split(' (')[0]} (${selectedOption.text.split(' - ')[0]})`; }
+                 state.cart.push({ ...item, cartId: Date.now(), quantity: 1 }); renderMyOrder(); showToast(`${item.name} aggiunto!`);
              }
              else if (button.id === 'add-sandwich-to-cart-btn') {
                  const { ingredients, totalPrice, subtype, base } = state.customSandwich;
-                 if (ingredients.length < 1 || !base || !subtype) return; // Ensure base and subtype are selected
-
-                 // Raggruppa gli ingredienti per nome per una descrizione chiara
-                 const ingredientCounts = ingredients.reduce((acc, ing) => {
-                      acc[ing.name] = (acc[ing.name] || 0) + 1;
-                     return acc;
-                 }, {});
-
-                 const ingredientNames = Object.entries(ingredientCounts)
-                    .map(([name, count]) => count > 1 ? `${name} (x${count})` : name)
-                    .join(', ');
-                 const sandwichName = `${BASE_OPTIONS[base].name} (${subtype}) personalizzato`;
-
-                 state.cart.push({
-                     cartId: Date.now(),
-                     name: sandwichName,
-                     price: totalPrice,
-                     quantity: 1,
-                     isCustom: true,
-                     details: ingredientNames,
-                     category: base === 'panino' ? 'Panini' : 'Pizze', // Use base type for category
-                 });
-                 // Reset custom sandwich builder state and UI
-                 renderCustomSandwichBuilder();
-                 showToast('Prodotto personalizzato aggiunto!');
-                 navigate('my-order'); // Go to cart after adding
+                 if (ingredients.length < 1 || !base || !subtype) return;
+                 const ingredientCounts = ingredients.reduce((acc, ing) => { acc[ing.name] = (acc[ing.name] || 0) + 1; return acc; }, {});
+                 const ingredientNames = Object.entries(ingredientCounts).map(([name, count]) => count > 1 ? `${name} (x${count})` : name).join(', ');
+                 state.cart.push({ cartId: Date.now(), name: `${BASE_OPTIONS[base].name} (${subtype})`, price: totalPrice, quantity: 1, isCustom: true, details: ingredientNames, category: base === 'panino' ? 'Panini' : 'Pizze' });
+                 renderCustomSandwichBuilder(); showToast('Prodotto personalizzato aggiunto!'); navigate('my-order');
              }
              else if (button.id === 'combo-add-btn') {
                  if (!state.currentComboItem) return;
-                 const selectedPanino = dom.comboPaninoSelect.value;
-                 const selectedDrink = dom.comboDrinkSelect.value;
-                 const baseItem = state.currentComboItem;
-
-                 const finalName = `Menù (${selectedPanino} + ${selectedDrink})`;
-                 const details = `Panino: ${selectedPanino}, Bevanda: ${selectedDrink}`;
-
-                 state.cart.push({
-                     cartId: Date.now(),
-                     name: finalName,
-                     details: details,
-                     price: baseItem.price,
-                     quantity: 1,
-                     isCombo: true,
-                     category: baseItem.category,
-                 });
-                 renderMyOrder();
-                 showToast('Menù aggiunto al carrello!');
-                 closeComboModal();
+                 const finalName = `Menù (${dom.comboPaninoSelect.value} + ${dom.comboDrinkSelect.value})`;
+                 state.cart.push({ cartId: Date.now(), name: finalName, details: `Panino: ${dom.comboPaninoSelect.value}, Bevanda: ${dom.comboDrinkSelect.value}`, price: state.currentComboItem.price, quantity: 1, isCombo: true, category: state.currentComboItem.category });
+                 renderMyOrder(); showToast('Menù aggiunto!'); closeComboModal();
              }
-             else if (button.id === 'combo-cancel-btn') {
-                 closeComboModal();
-            }
+             else if (button.id === 'combo-cancel-btn') { closeComboModal(); }
              else if (button.matches('.cart-qty-btn')) {
-                 const cartId = parseInt(button.dataset.id);
-                 const itemInCart = state.cart.find(i => i.cartId === cartId);
-                 if (itemInCart) {
-                     if (button.dataset.action === 'increase') itemInCart.quantity++;
-                     else if (button.dataset.action === 'decrease' && itemInCart.quantity > 1) itemInCart.quantity--;
-                     else state.cart = state.cart.filter(i => i.cartId !== cartId);
-                     // Remove if quantity becomes 0
-                 }
-                 renderMyOrder();
-            }
-             else if (button.matches('.cart-remove-btn')) {
-                 state.cart = state.cart.filter(i => i.cartId !== parseInt(button.dataset.id));
+                 const cartId = parseInt(button.dataset.id); const item = state.cart.find(i => i.cartId === cartId);
+                 if (item) { if (button.dataset.action === 'increase') item.quantity++; else if (item.quantity > 1) item.quantity--; else state.cart = state.cart.filter(i => i.cartId !== cartId); }
                  renderMyOrder();
              }
+             else if (button.matches('.cart-remove-btn')) { state.cart = state.cart.filter(i => i.cartId !== parseInt(button.dataset.id)); renderMyOrder(); }
              else if (button.matches('.delete-order-btn')) {
-                 const now = new Date();
-                 if (now.getHours() > 11 || (now.getHours() === 11 && now.getMinutes() >= 30)) {
-                     showToast("Non è più possibile eliminare gli ordini dopo le 11:30.");
-                     return;
-                 }
-                 const orderId = button.dataset.id;
-                 if (confirm('Sei sicuro di voler eliminare questo ordine? L\'azione è irreversibile.')) {
-                     try {
-                         await deleteDoc(doc(db, "orders", orderId));
-                         showToast("Ordine eliminato con successo.");
-                     } catch (error) {
-                         console.error("Errore eliminazione ordine:", error);
-                         showToast("Impossibile eliminare l'ordine.");
-                     }
-                 }
+                 const now = new Date(); if (now.getHours() > 11 || (now.getHours() === 11 && now.getMinutes() >= 30)) { showToast("Tempo scaduto per eliminare."); return; }
+                 if (confirm('Eliminare ordine?')) { try { await deleteDoc(doc(db, "orders", button.dataset.id)); showToast("Ordine eliminato."); } catch (e) { showToast("Errore eliminazione."); } }
              }
              else if (button.matches('.save-response-btn')) {
-                 const orderId = button.dataset.id;
-                 const responseInput = document.getElementById(`response-input-${orderId}`);
-                 if (!orderId || !responseInput) return;
-
-                 const responseText = responseInput.value.trim();
-                 const orderRef = doc(db, "orders", orderId);
-                 try {
-                     await updateDoc(orderRef, { restaurateurResponse: responseText });
-                     showToast("Risposta salvata.");
-                 } catch (error) {
-                     console.error("Errore salvataggio risposta: ", error);
-                     showToast("Errore durante il salvataggio.", 4000);
-                 }
+                 const inp = document.getElementById(`response-input-${button.dataset.id}`);
+                 if (inp) { try { await updateDoc(doc(db, "orders", button.dataset.id), { restaurateurResponse: inp.value.trim() }); showToast("Risposta salvata."); } catch (e) { console.error(e); } }
              }
              else if (button.id === 'save-username-btn') {
                  const name = dom.usernameInput.value.trim();
                  const email = dom.userEmailInput.value.trim();
                  if (name && email && /^\S+@\S+\.\S+$/.test(email)) {
-                     localStorage.setItem('dosepranza-username', name);
-                     localStorage.setItem('dosepranza-useremail', email);
-                     state.currentUser.name = name;
-                     state.currentUser.email = email;
+                     localStorage.setItem('dosepranza-username', name); localStorage.setItem('dosepranza-useremail', email);
+                     state.currentUser.name = name; state.currentUser.email = email;
                      dom.userModal.classList.add('hidden');
+                     
+                     const userExists = state.allUsersData.some(u => u.name.toLowerCase() === name.toLowerCase());
+                     if (!userExists) {
+                         try {
+                             await addDoc(usersCollectionRef, { name: name, email: email });
+                             state.allUsersData.push({ name, email });
+                         } catch (err) {
+                             console.error("Errore salvataggio nuovo utente DB:", err);
+                         }
+                     }
                      updateAdminControlsVisibility();
-                 } else if (!name) {
-                     showToast("Per favore, inserisci il tuo nome.");
-                 } else {
-                     showToast("Per favore, inserisci un'email valida.");
-                 }
+                 } else { showToast(name ? "Email non valida." : "Inserisci un nome."); }
              }
-             else if (button.id === 'toggle-calories') {
-                 state.caloriesVisible = !state.caloriesVisible;
-                 button.querySelector('span').textContent = state.caloriesVisible ? 'Nascondi Calorie' : 'Mostra Calorie';
-                 button.querySelector('i').className = `fas ${state.caloriesVisible ? 'fa-toggle-on' : 'fa-toggle-off'} mr-2`;
-                 renderMenu();
-                 // Re-render menu to show/hide calories
-             }
-             else if (button.id === 'show-allergens-btn') {
-                 dom.allergenModal.classList.remove('hidden');
-            }
-             else if (button.id === 'close-allergen-modal-btn') {
-                 dom.allergenModal.classList.add('hidden');
-            }
+             else if (button.id === 'toggle-calories') { state.caloriesVisible = !state.caloriesVisible; button.querySelector('span').textContent = state.caloriesVisible ? 'Nascondi' : 'Calorie'; button.querySelector('i').className = `fas ${state.caloriesVisible ? 'fa-toggle-on' : 'fa-toggle-off'} mr-2 text-primary`; renderMenu(); }
+             else if (button.id === 'show-allergens-btn') { dom.allergenModal.classList.remove('hidden'); }
+             else if (button.id === 'close-allergen-modal-btn') { dom.allergenModal.classList.add('hidden'); }
              else if (button.id === 'confirm-order-btn') {
-                 if (state.cart.length === 0) { showToast("Il tuo carrello è vuoto.");
-                 return; }
-                 
-                 if (!state.currentUser || !state.currentUser.name || !state.currentUser.email) { 
-                     showToast("Per favore, inserisci nome ed email.");
-                     dom.userModal.classList.remove('hidden'); 
-                     return; 
-                 }
-
-                 const allergies = document.getElementById('allergies-input').value.trim();
-                 const cutlery = document.getElementById('cutlery-checkbox').checked;
-                 const paymentMethod = document.querySelector('input[name="payment-method"]:checked')?.value;
-                 if (!paymentMethod) { showToast("Seleziona un metodo di pagamento."); return;
-                 }
-
-                 const total = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                 const itemsToSave = state.cart.map(item => ({
-                     name: item.name,
-                     category: item.category,
-                     quantity: item.quantity,
-                     price: item.price,
-                     details: item.details || null
-                 }));
-                 const orderData = {
-                     user: state.currentUser.name,
-                     uid: state.currentUser.uid,
-                     email: state.currentUser.email,
-                     items: itemsToSave,
-                     total,
-                     allergies,
-                     cutlery,
-                     paymentMethod,
-                     createdAt: serverTimestamp(),
-                     paid: false,
-                     restaurateurResponse: ""
-                 };
+                 if (state.cart.length === 0) return showToast("Carrello vuoto.");
+                 if (!state.currentUser?.name || !state.currentUser?.email) return dom.userModal.classList.remove('hidden');
+                 const itemsToSave = state.cart.map(i => ({ name: i.name, category: i.category, quantity: i.quantity, price: i.price, details: i.details || null }));
                  try {
+                     const orderData = { user: state.currentUser.name, uid: state.currentUser.uid, email: state.currentUser.email, items: itemsToSave, total: state.cart.reduce((s, i) => s + (i.price * i.quantity), 0), allergies: document.getElementById('allergies-input').value.trim(), cutlery: document.getElementById('cutlery-checkbox').checked, paymentMethod: 'Satispay', createdAt: serverTimestamp(), paid: false, restaurateurResponse: "" };
                      await addDoc(ordersCollectionRef, orderData);
-                     // --- SNIPPET SLACK AGGIUNTO ---
-                     const slackWebhookUrl = 'https://hooks.slack.com/triggers/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';
-                     const slackPayload = {
-                         user_email: orderData.email,
-                         user_name: orderData.user,
-                         order_details: orderData.items.map(item => `${item.quantity}x ${item.name}`).join(', '),
-                         order_total: orderData.total.toFixed(2),
-                         allergies: orderData.allergies || 'Nessuna',
-                         cutlery: orderData.cutlery ? 'Sì' : 'No'
-                     };
-                     try {
-                         await fetch(slackWebhookUrl, {
-                             method: 'POST',
-                             headers: {
-                                  'Content-Type': 'application/json',
-                             },
-                             body: JSON.stringify(slackPayload),
-                         });
-                     } catch (slackError) {
-                         console.error("Errore durante l'invio della notifica a Slack: ", slackError);
-                    }
-                     // --- FINE SNIPPET SLACK ---
-
-                     if (orderData.paymentMethod === 'Satispay') {
-                         dom.satispayModal.classList.remove('hidden');
-                    }
-
-                     showToast("Ordine confermato con successo!");
-                     state.cart = []; // Clear cart
-                     navigate('my-order');
-                     // Navigate to confirmation/order view
-                 } catch (error) {
-                     console.error("Errore nell'invio dell'ordine: ", error);
-                     showToast("Si è verificato un errore. Riprova.", 4000);
-                 }
+                     
+                     const slackPayload = { user_email: orderData.email, user_name: orderData.user, order_details: orderData.items.map(i => `${i.quantity}x ${i.name}`).join(', '), order_total: orderData.total.toFixed(2), allergies: orderData.allergies || 'Nessuna', cutlery: orderData.cutlery ? 'Sì' : 'No' };
+                     fetch('https://hooks.slack.com/triggers/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', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(slackPayload) }).catch(e => console.error("Slack err", e));
+                     
+                     dom.satispayModal.classList.remove('hidden'); state.cart = []; navigate('my-order');
+                 } catch (e) { console.error(e); showToast("Errore invio ordine."); }
              }
              else if (button.id === 'copy-summary-btn') {
-                 const today = new Date();
-                 today.setHours(0, 0, 0, 0);
-
-                 const todaysOrders = state.allOrders
-                     .filter(order => order.createdAt && order.createdAt.toDate() >= today)
-                     .sort((a, b) => a.createdAt.toDate() - b.createdAt.toDate());
-                 if (todaysOrders.length === 0) {
-                     showToast("Nessun ordine da copiare per oggi.");
-                     return;
-                 }
-
-                 const prepItems = {};
-                 todaysOrders.forEach(order => {
-                     order.items.forEach(item => {
-                         let itemName = item.name;
-                         if (item.details) {
-                             itemName += ` (${item.details})`;
-                         }
-
-                         if (!prepItems[itemName]) {
-                             prepItems[itemName] = { quantity: 0, users: [] };
-                         }
-                         prepItems[itemName].quantity += item.quantity;
-
-                         let userNote = `${order.user}`;
-                         if (item.quantity > 1) {
-                             userNote += ` (x${item.quantity})`;
-                         }
-                         
-                         let combinedNotes = [];
-                         if(order.allergies) combinedNotes.push(`ALLERGIA: ${order.allergies}`);
-                         if(combinedNotes.length > 0) userNote += ` [${combinedNotes.join('; ')}]`;
-
-                         prepItems[itemName].users.push(userNote);
-                     });
-                 });
-
-                 let prepText = "--- 📝 LISTA PREPARAZIONE ---\n\n";
-                 Object.keys(prepItems).sort().forEach(itemName => {
-                     const itemDetails = prepItems[itemName];
-                     prepText += `*${itemDetails.quantity}x ${itemName}*\n`;
-                     prepText += `  - Per: ${itemDetails.users.join(', ')}\n\n`;
-                 });
-                 let ordersText = "--- 💵 RIEPILOGO ORDINI E PAGAMENTI ---\n\n";
-                 let grandTotal = 0;
-                 todaysOrders.forEach(order => { 
-                     ordersText += `*${order.user}* - Totale: €${order.total.toFixed(2)}\n`;
-                     ordersText += `  - Pagamento: ${PAYMENT_METHODS[order.paymentMethod]?.name || order.paymentMethod}\n`;
-                     order.items.forEach(item => {
-                         let itemText = item.name;
-                         if (item.details) {
-                             itemText += ` (${item.details})`;
-                         }
-                         ordersText += `  - ${item.quantity}x ${itemText}\n`;
-                     });
-                     
-                     if (order.allergies) {
-                         ordersText += `  - ❗ ALLERGIA: ${order.allergies}\n`;
-                     }
-
-                      if (order.cutlery) {
-                         ordersText += `  - 🍴 Posate: Sì\n`;
-                     }
-                     ordersText += `\n`;
-                     grandTotal += order.total;
-                 });
-                 ordersText += `-------------------------------------\n`;
-                 ordersText += `TOTALE COMPLESSIVO: €${grandTotal.toFixed(2)}`;
-
-                 const finalSummary = prepText + "\n\n" + ordersText;
-                 navigator.clipboard.writeText(finalSummary)
-                     .then(() => {
-                         showToast("Riepilogo ottimizzato copiato negli appunti!");
-                     })
-                     .catch(err => {
-                         console.error('Errore durante la copia:', err);
-                         showToast("Errore: impossibile copiare il riepilogo.");
-                     });
-            }
-             else if (button.id === 'export-history-btn') {
-                 showToast("Esportazione in corso...");
-                 try {
-                     const allOrdersQuery = query(ordersCollectionRef, orderBy("createdAt", "desc"));
-                     const querySnapshot = await getDocs(allOrdersQuery);
-                     const allOrdersHistory = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
-                     if (allOrdersHistory.length === 0) {
-                         showToast("Nessun ordine nello storico da esportare.");
-                         return;
-                     }
-
-                     const escapeCsvField = (field) => {
-                         if (field === null || field === undefined) return '""';
-                         let stringField = String(field);
-                         if (stringField.search(/("|,|;|\n)/g) >= 0) {
-                             stringField = `"${stringField.replace(/"/g, '""')}"`;
-                         }
-                         return stringField.includes(';') ? `"${stringField}"` : stringField;
-                     };
-
-                     const header = [
-                         'OrderID', 'TimestampISO8601', 'DataLeggibile', 'UserID', 'Utente',
-                         'EmailUtente', 'Prodotto', 'Dettagli', 'CategoriaProdotto', 'Quantita',
-                         'PrezzoUnitario', 'TotaleRiga', 'MetodoPagamento',
-                         'Allergie', 'Posate', 'CanaleOrdine', 'StatoPagamento', 'RispostaRistoratore'
-                     ];
-                     let csvRows = [header.join(';')];
-
-                     allOrdersHistory.forEach(order => {
-                         order.items.forEach(item => {
-                             let category = item.category;
-                             if (!category) {
-                                 const menuItem = state.menuData.find(m => m.name === item.name);
-                                 category = menuItem ? menuItem.category : 'Sconosciuta';
-                             }
-
-                             const row = [
-                                 escapeCsvField(order.id),
-                                 escapeCsvField(order.createdAt ? order.createdAt.toDate().toISOString() : 'N/D'),
-                                 escapeCsvField(order.createdAt ? order.createdAt.toDate().toLocaleString('it-IT') : 'N/D'),
-                                 escapeCsvField(order.uid || 'N/D'),
-                                 escapeCsvField(order.user),
-                                 escapeCsvField(order.email || ''),
-                                 escapeCsvField(item.name),
-                                 escapeCsvField(item.details || ''),
-                                 escapeCsvField(category),
-                                 escapeCsvField(item.quantity),
-                                 escapeCsvField(item.price ? item.price.toFixed(2).replace('.', ',') : '0,00'),
-                                 escapeCsvField(item.price ? (item.quantity * item.price).toFixed(2).replace('.', ',') : '0,00'),
-                                 escapeCsvField(order.paymentMethod),
-                                 escapeCsvField(order.allergies || ''),
-                                 escapeCsvField(order.cutlery ? 'Si' : 'No'),
-                                 escapeCsvField('Web'), 
-                                 escapeCsvField(order.paid ? 'Pagato' : 'Da Pagare'),
-                                 escapeCsvField(order.restaurateurResponse || '')
-                             ];
-                             csvRows.push(row.join(';'));
-                         });
-                     });
-
-                     const csvContent = csvRows.join('\n');
-                     const blob = new Blob([`\uFEFF${csvContent}`], { type: 'text/csv;charset=utf-8;' });
-                     // Added BOM for Excel
-                     const url = URL.createObjectURL(blob);
-                     const a = document.createElement('a');
-                     a.setAttribute('href', url);
-                     a.setAttribute('download', 'storico_ordini_dosepranza.csv');
-                     document.body.appendChild(a);
-                     a.click();
-                     document.body.removeChild(a);
-                     URL.revokeObjectURL(url);
-                 } catch (error) {
-                     console.error("Errore durante l'esportazione: ", error);
-                     showToast("Esportazione fallita. Controlla la console.");
-                 }
+                const today = new Date(); today.setHours(0,0,0,0);
+                const todaysOrders = state.allOrders.filter(o => o.createdAt?.toDate() >= today).sort((a,b) => a.createdAt.toDate() - b.createdAt.toDate());
+                if (!todaysOrders.length) return showToast("Nessun ordine.");
+                const prepItems = {}; todaysOrders.forEach(o => o.items.forEach(i => { const n = i.details ? `${i.name} (${i.details})` : i.name; if(!prepItems[n]) prepItems[n] = {q:0, u:[]}; prepItems[n].q += i.quantity; let note = o.user; if(i.quantity > 1) note += ` (x${i.quantity})`; if(o.allergies) note += ` [⚠️${o.allergies}]`; prepItems[n].u.push(note); }));
+                let txt = "📝 PREPARAZIONE\n\n" + Object.keys(prepItems).sort().map(n => `*${prepItems[n].q}x ${n}*\n  > ${prepItems[n].u.join(', ')}`).join('\n\n') + "\n\n💵 RIEPILOGO\n\n";
+                let tot = 0; todaysOrders.forEach(o => { txt += `*${o.user}* - €${o.total.toFixed(2)}\n`; o.items.forEach(i => txt += `  - ${i.quantity}x ${i.name}${i.details?' ('+i.details+')':''}\n`); if(o.allergies) txt+=`  ❗ ${o.allergies}\n`; txt+='\n'; tot+=o.total; });
+                txt += `TOTALE: €${tot.toFixed(2)}`;
+                navigator.clipboard.writeText(txt).then(() => showToast("Copiato!")).catch(() => showToast("Errore copia."));
              }
         }
 
-        function updateAdminControlsVisibility() {
-            const exportBtn = document.getElementById('export-history-btn');
-            if (!exportBtn) return;
-
-            if (state.currentUser && state.currentUser.name) {
-                if (state.currentUser.name === 'Marco Tranquilli') {
-                    exportBtn.classList.remove('hidden');
-                } else {
-                    exportBtn.classList.add('hidden');
-                }
-            } else {
-                exportBtn.classList.add('hidden');
+        function handleEvents(event) {
+            const t = event.target; const btn = t.closest('button');
+            if (t.closest('a.nav-btn')) { event.preventDefault(); navigate(t.closest('a.nav-btn').dataset.view); }
+            else if (t.closest('.choice-btn')) {
+                const b = t.closest('.choice-btn');
+                if (b.classList.contains('subtype-choice-btn')) { state.customSandwich.subtype = b.dataset.subtype; dom.subtypeOptions.querySelectorAll('.choice-btn').forEach(x => { x.classList.remove('selected', 'border-primary', 'bg-orange-50'); x.classList.add('border-transparent'); }); b.classList.add('selected', 'border-primary', 'bg-orange-50'); b.classList.remove('border-transparent'); dom.ingredientsStepContainer.classList.remove('hidden'); }
+                else { const type = b.dataset.type; state.customSandwich.base = type; state.customSandwich.subtype = null; state.customSandwich.ingredients = []; dom.baseChoiceContainer.querySelectorAll('.choice-btn').forEach(x => { x.classList.remove('selected', 'border-primary', 'bg-orange-50'); x.classList.add('border-transparent'); }); b.classList.add('selected', 'border-primary', 'bg-orange-50'); b.classList.remove('border-transparent'); dom.subtypeOptions.innerHTML = BASE_OPTIONS[type].subtypes.map(st => `<button data-subtype="${st}" class="choice-btn subtype-choice-btn p-3 bg-gray-50 rounded-xl shadow-sm border-2 border-transparent transition-all font-medium text-sm hover:bg-white">${st}</button>`).join(''); dom.subtypeChoiceContainer.classList.remove('hidden'); dom.ingredientsStepContainer.classList.add('hidden'); }
+                updateSandwichSummary();
             }
+            else if (t.closest('.ingredient-card')) {
+                const ingId = t.closest('.ingredient-card').dataset.id;
+                state.customSandwich.ingredients.push({ ...SANDWICH_INGREDIENTS.find(i => i.id === ingId), uid: Date.now() + Math.random() });
+                updateSandwichSummary();
+            }
+            else if (event.type === 'click' && btn) handleClicks(btn);
+            else if (event.type === 'change' && t.matches('.portion-select')) document.getElementById(`price-display-${t.dataset.id}`).textContent = `€${parseFloat(t.value).toFixed(2)}`;
+            else if (event.type === 'change' && t.matches('select')) { if(t.id==='category-select') state.activeCategoryFilter=t.value; if(t.id==='diet-select') state.activeDietFilter=t.value; updateFilterCounter(); renderMenu(); }
+            else if (event.type === 'input' && t.id === 'search-input') { state.searchTerm = t.value; updateFilterCounter(); renderMenu(); }
         }
 
-        // NUOVA FUNZIONE: Carica gli utenti per il dropdown
-        async function loadUsers() {
-            try {
-                const usersCol = collection(db, 'users');
-                const userSnapshot = await getDocs(usersCol);
-                state.allUsersData = userSnapshot.docs.map(doc => doc.data());
-                
-                const datalist = document.getElementById('users-datalist');
-                if(datalist) {
-                    datalist.innerHTML = state.allUsersData
-                        .map(u => `<option value="${u.name}">`) 
-                        .join('');
-                }
-            } catch (e) {
-                console.error("Errore caricamento utenti:", e);
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('.remove-ingredient-btn');
+            if (btn) {
+                const idx = state.customSandwich.ingredients.findIndex(i => i.uid === btn.dataset.id);
+                if (idx > -1) { state.customSandwich.ingredients.splice(idx, 1); updateSandwichSummary(); }
+            }
+        });
+
+        function openComboModal(item) {
+            state.currentComboItem = item;
+            dom.comboPaninoSelect.innerHTML = state.menuData.filter(m => m.category === 'Panini' && !m.name.toLowerCase().includes("5 cereali")).map(p => `<option value="${p.name}">${p.name}</option>`).join('');
+            let drinks = item.comboType === 'panino_acqua_50cl' ? ['Acqua naturale 50cl', 'Acqua frizzante 50cl'] : item.comboType === 'panino_33cl' ? ['Coca Cola 33cl', 'Fanta 33cl', 'Tè freddo 33cl'] : ['Coca Cola 50cl', 'Fanta 50cl', 'Tè freddo 50cl'];
+            dom.comboDrinkLabel.textContent = item.comboType.includes('50cl') ? 'Scegli (50cl):' : 'Scegli (33cl):';
+            dom.comboDrinkSelect.innerHTML = drinks.map(d => `<option value="${d}">${d}</option>`).join('');
+            dom.comboModal.classList.remove('hidden');
+        }
+        function closeComboModal() { state.currentComboItem = null; dom.comboModal.classList.add('hidden'); }
+        function updateAdminControlsVisibility() { const btn = document.getElementById('export-history-btn'); if(btn) btn.classList.toggle('hidden', state.currentUser?.name !== 'Marco Tranquilli'); }
+        async function loadUsers() { try { const sn = await getDocs(usersCollectionRef); state.allUsersData = sn.docs.map(d => d.data()); dom.usersDatalist = document.getElementById('users-datalist'); if(dom.usersDatalist) dom.usersDatalist.innerHTML = state.allUsersData.map(u => `<option value="${u.name}">`).join(''); } catch (e) { console.error(e); } }
+        
+        function fillEmail(val) {
+            const user = state.allUsersData.find(u => u.name.toLowerCase() === val.toLowerCase());
+            if (user) {
+                dom.userEmailInput.value = user.email;
+                dom.userEmailInput.readOnly = true;
+                dom.userEmailInput.classList.add('bg-gray-100', 'text-gray-500');
+            } else {
+                dom.userEmailInput.readOnly = false;
+                dom.userEmailInput.classList.remove('bg-gray-100', 'text-gray-500');
             }
         }
 
         function init() {
             state.menuData = processMenuData(RAW_MENU, PRICES);
             Object.assign(dom, {
-                views: document.querySelectorAll('.view'),
-                navBtns: document.querySelectorAll('.nav-btn'),
-                navEl: document.querySelector('nav'),
+                views: document.querySelectorAll('.view'), navBtns: document.querySelectorAll('.nav-btn'), navEl: document.querySelector('nav'),
                 menuItemsContainer: document.getElementById('menu-items'), cartCountEl: document.getElementById('cart-count'),
                 myOrderContentEl: document.getElementById('my-order-content'), allOrdersListEl: document.getElementById('all-orders-list'),
                 grandTotalEl: document.getElementById('grand-total'), userModal: document.getElementById('user-modal'),
-                usernameInput: document.getElementById('username-input'),
-                userEmailInput: document.getElementById('user-email-input'),
-                toastEl: document.getElementById('toast'),
-                toastMessageEl: document.getElementById('toast-message'), categorySelect: document.getElementById('category-select'),
-                dietSelect: document.getElementById('diet-select'), filterCounterContainer: document.getElementById('filter-counter-container'),
-                allergenModal: document.getElementById('allergen-modal'), allergenModalContent: document.getElementById('allergen-modal-content'),
-                comboModal: document.getElementById('combo-modal'),
-                comboPaninoSelect: document.getElementById('combo-panino-select'),
-                comboDrinkSelect: document.getElementById('combo-drink-select'),
-                comboDrinkLabel: document.getElementById('combo-drink-label'),
-                ingredientsList: document.getElementById('ingredients-list'),
-                selectedIngredientsList: document.getElementById('selected-ingredients-list'),
-                sandwichTotalPrice: document.getElementById('sandwich-total-price'),
-                addSandwichBtn: document.getElementById('add-sandwich-to-cart-btn'),
-                baseChoiceContainer: document.getElementById('base-choice-container'),
-                subtypeChoiceContainer: document.getElementById('subtype-choice-container'),
-                ingredientsStepContainer: document.getElementById('ingredients-step-container'),
-                subtypeOptions: document.getElementById('subtype-options'),
-                sandwichBaseSummary: document.getElementById('sandwich-base-summary'),
-                extraChargeNotice: document.getElementById('extra-charge-notice'),
-                satispayModal: document.getElementById('satispay-modal'),
+                usernameInput: document.getElementById('username-input'), userEmailInput: document.getElementById('user-email-input'),
+                toastEl: document.getElementById('toast'), toastMessageEl: document.getElementById('toast-message'), categorySelect: document.getElementById('category-select'),
+                dietSelect: document.getElementById('diet-select'), filterCounterContainer: document.getElementById('filter-counter-container'), allergenModal: document.getElementById('allergen-modal'), allergenModalContent: document.getElementById('allergen-modal-content'),
+                comboModal: document.getElementById('combo-modal'), comboPaninoSelect: document.getElementById('combo-panino-select'), comboDrinkSelect: document.getElementById('combo-drink-select'), comboDrinkLabel: document.getElementById('combo-drink-label'),
+                ingredientsList: document.getElementById('ingredients-list'), selectedIngredientsList: document.getElementById('selected-ingredients-list'), sandwichTotalPrice: document.getElementById('sandwich-total-price'), addSandwichBtn: document.getElementById('add-sandwich-to-cart-btn'),
+                baseChoiceContainer: document.getElementById('base-choice-container'), subtypeChoiceContainer: document.getElementById('subtype-choice-container'), ingredientsStepContainer: document.getElementById('ingredients-step-container'), subtypeOptions: document.getElementById('subtype-options'), sandwichBaseSummary: document.getElementById('sandwich-base-summary'), extraChargeNotice: document.getElementById('extra-charge-notice'), satispayModal: document.getElementById('satispay-modal')
             });
-            document.body.addEventListener('click', handleEvents);
-            document.body.addEventListener('change', handleEvents);
-            document.body.addEventListener('input', handleEvents);
-
-            // Listener per autocompletamento Email
-            const nameInput = document.getElementById('username-input');
-            const emailInput = document.getElementById('user-email-input');
-            
-            if(nameInput) {
-                const fillEmail = (val) => {
-                    // Cerca se il nome inserito corrisponde esattamente a un utente
-                    const foundUser = state.allUsersData.find(u => u.name.toLowerCase() === val.toLowerCase());
-                    if(foundUser) {
-                        emailInput.value = foundUser.email;
-                        emailInput.classList.remove('bg-red-50');
-                        emailInput.classList.add('bg-green-50');
-                    } else {
-                        emailInput.value = "";
-                        // Pulisci se il nome non è valido
-                        emailInput.classList.remove('bg-green-50');
-                    }
-                };
-                nameInput.addEventListener('input', (e) => fillEmail(e.target.value));
-                nameInput.addEventListener('change', (e) => fillEmail(e.target.value));
-            }
-
-            renderFilters();
-            dom.views.forEach(v => {
-                if (v.id === 'menu-view') {
-                    v.classList.add('active'); 
-                } else {
-                    v.classList.remove('active'); 
-                }
-            });
-            dom.navBtns.forEach(b => {
-                b.classList.toggle('bg-primary', b.dataset.view === 'menu');
-                b.classList.toggle('text-white', b.dataset.view === 'menu');
-            });
-            state.currentView = 'menu'; 
-
-            renderMenu(); 
-            
-            loadUsers(); // Carica utenti all'avvio
+            document.body.addEventListener('click', handleEvents); document.body.addEventListener('change', handleEvents); document.body.addEventListener('input', handleEvents);
+            if (dom.usernameInput) dom.usernameInput.addEventListener('input', (e) => fillEmail(e.target.value));
+            renderFilters(); navigate('menu'); loadUsers();
         }
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                state.currentUser = { 
-                    uid: user.uid, 
-                    name: localStorage.getItem('dosepranza-username'),
-                    email: localStorage.getItem('dosepranza-useremail')
-                };
-                if (!state.currentUser.name || !state.currentUser.email) {
-                    dom.userEmailInput.value = state.currentUser.email || '';
-                    dom.usernameInput.value = state.currentUser.name || '';
-                    dom.userModal.classList.remove('hidden');
-                }
+                state.currentUser = { uid: user.uid, name: localStorage.getItem('dosepranza-username'), email: localStorage.getItem('dosepranza-useremail') };
+                if (!state.currentUser.name) dom.userModal.classList.remove('hidden');
                 updateAdminControlsVisibility();
-
-                onSnapshot(query(ordersCollectionRef, orderBy("createdAt", "desc")), snapshot => { 
-                    state.allOrders = snapshot.docs.map(doc => ({...doc.data(), id: doc.id}));
-                    if (state.currentView === 'all-orders') renderAllOrders();
-                    if (state.currentView === 'my-order') renderMyOrder();
-                }, error => {
-                    console.error("Errore con lo snapshot di Firestore:", error);
-                });
-            } else {
-                signInAnonymously(auth).catch(error => {
-                    console.error("Errore login anonimo:", error);
-                });
-            }
+                onSnapshot(query(ordersCollectionRef, orderBy("createdAt", "desc")), sn => { state.allOrders = sn.docs.map(d => ({...d.data(), id: d.id})); if(state.currentView==='all-orders') renderAllOrders(); if(state.currentView==='my-order') renderMyOrder(); });
+            } else { signInAnonymously(auth); }
         });
-
         init();
     </script>
 </body>
