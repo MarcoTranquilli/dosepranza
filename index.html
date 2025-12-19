@@ -359,7 +359,11 @@
             return Object.entries(updatedMenu).flatMap(([cat, items]) => items.map(item => ({ id: id++, name: item.name, category: cat.charAt(0).toUpperCase() + cat.slice(1), price: item.price !== undefined ? item.price : (prices[cat] || 0), icon: icons[cat] || 'fa-utensils', ...item })))
         }
 
-        function showToast(message, duration = 3000) { dom.toastMessageEl.textContent = message; dom.toastEl.classList.remove('opacity-0'); setTimeout(() => dom.toastEl.classList.add('opacity-0'), duration); }
+        function showToast(message, duration = 3000) { 
+            dom.toastMessageEl.textContent = message; 
+            dom.toastEl.classList.remove('opacity-0'); 
+            setTimeout(() => dom.toastEl.classList.add('opacity-0'), duration); 
+        }
 
         function navigate(viewName) {
             state.currentView = viewName;
@@ -374,11 +378,14 @@
             if (viewName === 'all-orders') renderAllOrders();
             if (viewName === 'custom-sandwich') renderCustomSandwichBuilder();
             
+            // FIX: Renderizza il menù se necessario, anche se si è nel modale
+            if (viewName === 'menu') renderMenu();
+            
             const targetElement = document.getElementById(viewName + "-view");
             if (targetElement) {
                 const navHeight = dom.navEl.offsetHeight;
                 const targetOffsetTop = targetElement.getBoundingClientRect().top + window.scrollY;
-                const finalPosition = targetOffsetTop - navHeight - 120; // Extra padding
+                const finalPosition = targetOffsetTop - navHeight - 120;
                 window.scrollTo({ top: finalPosition, behavior: 'smooth' });
             }
         }
@@ -457,22 +464,29 @@
         function renderMyOrder() {
             const today = new Date(); today.setHours(0, 0, 0, 0);
             const todaysUserOrder = state.allOrders.find(order => order.uid === state.currentUser?.uid && order.createdAt && order.createdAt.toDate() >= today);
+            
             if (todaysUserOrder) {
-                const itemsHtml = todaysUserOrder.items.map(item => `<li class="flex justify-between items-center text-sm py-1 border-b border-gray-50 last:border-0"><span>${item.quantity} x ${item.name}</span><span class="font-medium">€${(item.price * item.quantity).toFixed(2)}</span></li>`).join('');
+                const itemsHtml = todaysUserOrder.items.map(item => `<li class="flex justify-between items-center text-sm py-1 border-b border-gray-50 last:border-0"><span>${item.quantity} x ${item.name}</span><span class="font-medium">€${((item.price || 0) * item.quantity).toFixed(2)}</span></li>`).join('');
                 const notesHtml = `${todaysUserOrder.allergies ? `<p class="text-sm mt-3 p-2 bg-red-50 text-red-700 rounded-lg border border-red-100"><i class="fas fa-exclamation-triangle mr-1"></i> Allergie: ${todaysUserOrder.allergies}</p>` : ''}${todaysUserOrder.cutlery ? `<p class="text-sm mt-2 p-2 bg-green-50 text-green-700 rounded-lg border border-green-100"><i class="fas fa-utensils mr-1"></i> Posate richieste.</p>` : ''}`;
                 const responseHtml = todaysUserOrder.restaurateurResponse ? `<div id="restaurateur-response" class="mt-4 p-4 rounded-xl bg-yellow-50 border border-yellow-200 text-yellow-800 shadow-sm"><p class="font-bold flex items-center"><i class="fas fa-comment-dots mr-2"></i>Risposta Ristoratore:</p><p class="mt-1">${todaysUserOrder.restaurateurResponse}</p></div>` : '';
-                dom.myOrderContentEl.innerHTML = `<div class="text-center mb-6"><div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 text-green-500 rounded-full mb-3"><i class="fas fa-check text-2xl"></i></div><h3 class="text-xl font-bold">Ordine Inviato!</h3><p class="text-gray-500 text-sm">Ecco il riepilogo per oggi.</p></div><ul class="bg-gray-50 p-4 rounded-xl mb-4 space-y-1">${itemsHtml}</ul><div class="flex justify-between items-center font-bold text-xl px-2"><span>Totale:</span><span class="text-primary">€${todaysUserOrder.total.toFixed(2)}</span></div>${notesHtml}${responseHtml}<p class="text-xs text-gray-400 mt-6 text-center">Modifiche possibili entro le 11:30 in "Tutti gli Ordini".</p>`;
+                dom.myOrderContentEl.innerHTML = `<div class="text-center mb-6"><div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 text-green-500 rounded-full mb-3"><i class="fas fa-check text-2xl"></i></div><h3 class="text-xl font-bold">Ordine Inviato!</h3><p class="text-gray-500 text-sm">Ecco il riepilogo per oggi.</p></div><ul class="bg-gray-50 p-4 rounded-xl mb-4 space-y-1">${itemsHtml}</ul><div class="flex justify-between items-center font-bold text-xl px-2"><span>Totale:</span><span class="text-primary">€${(todaysUserOrder.total || 0).toFixed(2)}</span></div>${notesHtml}${responseHtml}<p class="text-xs text-gray-400 mt-6 text-center">Modifiche possibili entro le 11:30 in "Tutti gli Ordini".</p>`;
                 dom.cartCountEl.textContent = '✓'; dom.cartCountEl.classList.add('bg-green-500', 'text-white'); dom.cartCountEl.classList.remove('bg-red-500'); return;
             }
 
             const totalItems = state.cart.reduce((sum, item) => sum + item.quantity, 0);
             dom.cartCountEl.textContent = totalItems; dom.cartCountEl.classList.remove('bg-green-500'); dom.cartCountEl.classList.add('bg-red-500');
-            if (state.cart.length === 0) { dom.myOrderContentEl.innerHTML = `<div class="flex flex-col items-center justify-center py-12 text-gray-400"><i class="fas fa-shopping-basket text-4xl mb-3 opacity-50"></i><p>Il tuo carrello è vuoto.</p><button onclick="window.location.hash='#menu-view'" class="mt-4 text-primary font-semibold hover:underline">Vai al menù</button></div>`; return; }
+            
+            if (state.cart.length === 0) { 
+                dom.myOrderContentEl.innerHTML = `<div class="flex flex-col items-center justify-center py-12 text-gray-400"><i class="fas fa-shopping-basket text-4xl mb-3 opacity-50"></i><p>Il tuo carrello è vuoto.</p><button onclick="window.location.hash='#menu-view'" class="mt-4 text-primary font-semibold hover:underline">Vai al menù</button></div>`; 
+                return; 
+            }
 
-            const total = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const total = state.cart.reduce((sum, item) => sum + ((item.price || 0) * item.quantity), 0);
             const itemsHtml = state.cart.map(item => {
                 let detailsHtml = (item.isCustom || item.isCombo) ? `<p class="text-xs text-gray-500 mt-1 pl-4 border-l-2 border-gray-200">${item.details}</p>` : '';
-                return `<div class="py-4 border-b border-gray-100 last:border-0"><div class="flex justify-between items-start gap-3"><div class="flex-grow"><p class="font-semibold text-gray-800 leading-tight">${item.name}</p><p class="text-sm text-primary font-medium mt-1">€${item.price.toFixed(2)}</p></div><div class="flex items-center bg-gray-50 rounded-lg p-1 border border-gray-200"><button data-id="${item.cartId}" data-action="decrease" class="cart-qty-btn w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-white rounded-md transition-colors font-bold text-lg">-</button><span class="w-8 text-center font-semibold text-gray-800">${item.quantity}</span><button data-id="${item.cartId}" data-action="increase" class="cart-qty-btn w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-white rounded-md transition-colors font-bold text-lg">+</button></div><button data-id="${item.cartId}" class="cart-remove-btn text-red-400 hover:text-red-600 p-2 ml-1"><i class="fas fa-trash-alt"></i></button></div>${detailsHtml}</div>`;
+                // Fix: ensure item.price is a number
+                const price = item.price || 0;
+                return `<div class="py-4 border-b border-gray-100 last:border-0"><div class="flex justify-between items-start gap-3"><div class="flex-grow"><p class="font-semibold text-gray-800 leading-tight">${item.name}</p><p class="text-sm text-primary font-medium mt-1">€${price.toFixed(2)}</p></div><div class="flex items-center bg-gray-50 rounded-lg p-1 border border-gray-200"><button data-id="${item.cartId}" data-action="decrease" class="cart-qty-btn w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-white rounded-md transition-colors font-bold text-lg">-</button><span class="w-8 text-center font-semibold text-gray-800">${item.quantity}</span><button data-id="${item.cartId}" data-action="increase" class="cart-qty-btn w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-white rounded-md transition-colors font-bold text-lg">+</button></div><button data-id="${item.cartId}" class="cart-remove-btn text-red-400 hover:text-red-600 p-2 ml-1"><i class="fas fa-trash-alt"></i></button></div>${detailsHtml}</div>`;
             }).join('');
 
             dom.myOrderContentEl.innerHTML = `
@@ -536,7 +550,7 @@
                 const cardId = card.dataset.id;
                 const count = ingredientCounts[cardId]?.count || 0;
                 card.classList.toggle('selected', count > 0);
-                card.classList.toggle('bg-orange-50', count > 0); // Visual feedback
+                card.classList.toggle('bg-orange-50', count > 0);
                 let countDisplay = card.querySelector('span.absolute');
                 if (count > 0) {
                     if (!countDisplay) { countDisplay = document.createElement('span'); countDisplay.className = "absolute -top-2 -right-2 bg-primary text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center shadow-sm border-2 border-white"; card.appendChild(countDisplay); }
@@ -780,7 +794,11 @@
             });
             document.body.addEventListener('click', handleEvents); document.body.addEventListener('change', handleEvents); document.body.addEventListener('input', handleEvents);
             if (dom.usernameInput) dom.usernameInput.addEventListener('input', (e) => fillEmail(e.target.value));
-            renderFilters(); navigate('menu'); loadUsers();
+            
+            renderFilters();
+            navigate('menu'); 
+            renderMenu(); // CRITICO: Forza il render del menù all'avvio
+            loadUsers();
         }
 
         onAuthStateChanged(auth, (user) => {
