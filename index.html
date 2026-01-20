@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>dosemagna - Menù Completo</title>
+    <title>dosemagna</title>
+    <link rel="icon" href="data:;base64,=">
     <script src="https://cdn.tailwindcss.com/3.4.3"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,426 +29,499 @@
         body { font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
         .view { display: none; }
         .view.active { display: block; }
-        .nav-btn.active { background-color: #D6804F; color: white; box-shadow: 0 4px 10px rgba(214, 128, 79, 0.3); }
-        .ingredient-card.selected { border-color: #D6804F; background-color: #fef4ef; border-width: 3px; }
-        .allergen-icon { color: #9ca3af; font-size: 0.7rem; margin-left: 3px; }
+        .ingredient-card.selected { border-color: #D6804F; box-shadow: 0 0 0 3px rgba(214, 128, 79, 0.5); transform: translateY(-4px); }
+        .toggle-checkbox:checked { right: 0; border-color: #709460; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #709460; }
+        input::-webkit-calendar-picker-indicator { display: none !important; opacity: 0; }
     </style>
 </head>
-<body class="bg-background text-text-main pb-24">
+<body class="bg-background text-text-main pb-20">
 
     <div id="app" class="max-w-4xl mx-auto p-4 md:p-6">
         <header class="mb-6 flex flex-col items-center">
-            <img src="https://i.postimg.cc/L6H20zfp/logo-dosepranza-People-About-Food.png" alt="Dosepranza Logo" class="w-64 md:w-80 mx-auto mb-4">
-            <div class="bg-primary-100 border-l-4 border-primary text-primary-800 p-4 rounded-xl w-full text-center shadow-sm">
-                <p class="font-bold text-xs md:text-sm uppercase tracking-widest">⏰ Ordini entro 11:30 | Consegna 12:30</p>
+            <img src="https://i.postimg.cc/L6H20zfp/logo-dosepranza-People-About-Food.png" alt="Dosepranza Logo" class="w-64 md:w-96 mx-auto">
+            <div class="bg-primary-100 border-l-4 border-primary text-primary-800 p-4 rounded-md my-4 w-full mt-6 shadow-sm">
+                <p class="font-bold text-sm md:text-base">Attenzione: Ordine entro le 11:30.</p>
+                <p class="text-sm md:text-base">Consegna gratuita stimata ore 12:30.</p>
             </div>
         </header>
 
-        <nav id="main-nav" class="grid grid-cols-2 md:flex md:justify-center gap-2 bg-white/90 backdrop-blur-md p-2 rounded-2xl shadow-xl mb-8 sticky top-2 z-50 border border-white/50">
-            <button data-view="menu" class="nav-btn flex items-center justify-center py-3 rounded-xl font-bold text-sm transition-all active:scale-95"><i class="fas fa-utensils mr-2"></i>Menù</button>
-            <button data-view="custom" class="nav-btn flex items-center justify-center py-3 rounded-xl font-bold text-sm transition-all active:scale-95"><i class="fas fa-plus-circle mr-2"></i>Crea</button>
-            <button data-view="order" class="nav-btn flex items-center justify-center py-3 rounded-xl font-bold text-sm transition-all active:scale-95"><i class="fas fa-shopping-basket mr-2"></i>Ordine <span id="cart-count" class="bg-red-500 text-white text-[10px] font-bold rounded-full h-5 w-5 inline-flex items-center justify-center ml-1">0</span></button>
-            <button data-view="history" class="nav-btn flex items-center justify-center py-3 rounded-xl font-bold text-sm transition-all active:scale-95"><i class="fas fa-users mr-2"></i>Tutti</button>
+        <nav id="main-nav" class="grid grid-cols-2 md:flex md:justify-center gap-2 bg-white/80 backdrop-blur-md p-3 rounded-xl shadow-lg mb-6 sticky top-2 z-40 border border-white/50">
+            <a href="#menu-view" data-view="menu" class="nav-btn flex items-center justify-center text-center py-3 px-2 rounded-lg font-semibold text-sm md:text-base text-text-main transition-all duration-300 active:scale-95"><i class="fas fa-utensils mr-2"></i>Menù</a>
+            <a href="#custom-sandwich-view" data-view="custom-sandwich" class="nav-btn flex items-center justify-center text-center py-3 px-2 rounded-lg font-semibold text-sm md:text-base text-text-main transition-all duration-300 active:scale-95"><i class="fas fa-plus-circle mr-2"></i>Crea</a>
+            <a href="#my-order-view" data-view="my-order" class="nav-btn flex items-center justify-center text-center py-3 px-2 rounded-lg font-semibold text-sm md:text-base text-text-main transition-all duration-300 active:scale-95"><i class="fas fa-shopping-basket mr-2"></i>Ordine <span id="cart-count" class="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 inline-flex items-center justify-center ml-1 shadow-sm">0</span></a>
+            <a href="#all-orders-view" data-view="all-orders" class="nav-btn flex items-center justify-center text-center py-3 px-2 rounded-lg font-semibold text-sm md:text-base text-text-main transition-all duration-300 active:scale-95"><i class="fas fa-users mr-2"></i>Tutti</a>
         </nav>
 
         <main>
             <section id="menu-view" class="view">
-                <div class="space-y-3 mb-8">
-                    <div class="relative w-full">
-                        <input type="text" id="search-input" placeholder="Cerca nel menù..." class="w-full p-4 pl-12 border border-gray-200 rounded-2xl shadow-sm focus:ring-2 focus:ring-primary outline-none">
-                        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <h2 class="text-2xl md:text-3xl font-extrabold mb-4">Scegli cosa ordinare</h2>
+                <div class="flex flex-col sm:flex-row gap-3 mb-4 items-center">
+                    <div class="relative w-full sm:flex-grow">
+                        <input type="search" id="search-input" placeholder="Cerca un piatto..." class="w-full p-3 pl-10 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-primary text-base">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
                     </div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <select id="category-select" class="p-3 bg-white border border-gray-200 rounded-xl text-xs font-bold focus:ring-2 focus:ring-primary outline-none"></select>
-                        <select id="diet-select" class="p-3 bg-white border border-gray-200 rounded-xl text-xs font-bold focus:ring-2 focus:ring-primary outline-none">
-                            <option value="all">Tutti i Regimi</option>
-                            <option value="carne/pesce">🥩 Carne/Pesce</option>
-                            <option value="vegetariano">🧀 Vegetariano</option>
-                            <option value="vegano">🌱 Vegano</option>
-                        </select>
-                    </div>
+                    <select id="category-select" class="w-full sm:w-auto p-3 border border-gray-300 rounded-xl bg-white shadow-sm focus:ring-2 focus:ring-primary"></select>
                 </div>
-                <div id="menu-items" class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-20"></div>
+                <div id="menu-items" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-10"></div>
             </section>
 
-            <section id="custom-view" class="view">
-                <div id="custom-step-1" class="bg-white p-6 rounded-[2.5rem] shadow-md mb-6">
-                    <h3 class="font-bold mb-6 text-center text-gray-400 uppercase tracking-widest text-sm">1. Scegli la base (3,50€)</h3>
-                    <div class="flex gap-4">
-                        <button onclick="selectCustomBase('Panino')" class="flex-1 p-6 bg-gray-50 border-2 border-transparent rounded-3xl flex flex-col items-center hover:bg-orange-50 hover:border-primary transition-all group">
-                            <i class="fas fa-bread-slice text-primary text-4xl mb-3 group-hover:scale-110 transition-transform"></i>
-                            <span class="font-bold text-lg">Panino</span>
+            <section id="custom-sandwich-view" class="view">
+                <h2 class="text-2xl md:text-3xl font-extrabold mb-4">Crea il Tuo Prodotto</h2>
+                <div class="bg-white p-4 md:p-6 rounded-2xl shadow-md mb-6 text-center">
+                    <h3 class="text-lg font-bold mb-3">1. Scegli la base</h3>
+                    <div id="base-choice-container" class="flex gap-4">
+                        <button data-type="panino" class="choice-btn flex-1 p-4 bg-gray-50 rounded-xl shadow-sm border-2 border-transparent transition-all hover:bg-orange-50 flex flex-col items-center">
+                            <i class="fas fa-bread-slice text-3xl text-primary mb-2"></i><span class="font-semibold">Panino</span>
                         </button>
-                        <button onclick="selectCustomBase('Pizza')" class="flex-1 p-6 bg-gray-50 border-2 border-transparent rounded-3xl flex flex-col items-center hover:bg-orange-50 hover:border-primary transition-all group">
-                            <i class="fas fa-pizza-slice text-primary text-4xl mb-3 group-hover:scale-110 transition-transform"></i>
-                            <span class="font-bold text-lg">Pizza Ripiena</span>
+                        <button data-type="pizza" class="choice-btn flex-1 p-4 bg-gray-50 rounded-xl shadow-sm border-2 border-transparent transition-all hover:bg-orange-50 flex flex-col items-center">
+                            <i class="fas fa-pizza-slice text-3xl text-primary mb-2"></i><span class="font-semibold">Pizza</span>
                         </button>
                     </div>
                 </div>
-
-                <div id="custom-step-2" class="hidden">
-                    <div class="flex items-center justify-between mb-4 px-2">
-                        <h3 class="font-bold text-gray-800 uppercase text-sm tracking-widest">2. Aggiungi Ingredienti</h3>
-                        <button onclick="resetCustom()" class="text-xs text-primary font-bold underline">Cambia base</button>
-                    </div>
+                <div id="subtype-choice-container" class="bg-white p-4 rounded-2xl shadow-md mb-6 hidden text-center">
+                    <h3 class="text-lg font-bold mb-3">2. Scegli la variante</h3>
+                    <div id="subtype-options" class="grid grid-cols-2 gap-3 p-2"></div>
+                </div>
+                <div id="ingredients-step-container" class="hidden">
+                    <h3 class="text-lg font-bold mb-3 text-center">3. Aggiungi gli ingredienti</h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div id="ingredients-list" class="md:col-span-2 grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
-                        <div class="md:col-span-1">
-                            <div class="bg-white p-6 rounded-[2rem] shadow-xl sticky top-24 border border-gray-100">
-                                <p class="text-[10px] font-black text-primary uppercase mb-1" id="custom-base-label"></p>
-                                <h3 class="font-bold border-b pb-2 mb-4 text-sm uppercase">Riepilogo</h3>
-                                <ul id="custom-summary" class="text-[11px] space-y-2 mb-6 min-h-[60px] text-gray-500"></ul>
-                                <div class="flex justify-between items-center mb-6 border-t pt-4">
-                                    <span class="text-gray-400 font-bold">Totale</span>
-                                    <div class="text-2xl font-black text-primary" id="custom-total">€3.50</div>
+                        <div id="sandwich-summary" class="md:col-span-1">
+                            <div class="bg-white p-5 rounded-2xl shadow-lg border sticky top-24">
+                                <h3 class="font-bold border-b pb-2 mb-3 text-sm">Riepilogo Personalizzato</h3>
+                                <p class="font-semibold text-primary mb-2 text-xs" id="sandwich-base-summary"></p>
+                                <ul id="selected-ingredients-list" class="space-y-1 text-[10px] mb-4 overflow-y-auto max-h-40"></ul>
+                                <div class="border-t pt-3">
+                                    <div class="flex justify-between items-end">
+                                        <span class="text-gray-500 text-xs">Totale:</span>
+                                        <p class="text-xl font-extrabold text-primary" id="sandwich-total-price">€0.00</p>
+                                    </div>
+                                    <button id="add-sandwich-to-cart-btn" class="w-full mt-4 bg-secondary text-white font-bold py-2 rounded-xl shadow-md disabled:opacity-50 text-xs">Aggiungi al Carrello</button>
                                 </div>
-                                <button id="add-custom-btn" class="w-full bg-secondary text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 disabled:opacity-50">AGGIUNGI AL CARRELLO</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <section id="order-view" class="view">
-                <h2 class="text-2xl font-extrabold mb-6">Il Tuo Carrello</h2>
-                <div id="my-order-content" class="bg-white p-6 rounded-[2.5rem] shadow-md border border-gray-100"></div>
+            <section id="my-order-view" class="view">
+                <h2 class="text-2xl md:text-3xl font-extrabold mb-4">Il Tuo Carrello</h2>
+                <div id="my-order-content" class="bg-white p-4 md:p-6 rounded-2xl shadow-md"></div>
             </section>
 
-            <section id="history-view" class="view">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-extrabold text-gray-800">Ordini di Oggi</h2>
-                    <button id="export-history-btn" class="hidden bg-secondary hover:bg-secondary-dark text-white text-[10px] font-bold py-2 px-4 rounded-xl shadow-lg transition-all active:scale-95 uppercase">
-                        <i class="fas fa-file-csv mr-1"></i>Export Storico
-                    </button>
-                </div>
-                <div id="all-orders-list" class="space-y-4 min-h-[200px]"></div>
-                <div class="mt-8 bg-white p-6 rounded-[2.5rem] shadow-2xl text-right border-t-8 border-primary">
-                    <span class="text-sm font-bold text-gray-400 uppercase tracking-widest">Incasso Totale:</span>
-                    <span id="grand-total" class="text-4xl font-black text-primary ml-2">€0.00</span>
-                </div>
+            <section id="all-orders-view" class="view">
+                 <div class="flex justify-between items-center mb-6">
+                     <h2 class="text-2xl font-extrabold">Ordini di Oggi</h2>
+                     <button id="export-history-btn" class="bg-primary text-white font-bold py-2 px-4 rounded-lg text-sm"><i class="fas fa-download mr-2"></i>Export CSV</button>
+                 </div>
+                 <div id="all-orders-list" class="space-y-4"></div>
+                 <div class="mt-6 bg-white p-5 rounded-2xl shadow-lg text-right border-t-4 border-primary">
+                     <span class="font-bold text-gray-600">Totale Globale:</span>
+                     <span id="grand-total" class="text-3xl font-extrabold text-primary ml-2">€0.00</span>
+                 </div>
             </section>
         </main>
     </div>
 
-    <div id="allergen-modal" class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center z-[60] hidden p-4">
-        <div class="bg-white p-8 rounded-[2rem] shadow-2xl w-full max-w-sm">
-            <h3 class="text-xl font-bold mb-6 flex items-center text-gray-800"><i class="fas fa-info-circle text-primary mr-2"></i> Legenda Allergeni</h3>
-            <div class="space-y-4 text-sm text-gray-600">
-                <div class="flex items-center p-3 bg-gray-50 rounded-xl"><i class="fas fa-wheat-awn text-primary mr-3 text-xl"></i> <strong>G</strong> - Glutine</div>
-                <div class="flex items-center p-3 bg-gray-50 rounded-xl"><i class="fas fa-cheese text-primary mr-3 text-xl"></i> <strong>L</strong> - Latticini</div>
-                <div class="flex items-center p-3 bg-gray-50 rounded-xl"><i class="fas fa-shrimp text-primary mr-3 text-xl"></i> <strong>C</strong> - Crostacei</div>
-                <div class="flex items-center p-3 bg-gray-50 rounded-xl"><i class="fas fa-fish text-primary mr-3 text-xl"></i> <strong>P</strong> - Pesce</div>
-            </div>
-            <button onclick="document.getElementById('allergen-modal').classList.add('hidden')" class="w-full mt-6 py-4 bg-gray-100 rounded-2xl font-bold text-gray-500 hover:bg-gray-200 transition-colors">Chiudi</button>
+    <div id="user-modal" class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-md text-center">
+            <h3 class="text-2xl font-bold mb-4">Benvenuto!</h3>
+            <input type="text" id="username-input" placeholder="Nome e Cognome..." class="w-full p-3 border-2 rounded-xl mb-4 focus:border-primary outline-none">
+            <input type="email" id="user-email-input" placeholder="Email..." class="w-full p-3 border-2 rounded-xl mb-6 focus:border-primary outline-none">
+            <button id="save-username-btn" class="w-full bg-primary text-white font-bold py-3.5 rounded-xl shadow-lg active:scale-95">Salva</button>
         </div>
     </div>
 
-    <div id="user-modal" class="fixed inset-0 bg-gray-900/90 backdrop-blur-md flex items-center justify-center z-[100] hidden p-4">
-        <div class="bg-white p-8 rounded-[2.5rem] shadow-2xl w-full max-w-md text-center">
-            <h3 class="text-2xl font-bold mb-2">Benvenuto!</h3>
-            <p class="text-gray-400 mb-8 text-sm">Inserisci il tuo nome e la tua email per iniziare.</p>
-            <input type="text" id="username-input" placeholder="Nome e Cognome" class="w-full p-4 bg-gray-50 border-none rounded-2xl mb-4 focus:ring-2 focus:ring-primary outline-none font-semibold">
-            <input type="email" id="user-email-input" placeholder="Indirizzo Email" class="w-full p-4 bg-gray-50 border-none rounded-2xl mb-8 focus:ring-2 focus:ring-primary outline-none font-semibold">
-            <button id="save-username-btn" class="w-full bg-primary text-white font-bold py-4 rounded-2xl shadow-lg active:scale-95 transition-all">Salva e Inizia</button>
-        </div>
-    </div>
-
-    <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 bg-gray-800 text-white py-4 px-8 rounded-full shadow-2xl z-[110] opacity-0 transition-opacity duration-300 pointer-events-none text-sm font-bold flex items-center">
-        <i class="fas fa-shopping-cart mr-2 text-primary"></i> <span id="toast-message"></span>
+    <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 bg-gray-800 text-white py-3 px-6 rounded-full shadow-2xl z-[60] opacity-0 transition-opacity duration-300 pointer-events-none">
+        <p id="toast-message" class="text-sm font-medium"></p>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc, serverTimestamp, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, addDoc, serverTimestamp, doc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyCQJsNbgaR89gF_1vLe6H4DPboOhQvm9nI", authDomain: "app-ordini-pranzo-alimentari.firebaseapp.com", projectId: "app-ordini-pranzo-alimentari", storageBucket: "app-ordini-pranzo-alimentari.appspot.com", messagingSenderId: "553169964686", appId: "1:553169964686:web:7f8ca6f32a301949e4c3df" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const ordersCollectionRef = collection(db, "orders");
 
-        const ALLERGENS_MAP = { G: "fa-wheat-awn", L: "fa-cheese", C: "fa-shrimp", P: "fa-fish" };
-        const kgWeights = (p) => [{l:'250g', v:p*0.25}, {l:'500g', v:p*0.5}, {l:'1kg', v:p}];
+        const CUSTOM_PRODUCT_BASE_PRICE = 3.50;
+        const CATEGORY_ORDER = ["Prodotti da Forno", "Menù Combinati", "Gastronomia", "Panini", "Pizze", "Insalatone", "Verdure", "Fritti", "Dessert"];
+        const BASE_OPTIONS = { 
+            panino: { name: 'Panino ripieno', subtypes: ['Pane arabo', 'Ciabattina', 'Medaglione ai 5 cereali', 'Ciabattina integrale'] }, 
+            pizza: { name: 'Pizza Ripiena', subtypes: ['Pizza classica'] } 
+        };
 
-        // --- DATABASE COMPLETO ---
+        const INGREDIENTS_LIST = [
+            { id: 'bresaola', name: 'Bresaola' }, { id: 'brie', name: 'Brie' }, { id: 'broccoletti', name: 'Broccoletti' },
+            { id: 'capocollo', name: 'Capocollo' }, { id: 'carciofini', name: 'Carciofini' }, { id: 'cicoria', name: 'Cicoria' },
+            { id: 'frittata', name: 'Frittata' }, { id: 'insalata', name: 'Insalata' }, { id: 'lattuga', name: 'Lattuga' },
+            { id: 'melanzane-grigliate', name: 'Melanzane Grigliate' }, { id: 'mortadella', name: 'Mortadella' },
+            { id: 'mozzarella', name: 'Mozzarella' }, { id: 'olive', name: 'Olive' }, { id: 'parmigiano', name: 'Parmigiano' },
+            { id: 'pecorino', name: 'Pecorino' }, { id: 'peperoni-grigliati', name: 'Peperoni Grigliati' },
+            { id: 'pomodori-secchi', name: 'Pomodori Secchi' }, { id: 'pomodoro', name: 'Pomodoro' },
+            { id: 'porchetta', name: 'Porchetta' }, { id: 'primo-sale', name: 'Primo Sale' },
+            { id: 'prosciutto-cotto', name: 'Prosciutto Cotto' }, { id: 'prosciutto-crudo', name: 'Prosciutto Crudo' },
+            { id: 'rucola', name: 'Rucola' }, { id: 'salame', name: 'Salame' }, { id: 'scamorza', name: 'Scamorza' },
+            { id: 'scarola', name: 'Scarola' }, { id: 'speck', name: 'Speck' }, { id: 'stracchino', name: 'Stracchino' },
+            { id: 'stracciatella', name: 'Stracciatella' }, { id: 'tacchino-arrosto', name: 'Tacchino Arrosto' },
+            { id: 'zucchine-grigliate', name: 'Zucchine Grigliate' }
+        ];
+
         const RAW_MENU = {
-            "Gastronomia": [
-                { name: "Lasagna al ragù", price: 6.00, desc: "Pasta all'uovo, besciamella e ragù di manzo.", allergens: ["G", "L"], calories: 550, diet: ["carne/pesce"], icon: "fa-bowl-food" },
-                { name: "Cous cous vegetale", price: 4.00, desc: "Semola con verdure grigliate.", allergens: ["G"], calories: 350, diet: ["vegano", "vegetariano"], icon: "fa-bowl-food" },
-                { name: "Pomodori con riso (2pz)", price: 6.00, desc: "Con patate al forno.", allergens: [], calories: 420, diet: ["vegano", "vegetariano"], icon: "fa-bowl-food" },
-                { name: "Pasta fredda tonno", price: 4.00, desc: "Tonno, pomodorini e olive.", allergens: ["G", "P"], calories: 420, diet: ["carne/pesce"], icon: "fa-bowl-food" }
+            "prodotti da forno": [
+                { name: "Pane di Lariano", isCustomPriced: true, description: "Pane rustico a lunga lievitazione, crosta spessa", pricingOptions: [ { text: '250g - 0.75€', value: '0.75' }, { text: '500g - 1.50€', value: '1.50' }, { text: '1kg - 3.00€', value: '3.00' } ] },
+                { name: "Ciabatta", isCustomPriced: true, description: "Pane leggero e alveolato, crosta croccante", pricingOptions: [ { text: '250g - 1.00€', value: '1.00' }, { text: '500g - 2.00€', value: '2.00' }, { text: '1kg - 4.00€', value: '4.00' } ] },
+                { name: "Pane Casareccio", isCustomPriced: true, description: "Pane tradizionale, mollica compatta", pricingOptions: [ { text: '250g - 0.63€', value: '0.63' }, { text: '500g - 1.25€', value: '1.25' }, { text: '1kg - 2.50€', value: '2.50' } ] },
+                { name: "Ciabattine", isCustomPriced: true, description: "Versione piccola della ciabatta, ideale per panini", pricingOptions: [ { text: '250g - 0.75€', value: '0.75' }, { text: '500g - 1.50€', value: '1.50' }, { text: '1kg - 3.00€', value: '3.00' } ] },
+                { name: "Rosette", isCustomPriced: true, description: "Pane soffiato, leggero e vuoto all’interno", pricingOptions: [ { text: '250g - 0.75€', value: '0.75' }, { text: '500g - 1.50€', value: '1.50' }, { text: '1kg - 3.00€', value: '3.00' } ] },
+                { name: "Pane all'olio", isCustomPriced: true, description: "Pane morbido e profumato con olio d’oliva", pricingOptions: [ { text: '250g - 2.00€', value: '2.00' }, { text: '500g - 4.00€', value: '4.00' }, { text: '1kg - 8.00€', value: '8.00' } ] },
+                { name: "Pane Arabo", isCustomPriced: true, description: "Pane morbido e sottile, ideale per farciture", pricingOptions: [ { text: '250g - 1.25€', value: '1.25' }, { text: '500g - 2.50€', value: '2.50' }, { text: '1kg - 5.00€', value: '5.00' } ] },
+                { name: "Pane Azzimo", isCustomPriced: true, description: "Pane senza lievito, sottile e croccante", pricingOptions: [ { text: '250g - 1.25€', value: '1.25' }, { text: '500g - 2.50€', value: '2.50' }, { text: '1kg - 5.00€', value: '5.00' } ] },
+                { name: "Pane Integrale", isCustomPriced: true, description: "Pane ricco di fibre, gusto più deciso", pricingOptions: [ { text: '250g - 1.00€', value: '1.00' }, { text: '500g - 2.00€', value: '2.00' }, { text: '1kg - 4.00€', value: '4.00' } ] },
+                { name: "Pizza Rossa", isCustomPriced: true, description: "Base croccante con salsa di pomodoro", pricingOptions: [ { text: '200g - 2.00€', value: '2.00' }, { text: '500g - 5.00€', value: '5.00' }, { text: '1kg - 10.00€', value: '10.00' } ] },
+                { name: "Pizza Patate", isCustomPriced: true, description: "Pizza bianca con patate sottili e rosmarino", pricingOptions: [ { text: '200g - 2.00€', value: '2.00' }, { text: '500g - 5.00€', value: '5.00' }, { text: '1kg - 10.00€', value: '10.00' } ] },
+                { name: "Pizza Bianca", isCustomPriced: true, description: "Semplice, soffice e leggermente salata", pricingOptions: [ { text: '200g - 1.80€', value: '1.80' }, { text: '500g - 4.50€', value: '4.50' }, { text: '1kg - 9.00€', value: '9.00' } ] },
+                { name: "Pizzette", price: 1.50, description: "Mini pizze morbide, ideali come snack", allergens: ["G", "L"], diet: ["vegetariano"] }
             ],
-            "Forno: Pane": [
-                { name: "Pane di Lariano", weights: kgWeights(3.00), desc: "Cotto a legna, crosta croccante.", allergens: ["G"], calories: 240, diet: ["vegano", "vegetariano"], icon: "fa-bread-slice" },
-                { name: "Pane Casareccio", weights: kgWeights(2.50), desc: "Classico pane bianco.", allergens: ["G"], calories: 250, diet: ["vegano", "vegetariano"], icon: "fa-bread-slice" },
-                { name: "Ciabatta", weights: kgWeights(4.00), desc: "Leggerissimo e croccante.", allergens: ["G"], calories: 270, diet: ["vegano", "vegetariano"], icon: "fa-bread-slice" },
-                { name: "Pane Integrale", weights: kgWeights(4.00), desc: "Ricco di fibre.", allergens: ["G"], calories: 220, diet: ["vegano", "vegetariano"], icon: "fa-bread-slice" }
+            "menù combinati": [
+                { name: "Panino + Acqua 50cl", price: 4.00, ingredients: ["Panino a scelta", "Acqua 50cl"], diet: ["carne/pesce", "vegetariano", "vegano"], allergens: ["G", "L", "P"] },
+                { name: "Panino + Lattina 33cl", price: 4.50, ingredients: ["Panino a scelta", "Lattina 33cl"], diet: ["carne/pesce", "vegetariano", "vegano"], allergens: ["G", "L", "P"] },
+                { name: "Panino + Bibita 50cl", price: 5.00, ingredients: ["Panino a scelta", "Bibita 50cl"], diet: ["carne/pesce", "vegetariano", "vegano"], allergens: ["G", "L", "P"] }
             ],
-            "Forno: Pizza": [
-                { name: "Pizza Rossa", weights: kgWeights(10.00), desc: "Pomodoro e olio EVO.", allergens: ["G"], calories: 220, diet: ["vegano", "vegetariano"], icon: "fa-pizza-slice" },
-                { name: "Pizza Patate", weights: kgWeights(10.00), desc: "Bianca con patate e rosmarino.", allergens: ["G"], calories: 260, diet: ["vegetariano"], icon: "fa-pizza-slice" },
-                { name: "Pizza Bianca", weights: kgWeights(9.00), desc: "Classica scrocchiarella.", allergens: ["G"], calories: 250, diet: ["vegano", "vegetariano"], icon: "fa-pizza-slice" },
-                { name: "Pizzette Rosse", price: 1.50, desc: "Soffici al pomodoro. Prezzo cadauna.", allergens: ["G", "L"], calories: 150, icon: "fa-pizza-slice" }
+            "gastronomia": [
+                { name: "Melanzane alla parmigiana", price: 6.00, allergens: ["L"], diet: ["vegetariano"], calories: 350, ingredients: ["Melanzane grigliate", "Pomodoro", "Parmigiano"] },
+                { name: "Lasagna classica al ragù", price: 6.00, allergens: ["G", "L"], diet: ["carne/pesce"], calories: 550, ingredients: ["Sfoglia all'uovo", "Ragù di carne", "Besciamella"] },
+                { name: "Lasagna bianca vegetariana", price: 6.00, allergens: ["G", "L"], diet: ["vegetariano"], calories: 500, ingredients: ["Sfoglia all'uovo", "Besciamella", "Carciofi", "Parmigiano"] },
+                { name: "Lasagna funghi e salsiccia", price: 6.00, allergens: ["G", "L"], diet: ["carne/pesce"], calories: 600, ingredients: ["Besciamella", "Funghi", "Piselli", "Salsiccia"] },
+                { name: "Cous cous pollo", price: 4.00, allergens: ["G"], diet: ["carne/pesce"], calories: 450, ingredients: ["Cous cous", "Verdure", "Pollo"] },
+                { name: "Cous cous vegetale", price: 4.00, allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 350, ingredients: ["Cous cous", "Verdure miste"] },
+                { name: "Riso Venere gamberi", price: 4.00, allergens: ["C"], diet: ["carne/pesce"], calories: 420, ingredients: ["Riso Venere", "Gamberi", "Zucchine"] },
+                { name: "Insalata di riso", price: 4.00, allergens: [], diet: ["carne/pesce"], calories: 400 },
+                { name: "Pasta fredda tonno", price: 4.00, allergens: ["G", "P"], diet: ["carne/pesce"], calories: 450 },
+                { name: "Pasta fredda pesto primo sale", price: 4.00, allergens: ["G", "L"], diet: ["vegetariano"], calories: 500 },
+                { name: "Insalata di pollo", price: 4.00, allergens: [], diet: ["carne/pesce"], calories: 350 },
+                { name: "Riso bresaola limone", price: 4.00, allergens: [], diet: ["carne/pesce"], calories: 380 },
+                { name: "Pomodori riso (2 pz)", price: 6.00, allergens: [], diet: ["vegetariano", "vegano"], calories: 320 }
             ],
-            "Panini Farciti": [
-                { name: "Cotoletta di pollo", price: 3.50, desc: "Cotoletta, lattuga, pomodoro.", allergens: ["G", "L"], calories: 580, diet: ["carne/pesce"], icon: "fa-bread-slice" },
-                { name: "Brasato di manzo", price: 3.50, desc: "Brasato e verdura cotta ripassata.", allergens: ["G"], calories: 620, diet: ["carne/pesce"], icon: "fa-bread-slice" },
-                { name: "Crudo mozzarella", price: 3.50, desc: "Fresco e saporito.", allergens: ["G", "L"], calories: 550, diet: ["carne/pesce"], icon: "fa-bread-slice" }
+            "panini": [
+                { name: "Crudo pomodoro mozzarella", price: 3.50, allergens: ["G", "L"], diet: ["carne/pesce"], calories: 550, ingredients: ["Crudo", "Pomodoro", "Mozzarella"] },
+                { name: "Crudo stracchino rughetta", price: 3.50, allergens: ["G", "L"], diet: ["carne/pesce"], calories: 580, ingredients: ["Crudo", "Stracchino", "Rucola"] },
+                { name: "Cotto scamorza verdura", price: 3.50, allergens: ["G", "L"], diet: ["carne/pesce"], calories: 520 },
+                { name: "Capocollo pecorino pom secchi", price: 3.50, allergens: ["G", "L"], diet: ["carne/pesce"], calories: 600 },
+                { name: "Salame pecorino pom secchi", price: 3.50, allergens: ["G", "L"], diet: ["carne/pesce"], calories: 620 },
+                { name: "Speck Brie pom secchi", price: 3.50, allergens: ["G", "L"], diet: ["carne/pesce"], calories: 610 },
+                { name: "Porchetta", price: 3.50, allergens: ["G"], diet: ["carne/pesce"], calories: 650 },
+                { name: "Vegetariano grigliato", price: 3.50, allergens: ["G"], diet: ["vegetariano", "vegano"], calories: 450 },
+                { name: "Tacchino arrosto verdura", price: 3.50, allergens: ["G"], diet: ["carne/pesce"], calories: 480 },
+                { name: "Fesa tacchino verdura", price: 3.50, allergens: ["G"], diet: ["carne/pesce"], calories: 480 },
+                { name: "Bresaola parmigiano rughetta", price: 3.50, allergens: ["G", "L"], diet: ["carne/pesce"], calories: 500 },
+                { name: "Bresaola primo sale rughetta", price: 3.50, allergens: ["G", "L"], diet: ["carne/pesce"], calories: 470 },
+                { name: "Salmone formaggio", price: 3.50, allergens: ["G", "L", "P"], diet: ["carne/pesce"], calories: 530 },
+                { name: "Tonno pomodoro", price: 3.50, allergens: ["G", "P"], diet: ["carne/pesce"], calories: 490 },
+                { name: "Tonno carciofini", price: 3.50, allergens: ["G", "P"], diet: ["carne/pesce"], calories: 510 },
+                { name: "5 cereali salmone", price: 3.50, allergens: ["G", "L", "P"], diet: ["carne/pesce"], calories: 540 },
+                { name: "5 cereali tacchino", price: 3.50, allergens: ["G"], diet: ["carne/pesce"], calories: 490 },
+                { name: "Pollo lattuga pomodoro", price: 3.50, allergens: ["G"], diet: ["carne/pesce"], calories: 580 },
+                { name: "Brasato manzo verdura", price: 3.50, allergens: ["G"], diet: ["carne/pesce"], calories: 620 }
             ],
-            "Fritti e Contorni": [
-                { name: "Supplì", price: 1.50, desc: "Cuore di mozzarella.", allergens: ["G", "L"], calories: 250, diet: ["vegetariano"], icon: "fa-stroopwafel" },
-                { name: "Cicoria ripassata", price: 4.00, desc: "Aglio, olio e peperoncino.", allergens: [], calories: 140, diet: ["vegano", "vegetariano"], icon: "fa-carrot" },
-                { name: "Broccoletti ripassati", price: 4.00, desc: "Contorno di stagione.", allergens: [], calories: 150, diet: ["vegano", "vegetariano"], icon: "fa-carrot" }
+            "pizze": [
+                { name: "Pizza pollo maionese", price: 3.50, allergens: ["G"], diet: ["carne/pesce"], calories: 560 },
+                { name: "Pizza classica bresaola", price: 3.50, allergens: ["G", "L"], diet: ["carne/pesce"], calories: 570 },
+                { name: "Pizza tacchino verdure", price: 3.50, allergens: ["G"], diet: ["carne/pesce"], calories: 490 },
+                { name: "Crudo mozzarella", price: 3.50, allergens: ["G", "L"] },
+                { name: "Speck stracchino rughetta", price: 3.50, allergens: ["G", "L"] },
+                { name: "Cotto melanzane", price: 3.50, allergens: ["G", "L"] },
+                { name: "Mortadella stracciatella", price: 3.50, allergens: ["G", "L"] },
+                { name: "Frittata zucchine", price: 3.50, allergens: ["G", "L"] },
+                { name: "Bresaola formaggio", price: 3.50, allergens: ["G", "L"] },
+                { name: "Cotto stracchino", price: 3.50, allergens: ["G", "L"] },
+                { name: "Pizza Rustica: Scarola", price: 8.00, isCustomPriced: true, pricingOptions: [ { text: 'Intera - 8.00€', value: '8.00' }, { text: 'Mezza - 4.00€', value: '4.00' }, { text: '1/4 - 2.00€', value: '2.00' } ], allergens: ["G"], diet: ["vegetariano", "vegano"] },
+                { name: "Pizza Rustica: Cicoria", price: 8.00, isCustomPriced: true, pricingOptions: [ { text: 'Intera - 8.00€', value: '8.00' }, { text: 'Mezza - 4.00€', value: '4.00' }, { text: '1/4 - 2.00€', value: '2.00' } ], allergens: ["G"], diet: ["vegetariano", "vegano"] },
+                { name: "Pizza Rustica: Broccoli e salsiccia", price: 8.00, isCustomPriced: true, pricingOptions: [ { text: 'Intera - 8.00€', value: '8.00' }, { text: 'Mezza - 4.00€', value: '4.00' }, { text: '1/4 - 2.00€', value: '2.00' } ], allergens: ["G"], diet: ["carne/pesce"] }
+            ],
+            "insalatone": [
+                { name: "Insalatona Tonno", price: 5.00, diet: ["carne/pesce"], allergens: ["P"], calories: 450, ingredients: ["Misticanza", "Mais", "Olive", "Carote", "Tonno"] },
+                { name: "Insalatona Uovo Sodo", price: 5.00, diet: ["vegetariano"], allergens: [], calories: 380, ingredients: ["Misticanza", "Mais", "Olive", "Carote", "Uovo sodo"] },
+                { name: "Insalatona Primo Sale", price: 5.00, diet: ["vegetariano"], allergens: ["L"], calories: 420, ingredients: ["Misticanza", "Mais", "Olive", "Carote", "Primo Sale"] }
+            ],
+            "verdure": [
+                { name: "Melanzane", price: 4.00, diet: ["vegetariano", "vegano"], calories: 180 },
+                { name: "Zucchine", price: 4.00, diet: ["vegetariano", "vegano"], calories: 160 },
+                { name: "Peperoni", price: 4.00, diet: ["vegetariano", "vegano"], calories: 160 },
+                { name: "Cicoria ripassata", price: 4.00, diet: ["vegetariano", "vegano"], calories: 140 },
+                { name: "Broccoletti ripassati", price: 4.00, diet: ["vegetariano", "vegano"], calories: 150 },
+                { name: "Broccoli vapore", price: 4.00, diet: ["vegetariano", "vegano"], calories: 150 },
+                { name: "Scarola con olive", price: 4.00, diet: ["vegetariano", "vegano"], calories: 130 }
+            ],
+            "fritti": [
+                { name: "Pizzetta rossa", price: 1.50, isCustomPriced: true, pricingOptions: [ { text: '2 pz - 1.50€', value: '1.50' }, { text: '3 pz - 2.00€', value: '2.00' }, { text: '6 pz - 4.00€', value: '4.00' } ], allergens: ["G"] },
+                { name: "Lingua romana", price: 1.50, allergens: ["G"], diet: ["vegetariano", "vegano"] },
+                { name: "Supplì", price: 1.50, allergens: ["G", "L"], diet: ["vegetariano"] },
+                { name: "Polpetta melanzane", price: 1.50, allergens: ["G", "L"], diet: ["vegetariano"] }
+            ],
+            "dessert": [
+                { name: "Macedonia", price: 3.00, diet: ["vegetariano", "vegano"] },
+                { name: "Crostatina", price: 1.50, allergens: ["G"] },
+                { name: "Lingue di gatto (1pz)", price: 1.00, allergens: ["G", "L"] },
+                { name: "Ferretti glassati (1pz)", price: 2.00, allergens: ["G", "L"] }
             ]
         };
 
-        const INGREDIENTS = ["Prosciutto Crudo", "Prosciutto Cotto", "Salame", "Mortadella", "Bresaola", "Cotoletta", "Brasato", "Mozzarella", "Scamorza", "Grana", "Lattuga", "Pomodoro", "Rucola", "Olive", "Cicoria", "Broccoletti", "Scarola", "Melanzane", "Zucchine"].sort();
+        const state = {
+            currentUser: null, currentView: 'menu', searchTerm: '', activeCategoryFilter: 'all',
+            cart: [], allOrders: [], menuData: [],
+            customSandwich: { base: null, subtype: null, ingredients: [], totalPrice: 0 }
+        };
+        const dom = {};
 
-        const state = { currentUser: null, cart: [], allOrders: [], currentView: 'menu', customBase: null, customIngr: [], searchTerm: '', caloriesVisible: false, activeCat: 'all', activeDiet: 'all' };
+        function showToast(msg) {
+            dom.toastMessageEl.textContent = msg;
+            dom.toastEl.classList.remove('opacity-0');
+            setTimeout(() => dom.toastEl.classList.add('opacity-0'), 3000);
+        }
 
-        // --- CORE RENDERING ---
+        function processMenuData(raw) {
+            let id = 1;
+            const icons = { gastronomia: 'fa-bowl-food', panini: 'fa-bread-slice', "prodotti da forno": 'fa-wheat-awn', insalatone: 'fa-seedling', pizze: 'fa-pizza-slice', "menù combinati": "fa-box", dessert: "fa-ice-cream", fritti: "fa-utensils", verdure: "fa-carrot" };
+            return Object.entries(raw).flatMap(([catKey, items]) => items.map(item => ({
+                id: id++, ...item, category: catKey, 
+                categoryDisplay: catKey.charAt(0).toUpperCase() + catKey.slice(1),
+                icon: icons[catKey] || 'fa-utensils'
+            })));
+        }
+
         function renderMenu() {
-            let h = '';
-            const t = state.searchTerm.toLowerCase();
-            
-            Object.entries(RAW_MENU).forEach(([cat, items]) => {
-                if (state.activeCat !== 'all' && state.activeCat !== cat.toLowerCase()) return;
-
-                const filtered = items.filter(i => {
-                    const matchesSearch = i.name.toLowerCase().includes(t);
-                    const matchesDiet = state.activeDiet === 'all' || (i.diet && i.diet.includes(state.activeDiet));
-                    return matchesSearch && matchesDiet;
-                });
-
-                if (filtered.length === 0) return;
-
-                h += `<div class="col-span-full mt-10 mb-4 border-b-2 border-primary-light flex items-center justify-between"><h3 class="font-extrabold text-gray-800 text-lg uppercase tracking-widest">${cat}</h3></div>`;
-                filtered.forEach((item, idx) => {
-                    const id = `${cat}-${idx}`.replace(/\s|:/g, '');
-                    const aIcons = (item.allergens || []).map(a => `<i class="fas ${ALLERGENS_MAP[a]} allergen-icon" title="${a}"></i>`).join('');
-                    let pArea = `<span class="font-black text-primary text-lg">€${(item.price || 0).toFixed(2)}</span>`;
-                    
-                    if (item.weights) {
-                        const opts = item.weights.map(o => `<option value="${o.v}">${o.l}</option>`).join('');
-                        pArea = `<select id="sel-${id}" class="text-xs p-2 border-none rounded-xl bg-gray-100 outline-none focus:ring-2 focus:ring-primary">${opts}</select>`;
-                    }
-
-                    h += `
-                    <div class="bg-white p-5 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col justify-between hover:shadow-xl transition-all duration-300 h-full">
-                        <div>
-                            <div class="flex justify-between items-start mb-2">
-                                <h4 class="font-bold text-gray-800 leading-tight flex-grow">${item.name}</h4>
-                                <div class="flex ml-2">${aIcons}</div>
-                            </div>
-                            <p class="text-[11px] text-gray-400 mb-4 leading-relaxed italic">${item.desc || ''}</p>
-                        </div>
-                        <div class="mt-auto border-t pt-4 border-gray-50">
-                            <div class="flex justify-between items-center mb-3">
-                                <div class="flex flex-col">
-                                    ${pArea}
-                                    <span class="text-[10px] text-orange-500 font-bold ${state.caloriesVisible ? '' : 'hidden'}">⚡ ${item.calories} kcal</span>
-                                </div>
-                                <div class="flex items-center bg-gray-50 rounded-xl p-1 border border-gray-100 shadow-inner">
-                                    <button onclick="changeQty('${id}', -1)" class="w-8 h-8 flex items-center justify-center font-bold text-gray-400">-</button>
-                                    <span id="qty-${id}" class="w-8 text-center font-bold text-sm">1</span>
-                                    <button onclick="changeQty('${id}', 1)" class="w-8 h-8 flex items-center justify-center font-bold text-gray-400">+</button>
-                                </div>
-                            </div>
-                            <button onclick="add('${cat}', ${idx}, '${id}')" class="w-full bg-primary text-white font-bold py-3.5 rounded-2xl shadow-md active:scale-95 transition-all text-xs uppercase">Aggiungi</button>
-                        </div>
-                    </div>`;
-                });
-            });
-            document.getElementById('menu-items').innerHTML = h || '<p class="col-span-full text-center py-20 text-gray-400">Nessun prodotto trovato.</p>';
-        }
-
-        window.changeQty = (id, v) => {
-            const el = document.getElementById(`qty-${id}`);
-            let q = parseInt(el.textContent) + v;
-            if (q < 1) q = 1;
-            el.textContent = q;
-        };
-
-        window.add = (cat, idx, domId) => {
-            const item = RAW_MENU[cat][idx];
-            let price = item.price || 0;
-            let name = item.name;
-            const q = parseInt(document.getElementById(`qty-${domId}`).textContent);
-            const sel = document.getElementById(`sel-${domId}`);
-            if (sel) { price = parseFloat(sel.value); name += ` (${sel.options[sel.selectedIndex].text})`; }
-            for(let i=0; i<q; i++) state.cart.push({ name, price, cartId: Date.now() + Math.random(), category: cat });
-            document.getElementById('cart-count').textContent = state.cart.length;
-            showToast(`${q}x ${name} aggiunto!`);
-            document.getElementById(`qty-${domId}`).textContent = "1";
-        };
-
-        // --- SISTEMA EXPORT ---
-        async function exportToCSV() {
-            showToast("Esportazione...");
-            const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
-            const sn = await getDocs(q);
-            const header = "OrderID;TimestampISO8601;DataLeggibile;UserID;Utente;EmailUtente;Prodotto;Dettagli;CategoriaProdotto;Quantita;PrezzoUnitario;TotaleRiga;MetodoPagamento;Allergie;Posate;CanaleOrdine;StatoPagamento;RispostaRistoratore";
-            let rows = [header];
-
-            sn.docs.forEach(doc => {
-                const o = doc.data();
-                const oid = doc.id;
-                const dIso = o.createdAt ? o.createdAt.toDate().toISOString() : "";
-                const dLeg = o.createdAt ? `"${o.createdAt.toDate().toLocaleString('it-IT')}"` : "";
-                
-                o.items.forEach(i => {
-                    const row = [
-                        oid, dIso, dLeg, o.uid || "", `"${o.user}"`, o.email || "", `"${i.name}"`, `"${i.details || ""}"`,
-                        `"${i.category || ""}"`, 1, `"${i.price.toFixed(2).replace('.', ',')}"`, `"${i.price.toFixed(2).replace('.', ',')}"`,
-                        "Satispay", `"${o.allergies || ""}"`, o.cutlery ? "Si" : "No", "Web", o.paid ? "Pagato" : "Da Pagare", ""
-                    ];
-                    rows.push(row.join(";"));
-                });
+            const filtered = state.menuData.filter(i => {
+                const term = state.searchTerm.toLowerCase();
+                return i.name.toLowerCase().includes(term) && 
+                       (state.activeCategoryFilter === 'all' || i.category === state.activeCategoryFilter);
             });
 
-            const blob = new Blob(["\uFEFF" + rows.join("\n")], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = `storico_ordini_${new Date().toISOString().split('T')[0]}.csv`;
-            link.click();
-        }
-
-        // --- ALL ORDERS ---
-        function renderAllOrders() {
-            const todayStr = new Date().toLocaleDateString('it-IT');
-            const filtered = state.allOrders.filter(o => o.createdAt && o.createdAt.toDate().toLocaleDateString('it-IT') === todayStr);
-            const list = document.getElementById('all-orders-list');
-            
             if (filtered.length === 0) {
-                list.innerHTML = `<div class="text-center py-20 text-gray-300 italic"><p>Ancora nessun ordine per oggi (${todayStr}).</p></div>`;
-                document.getElementById('grand-total').textContent = "€0.00";
+                dom.menuItemsContainer.innerHTML = '<div class="col-span-full text-center p-10 text-gray-400 font-medium">Nessun prodotto trovato.</div>';
                 return;
             }
 
-            list.innerHTML = filtered.map(o => `
-                <div class="bg-white p-6 rounded-[2rem] shadow-sm border-l-8 border-primary flex justify-between items-center">
+            let currentCat = '';
+            dom.menuItemsContainer.innerHTML = filtered.map(item => {
+                let html = '';
+                if (item.categoryDisplay !== currentCat) {
+                    currentCat = item.categoryDisplay;
+                    html += `<div class="col-span-full mt-6 mb-2 font-bold text-xl border-b-2 border-primary-light pb-1">${currentCat}</div>`;
+                }
+
+                const priceArea = item.isCustomPriced ? 
+                    `<div class="flex items-center gap-2 justify-between w-full">
+                        <select data-id="${item.id}" class="portion-select text-[10px] p-1 border rounded bg-white flex-grow mr-2 max-w-[130px]">
+                            ${item.pricingOptions.map(o => `<option value="${o.value}">${o.text}</option>`).join('')}
+                        </select>
+                        <span id="price-display-${item.id}" class="font-bold text-primary shrink-0">€${parseFloat(item.pricingOptions[0].value).toFixed(2)}</span>
+                    </div>` : 
+                    `<span class="font-bold text-primary text-lg">€${item.price.toFixed(2)}</span>`;
+
+                html += `
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-transparent hover:border-primary/20 flex flex-col justify-between h-full transition-all">
                     <div>
-                        <h4 class="font-black text-gray-800 text-lg">${o.user}</h4>
-                        <p class="text-[10px] text-gray-400 uppercase font-bold mt-1">${o.items.map(i=>i.name).join(', ')}</p>
+                        <div class="flex items-start gap-3 mb-2">
+                            <div class="bg-primary/10 p-2 rounded-full text-primary shrink-0 w-10 h-10 flex items-center justify-center"><i class="fas ${item.icon}"></i></div>
+                            <div class="min-w-0">
+                                <h3 class="font-bold leading-tight truncate text-sm md:text-base">${item.name}</h3>
+                                <p class="text-[10px] text-gray-500 mt-1 line-clamp-2 italic">${item.description || item.ingredients?.join(', ') || 'Tradizione e freschezza'}</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="text-xl font-black text-primary">€${o.total.toFixed(2)}</div>
-                </div>
-            `).join('');
-            document.getElementById('grand-total').textContent = `€${filtered.reduce((s, o) => s + o.total, 0).toFixed(2)}`;
+                    <div class="mt-4 pt-3 border-t">
+                        <div class="mb-3 h-8 flex items-center">${priceArea}</div>
+                        <button data-id="${item.id}" class="add-to-cart-btn w-full bg-primary text-white p-2 rounded-xl text-xs font-bold shadow-md active:scale-95 transition-transform">Aggiungi</button>
+                    </div>
+                </div>`;
+                return html;
+            }).join('');
         }
 
-        // --- SISTEMA NAVIGAZIONE ---
+        function renderCustomSandwichBuilder() {
+            dom.ingredientsList.innerHTML = INGREDIENTS_LIST.map(ing => {
+                const count = state.customSandwich.ingredients.filter(i => i.id === ing.id).length;
+                const badge = count > 0 ? `<span class="absolute -top-2 -right-2 bg-primary text-white text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center border-2 border-white shadow-sm">${count}</span>` : '';
+                return `<div data-id="${ing.id}" class="ingredient-card bg-white p-3 rounded-xl border-2 border-transparent shadow-sm relative h-20 flex items-center justify-center text-center cursor-pointer active:scale-95 transition-all">
+                    <p class="font-semibold text-xs leading-tight">${ing.name}</p>${badge}
+                </div>`;
+            }).join('');
+            updateSandwichSummary();
+        }
+
+        function updateSandwichSummary() {
+            const { base, subtype, ingredients } = state.customSandwich;
+            if (!base || !subtype) {
+                dom.sandwichTotalPrice.textContent = "€0.00";
+                dom.addSandwichBtn.disabled = true;
+                dom.sandwichBaseSummary.textContent = "Inizia selezionando base e variante";
+                return;
+            }
+            const currentPrice = CUSTOM_PRODUCT_BASE_PRICE + (Math.max(0, ingredients.length - 3) * 1.00);
+            state.customSandwich.totalPrice = currentPrice;
+            dom.sandwichTotalPrice.textContent = `€${currentPrice.toFixed(2)}`;
+            dom.sandwichBaseSummary.textContent = `${BASE_OPTIONS[base].name} (${subtype})`;
+            dom.selectedIngredientsList.innerHTML = ingredients.map(i => `<li class="flex items-center gap-1"><i class="fas fa-check text-secondary text-[8px]"></i> ${i.name}</li>`).join('');
+            dom.addSandwichBtn.disabled = ingredients.length === 0;
+        }
+
+        async function exportData() {
+            try {
+                const sn = await getDocs(query(ordersCollectionRef, orderBy("createdAt", "desc")));
+                const rows = [["Data", "Utente", "Totale EUR", "Dettaglio Prodotti"]];
+                sn.forEach(d => {
+                    const o = d.data();
+                    rows.push([o.createdAt?.toDate().toLocaleString() || 'N/D', o.user, o.total.toFixed(2), o.items.map(i => `${i.quantity}x ${i.name}`).join(" | ")]);
+                });
+                const csv = rows.map(r => r.join(";")).join("\n");
+                const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
+                const a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = `Report_Ordini_${new Date().toLocaleDateString()}.csv`;
+                a.click();
+            } catch (e) { showToast("Errore durante l'esportazione"); }
+        }
+
         function navigate(v) {
             state.currentView = v;
-            document.querySelectorAll('.view').forEach(el => el.classList.toggle('active', el.id === v + '-view'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.view === v));
+            document.querySelectorAll('.view').forEach(el => el.classList.toggle('active', el.id === `${v}-view`));
+            document.querySelectorAll('.nav-btn').forEach(b => {
+                const active = b.dataset.view === v;
+                b.classList.toggle('bg-primary', active);
+                b.classList.toggle('text-white', active);
+            });
             if (v === 'menu') renderMenu();
-            if (v === 'history') renderAllOrders();
-            if (v === 'order') renderMyOrder();
-            if (v === 'custom') resetCustom();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (v === 'custom-sandwich') renderCustomSandwichBuilder();
+            if (v === 'all-orders') renderAllOrders();
+            if (v === 'my-order') renderMyOrder();
         }
 
-        // --- CREA PRODOTTO ---
-        window.selectCustomBase = (base) => {
-            state.customBase = base;
-            document.getElementById('custom-step-1').classList.add('hidden');
-            document.getElementById('custom-step-2').classList.remove('hidden');
-            document.getElementById('custom-base-label').textContent = "Base: " + base;
-            renderIngredients();
-        };
-        window.resetCustom = () => {
-            state.customBase = null; state.customIngr = [];
-            document.getElementById('custom-step-1').classList.remove('hidden');
-            document.getElementById('custom-step-2').classList.add('hidden');
-        };
-        function renderIngredients() {
-            document.getElementById('ingredients-list').innerHTML = INGREDIENTS.map(ing => `<div onclick="toggleIng('${ing}')" id="ing-${ing.replace(/\s/g, '')}" class="ingredient-card bg-white p-3 rounded-2xl shadow-sm text-center font-bold text-[10px] border-2 border-transparent cursor-pointer active:scale-90 transition-all uppercase">${ing}</div>`).join('');
-            updateCustomSum();
-        }
-        window.toggleIng = (ing) => {
-            const i = state.customIngr.indexOf(ing);
-            if (i > -1) state.customIngr.splice(i, 1); else state.customIngr.push(ing);
-            document.getElementById(`ing-${ing.replace(/\s/g, '')}`).classList.toggle('selected');
-            updateCustomSum();
-        };
-        function updateCustomSum() {
-            const total = 3.5 + Math.max(0, state.customIngr.length - 3);
-            document.getElementById('custom-summary').innerHTML = state.customIngr.map(i => `<li>• ${i}</li>`).join('') || 'Scegli ingredienti...';
-            document.getElementById('custom-total').textContent = `€${total.toFixed(2)}`;
-            document.getElementById('add-custom-btn').disabled = state.customIngr.length === 0;
-        }
+        document.body.addEventListener('click', async (e) => {
+            const btn = e.target.closest('button');
+            const link = e.target.closest('a.nav-btn');
+            const ingCard = e.target.closest('.ingredient-card');
+
+            if (link) { e.preventDefault(); navigate(link.dataset.view); }
+            
+            if (btn && btn.classList.contains('add-to-cart-btn')) {
+                const item = { ...state.menuData.find(i => i.id === parseInt(btn.dataset.id)) };
+                const select = document.querySelector(`select[data-id="${item.id}"]`);
+                if (select) {
+                    item.price = parseFloat(select.value);
+                    item.name = `${item.name} (${select.options[select.selectedIndex].text.split('-')[0].trim()})`;
+                }
+                state.cart.push({ ...item, cartId: Date.now(), quantity: 1 });
+                dom.cartCountEl.textContent = state.cart.length;
+                showToast("Aggiunto!");
+            }
+
+            if (btn && btn.id === 'export-history-btn') exportData();
+
+            if (btn && btn.dataset.type) {
+                state.customSandwich.base = btn.dataset.type;
+                dom.subtypeOptions.innerHTML = BASE_OPTIONS[btn.dataset.type].subtypes.map(s => 
+                    `<button data-subtype="${s}" class="subtype-btn p-3 bg-gray-50 rounded-xl border-2 border-transparent font-bold text-[10px] hover:bg-orange-100 transition-all">${s}</button>`
+                ).join('');
+                dom.subtypeChoiceContainer.classList.remove('hidden');
+                updateSandwichSummary();
+            }
+
+            if (e.target.classList.contains('subtype-btn')) {
+                state.customSandwich.subtype = e.target.dataset.subtype;
+                dom.ingredientsStepContainer.classList.remove('hidden');
+                updateSandwichSummary();
+            }
+
+            if (ingCard) {
+                const id = ingCard.dataset.id;
+                state.customSandwich.ingredients.push(INGREDIENTS_LIST.find(i => i.id === id));
+                renderCustomSandwichBuilder();
+            }
+
+            if (btn && btn.id === 'add-sandwich-to-cart-btn') {
+                const { base, subtype, ingredients, totalPrice } = state.customSandwich;
+                state.cart.push({ name: `${BASE_OPTIONS[base].name} (${subtype})`, price: totalPrice, quantity: 1, cartId: Date.now(), details: ingredients.map(i => i.name).join(", ") });
+                dom.cartCountEl.textContent = state.cart.length;
+                navigate('my-order');
+            }
+
+            if (btn && btn.id === 'confirm-order-btn') {
+                if(!state.currentUser?.name) return dom.userModal.classList.remove('hidden');
+                await addDoc(ordersCollectionRef, { user: state.currentUser.name, total: state.cart.reduce((s,i) => s+(i.price*i.quantity), 0), items: state.cart, createdAt: serverTimestamp() });
+                state.cart = [];
+                dom.cartCountEl.textContent = '0';
+                showToast("Ordine Inviato con Successo!");
+                navigate('menu');
+            }
+
+            if (btn && btn.id === 'save-username-btn') {
+                const n = document.getElementById('username-input').value.trim();
+                const em = document.getElementById('user-email-input').value.trim();
+                if(n && em) { localStorage.setItem('dosepranza-username', n); localStorage.setItem('dosepranza-useremail', em); state.currentUser = { name: n }; dom.userModal.classList.add('hidden'); }
+                else { showToast("Inserisci nome ed email"); }
+            }
+        });
+
+        document.body.addEventListener('change', (e) => {
+            if (e.target.id === 'category-select') { state.activeCategoryFilter = e.target.value; renderMenu(); }
+            if (e.target.classList.contains('portion-select')) {
+                document.getElementById(`price-display-${e.target.dataset.id}`).textContent = `€${parseFloat(e.target.value).toFixed(2)}`;
+            }
+        });
+
+        document.body.addEventListener('input', (e) => {
+            if (e.target.id === 'search-input') { state.searchTerm = e.target.value; renderMenu(); }
+        });
 
         function renderMyOrder() {
-            const todayStr = new Date().toLocaleDateString('it-IT');
-            const userO = state.allOrders.find(o => o.uid === state.currentUser?.uid && o.createdAt?.toDate().toLocaleDateString('it-IT') === todayStr);
-            const container = document.getElementById('my-order-content');
-            if (userO) {
-                container.innerHTML = `<div class="text-center py-10"><i class="fas fa-check-circle text-green-500 text-5xl mb-4"></i><h3 class="font-bold">Ordine Ricevuto!</h3><p class="text-gray-400 text-sm mt-2">Passa alle 12:30.</p></div>`;
-                document.getElementById('cart-count').textContent = '✓';
-                return;
-            }
-            if (state.cart.length === 0) { container.innerHTML = `<div class="text-center py-10 text-gray-300"><p>Carrello vuoto.</p></div>`; return; }
-            const tot = state.cart.reduce((s, i) => s + i.price, 0);
-            container.innerHTML = `
-                <div class="space-y-4 mb-8">${state.cart.map(i => `<div class="flex justify-between items-center border-b pb-2 text-sm"><span>${i.name}</span><b>€${i.price.toFixed(2)}</b></div>`).join('')}</div>
-                <textarea id="allergies-input" placeholder="Note o allergie..." class="w-full bg-gray-50 p-4 rounded-3xl mb-8 outline-none focus:ring-2 focus:ring-primary h-24 text-sm"></textarea>
-                <div class="flex justify-between text-2xl font-black text-primary mb-8"><span>TOTALE</span><span>€${tot.toFixed(2)}</span></div>
-                <button id="confirm-order-btn" class="w-full bg-primary text-white font-bold py-5 rounded-[2rem] shadow-xl">INVIA ORDINE</button>`;
+            const tot = state.cart.reduce((s,i) => s + (i.price*i.quantity), 0);
+            dom.myOrderContentEl.innerHTML = state.cart.length ? 
+                state.cart.map(i => `<div class="flex justify-between border-b py-2"><div class="text-xs font-bold">${i.name}</div><div class="text-primary font-bold">€${i.price.toFixed(2)}</div></div>`).join('') +
+                `<div class="flex justify-between font-bold text-xl mt-4"><span>Totale Carrello:</span><span class="text-primary">€${tot.toFixed(2)}</span></div>
+                <button id="confirm-order-btn" class="w-full mt-6 bg-primary text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-all">Conferma ed Invia Ordine</button>` : 
+                `<div class="text-center p-12"><i class="fas fa-shopping-basket text-4xl text-gray-200 mb-3"></i><p class="text-gray-400">Il carrello è vuoto</p></div>`;
         }
 
-        // --- INIT ---
-        onAuthStateChanged(auth, user => {
-            if (user) {
-                state.currentUser = { uid: user.uid, name: localStorage.getItem('dosepranza-username'), email: localStorage.getItem('dosepranza-useremail') };
-                if (!state.currentUser.name) document.getElementById('user-modal').classList.remove('hidden');
-                if (state.currentUser.name === "Marco Tranquilli") document.getElementById('export-history-btn').classList.remove('hidden');
-                onSnapshot(query(collection(db, "orders"), orderBy("createdAt", "desc")), sn => {
-                    state.allOrders = sn.docs.map(d => ({...d.data(), id: d.id}));
-                    if (state.currentView === 'history') renderAllOrders();
-                    if (state.currentView === 'order') renderMyOrder();
-                });
+        function renderAllOrders() {
+            onSnapshot(query(ordersCollectionRef, orderBy("createdAt", "desc")), sn => {
+                dom.allOrdersListEl.innerHTML = sn.docs.map(d => {
+                    const o = d.data();
+                    return `<div class="bg-white p-4 rounded-xl border-l-4 border-primary flex justify-between shadow-sm"><div><div class="font-bold text-sm text-gray-800">${o.user}</div><div class="text-[9px] text-gray-500 mt-1">${o.items.map(i => `${i.quantity}x ${i.name}`).join(", ")}</div></div><div class="font-bold text-primary">€${o.total.toFixed(2)}</div></div>`;
+                }).join('');
+                const grand = sn.docs.reduce((s,d) => s + d.data().total, 0);
+                dom.grandTotalEl.textContent = `€${grand.toFixed(2)}`;
+            });
+        }
+
+        function init() {
+            state.menuData = processMenuData(RAW_MENU);
+            Object.assign(dom, {
+                menuItemsContainer: document.getElementById('menu-items'), categorySelect: document.getElementById('category-select'),
+                cartCountEl: document.getElementById('cart-count'), toastEl: document.getElementById('toast'), toastMessageEl: document.getElementById('toast-message'),
+                ingredientsList: document.getElementById('ingredients-list'), sandwichTotalPrice: document.getElementById('sandwich-total-price'),
+                addSandwichBtn: document.getElementById('add-sandwich-to-cart-btn'), sandwichBaseSummary: document.getElementById('sandwich-base-summary'),
+                subtypeChoiceContainer: document.getElementById('subtype-choice-container'), subtypeOptions: document.getElementById('subtype-options'),
+                ingredientsStepContainer: document.getElementById('ingredients-step-container'), selectedIngredientsList: document.getElementById('selected-ingredients-list'),
+                myOrderContentEl: document.getElementById('my-order-content'), allOrdersListEl: document.getElementById('all-orders-list'),
+                grandTotalEl: document.getElementById('grand-total'), userModal: document.getElementById('user-modal')
+            });
+            dom.categorySelect.innerHTML = `<option value="all">Tutte le Categorie</option>` + CATEGORY_ORDER.map(c => `<option value="${c.toLowerCase()}">${c}</option>`).join('');
+            navigate('menu');
+        }
+
+        onAuthStateChanged(auth, u => {
+            if (u) {
+                const n = localStorage.getItem('dosepranza-username');
+                if(!n) dom.userModal.classList.remove('hidden'); else state.currentUser = { name: n, email: localStorage.getItem('dosepranza-useremail') };
             } else signInAnonymously(auth);
         });
 
-        document.getElementById('save-username-btn').onclick = () => {
-            const n = document.getElementById('username-input').value.trim();
-            const em = document.getElementById('user-email-input').value.trim();
-            if (n.length > 2 && em.includes('@')) {
-                state.currentUser = { name: n, email: em, uid: auth.currentUser.uid };
-                localStorage.setItem('dosepranza-username', n); localStorage.setItem('dosepranza-useremail', em);
-                document.getElementById('user-modal').classList.add('hidden');
-                if (n === "Marco Tranquilli") document.getElementById('export-history-btn').classList.remove('hidden');
-            }
-        };
-
-        document.getElementById('add-custom-btn').onclick = () => {
-            const p = 3.5 + Math.max(0, state.customIngr.length - 3);
-            state.cart.push({ name: `${state.customBase.toUpperCase()} PERS. (${state.customIngr.join(', ')})`, price: p, cartId: Date.now() });
-            document.getElementById('cart-count').textContent = state.cart.length;
-            showToast("Prodotto aggiunto!"); navigate('menu');
-        };
-
-        document.getElementById('export-history-btn').onclick = exportToCSV;
-        document.getElementById('search-input').oninput = (e) => { state.searchTerm = e.target.value; renderMenu(); };
-        document.getElementById('toggle-calories').onclick = () => { state.caloriesVisible = !state.caloriesVisible; renderMenu(); };
-        
-        const catSel = document.getElementById('category-select');
-        let opts = '<option value="all">Tutte le Categorie</option>';
-        Object.keys(RAW_MENU).forEach(c => opts += `<option value="${c.toLowerCase()}">${c}</option>`);
-        catSel.innerHTML = opts;
-        catSel.onchange = (e) => { state.activeCat = e.target.value; renderMenu(); };
-        document.getElementById('diet-select').onchange = (e) => { state.activeDiet = e.target.value; renderMenu(); };
-
-        function showToast(m) {
-            const t = document.getElementById('toast');
-            document.getElementById('toast-message').textContent = m;
-            t.classList.remove('opacity-0');
-            setTimeout(() => t.classList.add('opacity-0'), 2500);
-        }
-
-        navigate('menu');
+        init();
     </script>
 </body>
 </html>
