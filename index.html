@@ -80,7 +80,7 @@
 
             <section id="custom-sandwich-view" class="view">
                 <h2 class="text-2xl md:text-3xl font-extrabold mb-4 text-text-main">Crea il Tuo Prodotto</h2>
-                <div class="bg-white p-4 md:p-6 rounded-2xl shadow-md mb-6 text-center">
+                <div class="bg-white p-4 md:p-6 rounded-2xl shadow-md mb-6 text-center text-text-main">
                     <h3 class="text-lg font-bold mb-3">1. Scegli la base</h3>
                     <div id="base-choice-container" class="flex gap-4">
                         <button data-type="panino" class="choice-btn flex-1 p-4 bg-gray-50 rounded-xl shadow-sm border-2 border-transparent transition-all hover:bg-orange-50 flex flex-col items-center">
@@ -171,32 +171,23 @@
         const db = getFirestore(app);
         const ordersCollectionRef = collection(db, "orders");
 
-        const CUSTOM_PRODUCT_BASE_PRICE = 3.50;
-        const CATEGORY_ORDER = ["Gastronomia", "Insalatone", "Verdure", "Fritti", "Panini", "Pizze", "Dessert", "Menù Combinati", "Prodotti da Forno"];
+        const CATEGORY_ORDER = ["Menù Combinati", "Gastronomia", "Panini", "Pizze", "Insalatone", "Verdure", "Fritti", "Dessert", "Prodotti da Forno"];
         const ALLERGENS = { G: { name: "Glutine", icon: "fa-wheat-awn" }, L: { name: "Latticini", icon: "fa-cheese" }, C: { name: "Crostacei", icon: "fa-shrimp" }, P: { name: "Pesce", icon: "fa-fish-fins" }};
         const DIETS = { vegetariano: { name: "Vegetariano", icon: "🧀" }, vegano: { name: "Vegano", icon: "🌱" }, "carne/pesce": { name: "Carne/🐟Pesce", icon: "🥩" } };
         const BASE_OPTIONS = { 
             panino: { name: 'Panino ripieno', subtypes: ['Pane arabo', 'Ciabattina', 'Medaglione 5 cereali', 'Ciabattina integrale'] }, 
             pizza: { name: 'Pizza Ripiena', subtypes: ['Pizza classica'] } 
         };
-        
-        const INGREDIENTS_LIST = [
-            { id: 'bresaola', name: 'Bresaola' }, { id: 'brie', name: 'Brie' }, { id: 'broccoletti', name: 'Broccoletti' },
-            { id: 'capocollo', name: 'Capocollo' }, { id: 'carciofini', name: 'Carciofini' }, { id: 'cicoria', name: 'Cicoria' },
-            { id: 'frittata', name: 'Frittata' }, { id: 'insalata', name: 'Insalata' }, { id: 'lattuga', name: 'Lattuga' },
-            { id: 'melanzane-grigliate', name: 'Melanzane Grigliate' }, { id: 'mortadella', name: 'Mortadella' },
-            { id: 'mozzarella', name: 'Mozzarella' }, { id: 'olive', name: 'Olive' }, { id: 'parmigiano', name: 'Parmigiano' },
-            { id: 'pecorino', name: 'Pecorino' }, { id: 'peperoni-grigliati', name: 'Peperoni Grigliati' },
-            { id: 'pom-secchi', name: 'Pomodori Secchi' }, { id: 'pomodoro', name: 'Pomodoro' },
-            { id: 'porchetta', name: 'Porchetta' }, { id: 'primo-sale', name: 'Primo Sale' },
-            { id: 'p-cotto', name: 'Prosciutto Cotto' }, { id: 'p-crudo', name: 'Prosciutto Crudo' },
-            { id: 'rucola', name: 'Rucola' }, { id: 'salame', name: 'Salame' }, { id: 'scamorza', name: 'Scamorza' },
-            { id: 'scarola', name: 'Scarola' }, { id: 'speck', name: 'Speck' }, { id: 'stracchino', name: 'Stracchino' },
-            { id: 'stracciatella', name: 'Stracciatella' }, { id: 'tacchino-arrosto', name: 'Tacchino Arrosto' },
-            { id: 'zucchine-grigliate', name: 'Zucchine Grigliate' }
-        ].sort((a,b) => a.name.localeCompare(b.name));
+        const CUSTOM_PRODUCT_BASE_PRICE = 3.50;
+
+        const INGREDIENTS_LIST = [{ id: 'bresaola', name: 'Bresaola' }, { id: 'brie', name: 'Brie' }, { id: 'broccoletti', name: 'Broccoletti' }, { id: 'capocollo', name: 'Capocollo' }, { id: 'carciofini', name: 'Carciofini' }, { id: 'cicoria', name: 'Cicoria' }, { id: 'frittata', name: 'Frittata' }, { id: 'insalata', name: 'Insalata' }, { id: 'lattuga', name: 'Lattuga' }, { id: 'melanzane-grigliate', name: 'Melanzane Grigliate' }, { id: 'mortadella', name: 'Mortadella' }, { id: 'mozzarella', name: 'Mozzarella' }, { id: 'olive', name: 'Olive' }, { id: 'parmigiano', name: 'Parmigiano' }, { id: 'pecorino', name: 'Pecorino' }, { id: 'peperoni-grigliati', name: 'Peperoni Grigliati' }, { id: 'pom-secchi', name: 'Pomodori Secchi' }, { id: 'pomodoro', name: 'Pomodoro' }, { id: 'porchetta', name: 'Porchetta' }, { id: 'primo-sale', name: 'Primo Sale' }, { id: 'p-cotto', name: 'Prosciutto Cotto' }, { id: 'p-crudo', name: 'Prosciutto Crudo' }, { id: 'rucola', name: 'Rucola' }, { id: 'salame', name: 'Salame' }, { id: 'scamorza', name: 'Scamorza' }, { id: 'scarola', name: 'Scarola' }, { id: 'speck', name: 'Speck' }, { id: 'stracchino', name: 'Stracchino' }, { id: 'stracciatella', name: 'Stracciatella' }, { id: 'tacchino-arrosto', name: 'Tacchino Arrosto' }, { id: 'zucchine-grigliate', name: 'Zucchine Grigliate' }].sort((a,b) => a.name.localeCompare(b.name));
 
         const RAW_MENU = {
+            "menù combinati": [
+                { name: "Panino + bottiglia acqua 50 cl", price: 4.00, ingredients: ["Un panino a scelta", "Una bottiglietta di acqua naturale o frizzante da 50 cl"], diet: ["carne/pesce", "vegetariano", "vegano"], allergens: ["G", "L", "P"] },
+                { name: "Panino + lattina 33 cl", price: 4.50, ingredients: ["Un panino a scelta", "Una bevanda da 33 cl a scelta"], diet: ["carne/pesce", "vegetariano", "vegano"], allergens: ["G", "L", "P"] },
+                { name: "Panino + bottiglia 50 cl", price: 5.00, ingredients: ["Un panino a scelta", "Una bevanda da 50 cl a scelta"], diet: ["carne/pesce", "vegetariano", "vegano"], allergens: ["G", "L", "P"] }
+            ],
             "gastronomia": [
                 { name: "Melanzane alla parmigiana (grigliate, 250-300g)", price: 6.00, diet: ["vegetariano"], allergens: ["L"], ingredients: ["Melanzane grigliate", "Pomodoro", "Parmigiano"] },
                 { name: "Lasagna classica al ragù (250-300g)", price: 6.00, diet: ["carne/pesce"], allergens: ["G", "L"], ingredients: ["Sfoglia all'uovo", "Ragù di carne", "Besciamella"] },
@@ -241,32 +232,32 @@
                 { name: "Speck Brie e pomodori secchi", price: 3.50, allergens: ["G", "L"], diet: ["carne/pesce"], ingredients: ["Speck", "Brie", "Pomodori secchi"] },
                 { name: "Porchetta", price: 3.50, allergens: ["G"], diet: ["carne/pesce"], ingredients: ["Porchetta di Ariccia"] },
                 { name: "Vegetariano melanzane zucchine e peperoni", price: 3.50, allergens: ["G"], diet: ["vegetariano", "vegano"], ingredients: ["Melanzane", "Zucchine", "Peperoni grigliati"] },
-                { name: "Tacchino arrosto e verdura", price: 3.50, allergens: ["G"], diet: ["carne/pesce"], ingredients: ["Tacchino arrosto", "Verdura di stagione"] },
-                { name: "Fesa di tacchino e verdura", price: 3.50, allergens: ["G"], diet: ["carne/pesce"], ingredients: ["Tacchino arrosto", "Verdura di stagione"] },
-                { name: "Bresaola parmigiano e rughetta", price: 3.50, diet: ["carne/pesce"], ingredients: ["Bresaola", "Parmigiano a scaglie", "Rucola"] },
+                { name: "Tacchino arrosto e verdura", price: 3.50, allergens: ["G"], diet: ["carne/pesce"], ingredients: ["Tacchino arrosto", "Verdure"] },
+                { name: "Fesa di tacchino e verdura", price: 3.50, allergens: ["G"], diet: ["carne/pesce"], ingredients: ["Tacchino arrosto", "Verdure"] },
+                { name: "Bresaola parmigiano e rughetta", price: 3.50, diet: ["carne/pesce"], ingredients: ["Bresaola", "Parmigiano", "Rucola"] },
                 { name: "Bresaola primo sale e rughetta", price: 3.50, diet: ["carne/pesce"], ingredients: ["Bresaola", "Primo sale", "Rucola"] },
-                { name: "Salmone e formaggio", price: 3.50, allergens: ["G", "L", "P"], diet: ["carne/pesce"], ingredients: ["Salmone affumicato", "Formaggio spalmabile"] },
-                { name: "Tonno e pomodoro", price: 3.50, allergens: ["G", "P"], diet: ["carne/pesce"], ingredients: ["Tonno", "Pomodoro a fette"] },
-                { name: "Tonno e carciofini", price: 3.50, allergens: ["G", "P"], diet: ["carne/pesce"], ingredients: ["Tonno", "Carciofini sott'olio"] },
-                { name: "Pane ai 5 cereali con formaggio spalmabile e salmone", price: 3.50, allergens: ["G", "L", "P"], diet: ["carne/pesce"], ingredients: ["Pane 5 cereali", "Salmone affumicato", "Formaggio spalmabile"] },
-                { name: "Pane ai 5 cereali con tacchino e zucchine o scarola", price: 3.50, allergens: ["G"], diet: ["carne/pesce"], ingredients: ["Pane 5 cereali", "Tacchino arrosto", "Verdura di stagione"] },
-                { name: "Cotoletta di pollo lattuga e pomodoro", price: 3.50, allergens: ["G"], diet: ["carne/pesce"], ingredients: ["Cotoletta di pollo", "Lattuga", "Pomodoro"] },
-                { name: "Brasato di manzo e verdura", price: 3.50, allergens: ["G"], diet: ["carne/pesce"], ingredients: ["Brasato di manzo", "Verdura cotta di stagione"] }
+                { name: "Salmone e formaggio", price: 3.50, allergens: ["G", "L", "P"], diet: ["carne/pesce"] },
+                { name: "Tonno e pomodoro", price: 3.50, allergens: ["G", "P"], diet: ["carne/pesce"] },
+                { name: "Tonno e carciofini", price: 3.50, allergens: ["G", "P"], diet: ["carne/pesce"] },
+                { name: "Pane ai 5 cereali con formaggio spalmabile e salmone", price: 3.50, allergens: ["G", "L", "P"], diet: ["carne/pesce"] },
+                { name: "Pane ai 5 cereali con tacchino e zucchine o scarola", price: 3.50, allergens: ["G"], diet: ["carne/pesce"] },
+                { name: "Cotoletta di pollo lattuga e pomodoro", price: 3.50, allergens: ["G"], diet: ["carne/pesce"] },
+                { name: "Brasato di manzo e verdura", price: 3.50, allergens: ["G"], diet: ["carne/pesce"] }
             ],
             "pizze": [
-                { name: "Pizza con insalata di pollo con maionese", price: 3.50, diet: ["carne/pesce"], ingredients: ["Insalata di pollo con maionese", "Olive"] },
-                { name: "Pizza classica con bresaola, filadelfia e rughetta", price: 3.50, allergens: ["G", "L"], diet: ["carne/pesce"], ingredients: ["Bresaola", "Filadelfia", "Rughetta"] },
-                { name: "Pizza con tacchino e verdure", price: 3.50, allergens: ["G"], diet: ["carne/pesce"], ingredients: ["Tacchino arrosto", "Verdure di stagione"] },
-                { name: "Crudo e mozzarella", price: 3.50, allergens: ["G", "L"], diet: ["carne/pesce"], ingredients: ["Prosciutto crudo", "Mozzarella"] },
-                { name: "Speck stracchino e rughetta", price: 3.50, diet: ["carne/pesce"], ingredients: ["Speck", "Stracchino", "Rucola"] },
-                { name: "Cotto arrosto e melanzane", price: 3.50, diet: ["carne/pesce"], ingredients: ["Prosciutto cotto", "Melanzane"] },
-                { name: "Mortadella e stracciatella", price: 3.50, diet: ["carne/pesce"], ingredients: ["Mortadella", "Stracciatella"] },
-                { name: "Frittata e zucchine", price: 3.50, diet: ["vegetariano"], ingredients: ["Frittata", "Zucchine"] },
-                { name: "Bresaola e formaggio", price: 3.50, diet: ["carne/pesce"], ingredients: ["Bresaola", "Formaggio"] },
-                { name: "Cotto e stracchino", price: 3.50, diet: ["carne/pesce"], ingredients: ["Prosciutto cotto", "Stracchino"] },
-                { name: "Pizza Rustica: Scarola e olive", price: 8.00, isCustomPriced: true, pricingOptions: [{text:"Intera - 8.00€", value:"8.00"}, {text:"Mezza - 4.00€", value:"4.00"}, {text:"1/4 - 2.00€", value:"2.00"}], diet: ["vegano"], ingredients: ["Scarola", "Olive"] },
-                { name: "Pizza Rustica: Cicoria e pachino", price: 8.00, isCustomPriced: true, pricingOptions: [{text:"Intera - 8.00€", value:"8.00"}, {text:"Mezza - 4.00€", value:"4.00"}, {text:"1/4 - 2.00€", value:"2.00"}], diet: ["vegano"], ingredients: ["Cicoria", "Pomodorini Pachino"] },
-                { name: "Pizza Rustica: Broccoli e salsiccia", price: 8.00, isCustomPriced: true, pricingOptions: [{text:"Intera - 8.00€", value:"8.00"}, {text:"Mezza - 4.00€", value:"4.00"}, {text:"1/4 - 2.00€", value:"2.00"}], diet: ["carne/pesce"], ingredients: ["Broccoli", "Salsiccia"] }
+                { name: "Pizza con insalata di pollo con maionese", price: 3.50, diet: ["carne/pesce"], ingredients: ["Insalata di pollo", "Maionese", "Olive"] },
+                { name: "Pizza classica con bresaola, filadelfia e rughetta", price: 3.50, allergens: ["G", "L"], diet: ["carne/pesce"] },
+                { name: "Pizza con tacchino e verdure", price: 3.50, allergens: ["G"], diet: ["carne/pesce"] },
+                { name: "Crudo e mozzarella", price: 3.50, allergens: ["G", "L"], diet: ["carne/pesce"] },
+                { name: "Speck stracchino e rughetta", price: 3.50, diet: ["carne/pesce"] },
+                { name: "Cotto arrosto e melanzane", price: 3.50, diet: ["carne/pesce"] },
+                { name: "Mortadella e stracciatella", price: 3.50, diet: ["carne/pesce"] },
+                { name: "Frittata e zucchine", price: 3.50, diet: ["vegetariano"] },
+                { name: "Bresaola e formaggio", price: 3.50, diet: ["carne/pesce"] },
+                { name: "Cotto e stracchino", price: 3.50, diet: ["carne/pesce"] },
+                { name: "Pizza Rustica: Scarola e olive", price: 8.00, isCustomPriced: true, pricingOptions: [{text:"Intera - 8.00€", value:"8.00"}, {text:"Mezza - 4.00€", value:"4.00"}, {text:"1/4 - 2.00€", value:"2.00"}], diet: ["vegano"] },
+                { name: "Pizza Rustica: Cicoria e pachino", price: 8.00, isCustomPriced: true, pricingOptions: [{text:"Intera - 8.00€", value:"8.00"}, {text:"Mezza - 4.00€", value:"4.00"}, {text:"1/4 - 2.00€", value:"2.00"}], diet: ["vegano"] },
+                { name: "Pizza Rustica: Broccoli e salsiccia", price: 8.00, isCustomPriced: true, pricingOptions: [{text:"Intera - 8.00€", value:"8.00"}, {text:"Mezza - 4.00€", value:"4.00"}, {text:"1/4 - 2.00€", value:"2.00"}], diet: ["carne/pesce"] }
             ],
             "dessert": [
                 { name: "Macedonia", price: 3.00, diet: ["vegano"], ingredients: ["Frutta fresca di stagione"] },
@@ -274,15 +265,20 @@
                 { name: "Lingue di gatto (1pz)", price: 1.00, diet: ["vegetariano"], ingredients: ["Biscotti secchi", "Cioccolato"] },
                 { name: "Ferretti glassati (1pz)", price: 2.00, diet: ["vegetariano"], ingredients: ["Biscotti secchi", "Glaze"] }
             ],
-            "menù combinati": [
-                { name: "Panino + bottiglia acqua 50 cl", price: 4.00, ingredients: ["Un panino a scelta", "Una bottiglietta di acqua naturale o frizzante da 50 cl"], diet: ["carne/pesce", "vegetariano", "vegano"], allergens: ["G", "L", "P"] },
-                { name: "Panino + lattina 33 cl", price: 4.50, ingredients: ["Un panino a scelta", "Una bevanda da 33 cl a scelta"], diet: ["carne/pesce", "vegetariano", "vegano"], allergens: ["G", "L", "P"] },
-                { name: "Panino + bottiglia 50 cl", price: 5.00, ingredients: ["Un panino a scelta", "Una bevanda da 50 cl a scelta"], diet: ["carne/pesce", "vegetariano", "vegano"], allergens: ["G", "L", "P"] }
-            ],
             "prodotti da forno": [
-                { name: "Pane di Lariano", description: "Pane rustico a lunga lievitazione", isCustomPriced: true, pricingOptions: [{text:"250g - 0.75€", value:"0.75"}, {text:"500g - 1.50€", value:"1.50"}, {text:"1kg - 3.00€", value:"3.00"}], allergens: ["G"], diet: ["vegano"] },
-                { name: "Ciabatta", description: "Pane leggero e alveolato", isCustomPriced: true, pricingOptions: [{text:"250g - 1.00€", value:"1.00"}, {text:"500g - 2.00€", value:"2.00"}, {text:"1kg - 4.00€", value:"4.00"}], allergens: ["G"], diet: ["vegano"] },
-                { name: "Pizza Bianca", description: "Semplice e soffice", isCustomPriced: true, pricingOptions: [{text:"200g - 1.80€", value:"1.80"}, {text:"500g - 4.50€", value:"4.50"}, {text:"1kg - 9.00€", value:"9.00"}], allergens: ["G"], diet: ["vegano"] }
+                { name: "Pane di Lariano", description: "Pane rustico a lunga lievitazione, crosta spessa", isCustomPriced: true, pricingOptions: [{text:"250g-0.75€", value:"0.75"}, {text:"500g-1.50€", value:"1.50"}, {text:"1kg-3.00€", value:"3.00"}], allergens: ["G"], diet: ["vegano"] },
+                { name: "Ciabatta", description: "Pane leggero e alveolato, crosta croccante", isCustomPriced: true, pricingOptions: [{text:"250g-1.00€", value:"1.00"}, {text:"500g-2.00€", value:"2.00"}, {text:"1kg-4.00€", value:"4.00"}], allergens: ["G"], diet: ["vegano"] },
+                { name: "Pane Casareccio", description: "Pane tradizionale, mollica compatta", isCustomPriced: true, pricingOptions: [{text:"250g-0.63€", value:"0.63"}, {text:"500g-1.25€", value:"1.25"}, {text:"1kg-2.50€", value:"2.50"}], allergens: ["G"], diet: ["vegano"] },
+                { name: "Ciabattine", description: "Versione piccola della ciabatta, ideale per panini", isCustomPriced: true, pricingOptions: [{text:"250g-0.75€", value:"0.75"}, {text:"500g-1.50€", value:"1.50"}, {text:"1kg-3.00€", value:"3.00"}], allergens: ["G"], diet: ["vegano"] },
+                { name: "Rosette", description: "Pane soffiato, leggero e vuoto all’interno", isCustomPriced: true, pricingOptions: [{text:"250g-0.75€", value:"0.75"}, {text:"500g-1.50€", value:"1.50"}, {text:"1kg-3.00€", value:"3.00"}], allergens: ["G"], diet: ["vegano"] },
+                { name: "Pane all'olio", description: "Pane morbido e profumato con olio d’oliva", isCustomPriced: true, pricingOptions: [{text:"250g-2.00€", value:"2.00"}, {text:"500g-4.00€", value:"4.00"}, {text:"1kg-8.00€", value:"8.00"}], allergens: ["G"], diet: ["vegetariano"] },
+                { name: "Pane Arabo", description: "Pane morbido e sottile, ideale per farciture", isCustomPriced: true, pricingOptions: [{text:"250g-1.25€", value:"1.25"}, {text:"500g-2.50€", value:"2.50"}, {text:"1kg-5.00€", value:"5.00"}], allergens: ["G"], diet: ["vegano"] },
+                { name: "Pane Azzimo", description: "Pane senza lievito, sottile e croccante", isCustomPriced: true, pricingOptions: [{text:"250g-1.25€", value:"1.25"}, {text:"500g-2.50€", value:"2.50"}, {text:"1kg-5.00€", value:"5.00"}], allergens: ["G"], diet: ["vegano"] },
+                { name: "Pane Integrale", description: "Pane ricco di fibre, gusto più deciso", isCustomPriced: true, pricingOptions: [{text:"250g-1.00€", value:"1.00"}, {text:"500g-2.00€", value:"2.00"}, {text:"1kg-4.00€", value:"4.00"}], allergens: ["G"], diet: ["vegano"] },
+                { name: "Pizza Rossa", description: "Base croccante con salsa di pomodoro", isCustomPriced: true, pricingOptions: [{text:"200g-2.00€", value:"2.00"}, {text:"500g-5.00€", value:"5.00"}, {text:"1kg-10.00€", value:"10.00"}], allergens: ["G"], diet: ["vegetariano"] },
+                { name: "Pizza Patate", description: "Pizza bianca con patate sottili e rosmarino", isCustomPriced: true, pricingOptions: [{text:"200g-2.00€", value:"2.00"}, {text:"500g-5.00€", value:"5.00"}, {text:"1kg-10.00€", value:"10.00"}], allergens: ["G"], diet: ["vegetariano"] },
+                { name: "Pizza Bianca", description: "Semplice, soffice e leggermente salata", isCustomPriced: true, pricingOptions: [{text:"200g-1.80€", value:"1.80"}, {text:"500g-4.50€", value:"4.50"}, {text:"1kg-9.00€", value:"9.00"}], allergens: ["G"], diet: ["vegano"] },
+                { name: "Pizzette", price: 1.50, description: "Mini pizze morbide, ideali come snack", allergens: ["G", "L"], diet: ["vegetariano"] }
             ]
         };
 
@@ -318,7 +314,7 @@
             });
 
             let currentCat = '';
-            dom.menuItemsContainer.innerHTML = filtered.length > 0 ? filtered.map(item => {
+            dom.menuItemsContainer.innerHTML = filtered.map(item => {
                 let html = '';
                 if (item.categoryDisplay !== currentCat) {
                     currentCat = item.categoryDisplay;
@@ -330,7 +326,7 @@
                         <div class="bg-primary/10 p-2 rounded-full text-primary shrink-0 w-10 h-10 flex items-center justify-center"><i class="fas ${item.icon}"></i></div>
                         <div class="min-w-0 w-full">
                             <h3 class="font-bold leading-tight text-sm md:text-base product-title mb-1">${item.name}</h3>
-                            <p class="text-[10px] text-gray-500 line-clamp-2 italic">${item.description || item.ingredients?.join(', ') || 'Tradizione e Freschezza'}</p>
+                            <p class="text-[10px] text-gray-500 line-clamp-2 italic">${item.description || item.ingredients?.join(', ') || 'Dosemagna Selection'}</p>
                         </div>
                     </div>
                     <div class="mt-4 pt-3 border-t">
@@ -339,7 +335,7 @@
                     </div>
                 </div>`;
                 return html;
-            }).join('') : `<div class="col-span-full text-center py-10 text-gray-400">Nessun prodotto trovato.</div>`;
+            }).join('') || '<div class="col-span-full text-center py-10 text-gray-400 font-medium">Nessun prodotto trovato.</div>';
         }
 
         function renderMyOrder() {
@@ -366,7 +362,7 @@
             const total = state.cart.reduce((s, i) => s + (i.price * i.quantity), 0);
             dom.myOrderContentEl.innerHTML = `
                 <div class="space-y-1">${itemsHtml}</div>
-                <div class="bg-gray-50 p-4 rounded-xl space-y-4 border border-gray-100 mt-6">
+                <div class="bg-gray-50 p-4 rounded-xl space-y-4 border border-gray-100 mt-6 text-text-main">
                     <div>
                         <label class="block mb-2 font-bold text-xs text-red-700 flex items-center tracking-wide"><i class="fas fa-exclamation-triangle mr-2"></i>Segnalazione Allergie:</label>
                         <textarea id="allergies-input" placeholder="Allergie gravi..." class="w-full p-3 border border-red-100 rounded-xl focus:ring-2 focus:ring-red-400 outline-none text-xs"></textarea>
@@ -413,9 +409,7 @@
             
             dom.categorySelect.innerHTML = `<option value="all">Tutte le Categorie</option>` + CATEGORY_ORDER.map(c => `<option value="${c.toLowerCase()}">${c}</option>`).join('');
             dom.dietSelect.innerHTML = `<option value="all">Tutti i Regimi</option>` + Object.entries(DIETS).map(([k, v]) => `<option value="${k}">${v.icon} ${v.name}</option>`).join('');
-            let legendHtml = ''; Object.values(ALLERGENS).forEach(info => { legendHtml += `<p class="flex items-center text-sm mb-1"><i class="fas ${info.icon} mr-2 text-gray-600"></i> ${info.name}</p>`; });
-            dom.allergenModalContent.innerHTML = legendHtml;
-
+            
             document.body.addEventListener('click', async e => {
                 const link = e.target.closest('a.nav-btn'); if(link) { e.preventDefault(); navigate(link.dataset.view); }
                 const btn = e.target.closest('button');
@@ -449,12 +443,11 @@
                     renderCustomSandwichBuilder();
                 }
 
-                if(btn && btn.id === 'add-sandwich-to-cart-btn') { const { base, subtype, ingredients, totalPrice } = state.customSandwich; state.cart.push({ name: `${BASE_OPTIONS[base].name} (${subtype})`, price: totalPrice, quantity: 1, cartId: Date.now(), details: ingredients.map(i => i.name).join(", ") }); dom.cartCountEl.textContent = state.cart.length; navigate('my-order'); }
                 if(btn && btn.id === 'confirm-order-btn') {
                     if(!state.currentUser?.name) return dom.userModal.classList.remove('hidden');
                     const allergies = document.getElementById('allergies-input').value;
                     const cutlery = document.getElementById('cutlery-checkbox').checked;
-                    await addDoc(ordersCollectionRef, { user: state.currentUser.name, email: state.currentUser.email, total: state.cart.reduce((s,i) => s+(i.price*i.quantity), 0), items: state.cart, allergies, cutlery, createdAt: serverTimestamp() });
+                    await addDoc(ordersCollectionRef, { user: state.currentUser.name, total: state.cart.reduce((s,i) => s+(i.price*i.quantity), 0), items: state.cart, allergies, cutlery, createdAt: serverTimestamp() });
                     state.cart = []; dom.cartCountEl.textContent = '0'; showToast("Ordine Inviato!"); navigate('menu');
                 }
                 if(btn && btn.id === 'save-username-btn') {
@@ -464,6 +457,14 @@
                 }
                 if(e.target.id === 'show-allergens-btn') dom.allergenModal.classList.remove('hidden');
                 if(e.target.id === 'close-allergen-modal-btn') dom.allergenModal.classList.add('hidden');
+                if(btn && btn.id === 'export-history-btn') {
+                    const sn = await getDocs(query(ordersCollectionRef, orderBy("createdAt", "desc")));
+                    const rows = [["Data", "Utente", "Totale", "Articoli"]];
+                    sn.forEach(d => { const o = d.data(); rows.push([o.createdAt?.toDate().toLocaleString() || 'N/D', o.user, o.total.toFixed(2), o.items.map(i => i.name).join(" | ")]); });
+                    const csv = rows.map(r => r.join(";")).join("\n");
+                    const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
+                    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `Report_Ordini.csv`; a.click();
+                }
             });
 
             document.body.addEventListener('change', e => {
