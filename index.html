@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>dosemagna - Ordini Alimentari</title>
+    <title>dosemagna</title>
     <link rel="icon" href="https://i.postimg.cc/L6H20zfp/logo-dosepranza-People-About-Food.png">
     <meta name="mobile-web-app-capable" content="yes">
     <script src="https://cdn.tailwindcss.com/3.4.3"></script>
@@ -41,7 +41,7 @@
             </div>
         </header>
 
-        <nav class="grid grid-cols-4 gap-1 bg-white p-2 rounded-2xl shadow-lg sticky top-2 z-50 mb-6 border border-gray-100">
+        <nav class="grid grid-cols-4 gap-1 bg-white p-2 rounded-2xl shadow-lg sticky top-2 z-40 border border-gray-100">
             <button onclick="window.navigate('menu')" id="btn-menu" class="nav-btn py-3 rounded-xl font-bold text-[10px] uppercase transition-all active"><i class="fas fa-utensils block text-sm mb-1"></i>Menù</button>
             <button onclick="window.navigate('custom')" id="btn-custom" class="nav-btn py-3 rounded-xl font-bold text-[10px] uppercase transition-all"><i class="fas fa-plus-circle block text-sm mb-1"></i>Crea</button>
             <button onclick="window.navigate('cart')" id="btn-cart" class="nav-btn py-3 rounded-xl font-bold text-[10px] uppercase transition-all relative">
@@ -56,17 +56,16 @@
                 <div class="space-y-4 mb-6">
                     <input type="search" id="search-input" placeholder="Cerca un piatto..." class="w-full p-4 border border-gray-200 rounded-2xl outline-none focus:ring-2 focus:ring-primary shadow-sm">
                     <div class="grid grid-cols-2 gap-2">
-                        <select id="category-select" class="p-3 bg-white border border-gray-200 rounded-xl text-xs font-bold outline-none cursor-pointer"></select>
-                        <select id="diet-select" class="p-3 bg-white border border-gray-200 rounded-xl text-xs font-bold outline-none cursor-pointer"></select>
+                        <select id="category-select" class="p-3 bg-white border border-gray-200 rounded-xl text-xs font-bold cursor-pointer"></select>
+                        <select id="diet-select" class="p-3 bg-white border border-gray-200 rounded-xl text-xs font-bold cursor-pointer"></select>
                     </div>
                 </div>
                 <div id="menu-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-10"></div>
             </section>
 
             <section id="custom-view" class="view">
-                <h2 class="text-2xl font-black mb-6">Crea il Tuo Prodotto</h2>
                 <div class="bg-white p-6 rounded-3xl shadow-sm mb-4 border border-gray-100 text-center">
-                    <h3 class="text-xs font-black text-gray-400 uppercase mb-4 tracking-widest">1. Scegli la base</h3>
+                    <h3 class="text-xs font-black text-gray-400 uppercase mb-4 tracking-widest italic">1. Scegli la base</h3>
                     <div class="flex gap-4">
                         <button onclick="window.selectBase('Panino')" class="flex-1 p-6 bg-gray-50 rounded-2xl border-2 border-transparent hover:border-primary transition-all flex flex-col items-center">
                             <i class="fas fa-bread-slice text-3xl text-primary mb-2"></i><span class="font-bold text-sm">Panino</span>
@@ -77,7 +76,7 @@
                     </div>
                 </div>
                 <div id="custom-subtype-container" class="bg-white p-5 rounded-3xl shadow-sm mb-4 border border-gray-100 hidden text-center">
-                    <h3 class="text-xs font-black text-gray-400 uppercase mb-4 font-bold">2. Variante</h3>
+                    <h3 class="text-xs font-black text-gray-400 uppercase mb-4 italic">2. Variante</h3>
                     <div id="subtype-list" class="grid grid-cols-2 gap-2"></div>
                 </div>
                 <div id="custom-ingredients-container" class="hidden">
@@ -86,9 +85,9 @@
                         <div class="md:col-span-1">
                             <div class="bg-white p-6 rounded-3xl shadow-xl sticky top-24 border border-gray-50 text-center">
                                 <h4 class="font-bold text-xs mb-4 uppercase text-primary border-b pb-2">Riepilogo</h4>
-                                <ul id="custom-summary-list" class="text-[10px] space-y-1 mb-4 text-left"></ul>
+                                <ul id="custom-summary-list" class="text-[10px] space-y-1 mb-4 text-left min-h-[40px]"></ul>
                                 <div class="flex justify-between items-center mb-6 pt-2 border-t font-bold">
-                                    <span class="text-xs">Prezzo:</span>
+                                    <span class="text-xs text-gray-400 italic">Prezzo:</span>
                                     <span id="custom-price-display" class="text-xl font-black text-primary">€3.50</span>
                                 </div>
                                 <button onclick="window.addCustomToCart()" class="w-full bg-secondary text-white font-black py-4 rounded-2xl shadow-lg">AGGIUNGI</button>
@@ -99,26 +98,26 @@
             </section>
 
             <section id="cart-view" class="view">
-                <h2 class="text-2xl font-black mb-6">Il Mio Ordine</h2>
+                <h2 class="text-2xl font-black mb-6 tracking-tighter">Riepilogo Ordine</h2>
                 <div id="cart-content-wrapper" class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 mb-4">
                     <div id="cart-items-list"></div>
                     <div id="cart-options" class="mt-8 space-y-6 hidden">
                         <div class="p-4 rounded-2xl bg-orange-50 border border-orange-200">
                             <div class="flex items-center gap-4">
-                                <div class="flex-grow">
-                                    <p class="font-black text-xs text-primary-800 uppercase mb-1">Nuovo su Satispay?</p>
-                                    <p class="text-[10px] text-primary-800 leading-tight">Scarica l'app con codice <strong>WEB</strong> e ricevi <strong>5€ di Bonus</strong>!</p>
+                                <div class="flex-grow text-left">
+                                    <p class="font-black text-[10px] text-primary-800 uppercase mb-1">Nuovo su Satispay?</p>
+                                    <p class="text-[11px] text-primary-800 leading-tight">Usa il codice <strong>WEB</strong> e ricevi <strong>5€ di Bonus</strong>!</p>
                                 </div>
                                 <img src="https://www.datocms-assets.com/133951/1745419747-qr-code-scarica-app.svg" class="w-12 h-12 bg-white p-1 rounded-lg shadow-sm">
                             </div>
                         </div>
 
                         <div>
-                            <label class="block text-xs font-black text-red-700 uppercase mb-2">Note o Allergie:</label>
+                            <label class="block text-xs font-black text-red-700 uppercase mb-2 italic tracking-widest">Note o Allergie:</label>
                             <textarea id="allergies-input" class="w-full p-4 border border-red-100 rounded-2xl bg-red-50/30 outline-none text-sm"></textarea>
                         </div>
                         <div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl">
-                            <span class="text-xs font-bold uppercase tracking-widest text-gray-500">Ti servono le posate?</span>
+                            <span class="text-xs font-bold uppercase tracking-widest text-gray-500 italic">Ti servono le posate?</span>
                             <button onclick="window.togglePosate()" id="posate-btn" class="px-6 py-2 rounded-full font-black text-[10px] bg-gray-200 uppercase transition-all">No</button>
                         </div>
                         <div class="flex justify-between items-end border-t pt-6">
@@ -132,25 +131,24 @@
 
             <section id="history-view" class="view">
                  <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-black">Ordini di Oggi</h2>
+                    <h2 class="text-2xl font-black">Ordini Oggi</h2>
                     <div class="flex gap-2">
-                        <button id="admin-export-btn" onclick="window.exportFullHistory()" class="hidden bg-gray-900 text-white text-[10px] font-bold px-4 py-2 rounded-xl uppercase shadow-md"><i class="fas fa-file-csv mr-1"></i> Storico (Admin)</button>
+                        <button id="admin-export-btn" onclick="window.exportFullHistory()" class="hidden bg-gray-900 text-white text-[10px] font-bold px-4 py-2 rounded-xl uppercase shadow-md"><i class="fas fa-file-csv mr-1"></i> Storico</button>
                         <button onclick="window.copyDailySummary()" class="bg-primary text-white text-[10px] font-bold px-4 py-2 rounded-xl uppercase shadow-md"><i class="fas fa-copy mr-1"></i> Ristoratore</button>
                     </div>
                  </div>
 
                  <div class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 mb-6 flex items-center gap-4">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" class="w-20 h-20 rounded-xl shadow-sm">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" class="w-16 h-16 rounded-xl shadow-sm">
                     <div>
-                        <p class="font-black text-xs uppercase text-gray-400 mb-1">Paga Alimentari Russo</p>
-                        <p class="text-[10px] leading-tight text-gray-500 mb-2">Inquadra per pagare con Satispay.</p>
-                        <a href="https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" target="_blank" class="inline-block bg-[#E52230] text-white font-bold text-[9px] px-3 py-1.5 rounded-lg uppercase">Paga Ora</a>
+                        <p class="font-black text-xs uppercase text-gray-400 mb-1 leading-tight">Paga Alimentari Russo</p>
+                        <a href="https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" target="_blank" class="text-primary font-black text-[10px] uppercase border-b-2 border-primary tracking-widest italic">Apri Satispay</a>
                     </div>
                  </div>
 
                  <div id="all-orders-list" class="space-y-3 pb-24"></div>
                  <div class="fixed bottom-4 left-1/2 -translate-x-1/2 w-[90%] max-w-lg bg-white p-5 rounded-3xl shadow-2xl border-t-4 border-primary flex justify-between items-center z-[60]">
-                     <span class="text-gray-400 font-black text-[10px] uppercase">Incasso Oggi</span>
+                     <span class="text-gray-400 font-black text-[10px] uppercase tracking-widest">Incasso Oggi</span>
                      <span id="grand-total-display" class="text-2xl font-black text-primary">€0.00</span>
                  </div>
             </section>
@@ -158,11 +156,11 @@
     </div>
 
     <div id="user-modal" class="fixed inset-0 bg-gray-900/90 backdrop-blur-md flex items-center justify-center z-[100] hidden p-4">
-        <div class="bg-white p-8 rounded-[3rem] shadow-2xl w-full max-w-sm text-center">
-            <h3 class="text-2xl font-bold mb-6">Dati per l'ordine</h3>
+        <div class="bg-white p-8 rounded-[3rem] shadow-2xl w-full max-w-sm text-center border border-white/20">
+            <h3 class="text-2xl font-black mb-6 italic text-primary uppercase tracking-tighter">Benvenuto</h3>
             <input type="text" id="user-name-input" placeholder="Nome e Cognome" class="w-full p-5 border-2 border-gray-100 rounded-3xl mb-3 outline-none focus:border-primary text-center font-bold text-lg shadow-inner">
-            <input type="email" id="user-email-input" placeholder="Indirizzo Email" class="w-full p-5 border-2 border-gray-100 rounded-3xl mb-8 outline-none focus:border-primary text-center font-bold text-sm shadow-inner">
-            <button id="save-user-btn" onclick="window.saveUserData()" class="w-full bg-primary text-white font-black py-5 rounded-3xl shadow-lg uppercase tracking-widest transition-all active:scale-95">ACCEDI</button>
+            <input type="email" id="user-email-input" placeholder="Tua email" class="w-full p-5 border-2 border-gray-100 rounded-3xl mb-8 outline-none focus:border-primary text-center font-bold text-sm shadow-inner">
+            <button onclick="window.saveUserData()" class="w-full bg-primary text-white font-black py-5 rounded-3xl shadow-lg uppercase tracking-widest active:scale-95 transition-all">Accedi</button>
         </div>
     </div>
 
@@ -173,12 +171,12 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addDoc, serverTimestamp, query, orderBy, getDocs, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addDoc, serverTimestamp, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- DEFINIZIONI DATI ---
+        // --- DEFINIZIONE COSTANTI ---
         const DIETS_CONFIG = { "carne/pesce": "🥩 Carne/Pesce", "vegetariano": "🧀 Vegetariano", "vegano": "🌱 Vegano" };
         const INGREDIENTS_DATA = [{id:'br',name:'Bresaola'},{id:'bi',name:'Brie'},{id:'bl',name:'Broccoletti'},{id:'cp',name:'Capocollo'},{id:'cr',name:'Carciofini'},{id:'ci',name:'Cicoria'},{id:'fr',name:'Frittata'},{id:'in',name:'Insalata'},{id:'lt',name:'Lattuga'},{id:'mg',name:'Melanzane Grigliate'},{id:'mo',name:'Mortadella'},{id:'mz',name:'Mozzarella'},{id:'ol',name:'Olive'},{id:'pa',name:'Parmigiano'},{id:'pe',name:'Pecorino'},{id:'pg',name:'Peperoni Grigliati'},{id:'ps',name:'Pomodori Secchi'},{id:'po',name:'Pomodoro'},{id:'pc',name:'Porchetta'},{id:'pr',name:'Primo Sale'},{id:'co',name:'Prosciutto Cotto'},{id:'cu',name:'Prosciutto Crudo'},{id:'ru',name:'Rucola'},{id:'sa',name:'Salame'},{id:'sc',name:'Scamorza'},{id:'sk',name:'Scarola'},{id:'sp',name:'Speck'},{id:'st',name:'Stracchino'},{id:'sz',name:'Stracciatella'},{id:'ta',name:'Tacchino Arrosto'},{id:'zg',name:'Zucchine Grigliate'}].sort((a,b)=>a.name.localeCompare(b.name));
-
+        
         const RAW_MENU = {
             "Menù Combinati": [
                 { name: "Panino + acqua 50 cl", price: 4.0, diet: ["carne/pesce", "vegetariano", "vegano"] },
@@ -188,23 +186,22 @@
             "Gastronomia": [
                 { name: "Melanzane alla parmigiana", price: 6.0, desc: "Grigliate (250-300g)", diet: ["vegetariano"] },
                 { name: "Lasagna classica al ragù", price: 6.0, desc: "Sfoglia all'uovo (250-300g)", diet: ["carne/pesce"] },
-                { name: "Lasagna bianca ai carciofi", price: 6.0, desc: "Besciamella e carciofi (250-300g)", diet: ["vegetariano"] },
-                { name: "Lasagna bianca funghi piselli e salsiccia", price: 6.0, desc: "Besciamella (250-300g)", diet: ["carne/pesce"] },
-                { name: "Cous cous vegetale con pollo", price: 4.0, diet: ["carne/pesce"] },
+                { name: "Lasagna bianca ai carciofi", price: 6.0, desc: "Besciamella (250-300g)", diet: ["vegetariano"] },
+                { name: "Lasagna bianca funghi salsiccia", price: 6.0, desc: "Besciamella (250-300g)", diet: ["carne/pesce"] },
+                { name: "Cous cous vegetale pollo", price: 4.0, diet: ["carne/pesce"] },
                 { name: "Cous cous vegetale", price: 4.0, diet: ["vegano"] },
-                { name: "Riso Venere con gamberi e zucchine", price: 4.0, diet: ["carne/pesce"] },
+                { name: "Riso Venere gamberi zucchine", price: 4.0, diet: ["carne/pesce"] },
                 { name: "Insalata di riso", price: 4.0, diet: ["carne/pesce"] },
-                { name: "Pasta fredda tonno pomodori olive", price: 4.0, diet: ["carne/pesce"] },
-                { name: "Pasta fredda pesto primo sale pomodori olive", price: 4.0, diet: ["vegetariano"] },
-                { name: "Insalata di pollo", price: 4.0, diet: ["carne/pesce"] },
-                { name: "Riso integrale bresaola limone rughetta", price: 4.0, diet: ["carne/pesce"] },
-                { name: "Pomodori con il riso (2 pz)", price: 6.0, desc: "Con patate al forno", diet: ["vegano"] },
-                { name: "Ovoline di bufala 150g", price: 1.0, desc: "1€ l'una", diet: ["vegetariano"] }
+                { name: "Pasta fredda tonno olive", price: 4.0, diet: ["carne/pesce"] },
+                { name: "Pasta fredda pesto primo sale", price: 4.0, diet: ["vegetariano"] },
+                { name: "Riso integrale bresaola limone", price: 4.0, diet: ["carne/pesce"] },
+                { name: "Pomodori con il riso (2 pz)", price: 6.0, diet: ["vegano"] },
+                { name: "Ovoline di bufala 150g", price: 1.0, diet: ["vegetariano"] }
             ],
             "Insalatone": [
-                { name: "Insalatona con Uovo Sodo", price: 5.0, diet: ["vegetariano"] },
-                { name: "Insalatona con Primo Sale", price: 5.0, diet: ["vegetariano"] },
-                { name: "Insalatona con Tonno", price: 5.0, diet: ["carne/pesce"] }
+                { name: "Insalatona Uovo Sodo", price: 5.0, diet: ["vegetariano"] },
+                { name: "Insalatona Primo Sale", price: 5.0, diet: ["vegetariano"] },
+                { name: "Insalatona Tonno", price: 5.0, diet: ["carne/pesce"] }
             ],
             "Verdure": [
                 { name: "Melanzane grigliate", price: 2.0, hasPortions:true, portions:[{t:"100g-2€",v:2.0},{t:"150g-3€",v:3.0},{t:"200g-4€",v:4.0}], diet:["vegano"] },
@@ -216,42 +213,28 @@
                 { name: "Scarola con olive", price: 2.0, hasPortions:true, portions:[{t:"100g-2€",v:2.0},{t:"150g-3€",v:3.0},{t:"200g-4€",v:4.0}], diet:["vegano"] }
             ],
             "Fritti": [
-                { name: "Pizzetta rossa", price: 1.5, hasPortions:true, portions:[{t:"2pz-1.50€",v:1.5},{t:"3pz-2.00€",v:2.0},{t:"6pz-4.00€",v:4.0}], diet:["vegetariano"] },
-                { name: "Lingua romana scrocchiarella", price: 1.5, desc: "Pomodoro, Olio EVO", diet:["vegano"] },
-                { name: "Supplì", price: 1.5, desc: "Riso, Pomodoro, Mozzarella", diet:["vegetariano"] },
-                { name: "Polpetta di melanzane", price: 1.5, desc: "Melanzane, Parmigiano, Uova", diet:["vegetariano"] }
+                { name: "Pizzetta rossa", price: 1.5, hasPortions:true, portions:[{t:"2pz-1.5€",v:1.5},{t:"3pz-2€",v:2.0},{t:"6pz-4€",v:4.0}], diet:["vegetariano"] },
+                { name: "Lingua romana scrocchiarella", price: 1.5, diet:["vegano"] },
+                { name: "Supplì", price: 1.5, diet:["vegetariano"] },
+                { name: "Polpetta di melanzane", price: 1.5, diet:["vegetariano"] }
             ],
             "Panini": [
                 { name: "Crudo pomodoro mozzarella", price: 3.5, diet:["carne/pesce"] },
                 { name: "Crudo stracchino rughetta", price: 3.5, diet:["carne/pesce"] },
-                { name: "Cotto scamorza e verdura", price: 3.5, diet:["carne/pesce"] },
-                { name: "Capocollo pecorino pom. secchi", price: 3.5, diet:["carne/pesce"] },
                 { name: "Porchetta", price: 3.5, diet:["carne/pesce"] },
-                { name: "Vegetariano melanzane zucchine", price: 3.5, diet:["vegano"] },
-                { name: "Bresaola parmigiano rughetta", price: 3.5, diet:["carne/pesce"] },
-                { name: "Salmone formaggio spalmabile", price: 3.5, diet:["carne/pesce"] },
-                { name: "Cotoletta pollo lattuga pomodoro", price: 3.5, diet:["carne/pesce"] },
-                { name: "Brasato di manzo e verdura", price: 3.5, diet:["carne/pesce"] }
+                { name: "Bresaola parmigiano rughetta", price: 3.5, diet:["carne/pesce"] }
             ],
             "Pizze": [
                 { name: "Pizza insalata pollo maionese", price: 3.5, diet:["carne/pesce"] },
-                { name: "Pizza bresaola filadelfia rughetta", price: 3.5, diet:["carne/pesce"] },
-                { name: "Pizza tacchino e verdure", price: 3.5, diet:["carne/pesce"] },
-                { name: "Pizza rustica: Scarola e olive", price: 8.0, hasPortions:true, portions:[{t:"Intera-8€",v:8},{t:"Mezza-4€",v:4},{t:"1/4-2€",v:2}], diet:["vegano"] },
-                { name: "Pizza rustica: Cicoria e pachino", price: 8.0, hasPortions:true, portions:[{t:"Intera-8€",v:8},{t:"Mezza-4€",v:4},{t:"1/4-2€",v:2}], diet:["vegano"] },
-                { name: "Pizza rustica: Broccoli salsiccia", price: 8.0, hasPortions:true, portions:[{t:"Intera-8€",v:8},{t:"Mezza-4€",v:4},{t:"1/4-2€",v:2}], diet:["carne/pesce"] }
+                { name: "Pizza Rustica: Scarola e olive", price: 8.0, hasPortions:true, portions:[{t:"Intera-8€",v:8},{t:"Mezza-4€",v:4},{t:"1/4-2€",v:2}], diet:["vegano"] }
             ],
             "Dessert": [
-                { name: "Macedonia di stagione", price: 3.0, diet:["vegano"] },
-                { name: "Crostatina marmellata", price: 1.5, diet:["vegetariano"] },
-                { name: "Lingue di gatto (1pz)", price: 1.0, diet:["vegetariano"] },
-                { name: "Ferretti glassati (1pz)", price: 2.0, diet:["vegetariano"] }
+                { name: "Macedonia", price: 3.0, diet:["vegano"] },
+                { name: "Crostatina marmellata", price: 1.5, diet:["vegetariano"] }
             ],
             "Prodotti da Forno": [
-                { name: "Pane di Lariano", price: 0.75, hasPortions:true, portions:[{t:"250g-0.75€",v:0.75},{t:"500g-1.50€",v:1.5}], diet:["vegano"] },
-                { name: "Ciabatta", price: 1.00, hasPortions:true, portions:[{t:"250g-1.00€",v:1.0},{t:"1kg-4.00€",v:4.0}], diet:["vegano"] },
-                { name: "Pizza Bianca", price: 1.80, hasPortions:true, portions:[{t:"200g-1.80€",v:1.80},{t:"1kg-9.00€",v:9.0}], diet:["vegano"] },
-                { name: "Pizzette (mini sfizio)", price: 1.50, desc: "Mini pizze morbide", diet:["vegetariano"] }
+                { name: "Pane di Lariano", price: 0.75, hasPortions:true, portions:[{t:"250g-0.75€",v:0.75},{t:"500g-1.5€",v:1.5}], diet:["vegano"] },
+                { name: "Pizza Bianca", price: 1.8, hasPortions:true, portions:[{t:"200g-1.8€",v:1.8},{t:"1kg-9€",v:9.0}], diet:["vegano"] }
             ]
         };
 
@@ -262,7 +245,7 @@
             ordersToday: [], menuData: []
         };
 
-        // --- FIREBASE SETUP ---
+        // --- FIREBASE INIT ---
         const firebaseConfig = { apiKey: "AIzaSyCQJsNbgaR89gF_1vLe6H4DPboOhQvm9nI", authDomain: "app-ordini-pranzo-alimentari.firebaseapp.com", projectId: "app-ordini-pranzo-alimentari", storageBucket: "app-ordini-pranzo-alimentari.appspot.com", messagingSenderId: "553169964686", appId: "1:553169964686:web:7f8ca6f32a301949e4c3df" };
         const app_fb = initializeApp(firebaseConfig);
         const auth_fb = getAuth(app_fb);
@@ -329,7 +312,6 @@
             document.getElementById('custom-subtype-container').classList.add('hidden');
             document.getElementById('custom-ingredients-container').classList.add('hidden');
             window.navigate('menu');
-            window.toast("Aggiunto!");
         };
 
         window.removeFromCart = (id) => {
@@ -347,29 +329,30 @@
         };
 
         window.saveUserData = () => {
-            const name = document.getElementById('user-name-input').value.trim();
-            const email = document.getElementById('user-email-input').value.trim();
-            if(name && email) {
-                state.user = { name, email };
+            const n = document.getElementById('user-name-input').value.trim();
+            const e = document.getElementById('user-email-input').value.trim();
+            if(n && e) {
+                state.user = { name: n, email: e };
                 localStorage.setItem('dose_user', JSON.stringify(state.user));
                 document.getElementById('user-modal').classList.add('hidden');
-                checkAdmin(name);
+                checkAdmin(n);
             }
         };
 
         window.sendOrder = async () => {
             if(!state.user) return document.getElementById('user-modal').classList.remove('hidden');
             try {
-                const total = state.cart.reduce((s,i)=>s+i.price, 0);
+                const total = state.cart.reduce((s,i)=>s+i.price,0);
                 await addDoc(ordersCol, { 
                     user: state.user.name, email: state.user.email,
+                    uid: auth_fb.currentUser.uid, // Obbligatorio per le regole Firebase
                     items: state.cart, total, 
                     allergies: document.getElementById('allergies-input').value,
                     posate: state.posate ? 'Si' : 'No',
                     createdAt: serverTimestamp() 
                 });
                 state.cart = []; document.getElementById('cart-count').textContent='0'; window.navigate('history'); window.toast("Ordine Inviato!");
-            } catch(e) { alert("Connessione fallita. Carica l'app online."); }
+            } catch(e) { alert("Connessione fallita. Carica online!"); }
         };
 
         window.copyDailySummary = () => {
@@ -378,7 +361,7 @@
                 const k = i.name + (i.details ? ` (${i.details})` : "");
                 sum[k] = (sum[k] || 0) + 1;
             }));
-            const text = "ORDINI OGGI:\n" + Object.entries(sum).map(([k,v]) => `- ${v}x ${k}`).join('\n');
+            const text = "ORDINI DOSEPRANZA OGGI:\n" + Object.entries(sum).map(([k,v]) => `- ${v}x ${k}`).join('\n');
             navigator.clipboard.writeText(text).then(() => window.toast("Copiato!"));
         };
 
@@ -389,14 +372,14 @@
                 const o = d.data();
                 const ts = o.createdAt?.toDate();
                 o.items.forEach(i => {
-                    csv += `${d.id};${ts?.toISOString()};${ts?.toLocaleString()};Auth;${o.user};${o.email};${i.name};${i.details || ""};${i.cat || ""};1;${i.price};${o.total};Satispay;${o.allergies || "No"};${o.posate || "No"};Web;Da Pagare\n`;
+                    csv += `${d.id};${ts?.toISOString()};${ts?.toLocaleString()};${o.uid};${o.user};${o.email};${i.name};${i.details || ""};${i.cat || ""};1;${i.price};${o.total};Satispay;${o.allergies || "No"};${o.posate || "No"};Web;Da Pagare\n`;
                 });
             });
             const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "Storico_Ordini.csv"; link.click();
         };
 
-        // --- INTERNAL ---
+        // --- INTERNAL LOGIC ---
         function renderMenu() {
             const filtered = state.menuData.filter(i => {
                 const s = i.name.toLowerCase().includes(state.search.toLowerCase());
@@ -409,12 +392,12 @@
                 let html = "";
                 if(i.cat !== cur) { cur = i.cat; html += `<div class="col-span-full mt-6 mb-2 font-black text-[10px] uppercase text-primary/60 border-b border-primary/10 tracking-widest">${cur}</div>`; }
                 const pricing = i.hasPortions ? `<select data-pid="${i.id}" class="text-[9px] p-2 border rounded-xl w-full font-bold outline-none bg-gray-50">${i.portions.map(o=>`<option value="${o.v}">${o.t}</option>`).join('')}</select>` : `<span class="font-black text-primary text-lg">€${i.price.toFixed(2)}</span>`;
-                html += `<div class="bg-white p-5 rounded-[2rem] shadow-sm flex flex-col justify-between border border-transparent hover:shadow-xl transition-all">
+                html += `<div class="bg-white p-5 rounded-[2rem] shadow-sm flex flex-col justify-between transition-all">
                     <div><h4 class="font-bold text-sm product-title mb-1 leading-tight text-gray-800">${i.name}</h4><p class="text-[9px] text-gray-300 italic">${i.cat}</p></div>
                     <div class="mt-4 flex justify-between items-center gap-2">${pricing}<button onclick="window.addStdToCart('${i.id}')" class="bg-primary text-white h-10 w-10 rounded-2xl shadow-lg flex items-center justify-center flex-shrink-0 active:scale-90 transition-all"><i class="fas fa-plus"></i></button></div>
                 </div>`;
                 return html;
-            }).join('') || `<div class="col-span-full py-20 text-center text-gray-300">Nessun prodotto trovato.</div>`;
+            }).join('');
         }
 
         function renderCustomIngs() {
@@ -422,7 +405,7 @@
                 const count = state.custom.ings.filter(i => i.id === ing.id).length;
                 return `<div onclick="window.addIng('${ing.id}')" class="ingredient-card bg-white p-3 rounded-2xl border-2 border-transparent shadow-sm text-center cursor-pointer transition-all relative ${count > 0 ? 'selected' : ''}">
                     <p class="text-[9px] font-bold leading-tight">${ing.name}</p>
-                    ${count > 0 ? `<span class="absolute -top-1 -right-1 bg-primary text-white text-[9px] h-4 w-4 rounded-full flex items-center justify-center font-black">${count}</span>` : ''}
+                    ${count > 0 ? `<span class="absolute -top-1 -right-1 bg-primary text-white text-[9px] h-4 w-4 rounded-full flex items-center justify-center font-black shadow-md border border-white">${count}</span>` : ''}
                 </div>`;
             }).join('');
         }
@@ -431,7 +414,7 @@
             const s = state.custom;
             s.total = 3.5 + Math.max(0, s.ings.length - 3) * 1.0;
             document.getElementById('custom-price-display').textContent = `€${s.total.toFixed(2)}`;
-            document.getElementById('custom-summary-list').innerHTML = s.ings.map((n, idx) => `<li class="flex justify-between items-center bg-gray-50 p-2 rounded-xl mb-1"><span>${n.name}</span><i class="fas fa-times text-red-300" onclick="window.removeIng(${idx})"></i></li>`).join('');
+            document.getElementById('custom-summary-list').innerHTML = s.ings.map((n, idx) => `<li class="flex justify-between items-center bg-gray-50 p-2 rounded-xl mb-1 text-[9px]"><span>${n.name}</span><i class="fas fa-times text-red-300 cursor-pointer" onclick="window.removeIng(${idx})"></i></li>`).join('');
         }
 
         function renderCart() {
@@ -440,25 +423,28 @@
             if(state.cart.length === 0) { wrap.innerHTML = `<p class="text-center py-10 text-gray-300 font-bold uppercase">Carrello vuoto</p>`; opts.classList.add('hidden'); return; }
             opts.classList.remove('hidden');
             const tot = state.cart.reduce((s,i) => s+i.price, 0);
-            wrap.innerHTML = state.cart.map(i => `<div class="flex justify-between items-center py-4 border-b border-gray-50 last:border-0">
-                <div class="min-w-0 pr-4"><p class="font-black text-sm text-gray-800">${i.name}</p><p class="text-[9px] text-gray-300 truncate">${i.details || ''}</p><p class="text-xs text-primary font-black">€${i.price.toFixed(2)}</p></div>
+            wrap.innerHTML = state.cart.map(i => `<div class="flex justify-between items-center py-4 border-b border-gray-50">
+                <div class="min-w-0 pr-4 text-left"><p class="font-black text-sm text-gray-800">${i.name}</p><p class="text-[9px] text-gray-300 truncate">${i.details || ''}</p><p class="text-xs text-primary font-black">€${i.price.toFixed(2)}</p></div>
                 <button onclick="window.removeFromCart(${i.cartId})" class="text-red-300 p-2"><i class="fas fa-trash-alt"></i></button>
             </div>`).join('');
             document.getElementById('cart-total-display').textContent = `€${tot.toFixed(2)}`;
         }
 
         function syncOrders() {
-            const startOfDay = new Date(); startOfDay.setHours(0,0,0,0);
+            const now = new Date(); now.setHours(0,0,0,0);
             onSnapshot(query(ordersCol, orderBy("createdAt", "desc")), snap => {
                 let totalG = 0;
                 state.ordersToday = snap.docs
                     .map(d => ({id: d.id, ...d.data()}))
-                    .filter(o => o.createdAt && o.createdAt.toDate() >= startOfDay);
+                    .filter(o => o.createdAt && o.createdAt.toDate() >= now);
                 
                 document.getElementById('all-orders-list').innerHTML = state.ordersToday.map(o => {
                     totalG += o.total || 0;
                     return `<div class="bg-white p-5 rounded-3xl border-l-8 border-primary shadow-sm flex justify-between items-center">
-                        <div class="min-w-0 pr-4"><p class="font-black text-sm text-gray-800">${o.user}</p><p class="text-[9px] text-gray-300 font-bold truncate">${o.items.map(i=>i.name).join(' • ')}</p></div>
+                        <div class="min-w-0 pr-4 text-left">
+                            <p class="font-black text-sm text-gray-800">${o.user}</p>
+                            <p class="text-[9px] text-gray-400 font-bold truncate">${o.items.map(i=>i.name).join(' • ')}</p>
+                        </div>
                         <p class="font-black text-primary text-lg">€${(o.total || 0).toFixed(2)}</p>
                     </div>`;
                 }).join('');
@@ -468,24 +454,22 @@
 
         function checkAdmin(name) {
             if(name === "Marco Tranquilli") document.getElementById('admin-export-btn').classList.remove('hidden');
-            else document.getElementById('admin-export-btn').classList.add('hidden');
         }
 
-        // --- INIT APP ---
-        const init = () => {
-            state.menuData = Object.entries(RAW_MENU).flatMap(([cat, items]) => items.map((it, idx) => ({...it, cat, id: cat.replace(/\s/g,'')+idx})));
-            document.getElementById('category-select').innerHTML = `<option value="all">Tutte le Categorie</option>` + Object.keys(RAW_MENU).map(c => `<option value="${c}">${c.toUpperCase()}</option>`).join('');
-            document.getElementById('diet-select').innerHTML = `<option value="all">Tutti i Regimi</option>` + Object.entries(DIETS_CONFIG).map(([k,v]) => `<option value="${k}">${v}</option>`).join('');
+        // --- INITIALIZATION ---
+        onAuthStateChanged(auth_fb, u => { 
+            if(!u) signInAnonymously(auth_fb); 
+            if(state.user) checkAdmin(state.user.name);
+            else document.getElementById('user-modal').classList.remove('hidden');
+        });
 
+        const init = () => {
+            state.menuData = Object.entries(RAW_MENU).flatMap(([cat, items]) => items.map((it, idx) => ({ ...it, cat, id: cat.replace(/\s/g,'')+idx })));
+            document.getElementById('category-select').innerHTML = `<option value="all">Tutte le Categorie</option>` + Object.keys(RAW_MENU).map(c => `<option value="${c}">${c}</option>`).join('');
+            document.getElementById('diet-select').innerHTML = `<option value="all">Ogni Regime</option>` + Object.entries(DIETS_CONFIG).map(([k,v]) => `<option value="${k}">${v}</option>`).join('');
             document.getElementById('search-input').oninput = (e) => { state.search = e.target.value; renderMenu(); };
             document.getElementById('category-select').onchange = (e) => { state.cat = e.target.value; renderMenu(); };
             document.getElementById('diet-select').onchange = (e) => { state.diet = e.target.value; renderMenu(); };
-
-            onAuthStateChanged(auth_fb, u => { 
-                if(!u) signInAnonymously(auth_fb); 
-                if(!state.user) document.getElementById('user-modal').classList.remove('hidden');
-                else checkAdmin(state.user.name);
-            });
             renderMenu();
         };
 
