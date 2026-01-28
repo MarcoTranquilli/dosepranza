@@ -180,11 +180,6 @@
         const INGREDIENTS_DATA = [{id:'br',name:'Bresaola'},{id:'bi',name:'Brie'},{id:'bl',name:'Broccoletti'},{id:'cp',name:'Capocollo'},{id:'cr',name:'Carciofini'},{id:'ci',name:'Cicoria'},{id:'fr',name:'Frittata'},{id:'in',name:'Insalata'},{id:'lt',name:'Lattuga'},{id:'mg',name:'Melanzane Grigliate'},{id:'mo',name:'Mortadella'},{id:'mz',name:'Mozzarella'},{id:'ol',name:'Olive'},{id:'pa',name:'Parmigiano'},{id:'pe',name:'Pecorino'},{id:'pg',name:'Peperoni Grigliati'},{id:'ps',name:'Pomodori Secchi'},{id:'po',name:'Pomodoro'},{id:'pc',name:'Porchetta'},{id:'pr',name:'Primo Sale'},{id:'co',name:'Prosciutto Cotto'},{id:'cu',name:'Prosciutto Crudo'},{id:'ru',name:'Rucola'},{id:'sa',name:'Salame'},{id:'sc',name:'Scamorza'},{id:'sk',name:'Scarola'},{id:'sp',name:'Speck'},{id:'st',name:'Stracchino'},{id:'sz',name:'Stracciatella'},{id:'ta',name:'Tacchino Arrosto'},{id:'zg',name:'Zucchine Grigliate'}].sort((a,b)=>a.name.localeCompare(b.name));
 
         const RAW_MENU = {
-            "Menù Combinati": [
-                { name: "Panino + acqua 50 cl", price: 4.0, diet: ["carne/pesce", "vegetariano", "vegano"] },
-                { name: "Panino + lattina 33 cl", price: 4.5, diet: ["carne/pesce", "vegetariano", "vegano"] },
-                { name: "Panino + bevanda 50 cl", price: 5.0, diet: ["carne/pesce", "vegetariano", "vegano"] }
-            ],
             "Gastronomia": [
                 { name: "Melanzane alla parmigiana", price: 6.0, desc: "Grigliate (250-300g)", diet: ["vegetariano"] },
                 { name: "Lasagna classica al ragù", price: 6.0, desc: "Sfoglia all'uovo (250-300g)", diet: ["carne/pesce"] },
@@ -214,8 +209,6 @@
                 { name: "Scarola con olive", price: 2.0, hasPortions:true, portions:[{t:"100g-2€",v:2.0},{t:"150g-3€",v:3.0},{t:"200g-4€",v:4.0}], diet:["vegano"] }
             ],
             "Fritti": [
-                { name: "Pizzetta rossa", price: 1.5, hasPortions:true, portions:[{t:"2pz-1.5€",v:1.5},{t:"3pz-2€",v:2.0},{t:"6pz-4€",v:4.0}], diet:["vegetariano"] },
-                { name: "Lingua romana scrocchiarella", price: 1.5, diet:["vegano"] },
                 { name: "Supplì", price: 1.5, diet:["vegetariano"] },
                 { name: "Polpetta di melanzane", price: 1.5, diet:["vegetariano"] }
             ],
@@ -236,18 +229,27 @@
                 { name: "Pizza rustica: Cicoria e pachino", price: 8.0, hasPortions:true, portions:[{t:"Intera-8€",v:8},{t:"Mezza-4€",v:4},{t:"1/4-2€",v:2}], diet:["vegano"] },
                 { name: "Pizza rustica: Broccoli salsiccia", price: 8.0, hasPortions:true, portions:[{t:"Intera-8€",v:8},{t:"Mezza-4€",v:4},{t:"1/4-2€",v:2}], diet:["carne/pesce"] }
             ],
+            "Prodotti da Forno": [
+                { name: "Pane di Lariano", price: 0.75, hasPortions:true, portions:[{t:"250g-0.75€",v:0.75},{t:"500g-1.50€",v:1.5}], diet:["vegano"] },
+                { name: "Ciabatta", price: 1.00, hasPortions:true, portions:[{t:"250g-1.00€",v:1.0},{t:"1kg-4.00€",v:4.0}], diet:["vegano"] },
+                { name: "Pizza Bianca", price: 1.80, hasPortions:true, portions:[{t:"200g-1.80€",v:1.80},{t:"1kg-9.00€",v:9.0}], diet:["vegano"] },
+                { name: "Pizza Rossa", price: 2.00, hasPortions:true, portions:[{t:"200g-2.00€",v:2.00},{t:"1kg-10.00€",v:9.0}], diet:["vegano"] },
+                { name: "Pizza Con patate", price: 2.00, hasPortions:true, portions:[{t:"200g-2.00€",v:2.00},{t:"1kg-10.00€",v:9.0}], diet:["vegano"] },
+                { name: "Pizzette (mini)", price: 1.50, desc: "Mini pizze morbide", diet:["vegetariano"] },
+                { name: "Pizzetta rossa", price: 1.5, hasPortions:true, portions:[{t:"2pz-1.5€",v:1.5},{t:"3pz-2€",v:2.0},{t:"6pz-4€",v:4.0}], diet:["vegetariano"] },
+                { name: "Lingua romana scrocchiarella", price: 1.5, diet:["vegano"] },
+            ],
             "Dessert": [
                 { name: "Macedonia di stagione", price: 3.0, diet:["vegano"] },
                 { name: "Crostatina marmellata", price: 1.5, diet:["vegetariano"] },
                 { name: "Lingue di gatto (1pz)", price: 1.0, diet:["vegetariano"] },
                 { name: "Ferretti glassati (1pz)", price: 2.0, diet:["vegetariano"] }
+            ],            
+            "Menù Combinati": [
+                { name: "Panino + acqua 50 cl", price: 4.0, diet: ["carne/pesce", "vegetariano", "vegano"] },
+                { name: "Panino + lattina 33 cl", price: 4.5, diet: ["carne/pesce", "vegetariano", "vegano"] },
+                { name: "Panino + bevanda 50 cl", price: 5.0, diet: ["carne/pesce", "vegetariano", "vegano"] }
             ],
-            "Prodotti da Forno": [
-                { name: "Pane di Lariano", price: 0.75, hasPortions:true, portions:[{t:"250g-0.75€",v:0.75},{t:"500g-1.50€",v:1.5}], diet:["vegano"] },
-                { name: "Ciabatta", price: 1.00, hasPortions:true, portions:[{t:"250g-1.00€",v:1.0},{t:"1kg-4.00€",v:4.0}], diet:["vegano"] },
-                { name: "Pizza Bianca", price: 1.80, hasPortions:true, portions:[{t:"200g-1.80€",v:1.80},{t:"1kg-9.00€",v:9.0}], diet:["vegano"] },
-                { name: "Pizzette (mini)", price: 1.50, desc: "Mini pizze morbide", diet:["vegetariano"] }
-            ]
         };
 
         const state = {
