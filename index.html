@@ -368,14 +368,45 @@
             } catch(e) { alert("Connessione fallita. Carica online!"); }
         };
 
+        // --- FUNZIONE RIEPILOGO AGGIORNATA ---
         window.copyDailySummary = () => {
-            const sum = {};
-            state.ordersToday.forEach(o => o.items.forEach(i => {
-                const k = i.name + (i.details ? ` (${i.details})` : "");
-                sum[k] = (sum[k] || 0) + 1;
-            }));
-            const text = "ORDINI DOSEPRANZA OGGI:\n" + Object.entries(sum).map(([k,v]) => `- ${v}x ${k}`).join('\n');
-            navigator.clipboard.writeText(text).then(() => window.toast("Copiato!"));
+            if(state.ordersToday.length === 0) return window.toast("Nessun ordine presente!");
+
+            // 1. Invertiamo l'array (che arriva ordinato per data decrescente)
+            // così da avere l'ordine CRONOLOGICO (dal primo della mattina all'ultimo)
+            const chronOrder = [...state.ordersToday].reverse();
+
+            // 2. Costruiamo il testo
+            let text = `📋 *DOSEPRANZA - ${new Date().toLocaleDateString('it-IT')}*\n\n`;
+
+            chronOrder.forEach(o => {
+                // Intestazione Utente
+                text += `👤 *${o.user.toUpperCase()}*`;
+                // Se c'è un timestamp valido, aggiungiamo l'orario
+                if(o.createdAt) {
+                    const d = o.createdAt.toDate();
+                    text += ` (${d.getHours()}:${(d.getMinutes()<10?'0':'') + d.getMinutes()})`;
+                }
+                text += `\n`;
+
+                // Lista Prodotti
+                o.items.forEach(i => {
+                    text += `▪️ ${i.name}`;
+                    if(i.details && i.details !== "") text += ` _(${i.details})_`;
+                    text += `\n`;
+                });
+
+                // Note / Allergie
+                if(o.allergies && o.allergies.trim().length > 0) {
+                    text += `⚠️ NOTE: ${o.allergies}\n`;
+                }
+                
+                // Divisore
+                text += `-------------------\n`;
+            });
+
+            // 3. Copia nella clipboard
+            navigator.clipboard.writeText(text).then(() => window.toast("Copiato per WhatsApp!"));
         };
 
         window.exportFullHistory = async () => {
