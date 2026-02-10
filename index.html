@@ -12,7 +12,7 @@
     <script src="https://cdn.tailwindcss.com/3.4.3"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="styles.css?v=20260210l">
+    <link rel="stylesheet" href="styles.css?v=20260210m">
 </head>
 <body class="bg-background text-text-main pb-20 font-sans">
 
@@ -35,6 +35,13 @@
             <button data-action="navigate" data-view="history" id="btn-history" class="nav-btn py-3 rounded-xl font-bold text-[10px] uppercase transition-all"><i class="fas fa-users block text-sm mb-1"></i>Tutti</button>
             <button data-action="navigate" data-view="analytics" id="btn-analytics" class="nav-btn py-3 rounded-xl font-bold text-[10px] uppercase transition-all"><i class="fas fa-chart-line block text-sm mb-1"></i>Analisi</button>
         </nav>
+        <div id="auth-banner" class="hidden bg-amber-50 border border-amber-200 text-amber-900 text-[11px] font-bold px-4 py-3 rounded-2xl mb-4 flex items-center justify-between">
+            <span>Non sei autenticato. Effettua l’accesso per usare funzioni admin/ristoratore.</span>
+            <div class="flex gap-2">
+                <button data-action="signin-google" class="btn btn-ghost text-[10px] px-3 py-2">Login Google</button>
+                <button data-action="signout" class="btn btn-ghost text-[10px] px-3 py-2">Logout</button>
+            </div>
+        </div>
 
         <main>
             <section id="menu-view" class="view active">

@@ -1224,6 +1224,7 @@ import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signO
         function renderRoleStatus() {
             const el = document.getElementById('role-status');
             const missingEl = document.getElementById('claims-missing');
+            const banner = document.getElementById('auth-banner');
             if(!el || !missingEl) return;
             const cached = (() => {
                 try { return JSON.parse(localStorage.getItem('dose_user') || 'null'); } catch(e) { return null; }
@@ -1235,6 +1236,10 @@ import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signO
             const isMapped = ROLE_EMAILS.admin.includes(email) || ROLE_EMAILS.ristoratore.includes(email) || ROLE_EMAILS.facility.includes(email);
             const claimsNote = (state.role === 'user' && isMapped);
             missingEl.textContent = claimsNote ? 'Claims non ancora assegnate (utente deve fare login)' : '';
+            if(banner) {
+                if(state.user) banner.classList.add('hidden');
+                else banner.classList.remove('hidden');
+            }
         }
 
         function syncFrige() {
