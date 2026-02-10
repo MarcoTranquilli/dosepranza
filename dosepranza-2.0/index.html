@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dosemagna - Gestione Ordini</title>
+    <link rel="icon" href="https://i.postimg.cc/L6H20zfp/logo-dosepranza-People-About-Food.png?v=20260209">
+    <meta name="referrer" content="no-referrer">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; img-src 'self' data: https://i.postimg.cc https://www.datocms-assets.com https://api.qrserver.com; script-src 'self' https://www.gstatic.com https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://identity.netlify.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; connect-src 'self' https://identity.netlify.com https://*.googleapis.com https://firestore.googleapis.com https://www.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebaseinstallations.googleapis.com https://*.firebaseio.com https://*.appspot.com; frame-src https://identity.netlify.com; upgrade-insecure-requests">
+    <script src="tailwind-config.js"></script>
+    <script src="https://cdn.tailwindcss.com/3.4.3"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css?v=20260210b">
+</head>
+<body class="bg-background text-text-main pb-20 font-sans">
+
+    <div id="app" class="max-w-4xl mx-auto p-4">
+        <header class="mb-6 flex flex-col items-center">
+            <img src="https://i.postimg.cc/L6H20zfp/logo-dosepranza-People-About-Food.png?v=20260209" class="w-64 md:w-80">
+            <div class="glass border-l-4 border-primary p-3 rounded-r-xl mt-4 w-full text-xs font-bold shadow-sm">
+                Ordine entro le 11:30 | Consegna gratuita ore 12:30.
+            </div>
+        </header>
+
+        <nav class="grid grid-cols-6 gap-1 glass p-2 rounded-2xl shadow-lg sticky top-2 z-50 mb-6">
+            <button data-action="navigate" data-view="menu" id="btn-menu" class="nav-btn py-3 rounded-xl font-bold text-[10px] uppercase transition-all active"><i class="fas fa-utensils block text-sm mb-1"></i>Menù</button>
+            <button data-action="navigate" data-view="custom" id="btn-custom" class="nav-btn py-3 rounded-xl font-bold text-[10px] uppercase transition-all"><i class="fas fa-plus-circle block text-sm mb-1"></i>Crea</button>
+            <button data-action="navigate" data-view="frige" id="btn-frige" class="nav-btn py-3 rounded-xl font-bold text-[10px] uppercase transition-all"><i class="fas fa-snowflake block text-sm mb-1"></i>Frige</button>
+            <button data-action="navigate" data-view="cart" id="btn-cart" class="nav-btn py-3 rounded-xl font-bold text-[10px] uppercase transition-all relative">
+                <i class="fas fa-shopping-basket block text-sm mb-1"></i>Ordine
+                <span id="cart-count" class="absolute top-1 right-1 bg-red-500 text-white text-[9px] h-4 w-4 rounded-full flex items-center justify-center border border-white">0</span>
+            </button>
+            <button data-action="navigate" data-view="history" id="btn-history" class="nav-btn py-3 rounded-xl font-bold text-[10px] uppercase transition-all"><i class="fas fa-users block text-sm mb-1"></i>Tutti</button>
+            <button data-action="navigate" data-view="analytics" id="btn-analytics" class="nav-btn py-3 rounded-xl font-bold text-[10px] uppercase transition-all"><i class="fas fa-chart-line block text-sm mb-1"></i>Analisi</button>
+        </nav>
+
+        <main>
+            <section id="menu-view" class="view active">
+                <div class="space-y-4 mb-6">
+                    <input type="search" id="search-input" placeholder="Cerca un piatto..." class="w-full p-4 border border-gray-200 rounded-2xl outline-none focus:ring-2 focus:ring-primary shadow-sm">
+                    <div class="grid grid-cols-2 gap-2">
+                        <select id="category-select" class="p-3 bg-white border border-gray-200 rounded-xl text-xs font-bold outline-none cursor-pointer"></select>
+                        <select id="diet-select" class="p-3 bg-white border border-gray-200 rounded-xl text-xs font-bold outline-none cursor-pointer"></select>
+                    </div>
+                </div>
+                <div id="menu-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-10"></div>
+            </section>
+
+            <section id="custom-view" class="view">
+                <h2 class="text-2xl font-black mb-6 tracking-tighter section-title">Personalizza il Tuo Ordine</h2>
+                <div class="card p-6 rounded-3xl mb-4 text-center">
+                    <h3 class="text-xs font-black text-gray-400 uppercase mb-4 tracking-widest italic">1. Scegli la base</h3>
+                    <div class="flex gap-4">
+                        <button data-action="select-base" data-base="Panino" class="flex-1 p-6 bg-gray-50 rounded-2xl border-2 border-transparent hover:border-primary transition-all flex flex-col items-center shadow-sm">
+                            <i class="fas fa-bread-slice text-3xl text-primary mb-2"></i><span class="font-bold text-sm">Panino</span>
+                        </button>
+                        <button data-action="select-base" data-base="Pizza Ripiena" class="flex-1 p-6 bg-gray-50 rounded-2xl border-2 border-transparent hover:border-primary transition-all flex flex-col items-center shadow-sm">
+                            <i class="fas fa-pizza-slice text-3xl text-primary mb-2"></i><span class="font-bold text-sm">Pizza</span>
+                        </button>
+                    </div>
+                </div>
+                <div id="custom-subtype-container" class="card p-5 rounded-3xl mb-4 hidden text-center transition-all">
+                    <h3 class="text-xs font-black text-gray-400 uppercase mb-4 italic font-bold">2. Variante</h3>
+                    <div id="subtype-list" class="grid grid-cols-2 gap-2"></div>
+                </div>
+                <div id="custom-ingredients-container" class="hidden">
+                    <h3 class="text-xs font-black text-gray-400 uppercase mb-4 italic text-center tracking-widest font-bold">3. Scegli gli ingredienti</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div id="ingredients-grid" class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
+                        <div class="md:col-span-1">
+                            <div class="card p-6 rounded-3xl sticky top-24 text-center">
+                                <h4 class="font-bold text-xs mb-4 uppercase text-primary border-b pb-2">Riepilogo</h4>
+                                <ul id="custom-summary-list" class="text-[10px] space-y-1 mb-4 text-left min-h-[40px]"></ul>
+                                <div class="flex justify-between items-center mb-6 pt-2 border-t font-bold">
+                                    <span class="text-xs text-gray-400 italic font-medium uppercase">Prezzo Finale:</span>
+                                    <span id="custom-price-display" class="text-2xl font-black text-primary">€3.50</span>
+                                </div>
+                                <button data-action="add-custom" class="w-full btn btn-secondary py-4">Aggiungi al carrello</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="frige-view" class="view">
+                <div class="flex justify-between items-start gap-4 mb-4">
+                    <div>
+                        <h2 class="text-2xl font-black tracking-tighter uppercase section-title">Frige</h2>
+                        <p class="text-[11px] text-gray-500 italic">Acquista prodotti gastronomici in autonomia.</p>
+                    </div>
+                    <a href="https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" target="_blank" rel="noopener noreferrer" class="btn btn-ghost text-[10px] px-4 py-2">Apri Satispay</a>
+                </div>
+
+                <div class="card p-5 rounded-3xl mb-6">
+                    <p class="text-[10px] muted font-bold uppercase tracking-widest">Regole rapide</p>
+                    <ul class="text-[11px] mt-2 muted space-y-1">
+                        <li>1. Scegli un prodotto e verifica la disponibilita.</li>
+                        <li>2. Paga con Satispay all'alimentari.</li>
+                        <li>3. Conferma il pagamento nel popup.</li>
+                    </ul>
+                </div>
+
+                <div id="frige-admin-tools" class="hidden card p-5 rounded-3xl mb-6">
+                    <div class="flex flex-col gap-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-black uppercase text-primary">Gestione Frige</p>
+                                <p class="text-[10px] text-gray-400">Rimanenze, prodotti e richieste rifornimento.</p>
+                            </div>
+                            <div class="flex gap-2">
+                            <button id="frige-seed-btn" data-action="seed-frige" class="btn btn-ghost text-[10px] px-4 py-2">Inizializza prodotti</button>
+                            </div>
+                        </div>
+
+                        <div id="frige-add-form" class="hidden bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                            <p class="text-[10px] font-black uppercase text-gray-500 mb-2">Aggiungi prodotto</p>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                                <input id="frige-new-name" type="text" placeholder="Nome prodotto" class="p-3 rounded-xl border border-gray-200 text-[11px] font-bold outline-none">
+                                <input id="frige-new-price" type="number" step="0.01" placeholder="Prezzo (€)" class="p-3 rounded-xl border border-gray-200 text-[11px] font-bold outline-none">
+                                <input id="frige-new-stock" type="number" step="1" placeholder="Quantita" class="p-3 rounded-xl border border-gray-200 text-[11px] font-bold outline-none">
+                            </div>
+                            <button data-action="add-frige-form" class="mt-3 w-full btn btn-primary text-[10px] py-3">Aggiungi prodotto</button>
+                        </div>
+
+                        <div id="frige-restock-form" class="hidden bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                            <p class="text-[10px] font-black uppercase text-gray-500 mb-2">Aggiorna rimanenze</p>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                                <select id="frige-restock-product" class="p-3 rounded-xl border border-gray-200 text-[11px] font-bold outline-none"></select>
+                                <input id="frige-restock-qty" type="number" step="1" placeholder="Quantita da aggiungere" class="p-3 rounded-xl border border-gray-200 text-[11px] font-bold outline-none">
+                                <button data-action="apply-restock" class="btn btn-ghost text-[10px] py-3">Aggiorna</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-4 rounded-2xl mb-4">
+                    <div class="flex items-center justify-between">
+                        <p class="text-[10px] font-black uppercase text-gray-500">Filtri</p>
+                        <div class="flex gap-2">
+                            <button data-action="frige-filter" data-filter="all" id="frige-filter-all" class="btn btn-primary text-[10px] px-3 py-2">Tutti</button>
+                            <button data-action="frige-filter" data-filter="low" id="frige-filter-low" class="btn btn-ghost text-[10px] px-3 py-2">Sotto soglia</button>
+                            <button data-action="frige-filter" data-filter="out" id="frige-filter-out" class="btn btn-ghost text-[10px] px-3 py-2">Esauriti</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="frige-products" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-8"></div>
+
+                <div id="frige-admin-summary" class="hidden">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                        <div class="bg-white p-4 rounded-2xl border border-gray-100 text-center">
+                            <p class="text-[10px] uppercase text-gray-400 font-black">Venduti Oggi</p>
+                            <p id="frige-kpi-sold" class="text-2xl font-black text-primary">0</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-gray-100 text-center">
+                            <p class="text-[10px] uppercase text-gray-400 font-black">Incasso Oggi</p>
+                            <p id="frige-kpi-revenue" class="text-2xl font-black text-primary">€0.00</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-gray-100 text-center">
+                            <p class="text-[10px] uppercase text-gray-400 font-black">Sotto Soglia</p>
+                            <p id="frige-kpi-low" class="text-2xl font-black text-primary">0</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-gray-100 text-center">
+                            <p class="text-[10px] uppercase text-gray-400 font-black">Esauriti</p>
+                            <p id="frige-kpi-out" class="text-2xl font-black text-primary">0</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+                        <div class="bg-white p-4 rounded-2xl border border-gray-100 text-center">
+                            <p class="text-[10px] uppercase text-gray-400 font-black">Da Riconciliare</p>
+                            <p id="frige-kpi-unpaid" class="text-2xl font-black text-primary">0</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-gray-100 text-center">
+                            <p class="text-[10px] uppercase text-gray-400 font-black">Importo Da Verificare</p>
+                            <p id="frige-kpi-unpaid-amt" class="text-2xl font-black text-primary">€0.00</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-gray-100 text-center">
+                            <p class="text-[10px] uppercase text-gray-400 font-black">Riconciliati Oggi</p>
+                            <p id="frige-kpi-paid" class="text-2xl font-black text-primary">0</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-gray-100 mb-6">
+                        <p class="text-[10px] uppercase text-gray-400 font-black mb-2">Top Prodotti Oggi</p>
+                        <div id="frige-kpi-top" class="text-[11px] text-gray-600 font-bold"></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-gray-100 mb-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="text-xs font-black uppercase text-gray-500">Riconciliazione Pagamenti</h3>
+                            <div class="flex gap-2">
+                                <button data-action="frige-pay-filter" data-filter="pending" id="frige-pay-filter-pending" class="px-3 py-2 rounded-xl text-[10px] font-black uppercase bg-primary text-white">Da verificare</button>
+                                <button data-action="frige-pay-filter" data-filter="paid" id="frige-pay-filter-paid" class="px-3 py-2 rounded-xl text-[10px] font-black uppercase bg-gray-100 text-gray-700">Riconciliati</button>
+                                <button data-action="copy-frige-payments" class="px-3 py-2 rounded-xl text-[10px] font-black uppercase bg-gray-900 text-white">Copia lista</button>
+                            </div>
+                        </div>
+                        <div id="frige-payments-list" class="space-y-3"></div>
+                    </div>
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-xs font-black uppercase text-gray-500">Acquisti Oggi</h3>
+                        <button data-action="copy-frige-summary" class="bg-primary text-white text-[10px] font-black px-4 py-2 rounded-xl uppercase shadow-lg">Copia Riepilogo</button>
+                    </div>
+                    <div id="frige-purchases-list" class="space-y-3"></div>
+                    <div class="flex justify-between items-center mt-8 mb-3">
+                        <h3 class="text-xs font-black uppercase text-gray-500">Rifornimenti Richiesti</h3>
+                    </div>
+                    <div id="frige-refills-list" class="space-y-3"></div>
+                </div>
+            </section>
+
+            <section id="cart-view" class="view">
+                <h2 class="text-2xl font-black mb-6 tracking-tighter section-title">Riepilogo Ordine</h2>
+                <div id="cart-content-wrapper" class="card p-6 rounded-[2rem] mb-4">
+                    <div id="cart-items-list"></div>
+                    <div id="cart-options" class="mt-8 space-y-6 hidden">
+                        <div class="p-5 rounded-3xl bg-orange-50 border border-orange-200 flex items-center gap-4">
+                            <div class="flex-grow text-left">
+                                <p class="font-black text-xs text-primary-800 uppercase mb-1">Bonus Satispay</p>
+                                <p class="text-[11px] text-primary-800 leading-tight">Usa il codice <strong>WEB</strong> per ottenere <strong>5€ di Bonus</strong> al download!</p>
+                            </div>
+                            <img src="https://www.datocms-assets.com/133951/1745419747-qr-code-scarica-app.svg" class="w-14 h-14 bg-white p-1 rounded-xl shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-black text-red-700 uppercase mb-2 tracking-widest">Note / Allergie:</label>
+                            <textarea id="allergies-input" class="w-full p-4 border border-red-100 rounded-2xl bg-red-50/20 outline-none text-sm font-bold shadow-inner"></textarea>
+                        </div>
+                        <div class="flex justify-between items-center bg-gray-50 p-5 rounded-2xl border border-gray-100">
+                            <span class="text-xs font-black uppercase text-gray-500">Servono posate?</span>
+                        <button data-action="toggle-posate" id="posate-btn" class="px-8 py-2 rounded-full font-black text-[11px] bg-gray-200 uppercase transition-all shadow-sm">No</button>
+                        </div>
+                        <div class="flex justify-between items-end border-t pt-6">
+                            <span class="text-gray-400 font-bold text-xs uppercase">Totale</span>
+                            <span id="cart-total-display" class="text-4xl font-black text-primary">€0.00</span>
+                        </div>
+                        <button data-action="send-order" class="w-full btn btn-primary py-5 text-lg">Conferma ordine</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="history-view" class="view">
+                 <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-black tracking-tighter uppercase section-title">Ordini Oggi</h2>
+                    <div class="flex gap-2">
+                        <button id="admin-export-btn" data-action="export-history" class="hidden bg-gray-900 text-white text-[10px] font-black px-4 py-2 rounded-xl uppercase shadow-lg transition-all"><i class="fas fa-file-csv mr-1"></i> Export Storico</button>
+                        <button data-action="copy-daily-summary" class="bg-primary text-white text-[10px] font-black px-4 py-2 rounded-xl uppercase shadow-lg transition-all"><i class="fas fa-copy mr-1"></i> Copia Comanda</button>
+                        <button data-action="copy-kitchen-summary" class="bg-secondary text-white text-[10px] font-black px-4 py-2 rounded-xl uppercase shadow-lg transition-all"><i class="fas fa-list mr-1"></i> Copia Cucina</button>
+                    </div>
+                 </div>
+
+                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6">
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        <div class="bg-gray-50 p-4 rounded-2xl text-center border border-gray-100">
+                            <p class="text-[10px] uppercase text-gray-400 font-black">Da Riconciliare</p>
+                            <p id="orders-kpi-unpaid" class="text-2xl font-black text-primary">0</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-2xl text-center border border-gray-100">
+                            <p class="text-[10px] uppercase text-gray-400 font-black">Importo Da Verificare</p>
+                            <p id="orders-kpi-unpaid-amt" class="text-2xl font-black text-primary">€0.00</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-2xl text-center border border-gray-100">
+                            <p class="text-[10px] uppercase text-gray-400 font-black">Riconciliati Oggi</p>
+                            <p id="orders-kpi-paid" class="text-2xl font-black text-primary">0</p>
+                        </div>
+                    </div>
+                 </div>
+
+                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-xs font-black uppercase text-gray-500">Comanda Cucina (Riepilogo)</h3>
+                        <span id="orders-summary-count" class="text-[10px] text-gray-400 font-bold uppercase"></span>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                            <p class="text-[10px] uppercase text-gray-400 font-black mb-2">Prodotti (Totali)</p>
+                            <div id="orders-summary-products" class="space-y-2 text-[11px]"></div>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                            <p class="text-[10px] uppercase text-gray-400 font-black mb-2">Allergie & Note</p>
+                            <div id="orders-summary-allergies" class="space-y-2 text-[11px]"></div>
+                        </div>
+                    </div>
+                 </div>
+
+                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-xs font-black uppercase text-gray-500">Riconciliazione Ordini</h3>
+                        <div class="flex gap-2">
+                        <button data-action="orders-pay-filter" data-filter="pending" id="orders-pay-filter-pending" class="btn btn-primary text-[10px] px-3 py-2">Da verificare</button>
+                        <button data-action="orders-pay-filter" data-filter="paid" id="orders-pay-filter-paid" class="btn btn-ghost text-[10px] px-3 py-2">Riconciliati</button>
+                        <button data-action="copy-orders-payments" class="btn btn-ghost text-[10px] px-3 py-2">Copia lista</button>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2 mb-3">
+                        <button data-action="orders-time-filter" data-filter="all" id="orders-time-filter-all" class="btn btn-primary text-[10px] px-3 py-2">Tutti</button>
+                        <button data-action="orders-time-filter" data-filter="pre1130" id="orders-time-filter-pre" class="btn btn-ghost text-[10px] px-3 py-2">Entro 11:30</button>
+                        <button data-action="orders-time-filter" data-filter="post1130" id="orders-time-filter-post" class="btn btn-ghost text-[10px] px-3 py-2">Dopo 11:30</button>
+                        <button data-action="orders-select-all" class="ml-auto btn btn-ghost text-[10px] px-3 py-2">Seleziona tutti</button>
+                        <button data-action="orders-reconcile-selected" class="btn btn-primary text-[10px] px-3 py-2">Riconcilia selezionati</button>
+                        <button data-action="orders-export-csv" class="btn btn-ghost text-[10px] px-3 py-2">Export CSV</button>
+                    </div>
+                    <div id="orders-payments-list" class="space-y-3"></div>
+                 </div>
+
+                 <div class="card p-6 rounded-3xl mb-8 flex items-center gap-5">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" class="w-24 h-24 rounded-2xl shadow-sm border border-gray-100">
+                    <div>
+                        <p class="font-black text-xs uppercase text-primary mb-1 tracking-widest">Saldo Alimentari Russo</p>
+                        <p class="text-[10px] leading-tight text-gray-500 mb-3 italic">Pagamento obbligatorio entro le 11:30.</p>
+                        <a href="https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" target="_blank" rel="noopener noreferrer" class="btn btn-ghost text-[10px] px-4 py-2">Apri Satispay</a>
+                    </div>
+                 </div>
+
+                 <div id="all-orders-list" class="space-y-4 pb-32"></div>
+                 <div class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-lg bg-white p-6 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] border-t-4 border-primary flex justify-between items-center z-[60]">
+                     <span class="text-gray-400 font-black text-xs uppercase tracking-widest italic">Incasso Stimato</span>
+                     <span id="grand-total-display" class="text-3xl font-black text-primary tracking-tighter">€0.00</span>
+                 </div>
+            </section>
+
+            <section id="analytics-view" class="view">
+                <div class="print-header hidden items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <img src="https://i.postimg.cc/L6H20zfp/logo-dosepranza-People-About-Food.png?v=20260209" class="w-16 h-16">
+                        <div>
+                            <p class="text-xs font-black uppercase tracking-widest">Board-Ready Report</p>
+                            <p class="text-[10px] text-gray-500">DOSepranza · Analisi Business</p>
+                        </div>
+                    </div>
+                    <div class="text-[10px] text-gray-500">Generato: <span id="print-generated-at"></span></div>
+                </div>
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-black tracking-tighter uppercase section-title">Analisi</h2>
+                    <span id="analytics-updated" class="text-[10px] text-gray-400 font-bold uppercase"></span>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl border border-gray-100 mb-6">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-[10px] font-black uppercase text-gray-500">Periodo</span>
+                        <button data-action="analytics-range" data-range="today" id="analytics-range-today" class="btn btn-primary text-[10px] px-3 py-2">Oggi</button>
+                        <button data-action="analytics-range" data-range="7d" id="analytics-range-7d" class="btn btn-ghost text-[10px] px-3 py-2">7 giorni</button>
+                        <button data-action="analytics-range" data-range="30d" id="analytics-range-30d" class="btn btn-ghost text-[10px] px-3 py-2">30 giorni</button>
+                        <button data-action="analytics-range" data-range="all" id="analytics-range-all" class="btn btn-ghost text-[10px] px-3 py-2">All time</button>
+                        <button data-action="analytics-range" data-range="quarter" id="analytics-range-quarter" class="btn btn-ghost text-[10px] px-3 py-2">Ultimo trimestre</button>
+                        <button data-action="analytics-range" data-range="month" id="analytics-range-month" class="btn btn-ghost text-[10px] px-3 py-2">Ultimo mese</button>
+                        <div class="flex items-center gap-2 ml-auto">
+                            <input id="analytics-start" type="date" class="p-2 rounded-xl border border-gray-200 text-[10px] font-bold outline-none">
+                            <input id="analytics-end" type="date" class="p-2 rounded-xl border border-gray-200 text-[10px] font-bold outline-none">
+                            <button data-action="analytics-range" data-range="custom" class="btn btn-ghost text-[10px] px-3 py-2">Applica</button>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2 mt-3">
+                        <button data-action="analytics-quick" data-quick="peak" class="btn btn-ghost text-[10px] px-3 py-2">Orari di picco</button>
+                        <button data-action="analytics-quick" data-quick="topUsers" class="btn btn-ghost text-[10px] px-3 py-2">Top utenti</button>
+                        <button data-action="analytics-quick" data-quick="topItems" class="btn btn-ghost text-[10px] px-3 py-2">Top prodotti</button>
+                        <button data-action="analytics-export-csv" class="btn btn-ghost text-[10px] px-3 py-2">Export CSV</button>
+                        <button data-action="analytics-export-pdf" class="btn btn-ghost text-[10px] px-3 py-2">Export PDF</button>
+                    </div>
+                    <div id="analytics-insights" class="mt-3 text-[11px] text-gray-600 font-bold"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="card p-4 rounded-2xl">
+                        <p class="text-[10px] uppercase text-gray-400 font-black mb-2">Target vs Actual (Ordini)</p>
+                        <div id="analytics-target-orders" class="text-[11px] text-gray-700 font-bold"></div>
+                    </div>
+                    <div class="card p-4 rounded-2xl">
+                        <p class="text-[10px] uppercase text-gray-400 font-black mb-2">Target vs Actual (Frige)</p>
+                        <div id="analytics-target-frige" class="text-[11px] text-gray-700 font-bold"></div>
+                    </div>
+                    <div class="card p-4 rounded-2xl">
+                        <p class="text-[10px] uppercase text-gray-400 font-black mb-2">Target vs Actual (Incasso)</p>
+                        <div id="analytics-target-revenue" class="text-[11px] text-gray-700 font-bold"></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="card p-4 rounded-2xl">
+                        <div class="flex items-center justify-between mb-2">
+                            <p class="text-[10px] uppercase text-gray-400 font-black">Cruscotto Strategico</p>
+                            <span class="badge">Executive</span>
+                        </div>
+                        <div class="space-y-2 text-[11px] text-gray-700 font-bold">
+                            <div>Indice salute pagamenti: <span id="analytics-pay-health">-</span></div>
+                            <div>Rischio stockout: <span id="analytics-stock-risk">-</span></div>
+                            <div>Adozione interna: <span id="analytics-adoption">-</span></div>
+                        </div>
+                    </div>
+                    <div class="card p-4 rounded-2xl">
+                        <div class="flex items-center justify-between mb-2">
+                            <p class="text-[10px] uppercase text-gray-400 font-black">Alert Operativi</p>
+                            <span class="badge badge-amber"><i class="fas fa-exclamation-triangle"></i>Alert</span>
+                        </div>
+                        <div id="analytics-alerts" class="text-[11px] text-gray-700 font-bold"></div>
+                    </div>
+                    <div class="card p-4 rounded-2xl">
+                        <div class="flex items-center justify-between mb-2">
+                            <p class="text-[10px] uppercase text-gray-400 font-black">Governance</p>
+                            <span class="badge badge-green"><i class="fas fa-check"></i>Compliance</span>
+                        </div>
+                        <div class="space-y-2 text-[11px] text-gray-700 font-bold">
+                            <div>Pagamenti riconciliati: <span id="analytics-pay-rate">-</span></div>
+                            <div>Riconciliazioni aperte: <span id="analytics-pay-open">-</span></div>
+                            <div>Tempo medio riconciliazione: <span id="analytics-recon-avg">-</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                    <div class="card p-4 rounded-2xl text-center tooltip" data-tip="Totale ordini ricevuti oggi">
+                        <p class="text-[10px] uppercase text-gray-400 font-black">Ordini Oggi</p>
+                        <p id="analytics-orders-today" class="text-2xl font-black text-primary">0</p>
+                    </div>
+                    <div class="card p-4 rounded-2xl text-center tooltip" data-tip="Somma totale degli ordini di oggi">
+                        <p class="text-[10px] uppercase text-gray-400 font-black">Incasso Oggi</p>
+                        <p id="analytics-revenue-today" class="text-2xl font-black text-primary">€0.00</p>
+                    </div>
+                    <div class="card p-4 rounded-2xl text-center tooltip" data-tip="Valore medio per ordine di oggi">
+                        <p class="text-[10px] uppercase text-gray-400 font-black">Ticket Medio</p>
+                        <p id="analytics-avg-today" class="text-2xl font-black text-primary">€0.00</p>
+                    </div>
+                    <div class="card p-4 rounded-2xl text-center tooltip" data-tip="Totale ordini nel periodo selezionato">
+                        <p class="text-[10px] uppercase text-gray-400 font-black">Ordini Periodo</p>
+                        <p id="analytics-orders-7d" class="text-2xl font-black text-primary">0</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                    <div class="card p-4 rounded-2xl text-center tooltip" data-tip="Totale acquisti Frige oggi">
+                        <p class="text-[10px] uppercase text-gray-400 font-black">Frige Oggi</p>
+                        <p id="analytics-frige-today" class="text-2xl font-black text-primary">0</p>
+                    </div>
+                    <div class="card p-4 rounded-2xl text-center tooltip" data-tip="Somma acquisti Frige oggi">
+                        <p class="text-[10px] uppercase text-gray-400 font-black">Incasso Frige</p>
+                        <p id="analytics-frige-revenue" class="text-2xl font-black text-primary">€0.00</p>
+                    </div>
+                    <div class="card p-4 rounded-2xl text-center tooltip" data-tip="Pagamenti Frige non riconciliati oggi">
+                        <p class="text-[10px] uppercase text-gray-400 font-black">Da Riconciliare</p>
+                        <p id="analytics-frige-pending" class="text-2xl font-black text-primary">0</p>
+                    </div>
+                    <div class="card p-4 rounded-2xl text-center tooltip" data-tip="Prodotti Frige con scorte basse">
+                        <p class="text-[10px] uppercase text-gray-400 font-black">Prodotti Sotto Soglia</p>
+                        <p id="analytics-frige-low" class="text-2xl font-black text-primary">0</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="card p-4 rounded-2xl">
+                        <p class="text-[10px] uppercase text-gray-400 font-black mb-2">Mix Vendite (Ordini)</p>
+                        <div id="analytics-top-categories" class="text-[11px] text-gray-700 font-bold"></div>
+                    </div>
+                    <div class="card p-4 rounded-2xl">
+                        <p class="text-[10px] uppercase text-gray-400 font-black mb-2">Top Utenti (Periodo)</p>
+                        <div id="analytics-top-users" class="text-[11px] text-gray-700 font-bold"></div>
+                    </div>
+                </div>
+
+                <div class="card p-4 rounded-2xl mb-6">
+                    <p class="text-[10px] uppercase text-gray-400 font-black mb-2">Top Prodotti (Oggi)</p>
+                    <div id="analytics-top-products" class="text-[11px] text-gray-600 font-bold"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="card p-4 rounded-2xl">
+                        <p class="text-[10px] uppercase text-gray-400 font-black mb-2">Ordini per Giorno</p>
+                        <p class="text-[10px] text-gray-400 mb-2" id="analytics-chart-orders-sub"></p>
+                        <div class="flex flex-wrap items-center gap-2 mb-3">
+                            <span class="badge">Risoluzione</span>
+                            <button data-action="chart-resolution" data-chart="orders" data-resolution="daily" id="orders-res-daily" class="btn btn-primary text-[10px] px-3 py-2">Giornaliero</button>
+                            <button data-action="chart-resolution" data-chart="orders" data-resolution="weekly" id="orders-res-weekly" class="btn btn-ghost text-[10px] px-3 py-2">Settimanale</button>
+                            <span class="badge">Target</span>
+                            <input id="orders-target-min" type="number" min="0" class="p-2 rounded-xl border border-gray-200 text-[10px] font-bold w-24" placeholder="min">
+                            <input id="orders-target-max" type="number" min="0" class="p-2 rounded-xl border border-gray-200 text-[10px] font-bold w-24" placeholder="max">
+                            <button data-action="apply-target" data-target="orders" class="btn btn-ghost text-[10px] px-3 py-2">Applica</button>
+                            <button data-action="reset-zoom" class="btn btn-ghost text-[10px] px-3 py-2">Reset zoom</button>
+                        </div>
+                        <div class="chart-scroll">
+                            <canvas id="analytics-chart-orders" height="220"></canvas>
+                        </div>
+                    </div>
+                    <div class="card p-4 rounded-2xl">
+                        <p class="text-[10px] uppercase text-gray-400 font-black mb-2">Frige per Giorno</p>
+                        <p class="text-[10px] text-gray-400 mb-2" id="analytics-chart-frige-sub"></p>
+                        <div class="flex flex-wrap items-center gap-2 mb-3">
+                            <span class="badge">Risoluzione</span>
+                            <button data-action="chart-resolution" data-chart="frige" data-resolution="daily" id="frige-res-daily" class="btn btn-primary text-[10px] px-3 py-2">Giornaliero</button>
+                            <button data-action="chart-resolution" data-chart="frige" data-resolution="weekly" id="frige-res-weekly" class="btn btn-ghost text-[10px] px-3 py-2">Settimanale</button>
+                            <span class="badge">Target</span>
+                            <input id="frige-target-min" type="number" min="0" class="p-2 rounded-xl border border-gray-200 text-[10px] font-bold w-24" placeholder="min">
+                            <input id="frige-target-max" type="number" min="0" class="p-2 rounded-xl border border-gray-200 text-[10px] font-bold w-24" placeholder="max">
+                            <button data-action="apply-target" data-target="frige" class="btn btn-ghost text-[10px] px-3 py-2">Applica</button>
+                        </div>
+                        <div class="chart-scroll">
+                            <canvas id="analytics-chart-frige" height="220"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="card p-4 rounded-2xl">
+                        <p class="text-[10px] uppercase text-gray-400 font-black mb-2">Incasso per Giorno</p>
+                        <p class="text-[10px] text-gray-400 mb-2" id="analytics-chart-revenue-sub"></p>
+                        <div class="chart-scroll">
+                            <canvas id="analytics-chart-revenue" height="220"></canvas>
+                        </div>
+                    </div>
+                    <div class="card p-4 rounded-2xl">
+                        <p class="text-[10px] uppercase text-gray-400 font-black mb-2">Mix Vendite (Periodo)</p>
+                        <div id="analytics-mix-bars" class="space-y-2"></div>
+                        <p class="text-[10px] uppercase text-gray-400 font-black mt-4 mb-2">Slow Movers</p>
+                        <div id="analytics-slow-movers" class="text-[11px] text-gray-700 font-bold"></div>
+                        <p class="text-[10px] uppercase text-gray-400 font-black mt-4 mb-2">Forecast 4 settimane</p>
+                        <div id="analytics-forecast" class="text-[11px] text-gray-700 font-bold"></div>
+                    </div>
+                </div>
+
+                <div class="card p-4 rounded-2xl mb-6">
+                    <p class="text-[10px] uppercase text-gray-400 font-black mb-2">Dati di Sistema</p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-[11px] text-gray-600 font-bold">
+                        <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">Menu attivi: <span id="analytics-menu-count">0</span></div>
+                        <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">Prodotti Frige: <span id="analytics-frige-count">0</span></div>
+                        <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">Rifornimenti aperti: <span id="analytics-refills-open">0</span></div>
+                        <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">Pagamenti ordini pendenti: <span id="analytics-orders-pending">0</span></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="user-modal" class="fixed inset-0 bg-gray-900/90 backdrop-blur-md flex items-center justify-center z-[100] hidden p-4">
+        <div class="bg-white p-10 rounded-[3.5rem] shadow-2xl w-full max-w-sm text-center border border-white/20">
+            <h3 class="text-2xl font-black mb-2 uppercase tracking-tighter text-primary italic">Dosemagna</h3>
+            <p class="text-[10px] text-gray-400 mb-8 font-bold uppercase tracking-widest">Identificati per ordinare</p>
+            <input type="text" id="user-name-input" placeholder="Nome e Cognome" class="w-full p-5 border-2 border-gray-100 rounded-3xl mb-3 outline-none focus:border-primary text-center font-bold text-lg shadow-inner">
+            <input type="email" id="user-email-input" placeholder="La tua email" class="w-full p-5 border-2 border-gray-100 rounded-3xl mb-10 outline-none focus:border-primary text-center font-bold text-sm shadow-inner">
+            <button data-action="save-user" class="w-full bg-primary text-white font-black py-5 rounded-3xl shadow-lg uppercase tracking-widest active:scale-95 transition-all text-sm">Entra nell'App</button>
+        </div>
+    </div>
+
+    <div id="frige-modal" class="fixed inset-0 bg-gray-900/90 backdrop-blur-md flex items-center justify-center z-[100] hidden p-4">
+        <div class="bg-white p-8 rounded-[2.5rem] shadow-2xl w-full max-w-sm text-center border border-white/20">
+            <h3 class="text-xl font-black mb-2 uppercase tracking-tighter text-primary">Conferma Pagamento</h3>
+            <p class="text-[11px] text-gray-500 mb-4">Paga con Satispay e conferma qui.</p>
+            <div class="bg-gray-50 rounded-2xl p-4 text-left mb-4">
+                <p id="frige-modal-product" class="font-black text-sm"></p>
+                <p id="frige-modal-price" class="text-primary font-black text-lg"></p>
+            </div>
+            <label class="flex items-center gap-2 text-[11px] font-bold text-gray-600 mb-4">
+                <input id="frige-paid-check" type="checkbox" class="h-4 w-4">
+                Ho effettuato il pagamento con Satispay.
+            </label>
+            <div class="flex gap-2">
+                <button data-action="close-frige-modal" class="flex-1 btn btn-ghost text-[11px] py-3">Annulla</button>
+                <button data-action="confirm-frige" id="frige-confirm-btn" class="flex-1 btn btn-primary text-[11px] py-3" disabled>Conferma</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="order-confirm-modal" class="fixed inset-0 bg-gray-900/90 backdrop-blur-md flex items-center justify-center z-[100] hidden p-4">
+        <div class="bg-white p-8 rounded-[2.5rem] shadow-2xl w-full max-w-md text-center border border-white/20">
+            <h3 class="text-xl font-black mb-2 uppercase tracking-tighter text-primary">Ordine Confermato</h3>
+            <p class="text-[11px] text-gray-500 mb-4">Riceverai una notifica appena il ristoratore lo prende in carico.</p>
+            <div class="bg-gray-50 rounded-2xl p-4 text-left mb-4">
+                <p class="text-[10px] text-gray-400 uppercase font-bold mb-2">Riepilogo</p>
+                <div id="order-confirm-summary" class="text-[11px] font-bold text-gray-700"></div>
+            </div>
+            <div class="flex gap-2">
+                <button data-action="close-order-confirm" class="flex-1 btn btn-ghost text-[11px] py-3">Chiudi</button>
+                <button data-action="copy-order-confirm" class="flex-1 btn btn-primary text-[11px] py-3">Copia</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white py-4 px-8 rounded-full shadow-2xl z-[200] opacity-0 transition-all duration-300 pointer-events-none scale-90 text-[10px] font-black uppercase text-center tracking-widest">
+        <p id="toast-message"></p>
+    </div>
+
+    <script type="module" src="sw-killer.js?v=20260210"></script>
+    <script type="module" src="app.v20260210.js?v=1"></script>
+
+</body>
+</html>
