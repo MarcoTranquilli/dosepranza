@@ -1,0 +1,78 @@
+:root {
+            --brand-ink: #2f3327;
+            --brand-cream: #f3f1e7;
+            --brand-sand: #efe6da;
+            --brand-accent: #d6804f;
+            --brand-accent-dark: #b8683f;
+            --brand-forest: #587b57;
+            --brand-rose: #e6c1ae;
+        }
+        body {
+            background: radial-gradient(1400px 900px at 15% -10%, #fbf3ec 0%, #f3f1e7 55%, #edf2ea 100%);
+            background-attachment: fixed;
+            color: var(--brand-ink);
+        }
+        header img { filter: drop-shadow(0 12px 24px rgba(45, 40, 30, 0.12)); }
+        nav { box-shadow: 0 10px 28px rgba(60,45,20,0.12); border: 1px solid rgba(214, 200, 175, 0.55); }
+        .view { display: none; }
+        .view.active { display: block; animation: fadeUp .35s ease; }
+        .product-title { min-height: 2.8rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .ingredient-card.selected { border-color: #D6804F; background-color: #fef4ef; border-width: 3px; }
+        .nav-btn { background: rgba(255,255,255,0.9); border: 1px solid rgba(214, 200, 175, 0.7); }
+        .nav-btn.active { background: linear-gradient(135deg, #D6804F, #c0673a); color: white; box-shadow: 0 12px 26px rgba(208,128,79,0.28); }
+        .glass { background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.7); box-shadow: 0 12px 26px rgba(50,40,20,0.08); }
+        .card { background: rgba(255,255,255,0.95); border: 1px solid rgba(222, 212, 192, 0.65); box-shadow: 0 12px 28px rgba(50,40,20,0.1); transition: transform .2s ease, box-shadow .2s ease; }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 18px 32px rgba(50,40,20,0.14); }
+        .section-title { font-family: 'Fraunces', serif; letter-spacing: -0.02em; }
+        h1, h2, h3, .section-title { text-rendering: optimizeLegibility; }
+        h2.section-title { font-size: clamp(1.6rem, 2vw, 2.1rem); }
+        h3 { font-size: 1.05rem; }
+        .muted { color: #7b8072; }
+        .muted { color: #7b8072; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; border-radius: 16px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; transition: transform .12s ease, box-shadow .2s ease, background .2s ease; }
+        .btn-lg { padding: .9rem 1.4rem; font-size: 12px; }
+        .btn-primary { background: linear-gradient(135deg, var(--brand-accent), var(--brand-accent-dark)); color: #fff; box-shadow: 0 12px 24px rgba(208,128,79,0.25); }
+        .btn-secondary { background: linear-gradient(135deg, #6a8e5c, var(--brand-forest)); color: #fff; box-shadow: 0 12px 24px rgba(88,123,87,0.25); }
+        .btn-ghost { background: #f4efe6; color: #5b5f50; border: 1px solid #e3dccf; }
+        .btn:active { transform: scale(0.98); }
+        .btn-primary:hover { box-shadow: 0 16px 32px rgba(208,128,79,0.3); }
+        .btn-secondary:hover { box-shadow: 0 16px 32px rgba(88,123,87,0.3); }
+        input, select, textarea { border-radius: 16px; }
+        input:focus, select:focus, textarea:focus { outline: 2px solid rgba(214,128,79,0.35); outline-offset: 2px; }
+        .badge { background: #f7efe6; color: #8c502f; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; padding: .35rem .6rem; border-radius: 999px; font-size: 10px; display: inline-flex; align-items: center; gap: .35rem; }
+        .kpi-card { background: #f8f5ef; border: 1px solid #efe6d8; border-radius: 18px; padding: 1rem; text-align: center; }
+        .kpi-value { font-size: 1.6rem; font-weight: 800; color: var(--brand-accent); }
+        .badge-green { background: #e7f5ea; color: #2f6b3a; }
+        .badge-red { background: #fdeaea; color: #9b2c2c; }
+        .badge-amber { background: #fff4e5; color: #8a5a12; }
+        /* Fallback colors if Tailwind custom palette isn't applied */
+        .bg-primary { background-color: var(--brand-accent) !important; }
+        .bg-primary-100 { background-color: #fef4ef !important; }
+        .text-primary { color: var(--brand-accent) !important; }
+        .text-primary-800 { color: #8c502f !important; }
+        .border-primary { border-color: var(--brand-accent) !important; }
+        .bg-secondary { background-color: var(--brand-forest) !important; }
+        .text-secondary { color: var(--brand-forest) !important; }
+        .chip { display: inline-flex; align-items: center; gap: .35rem; padding: .35rem .6rem; border-radius: 999px; font-size: 10px; font-weight: 700; background: #f5efe5; color: #6a5642; border: 1px solid #eadfce; }
+        .chip-quiet { background: #f8f6f2; color: #7a6f61; border-color: #efe6d8; }
+        .card-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: .6rem; }
+        .card-meta { display: flex; flex-wrap: wrap; gap: .4rem; }
+        .tooltip { position: relative; cursor: help; }
+        .tooltip[data-tip]:hover::after { content: attr(data-tip); position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(100% + 8px); background: #1f2a1f; color: #fff; padding: .4rem .6rem; border-radius: .6rem; font-size: 10px; white-space: nowrap; box-shadow: 0 10px 20px rgba(0,0,0,.2); z-index: 50; }
+        .chart-scroll { overflow-x: auto; padding-bottom: 6px; }
+        .chart-scroll canvas { min-width: 520px; }
+        .toast-show { opacity: 1 !important; transform: translateX(-50%) scale(1) !important; }
+        .compact .card { padding: .75rem !important; border-radius: 1rem !important; }
+        .compact .section-title { font-size: 1.1rem !important; }
+        .compact .nav-btn { font-size: 9px !important; padding: .4rem !important; }
+        .compact .btn { padding: .5rem .7rem !important; font-size: 10px !important; }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        @media print {
+            body { background: #fff !important; }
+            nav, #toast, #user-modal, #frige-modal, .btn { display: none !important; }
+            .print-mode .chart-scroll { display: block !important; }
+            .print-mode .chart-scroll canvas { min-width: 100% !important; }
+            .card { box-shadow: none !important; border: 1px solid #e5e7eb !important; }
+            .print-header { display: flex !important; }
+        }

@@ -1,0 +1,42 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isRole(role) {
+      return isSignedIn() && request.auth.token.role == role;
+    }
+    function isStaff() {
+      return isSignedIn() && (request.auth.token.role in ['admin','ristoratore','facility']);
+    }
+
+    // Ordini: lettura staff, scrittura utenti autenticati
+    match /orders/{doc} {
+      allow read: if isStaff();
+      allow create: if isSignedIn();
+      allow update: if isStaff();
+      allow delete: if isRole('admin');
+    }
+
+    // Frige: lettura staff, scrittura staff
+    match /frige_products/{doc} {
+      allow read: if isStaff();
+      allow write: if isStaff();
+    }
+    match /frige_purchases/{doc} {
+      allow read: if isStaff();
+      allow create: if isSignedIn();
+      allow update: if isStaff();
+    }
+    match /frige_refills/{doc} {
+      allow read, write: if isStaff();
+    }
+
+    // Disponibilità menu: solo admin/ristoratore scrivono
+    match /menu_products/{doc} {
+      allow read: if isSignedIn();
+      allow write: if isRole('admin') || isRole('ristoratore');
+    }
+  }
+}

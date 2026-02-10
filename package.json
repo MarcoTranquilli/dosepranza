@@ -1,0 +1,22 @@
+{
+  "name": "dosepranza-frige-mvp",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "test:uat": "playwright test",
+    "test:uat:headed": "playwright test --headed",
+    "report:pdf": "node scripts/render_report_pdf.mjs",
+    "build:css": "tailwindcss -c tailwind.config.cjs -i tailwind.input.css -o tailwind.output.css --minify"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.50.0"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^7.0.0",
+    "@aws-sdk/client-s3": "^3.637.0",
+    "firebase-admin": "^12.5.0",
+    "form-data": "^4.0.0",
+    "node-fetch": "^3.3.2"
+  }
+}
