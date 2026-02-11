@@ -163,6 +163,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             menuAudit: [],
             menuAuditFilter: 'all',
             pendingOrder: null,
+            e2eNavDone: false,
             analytics: { ordersAll: [], frigeAll: [], frigeProducts: [], refillsOpen: [], unsub: {}, range: 'today', lastPreset: 'today', resolution: { orders: 'daily', frige: 'daily' }, targets: { orders: { min: null, max: null }, frige: { min: null, max: null } }, chartData: {}, zoom: { orders: null, frige: null } },
             subs: { orders: null, frige: null, menu: null, myOrders: null, custom: null, menuAudit: null },
             role: 'user',
@@ -2761,6 +2762,10 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(isAdmin() || isRistoratore()) syncMenuAudit();
             renderDailySummaryInline();
             updateInvalidOrdersUI();
+            if(isLocalE2E && !state.e2eNavDone && (state.role === 'ristoratore' || state.role === 'admin')) {
+                state.e2eNavDone = true;
+                window.navigate('history');
+            }
         }
 
         // --- INIT ---
