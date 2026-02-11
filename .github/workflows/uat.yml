@@ -3,11 +3,10 @@ name: UAT Playwright
 on:
   push:
     branches: ["main"]
-  pull_request:
+  pull_request: {}
+  workflow_dispatch: {}
 
-permissions:
-  contents: read
-  actions: read
+permissions: read-all
 
 jobs:
   uat:
