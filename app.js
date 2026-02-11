@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addDoc, serverTimestamp, query, orderBy, getDocs, runTransaction, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addDoc, serverTimestamp, query, orderBy, getDocs, runTransaction, doc, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- DATABASE PRODOTTI COMPLETO ---
         const DIETS_CONFIG = { "carne/pesce": "🥩 Carne/Pesce", "vegetariano": "🧀 Vegetariano", "vegano": "🌱 Vegano" };
@@ -159,7 +159,7 @@ import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signO
             ordersTimeFilter: 'all',
             ordersSelected: {},
             analytics: { ordersAll: [], frigeAll: [], frigeProducts: [], refillsOpen: [], unsub: {}, range: 'today', lastPreset: 'today', resolution: { orders: 'daily', frige: 'daily' }, targets: { orders: { min: null, max: null }, frige: { min: null, max: null } }, chartData: {}, zoom: { orders: null, frige: null } },
-            subs: { orders: null, frige: null, menu: null },
+            subs: { orders: null, frige: null, menu: null, myOrders: null },
             role: 'user'
         };
         const LOW_STOCK_THRESHOLD = 2;
@@ -514,6 +514,7 @@ import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signO
                     posate: state.posate ? 'Si' : 'No',
                     paymentStatus: "pending",
                     reconciled: false,
+                    orderStatus: "ricevuto",
                     createdAt: serverTimestamp() 
                 });
                 const summary = buildOrderConfirmSummary(docRef.id, state.cart, total);
@@ -1053,6 +1054,7 @@ import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signO
                     </div>
                 `;
                 opts.classList.add('hidden');
+                renderMyOrderStatus();
                 return;
             }
             opts.classList.remove('hidden');
@@ -1062,6 +1064,56 @@ import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signO
                 <button data-action="remove-from-cart" data-id="${i.cartId}" class="text-red-300 p-2"><i class="fas fa-trash-alt"></i></button>
             </div>`).join('');
             document.getElementById('cart-total-display').textContent = formatCurrency(tot);
+            renderMyOrderStatus();
+        }
+
+        function syncMyOrders() {
+            if(!state.user?.email || state.subs.myOrders) return;
+            state.subs.myOrders = onSnapshot(
+                query(ordersCol, where("email", "==", state.user.email), orderBy("createdAt", "desc")),
+                snap => {
+                    state.myOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    renderMyOrderStatus();
+                },
+                () => {
+                    state.subs.myOrders = null;
+                    onSnapshot(query(ordersCol, orderBy("createdAt", "desc")), snap => {
+                        state.myOrders = snap.docs
+                            .map(d => ({ id: d.id, ...d.data() }))
+                            .filter(o => o.email === state.user.email);
+                        renderMyOrderStatus();
+                    });
+                }
+            );
+        }
+
+        function renderMyOrderStatus() {
+            const el = document.getElementById('my-order-status');
+            if(!el) return;
+            if(!state.user) {
+                el.innerHTML = `<div class="text-[11px] text-gray-500 font-bold">Accedi per vedere lo stato del tuo ordine.</div>`;
+                return;
+            }
+            const orders = (state.myOrders || []).filter(o => o.items && o.items.length > 0);
+            if(!orders.length) {
+                el.innerHTML = `<div class="text-[11px] text-gray-500 font-bold">Nessun ordine inviato oggi.</div>`;
+                return;
+            }
+            const latest = orders[0];
+            const paid = latest.paymentStatus === "paid";
+            const status = latest.orderStatus || "ricevuto";
+            const time = latest.createdAt ? formatTime(latest.createdAt) : '--:--';
+            const items = (latest.items || []).map(i => `${i.name}${i.details ? ` (${i.details})` : ''}`).join(' • ');
+            el.innerHTML = `
+                <div class="bg-white p-4 rounded-2xl border border-gray-100">
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="text-[10px] uppercase text-gray-400 font-black">Il tuo ultimo ordine</p>
+                        <span class="badge ${paid ? 'badge-green' : 'badge-amber'}">${paid ? 'Pagato' : 'Da verificare'}</span>
+                    </div>
+                    <p class="text-[12px] font-black mb-1">${esc(items)}</p>
+                    <div class="text-[11px] text-gray-500 font-bold">Ore ${time} · Stato: ${status}</div>
+                </div>
+            `;
         }
 
         const formatTime = (ts) => {
@@ -2178,6 +2230,7 @@ import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signO
                 localStorage.setItem('dose_user', JSON.stringify(state.user));
                 document.getElementById('user-modal').classList.add('hidden');
                 await setRole(email);
+                syncMyOrders();
             } else {
                 document.getElementById('user-modal').classList.remove('hidden');
             }
