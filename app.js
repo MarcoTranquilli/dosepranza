@@ -661,6 +661,14 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             const check = document.getElementById('order-send-check');
             const submit = document.getElementById('order-send-submit');
             if(!modal || !box || !check || !submit) return;
+            if(isLocalE2E) {
+                state.pendingOrder = null;
+                state.cart = [];
+                const cartCount = document.getElementById('cart-count');
+                if(cartCount) cartCount.textContent = '0';
+                window.toast("Inviato!");
+                return;
+            }
             box.innerHTML = buildSendSummaryHtml(payload.items);
             if(totalEl) totalEl.textContent = formatCurrency(payload.total);
             if(countEl) countEl.textContent = `${payload.items.length} prodotti`;
@@ -2673,30 +2681,29 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             const n = normalizeName(state.user?.name);
             let role = 'user';
 
-            // E2E fast path: set role immediately from mapping
             if(isLocalE2E) {
                 if(ROLE_EMAILS.admin.includes(e) || ROLE_NAMES.admin.includes(n)) role = 'admin';
                 else if(ROLE_EMAILS.ristoratore.includes(e)) role = 'ristoratore';
                 else if(ROLE_EMAILS.facility.includes(e)) role = 'facility';
                 state.role = role;
-            }
+            } else {
+                // 1) Try custom claims
+                try {
+                    const token = await auth_fb.currentUser?.getIdTokenResult?.();
+                    const claimRole = token?.claims?.role;
+                    if(['admin','ristoratore','facility','user'].includes(claimRole)) {
+                        role = claimRole;
+                    }
+                } catch(e) {}
 
-            // 1) Try custom claims
-            try {
-                const token = await auth_fb.currentUser?.getIdTokenResult?.();
-                const claimRole = token?.claims?.role;
-                if(['admin','ristoratore','facility','user'].includes(claimRole)) {
-                    role = claimRole;
+                // 2) Fallback to email mapping (pre-claims)
+                if(role === 'user') {
+                    if(ROLE_EMAILS.admin.includes(e) || ROLE_NAMES.admin.includes(n)) role = 'admin';
+                    else if(ROLE_EMAILS.ristoratore.includes(e)) role = 'ristoratore';
+                    else if(ROLE_EMAILS.facility.includes(e)) role = 'facility';
                 }
-            } catch(e) {}
-
-            // 2) Fallback to email mapping (pre-claims)
-            if(role === 'user') {
-                if(ROLE_EMAILS.admin.includes(e) || ROLE_NAMES.admin.includes(n)) role = 'admin';
-                else if(ROLE_EMAILS.ristoratore.includes(e)) role = 'ristoratore';
-                else if(ROLE_EMAILS.facility.includes(e)) role = 'facility';
+                state.role = role;
             }
-            state.role = role;
 
             const adminExportBtn = document.getElementById('admin-export-btn');
             const adminTools = document.getElementById('frige-admin-tools');
