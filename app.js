@@ -161,6 +161,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             ordersTimeFilter: 'all',
             ordersSelected: {},
             menuAudit: [],
+            menuAuditFilter: 'all',
             analytics: { ordersAll: [], frigeAll: [], frigeProducts: [], refillsOpen: [], unsub: {}, range: 'today', lastPreset: 'today', resolution: { orders: 'daily', frige: 'daily' }, targets: { orders: { min: null, max: null }, frige: { min: null, max: null } }, chartData: {}, zoom: { orders: null, frige: null } },
             subs: { orders: null, frige: null, menu: null, myOrders: null, custom: null, menuAudit: null },
             role: 'user',
@@ -174,7 +175,8 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             try {
                 const host = window.location.hostname;
                 const params = new URLSearchParams(window.location.search);
-                return (host === '127.0.0.1' || host === 'localhost') && params.get('e2e') === '1';
+                const flag = localStorage.getItem('dose_e2e');
+                return (host === '127.0.0.1' || host === 'localhost') && (params.get('e2e') === '1' || flag === '1');
             } catch(e) {
                 return false;
             }
@@ -1298,12 +1300,25 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
 
         function renderMenuAudit() {
             const list = document.getElementById('menu-audit-list');
+            const last = document.getElementById('menu-audit-last');
             if(!list) return;
-            if(!state.menuAudit.length) {
+            const items = filterMenuAudit(state.menuAudit || []);
+            if(last) {
+                if(state.menuAudit && state.menuAudit.length) {
+                    const a = state.menuAudit[0];
+                    const when = a.createdAt ? formatTime(a.createdAt) : '--:--';
+                    const who = a.actorEmail || 'utente';
+                    const what = a.payload?.name || a.payload?.key || '—';
+                    last.textContent = `${what} · ${who} · ${when}`;
+                } else {
+                    last.textContent = 'Nessuna modifica recente';
+                }
+            }
+            if(!items.length) {
                 list.innerHTML = `<div class="text-[11px] text-gray-500 font-bold">Nessuna attività recente.</div>`;
                 return;
             }
-            list.innerHTML = state.menuAudit.map(a => {
+            list.innerHTML = items.map(a => {
                 const when = a.createdAt ? formatTime(a.createdAt) : '--:--';
                 const actor = a.actorEmail || 'utente';
                 const action = (a.action || '').toUpperCase();
@@ -1323,6 +1338,50 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 `;
             }).join('');
         }
+
+        function filterMenuAudit(items) {
+            const f = state.menuAuditFilter;
+            if(f === 'all') return items;
+            if(f === 'price') return items.filter(i => i.action === 'price');
+            if(f === 'availability') return items.filter(i => i.action === 'availability');
+            if(f === 'create') return items.filter(i => i.action === 'create');
+            if(f === 'update') return items.filter(i => i.action === 'update');
+            return items;
+        }
+
+        window.setMenuAuditFilter = (filter) => {
+            state.menuAuditFilter = filter;
+            ['all','price','availability','create','update'].forEach(f => {
+                const btn = document.getElementById(`menu-audit-filter-${f}`);
+                if(!btn) return;
+                btn.classList.toggle('btn-primary', filter === f);
+                btn.classList.toggle('btn-ghost', filter !== f);
+            });
+            renderMenuAudit();
+        };
+
+        window.exportMenuAudit = async () => {
+            try {
+                const snap = await getDocs(query(menuAuditCol, orderBy("createdAt", "desc"), limit(200)));
+                const fmt = (n) => {
+                    if(n === null || n === undefined || n === '') return '';
+                    const num = Number(n);
+                    if(Number.isNaN(num)) return '';
+                    return num.toLocaleString('it-IT', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+                };
+                let csv = "Timestamp;Azione;Prodotto;Categoria;Prezzo;Attivo;Utente;Ruolo\n";
+                snap.forEach(d => {
+                    const a = d.data();
+                    const ts = a.createdAt?.toDate();
+                    csv += `${ts ? ts.toLocaleString() : ''};${a.action || ''};${a.payload?.name || ''};${a.payload?.cat || ''};${fmt(a.payload?.price)};${typeof a.payload?.isActive === 'boolean' ? (a.payload.isActive ? 'Si' : 'No') : ''};${a.actorEmail || ''};${a.actorRole || ''}\n`;
+                });
+                const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "Audit_Menu.csv"; link.click();
+            } catch(e) {
+                console.warn('menu audit export failed', e);
+                window.toast("Errore export audit");
+            }
+        };
 
         window.voteCreation = async (id) => {
             if(!state.user) return window.toast("Accedi per votare");
@@ -2493,6 +2552,8 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             'menu-update-price': (el) => window.updateMenuPrice(el.dataset.key),
             'refresh-menu-admin': () => window.renderMenuAdmin(),
             'toggle-menu-admin': () => window.toggleMenuAdmin(),
+            'menu-audit-filter': (el) => window.setMenuAuditFilter(el.dataset.filter),
+            'menu-audit-export': () => window.exportMenuAudit(),
             'remove-from-cart': (el) => window.removeFromCart(Number(el.dataset.id)),
             'custom-vote': (el) => window.voteCreation(el.dataset.id),
             'custom-filter': (el) => window.setCustomFilter(el.dataset.filter),

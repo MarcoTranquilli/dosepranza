@@ -92,7 +92,21 @@
                     </datalist>
                     <div id="menu-admin-list" class="space-y-2"></div>
                     <div class="mt-4">
-                        <h4 class="text-xs font-black uppercase text-gray-500 mb-2">Ultime attività</h4>
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                            <h4 class="text-xs font-black uppercase text-gray-500">Ultime attività</h4>
+                            <button data-action="menu-audit-export" class="btn btn-ghost text-[10px] px-3 py-2">Export Audit</button>
+                        </div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="badge">Ultima modifica</span>
+                            <span id="menu-audit-last" class="text-[11px] text-gray-600 font-bold">-</span>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2 mb-3">
+                            <button data-action="menu-audit-filter" data-filter="all" id="menu-audit-filter-all" class="btn btn-primary text-[10px] px-3 py-2">Tutte</button>
+                            <button data-action="menu-audit-filter" data-filter="price" id="menu-audit-filter-price" class="btn btn-ghost text-[10px] px-3 py-2">Prezzi</button>
+                            <button data-action="menu-audit-filter" data-filter="availability" id="menu-audit-filter-availability" class="btn btn-ghost text-[10px] px-3 py-2">Disponibilità</button>
+                            <button data-action="menu-audit-filter" data-filter="create" id="menu-audit-filter-create" class="btn btn-ghost text-[10px] px-3 py-2">Nuovi</button>
+                            <button data-action="menu-audit-filter" data-filter="update" id="menu-audit-filter-update" class="btn btn-ghost text-[10px] px-3 py-2">Aggiornamenti</button>
+                        </div>
                         <div id="menu-audit-list" class="space-y-2"></div>
                     </div>
                 </div>

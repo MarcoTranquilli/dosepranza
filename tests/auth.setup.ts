@@ -12,6 +12,7 @@ async function loginAndSave(page: any, name: string, email: string, storagePath:
   await page.evaluate(() => localStorage.removeItem('dose_user'));
   await page.evaluate((payload) => {
     localStorage.setItem('dose_user', JSON.stringify(payload));
+    localStorage.setItem('dose_e2e', '1');
   }, { name, email });
   await page.reload();
   await page.waitForTimeout(200);
