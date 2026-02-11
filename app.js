@@ -155,11 +155,13 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             custom: { base: null, subtype: null, ings: [], total: 3.5 },
             ordersToday: [], menuData: [], menuExtras: [], menuOverrides: new Map(), disabledProducts: new Set(),
             frige: { products: [], purchasesToday: [], refillsToday: [], selected: null, filter: 'all', paymentFilter: 'pending' },
+            customCreations: [],
+            customFilter: 'all',
             ordersPaymentFilter: 'pending',
             ordersTimeFilter: 'all',
             ordersSelected: {},
             analytics: { ordersAll: [], frigeAll: [], frigeProducts: [], refillsOpen: [], unsub: {}, range: 'today', lastPreset: 'today', resolution: { orders: 'daily', frige: 'daily' }, targets: { orders: { min: null, max: null }, frige: { min: null, max: null } }, chartData: {}, zoom: { orders: null, frige: null } },
-            subs: { orders: null, frige: null, menu: null, myOrders: null },
+            subs: { orders: null, frige: null, menu: null, myOrders: null, custom: null },
             role: 'user'
         };
         const LOW_STOCK_THRESHOLD = 2;
@@ -183,6 +185,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         const frigePurchasesCol = collection(db_fb, "frige_purchases");
         const frigeRefillsCol = collection(db_fb, "frige_refills");
         const menuProductsCol = collection(db_fb, "menu_products");
+        const customCreationsCol = collection(db_fb, "custom_creations");
 
         // --- GLOBAL WINDOW FUNCTIONS ---
         window.onerror = (message, source, lineno, colno) => {
@@ -312,11 +315,41 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(!c.subtype || c.ings.length === 0) return window.toast("Scegli gli ingredienti!");
             state.cart.push({ name: `${c.base} (${c.subtype})`, price: c.total, cat: 'Crea', details: c.ings.map(i=>i.name).join(', '), cartId: Date.now() });
             document.getElementById('cart-count').textContent = state.cart.length;
+            const saveToggle = document.getElementById('custom-save-toggle');
+            const customName = (document.getElementById('custom-name-input')?.value || '').trim();
+            if(saveToggle?.checked && customName) {
+                saveCustomCreation(customName);
+            }
             state.custom = { base:null, subtype:null, ings:[], total:3.5 };
             document.getElementById('custom-subtype-container').classList.add('hidden');
             document.getElementById('custom-ingredients-container').classList.add('hidden');
             window.navigate('menu');
         };
+
+        async function saveCustomCreation(name) {
+            if(!state.user) return;
+            const c = state.custom;
+            const payload = {
+                name,
+                type: c.base,
+                subtype: c.subtype,
+                ingredients: c.ings.map(i => i.name),
+                ownerEmail: state.user.email,
+                ownerName: state.user.name,
+                votes: 0,
+                voters: {},
+                createdAt: serverTimestamp()
+            };
+            try {
+                await addDoc(customCreationsCol, payload);
+                window.toast("Creato nello storico");
+                const input = document.getElementById('custom-name-input');
+                if(input) input.value = '';
+            } catch(e) {
+                console.warn('save custom creation failed', e);
+                window.toast("Errore salvataggio creazione");
+            }
+        }
 
         window.toggleProductAvailability = async (id) => {
             if(!(isAdmin() || isRistoratore())) return;
@@ -1164,6 +1197,87 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 renderMenu();
                 renderMenuAdmin();
             });
+        }
+
+        function syncCustomCreations() {
+            if(state.subs.custom) return;
+            state.subs.custom = onSnapshot(query(customCreationsCol, orderBy("createdAt", "desc")), snap => {
+                state.customCreations = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderCustomCreations();
+            });
+        }
+
+        window.voteCreation = async (id) => {
+            if(!state.user) return window.toast("Accedi per votare");
+            try {
+                await runTransaction(db_fb, async (tx) => {
+                    const ref = doc(db_fb, "custom_creations", id);
+                    const snap = await tx.get(ref);
+                    if(!snap.exists()) return;
+                    const data = snap.data();
+                    const voters = data.voters || {};
+                    if(voters[state.user.email]) return;
+                    if(data.ownerEmail === state.user.email) return;
+                    voters[state.user.email] = true;
+                    const votes = (data.votes || 0) + 1;
+                    tx.update(ref, { voters, votes, updatedAt: serverTimestamp() });
+                });
+            } catch(e) {
+                console.warn('vote failed', e);
+                window.toast("Errore voto");
+            }
+        };
+
+        window.setCustomFilter = (filter) => {
+            state.customFilter = filter;
+            ['all','Panino','Pizza Ripiena'].forEach(f => {
+                const btn = document.getElementById(`custom-filter-${f === 'all' ? 'all' : (f === 'Panino' ? 'panino' : 'pizza')}`);
+                if(btn) btn.classList.toggle('btn-primary', filter === f);
+                if(btn) btn.classList.toggle('btn-ghost', filter !== f);
+            });
+            renderCustomCreations();
+        };
+
+        function renderCustomCreations() {
+            const list = document.getElementById('custom-history-list');
+            const topMonth = document.getElementById('custom-top-month');
+            const topAll = document.getElementById('custom-top-all');
+            if(!list || !topMonth || !topAll) return;
+            const filter = state.customFilter;
+            const data = state.customCreations || [];
+            const filtered = filter === 'all' ? data : data.filter(c => c.type === filter);
+            const now = new Date();
+            const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+            const monthItems = filtered.filter(c => c.createdAt && c.createdAt.toDate && c.createdAt.toDate() >= monthStart);
+            const topM = [...monthItems].sort((a,b) => (b.votes||0) - (a.votes||0))[0];
+            const topA = [...filtered].sort((a,b) => (b.votes||0) - (a.votes||0))[0];
+            topMonth.textContent = topM ? `Top mese: ${topM.name} (${topM.votes||0} voti)` : 'Top mese: n.d.';
+            topAll.textContent = topA ? `Top sempre: ${topA.name} (${topA.votes||0} voti)` : 'Top sempre: n.d.';
+
+            if(!filtered.length) {
+                list.innerHTML = `<div class="text-[11px] text-gray-500 font-bold">Nessuna creazione salvata.</div>`;
+                return;
+            }
+            list.innerHTML = filtered.map(c => {
+                const ingredients = (c.ingredients || []).join(', ');
+                const isOwner = c.ownerEmail === state.user?.email;
+                const hasVoted = c.voters && state.user?.email && c.voters[state.user.email];
+                const disabled = isOwner || hasVoted;
+                const voteLabel = isOwner ? 'Tuo' : (hasVoted ? 'Votato' : 'Vota');
+                return `
+                    <div class="bg-white p-4 rounded-2xl border border-gray-100 flex flex-wrap items-center gap-3">
+                        <div class="flex-1 min-w-[220px]">
+                            <p class="font-black text-sm">${esc(c.name)} <span class="chip chip-quiet">${esc(c.type)}</span></p>
+                            <p class="text-[10px] text-gray-500">di ${esc(c.ownerName || c.ownerEmail || 'Utente')}</p>
+                            <p class="text-[11px] text-gray-700 mt-1">${esc(ingredients)}</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="badge">${c.votes || 0} voti</span>
+                            <button data-action="custom-vote" data-id="${c.id}" class="btn btn-ghost text-[10px] px-3 py-2" ${disabled ? 'disabled' : ''}>${voteLabel}</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
         function syncOrders() {
@@ -2249,6 +2363,8 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             'menu-update-price': (el) => window.updateMenuPrice(el.dataset.key),
             'refresh-menu-admin': () => window.renderMenuAdmin(),
             'remove-from-cart': (el) => window.removeFromCart(Number(el.dataset.id)),
+            'custom-vote': (el) => window.voteCreation(el.dataset.id),
+            'custom-filter': (el) => window.setCustomFilter(el.dataset.filter),
             'toggle-posate': () => window.togglePosate(),
             'send-order': () => window.sendOrder(),
             'copy-daily-summary': () => window.copyDailySummary(),
@@ -2329,6 +2445,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             bindChartZoom('analytics-chart-frige', 'frige');
             renderMenuAdmin();
             renderMyOrderStatus();
+            syncCustomCreations();
         };
 
         init();

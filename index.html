@@ -12,7 +12,7 @@
     <script src="https://cdn.tailwindcss.com/3.4.3"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="styles.css?v=20260210o">
+    <link rel="stylesheet" href="styles.css?v=20260210p">
 </head>
 <body class="bg-background text-text-main pb-20 font-sans">
 
@@ -90,6 +90,13 @@
 
             <section id="custom-view" class="view">
                 <h2 class="text-2xl font-black mb-6 tracking-tighter section-title">Personalizza il Tuo Ordine</h2>
+                <div class="card p-4 rounded-2xl mb-6">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <input id="custom-name-input" type="text" placeholder="Nome del tuo panino/pizza" class="p-3 rounded-xl border border-gray-200 text-[11px] font-bold outline-none flex-1 min-w-[220px]">
+                        <label class="chip" for="custom-save-toggle"><input id="custom-save-toggle" type="checkbox" class="mr-1">Salva nello storico</label>
+                    </div>
+                    <p class="text-[10px] text-gray-500 mt-2">Se salvi, la tua creazione entra nello storico e può essere votata.</p>
+                </div>
                 <div class="card p-6 rounded-3xl mb-4 text-center">
                     <h3 class="text-xs font-black text-gray-400 uppercase mb-4 tracking-widest italic">1. Scegli la base</h3>
                     <div class="flex gap-4">
@@ -121,6 +128,20 @@
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <div class="card p-5 rounded-3xl mt-6">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <h3 class="text-xs font-black uppercase text-gray-500">Storico Creazioni</h3>
+                        <div class="flex gap-2">
+                            <button data-action="custom-filter" data-filter="all" id="custom-filter-all" class="btn btn-primary text-[10px] px-3 py-2">Tutte</button>
+                            <button data-action="custom-filter" data-filter="Panino" id="custom-filter-panino" class="btn btn-ghost text-[10px] px-3 py-2">Panini</button>
+                            <button data-action="custom-filter" data-filter="Pizza Ripiena" id="custom-filter-pizza" class="btn btn-ghost text-[10px] px-3 py-2">Pizze</button>
+                        </div>
+                    </div>
+                    <div id="custom-top-month" class="text-[11px] text-gray-600 font-bold mb-3"></div>
+                    <div id="custom-top-all" class="text-[11px] text-gray-600 font-bold mb-4"></div>
+                    <div id="custom-history-list" class="space-y-3"></div>
                 </div>
             </section>
 
