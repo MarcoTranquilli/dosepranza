@@ -38,8 +38,3 @@ jobs:
         with:
           name: playwright-report
           path: playwright-report
-      - name: Trigger Netlify Deploy (optional)
-        if: ${{ secrets.NETLIFY_BUILD_HOOK }}
-        run: curl -X POST "$NETLIFY_BUILD_HOOK"
-        env:
-          NETLIFY_BUILD_HOOK: ${{ secrets.NETLIFY_BUILD_HOOK }}
