@@ -2000,6 +2000,10 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         function renderOrdersPayments() {
             if(!isAdmin() && !isRistoratore()) return;
             const wrap = document.getElementById('orders-payments-list');
+            if(wrap) {
+                wrap.classList.remove('hidden');
+                wrap.style.display = 'block';
+            }
             const isPaidView = state.ordersPaymentFilter === "paid";
             const items = getFilteredOrdersForReconciliation();
             if(items.length === 0) {
@@ -2764,7 +2768,16 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             updateInvalidOrdersUI();
             if(isLocalE2E && !state.e2eNavDone && (state.role === 'ristoratore' || state.role === 'admin')) {
                 state.e2eNavDone = true;
-                window.navigate('history');
+                setTimeout(() => {
+                    window.navigate('history');
+                    const hv = document.getElementById('history-view');
+                    if(hv) {
+                        document.querySelectorAll('.view').forEach(e => e.classList.remove('active'));
+                        hv.classList.add('active');
+                    }
+                    const list = document.getElementById('orders-payments-list');
+                    if(list) { list.classList.remove('hidden'); list.style.display = 'block'; }
+                }, 0);
             }
         }
 
