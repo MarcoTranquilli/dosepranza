@@ -626,6 +626,8 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 if(!state.cart.length) return window.toast("Carrello vuoto");
                 const total = state.cart.reduce((s,i)=>s+i.price, 0);
                 if(total <= 0) return window.toast("Totale non valido");
+                const ok = window.confirm(`Confermi l'invio dell'ordine? Totale: ${formatCurrency(total)}`);
+                if(!ok) return;
                 const docRef = await addDoc(ordersCol, { 
                     user: state.user.name, email: state.user.email,
                     uid: auth_fb.currentUser.uid,
