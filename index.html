@@ -331,8 +331,11 @@
                 <div id="my-order-status" class="mt-4 text-[11px] text-gray-500 font-bold">Accedi per vedere lo stato del tuo ordine.</div>
                 <div id="daily-summary-inline" class="mt-6 card p-5 rounded-3xl hidden">
                     <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-                        <h3 class="text-xs font-black uppercase text-gray-500">Riepilogo Ordini Oggi</h3>
-                        <span id="daily-summary-count" class="text-[10px] text-gray-400 font-bold uppercase"></span>
+                        <h3 id="daily-summary-title" class="text-xs font-black uppercase text-gray-500">Riepilogo Ordini Oggi</h3>
+                        <div class="flex items-center gap-2">
+                            <span id="daily-summary-count" class="text-[10px] text-gray-400 font-bold uppercase"></span>
+                            <button id="daily-summary-admin-link" data-action="navigate" data-view="history" class="btn btn-ghost text-[10px] px-3 py-2 hidden">Vai a Tutti</button>
+                        </div>
                     </div>
                     <div class="grid md:grid-cols-2 gap-4">
                         <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">

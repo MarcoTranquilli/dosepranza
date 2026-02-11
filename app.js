@@ -286,6 +286,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(v === 'cart') renderCart();
             if(v === 'history') syncOrders();
             if(v === 'cart' && (isAdmin() || isRistoratore())) syncOrders();
+            if(v === 'cart' && state.user && !(isAdmin() || isRistoratore())) syncMyOrders();
             if(v === 'frige') syncFrige();
             if(v === 'analytics') syncAnalytics();
             if(v === 'menu') renderMenuAdmin();
@@ -1572,34 +1573,87 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             const productsEl = document.getElementById('daily-summary-products');
             const allergiesEl = document.getElementById('daily-summary-allergies');
             const countEl = document.getElementById('daily-summary-count');
-            if(!wrap || !productsEl || !allergiesEl || !countEl) return;
-            if(!(isAdmin() || isRistoratore())) { wrap.classList.add('hidden'); return; }
-            wrap.classList.remove('hidden');
+            const titleEl = document.getElementById('daily-summary-title');
+            const adminLink = document.getElementById('daily-summary-admin-link');
+            if(!wrap || !productsEl || !allergiesEl || !countEl || !titleEl || !adminLink) return;
 
-            if(state.ordersToday.length === 0) {
-                productsEl.innerHTML = `<p class="text-gray-400">Nessun ordine presente.</p>`;
+            if(isAdmin() || isRistoratore()) {
+                wrap.classList.remove('hidden');
+                adminLink.classList.remove('hidden');
+                titleEl.textContent = "Riepilogo Ordini Oggi";
+                if(state.ordersToday.length === 0) {
+                    productsEl.innerHTML = `<p class="text-gray-400">Nessun ordine presente.</p>`;
+                    allergiesEl.innerHTML = `<p class="text-gray-400">Nessuna nota.</p>`;
+                    countEl.textContent = "";
+                    return;
+                }
+                const { itemsSorted, totalOrders, totalItems } = buildKitchenSummary();
+                countEl.textContent = `${totalOrders} ordini · ${totalItems} pezzi`;
+                productsEl.innerHTML = itemsSorted.map(i => `
+                    <div class="flex items-center justify-between gap-2 bg-white px-3 py-2 rounded-xl border border-gray-100">
+                        <span class="font-semibold text-gray-700">${esc(i.label)}</span>
+                        <span class="badge">${i.count}x</span>
+                    </div>
+                `).join('');
+                const allergies = state.ordersToday
+                    .filter(o => o.allergies && o.allergies.trim().length > 0)
+                    .map(o => ({
+                        user: o.user,
+                        note: o.allergies.trim()
+                    }));
+                allergiesEl.innerHTML = allergies.length === 0
+                    ? `<p class="text-gray-400">Nessuna nota o allergia.</p>`
+                    : allergies.map(a => `
+                        <div class="bg-white px-3 py-2 rounded-xl border border-red-100">
+                            <p class="text-[10px] font-black uppercase text-red-700">${esc(a.user)}</p>
+                            <p class="text-[11px] text-gray-700">${esc(a.note)}</p>
+                        </div>
+                    `).join('');
+                return;
+            }
+
+            // Utenti standard: mostra solo i propri ordini
+            adminLink.classList.add('hidden');
+            if(!state.user) { wrap.classList.add('hidden'); return; }
+            wrap.classList.remove('hidden');
+            titleEl.textContent = "Il tuo riepilogo oggi";
+            const now = new Date(); now.setHours(0,0,0,0);
+            const myOrdersToday = (state.myOrders || []).filter(o => {
+                if(!o.createdAt) return false;
+                const d = o.createdAt.toDate ? o.createdAt.toDate() : o.createdAt;
+                return d >= now;
+            });
+            if(myOrdersToday.length === 0) {
+                productsEl.innerHTML = `<p class="text-gray-400">Nessun ordine inviato oggi.</p>`;
                 allergiesEl.innerHTML = `<p class="text-gray-400">Nessuna nota.</p>`;
                 countEl.textContent = "";
                 return;
             }
-
-            const { itemsSorted, totalOrders, totalItems } = buildKitchenSummary();
-            countEl.textContent = `${totalOrders} ordini · ${totalItems} pezzi`;
-
+            const itemCounts = new Map();
+            let totalItems = 0;
+            myOrdersToday.forEach(o => {
+                (o.items || []).forEach(i => {
+                    const label = i.details && i.details !== "" ? `${i.name} (${i.details})` : i.name;
+                    itemCounts.set(label, (itemCounts.get(label) || 0) + 1);
+                    totalItems += 1;
+                });
+            });
+            const itemsSorted = Array.from(itemCounts.entries())
+                .map(([label, count]) => ({ label, count }))
+                .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+            countEl.textContent = `${myOrdersToday.length} ordini · ${totalItems} pezzi`;
             productsEl.innerHTML = itemsSorted.map(i => `
                 <div class="flex items-center justify-between gap-2 bg-white px-3 py-2 rounded-xl border border-gray-100">
                     <span class="font-semibold text-gray-700">${esc(i.label)}</span>
                     <span class="badge">${i.count}x</span>
                 </div>
             `).join('');
-
-            const allergies = state.ordersToday
+            const allergies = myOrdersToday
                 .filter(o => o.allergies && o.allergies.trim().length > 0)
                 .map(o => ({
                     user: o.user,
                     note: o.allergies.trim()
                 }));
-
             allergiesEl.innerHTML = allergies.length === 0
                 ? `<p class="text-gray-400">Nessuna nota o allergia.</p>`
                 : allergies.map(a => `
@@ -2576,6 +2630,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 document.getElementById('user-modal').classList.add('hidden');
                 await setRole(email);
                 syncMyOrders();
+                renderDailySummaryInline();
             } else {
                 if(isLocalE2E && state.user?.email) {
                     document.getElementById('user-modal').classList.add('hidden');
