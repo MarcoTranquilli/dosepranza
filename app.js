@@ -2328,6 +2328,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             bindChartZoom('analytics-chart-orders', 'orders');
             bindChartZoom('analytics-chart-frige', 'frige');
             renderMenuAdmin();
+            renderMyOrderStatus();
         };
 
         init();
