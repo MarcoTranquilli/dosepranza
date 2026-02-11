@@ -15,21 +15,16 @@ jobs:
           node-version: 20
       - name: Install dependencies
         run: npm install
-        working-directory: dosepranza-frige-mvp
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
-        working-directory: dosepranza-frige-mvp
       - name: Start local server
         run: nohup python3 -m http.server 8081 --bind 127.0.0.1 >/tmp/uat_server.log 2>&1 &
-        working-directory: dosepranza-frige-mvp
       - name: Run UAT
         run: npm run test:uat
-        working-directory: dosepranza-frige-mvp
         env:
           BASE_URL: http://127.0.0.1:8081
       - name: Generate PDF report
         run: node scripts/render_report_pdf.mjs
-        working-directory: dosepranza-frige-mvp
       - name: Deploy summary
         run: |
           echo "UAT report (HTML): artifact playwright-report"
@@ -39,7 +34,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
-          path: dosepranza-frige-mvp/playwright-report
+          path: playwright-report
       - name: Trigger Netlify Deploy (optional)
         if: ${{ secrets.NETLIFY_BUILD_HOOK }}
         run: curl -X POST "$NETLIFY_BUILD_HOOK"
