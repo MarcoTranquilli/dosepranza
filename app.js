@@ -285,6 +285,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.id === `btn-${v}`));
             if(v === 'cart') renderCart();
             if(v === 'history') syncOrders();
+            if(v === 'cart' && (isAdmin() || isRistoratore())) syncOrders();
             if(v === 'frige') syncFrige();
             if(v === 'analytics') syncAnalytics();
             if(v === 'menu') renderMenuAdmin();
@@ -1171,6 +1172,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 `;
                 opts.classList.add('hidden');
                 renderMyOrderStatus();
+                renderDailySummaryInline();
                 return;
             }
             opts.classList.remove('hidden');
@@ -1181,6 +1183,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             </div>`).join('');
             document.getElementById('cart-total-display').textContent = formatCurrency(tot);
             renderMyOrderStatus();
+            renderDailySummaryInline();
         }
 
         function syncMyOrders() {
@@ -1504,6 +1507,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 renderOrdersPayments();
                 renderOrdersKPIs();
                 renderKitchenSummary();
+                renderDailySummaryInline();
             });
         }
 
@@ -1528,6 +1532,49 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             const allergiesEl = document.getElementById('orders-summary-allergies');
             const countEl = document.getElementById('orders-summary-count');
             if(!productsEl || !allergiesEl || !countEl) return;
+
+            if(state.ordersToday.length === 0) {
+                productsEl.innerHTML = `<p class="text-gray-400">Nessun ordine presente.</p>`;
+                allergiesEl.innerHTML = `<p class="text-gray-400">Nessuna nota.</p>`;
+                countEl.textContent = "";
+                return;
+            }
+
+            const { itemsSorted, totalOrders, totalItems } = buildKitchenSummary();
+            countEl.textContent = `${totalOrders} ordini · ${totalItems} pezzi`;
+
+            productsEl.innerHTML = itemsSorted.map(i => `
+                <div class="flex items-center justify-between gap-2 bg-white px-3 py-2 rounded-xl border border-gray-100">
+                    <span class="font-semibold text-gray-700">${esc(i.label)}</span>
+                    <span class="badge">${i.count}x</span>
+                </div>
+            `).join('');
+
+            const allergies = state.ordersToday
+                .filter(o => o.allergies && o.allergies.trim().length > 0)
+                .map(o => ({
+                    user: o.user,
+                    note: o.allergies.trim()
+                }));
+
+            allergiesEl.innerHTML = allergies.length === 0
+                ? `<p class="text-gray-400">Nessuna nota o allergia.</p>`
+                : allergies.map(a => `
+                    <div class="bg-white px-3 py-2 rounded-xl border border-red-100">
+                        <p class="text-[10px] font-black uppercase text-red-700">${esc(a.user)}</p>
+                        <p class="text-[11px] text-gray-700">${esc(a.note)}</p>
+                    </div>
+                `).join('');
+        }
+
+        function renderDailySummaryInline() {
+            const wrap = document.getElementById('daily-summary-inline');
+            const productsEl = document.getElementById('daily-summary-products');
+            const allergiesEl = document.getElementById('daily-summary-allergies');
+            const countEl = document.getElementById('daily-summary-count');
+            if(!wrap || !productsEl || !allergiesEl || !countEl) return;
+            if(!(isAdmin() || isRistoratore())) { wrap.classList.add('hidden'); return; }
+            wrap.classList.remove('hidden');
 
             if(state.ordersToday.length === 0) {
                 productsEl.innerHTML = `<p class="text-gray-400">Nessun ordine presente.</p>`;
@@ -2516,6 +2563,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             renderMenuAdminToggle();
             renderMenuAdmin();
             if(isAdmin() || isRistoratore()) syncMenuAudit();
+            renderDailySummaryInline();
         }
 
         // --- INIT ---

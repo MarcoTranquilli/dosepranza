@@ -329,6 +329,22 @@
                     </div>
                 </div>
                 <div id="my-order-status" class="mt-4 text-[11px] text-gray-500 font-bold">Accedi per vedere lo stato del tuo ordine.</div>
+                <div id="daily-summary-inline" class="mt-6 card p-5 rounded-3xl hidden">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <h3 class="text-xs font-black uppercase text-gray-500">Riepilogo Ordini Oggi</h3>
+                        <span id="daily-summary-count" class="text-[10px] text-gray-400 font-bold uppercase"></span>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                            <p class="text-[10px] uppercase text-gray-400 font-black mb-2">Prodotti (Totali)</p>
+                            <div id="daily-summary-products" class="space-y-2 text-[11px]"></div>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                            <p class="text-[10px] uppercase text-gray-400 font-black mb-2">Allergie & Note</p>
+                            <div id="daily-summary-allergies" class="space-y-2 text-[11px]"></div>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <section id="history-view" class="view">
