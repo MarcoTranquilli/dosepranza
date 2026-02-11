@@ -2437,6 +2437,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(isAdmin() || isRistoratore()) show(analyticsBtn);
 
             if (frigeBtn) {
+                frigeBtn.classList.remove('hidden');
                 if (isAdmin() || isRistoratore() || isFacility()) {
                     frigeBtn.classList.remove('nav-disabled');
                     frigeBtn.dataset.action = 'navigate';
