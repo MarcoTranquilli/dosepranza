@@ -2624,6 +2624,8 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             syncMenuAvailability();
             renderRoleStatus();
             renderMenuAdminToggle();
+            const frigeBtn = document.getElementById('btn-frige');
+            if(frigeBtn) frigeBtn.classList.remove('hidden');
             document.getElementById('category-select').innerHTML = `<option value="all">Tutte le Categorie</option>` + Object.keys(RAW_MENU).map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
             document.getElementById('diet-select').innerHTML = `<option value="all">Ogni Regime</option>` + Object.entries(DIETS_CONFIG).map(([k,v]) => `<option value="${esc(k)}">${esc(v)}</option>`).join('');
             document.getElementById('search-input').oninput = (e) => { state.search = e.target.value; renderMenu(); };
@@ -2639,6 +2641,9 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             renderMenuAdmin();
             renderMyOrderStatus();
             syncCustomCreations();
+            if(isLocalE2E && state.user?.email) {
+                setRole(state.user.email);
+            }
         };
 
         init();

@@ -11,7 +11,7 @@ test('UAT Utente standard: ordine + frige WIP', async ({ page }) => {
   await confirm.click();
 
   await page.click('#btn-menu');
-  await expect(page.locator('#btn-frige')).toHaveClass(/nav-disabled/);
+  await expect(page.locator('#btn-frige')).toHaveAttribute('aria-disabled', 'true');
   await expect(page.locator('#frige-wip')).toBeVisible();
 
   await expect(page.locator('#toast')).toBeVisible();
