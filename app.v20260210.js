@@ -256,6 +256,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         };
 
         const ensureOrderWindow = () => {
+            if(isLocalE2E) return true;
             if(isOrderWindowOpen()) return true;
             window.toast("Ordini chiusi dopo le 11:30. Usa Frige.");
             return false;
@@ -2670,6 +2671,14 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             const e = normalizeEmail(email);
             const n = normalizeName(state.user?.name);
             let role = 'user';
+
+            // E2E fast path: set role immediately from mapping
+            if(isLocalE2E) {
+                if(ROLE_EMAILS.admin.includes(e) || ROLE_NAMES.admin.includes(n)) role = 'admin';
+                else if(ROLE_EMAILS.ristoratore.includes(e)) role = 'ristoratore';
+                else if(ROLE_EMAILS.facility.includes(e)) role = 'facility';
+                state.role = role;
+            }
 
             // 1) Try custom claims
             try {
