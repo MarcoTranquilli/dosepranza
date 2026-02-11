@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addDoc, serverTimestamp, query, orderBy, getDocs, runTransaction, doc, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addDoc, serverTimestamp, query, orderBy, getDocs, runTransaction, doc, where, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- DATABASE PRODOTTI COMPLETO ---
         const DIETS_CONFIG = { "carne/pesce": "🥩 Carne/Pesce", "vegetariano": "🧀 Vegetariano", "vegano": "🌱 Vegano" };
@@ -160,8 +160,9 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             ordersPaymentFilter: 'pending',
             ordersTimeFilter: 'all',
             ordersSelected: {},
+            menuAudit: [],
             analytics: { ordersAll: [], frigeAll: [], frigeProducts: [], refillsOpen: [], unsub: {}, range: 'today', lastPreset: 'today', resolution: { orders: 'daily', frige: 'daily' }, targets: { orders: { min: null, max: null }, frige: { min: null, max: null } }, chartData: {}, zoom: { orders: null, frige: null } },
-            subs: { orders: null, frige: null, menu: null, myOrders: null, custom: null },
+            subs: { orders: null, frige: null, menu: null, myOrders: null, custom: null, menuAudit: null },
             role: 'user',
             menuAdminOpen: (() => {
                 try { return JSON.parse(localStorage.getItem('menu_admin_open') || 'true'); } catch(e) { return true; }
@@ -198,6 +199,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         const frigeRefillsCol = collection(db_fb, "frige_refills");
         const menuProductsCol = collection(db_fb, "menu_products");
         const customCreationsCol = collection(db_fb, "custom_creations");
+        const menuAuditCol = collection(db_fb, "menu_audit");
 
         // --- GLOBAL WINDOW FUNCTIONS ---
         window.onerror = (message, source, lineno, colno) => {
@@ -390,6 +392,12 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                         });
                     }
                 });
+                await logMenuAudit('availability', {
+                    key,
+                    name: item.name,
+                    cat: item.cat,
+                    isActive: !shouldDisable
+                });
             } catch(e) {
                 console.warn('toggle availability failed', e);
                 window.toast("Errore salvataggio disponibilità");
@@ -414,9 +422,11 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             const item = { name, cat, price: priceVal, diet, isActive: true };
             const key = computeProductKey(item);
             try {
+                let existed = false;
                 await runTransaction(db_fb, async (tx) => {
                     const ref = doc(db_fb, "menu_products", key);
                     const snap = await tx.get(ref);
+                    existed = snap.exists();
                     const payload = {
                         key,
                         name,
@@ -429,6 +439,13 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                     };
                     if(!snap.exists()) payload.createdAt = serverTimestamp();
                     tx.set(ref, payload, { merge: true });
+                });
+                await logMenuAudit(existed ? 'update' : 'create', {
+                    key,
+                    name,
+                    cat,
+                    price: priceVal,
+                    diet
                 });
                 window.toast("Prodotto salvato");
                 document.getElementById('menu-admin-name').value = '';
@@ -452,12 +469,27 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                     if(!snap.exists()) return;
                     tx.update(ref, { price: priceVal, updatedAt: serverTimestamp(), updatedBy: state.user?.email || 'anon' });
                 });
+                await logMenuAudit('price', { key, price: priceVal });
                 window.toast("Prezzo aggiornato");
             } catch(e) {
                 console.warn('update price failed', e);
                 window.toast("Errore aggiornamento prezzo");
             }
         };
+
+        async function logMenuAudit(action, payload = {}) {
+            try {
+                await addDoc(menuAuditCol, {
+                    action,
+                    payload,
+                    actorEmail: state.user?.email || 'anon',
+                    actorRole: state.role || 'user',
+                    createdAt: serverTimestamp()
+                });
+            } catch(e) {
+                console.warn('menu audit log failed', e);
+            }
+        }
 
         const renderMenuAdminToggle = () => {
             const quick = document.getElementById('role-quick');
@@ -1254,6 +1286,42 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 state.customCreations = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                 renderCustomCreations();
             });
+        }
+
+        function syncMenuAudit() {
+            if(state.subs.menuAudit) return;
+            state.subs.menuAudit = onSnapshot(query(menuAuditCol, orderBy("createdAt", "desc"), limit(10)), snap => {
+                state.menuAudit = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderMenuAudit();
+            });
+        }
+
+        function renderMenuAudit() {
+            const list = document.getElementById('menu-audit-list');
+            if(!list) return;
+            if(!state.menuAudit.length) {
+                list.innerHTML = `<div class="text-[11px] text-gray-500 font-bold">Nessuna attività recente.</div>`;
+                return;
+            }
+            list.innerHTML = state.menuAudit.map(a => {
+                const when = a.createdAt ? formatTime(a.createdAt) : '--:--';
+                const actor = a.actorEmail || 'utente';
+                const action = (a.action || '').toUpperCase();
+                const name = a.payload?.name || a.payload?.key || '';
+                const price = a.payload?.price ? formatCurrency(a.payload.price) : '';
+                const active = typeof a.payload?.isActive === 'boolean' ? (a.payload.isActive ? 'Attivo' : 'Disattivato') : '';
+                const detail = [name, price, active].filter(Boolean).join(' · ');
+                return `
+                    <div class="bg-white p-3 rounded-2xl border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <p class="text-[10px] font-black uppercase text-gray-400">${action}</p>
+                            <span class="text-[10px] text-gray-400 font-bold">${when}</span>
+                        </div>
+                        <p class="text-[11px] font-bold">${esc(detail)}</p>
+                        <p class="text-[10px] text-gray-500">da ${esc(actor)}</p>
+                    </div>
+                `;
+            }).join('');
         }
 
         window.voteCreation = async (id) => {
@@ -2387,6 +2455,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             renderRoleStatus();
             renderMenuAdminToggle();
             renderMenuAdmin();
+            if(isAdmin() || isRistoratore()) syncMenuAudit();
         }
 
         // --- INIT ---

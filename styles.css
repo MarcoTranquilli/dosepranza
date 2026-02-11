@@ -39,6 +39,10 @@
         .btn:active { transform: scale(0.98); }
         .btn-primary:hover { box-shadow: 0 16px 32px rgba(208,128,79,0.3); }
         .btn-secondary:hover { box-shadow: 0 16px 32px rgba(88,123,87,0.3); }
+        #role-quick { background: rgba(255,255,255,0.9); box-shadow: 0 8px 22px rgba(50,40,20,0.08); border-color: rgba(214,200,175,0.55); }
+        #role-quick p { margin: 0; }
+        #role-quick-text { font-weight: 800; }
+        #role-quick-hint { color: #7a6f61; }
         input, select, textarea { border-radius: 16px; }
         input:focus, select:focus, textarea:focus { outline: 2px solid rgba(214,128,79,0.35); outline-offset: 2px; }
         .badge { background: #f7efe6; color: #8c502f; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; padding: .35rem .6rem; border-radius: 999px; font-size: 10px; display: inline-flex; align-items: center; gap: .35rem; }

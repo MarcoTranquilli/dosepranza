@@ -61,6 +61,9 @@
                         <h3 class="text-xs font-black uppercase text-gray-500">Gestione Menù (Admin/Ristoratore)</h3>
                         <button data-action="refresh-menu-admin" class="btn btn-ghost text-[10px] px-3 py-2">Aggiorna elenco</button>
                     </div>
+                    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-3 text-[11px] text-amber-900 font-bold mb-4">
+                        Guida rapida: 1) inserisci nome, categoria e prezzo → 2) “Aggiungi/Aggiorna” → 3) usa “Disattiva” per rimuovere il prodotto dal giorno.
+                    </div>
                     <div class="grid md:grid-cols-4 gap-3 mb-4">
                         <label class="sr-only" for="menu-admin-name">Nome prodotto</label>
                         <input id="menu-admin-name" name="menu-admin-name" type="text" placeholder="Nome prodotto" class="p-3 rounded-xl border border-gray-200 text-[11px] font-bold outline-none md:col-span-2">
@@ -88,6 +91,10 @@
                         <option value="Menù Combinati"></option>
                     </datalist>
                     <div id="menu-admin-list" class="space-y-2"></div>
+                    <div class="mt-4">
+                        <h4 class="text-xs font-black uppercase text-gray-500 mb-2">Ultime attività</h4>
+                        <div id="menu-audit-list" class="space-y-2"></div>
+                    </div>
                 </div>
                 <div class="space-y-4 mb-6">
                     <input type="search" id="search-input" placeholder="Cerca un piatto..." class="w-full p-4 border border-gray-200 rounded-2xl outline-none focus:ring-2 focus:ring-primary shadow-sm">
