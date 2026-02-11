@@ -25,6 +25,12 @@
         .glass { background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.7); box-shadow: 0 12px 26px rgba(50,40,20,0.08); }
         .card { background: rgba(255,255,255,0.95); border: 1px solid rgba(222, 212, 192, 0.65); box-shadow: 0 12px 28px rgba(50,40,20,0.1); transition: transform .2s ease, box-shadow .2s ease; }
         .card:hover { transform: translateY(-3px); box-shadow: 0 18px 32px rgba(50,40,20,0.14); }
+        .modal-premium {
+            background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(252,249,244,0.98) 100%);
+            border: 1px solid rgba(214, 200, 175, 0.6);
+            box-shadow: 0 30px 70px rgba(40,30,20,0.25);
+            animation: fadeUp .25s ease;
+        }
         .section-title { font-family: 'Fraunces', serif; letter-spacing: -0.02em; }
         h1, h2, h3, .section-title { text-rendering: optimizeLegibility; }
         h2.section-title { font-size: clamp(1.6rem, 2vw, 2.1rem); }

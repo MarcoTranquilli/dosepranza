@@ -639,19 +639,34 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             return `Ordine #${orderId}\n` + lines.join('\n') + `\nTotale: ${formatCurrency(total)}`;
         }
 
-        function buildSendSummary(items, total) {
-            const lines = items.map(i => `• ${i.name}${i.details ? ` (${i.details})` : ''} — ${formatCurrency(i.price)}`);
-            return lines.join('\n') + `\nTotale: ${formatCurrency(total)}`;
+        function buildSendSummaryHtml(items) {
+            return items.map(i => {
+                const label = `${esc(i.name)}${i.details ? ` (${esc(i.details)})` : ''}`;
+                return `<div class="flex items-center justify-between gap-2">
+                    <span>${label}</span>
+                    <span class="text-primary font-black">${formatCurrency(i.price)}</span>
+                </div>`;
+            }).join('');
         }
 
         function openSendConfirm(payload) {
             state.pendingOrder = payload;
             const modal = document.getElementById('order-send-modal');
             const box = document.getElementById('order-send-summary');
+            const totalEl = document.getElementById('order-send-total');
+            const countEl = document.getElementById('order-send-count');
+            const notesEl = document.getElementById('order-send-notes');
             const check = document.getElementById('order-send-check');
             const submit = document.getElementById('order-send-submit');
             if(!modal || !box || !check || !submit) return;
-            box.textContent = buildSendSummary(payload.items, payload.total);
+            box.innerHTML = buildSendSummaryHtml(payload.items);
+            if(totalEl) totalEl.textContent = formatCurrency(payload.total);
+            if(countEl) countEl.textContent = `${payload.items.length} prodotti`;
+            if(notesEl) {
+                const notes = [];
+                if(payload.allergies && payload.allergies.trim().length > 0) notes.push(`Note: ${esc(payload.allergies.trim())}`);
+                notesEl.innerHTML = notes.length ? notes.map(n => `<div>${n}</div>`).join('') : '';
+            }
             check.checked = false;
             submit.disabled = true;
             modal.classList.remove('hidden');

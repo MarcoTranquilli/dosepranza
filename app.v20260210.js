@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addDoc, serverTimestamp, query, orderBy, getDocs, runTransaction, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addDoc, serverTimestamp, query, orderBy, getDocs, runTransaction, doc, where, limit, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- DATABASE PRODOTTI COMPLETO ---
         const DIETS_CONFIG = { "carne/pesce": "🥩 Carne/Pesce", "vegetariano": "🧀 Vegetariano", "vegano": "🌱 Vegano" };
@@ -58,7 +58,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             ],
             "Fritti": [
                 { name: "Supplì", price: 1.5, diet:["vegetariano"] },
-                { name: "Polpetta di melanzane", price: 1.5, diet:["vegetariano"] }
+                { name: "Polpetta di melanzane", price: 1.5, diet:["vegetariano"] },
+                { name: "Pizzetta rossa", price: 1.5, hasPortions:true, portions:[{t:"2pz-1.5€",v:1.5},{t:"3pz-2€",v:2.0},{t:"6pz-4€",v:4.0}], diet:["vegetariano"] },
+                { name: "Lingua romana scrocchiarella", price: 1.5, diet:["vegano"] }
             ],
             "Panini": [
                 { name: "Crudo pomodoro mozzarella", price: 3.5, diet:["carne/pesce"] },
@@ -68,6 +70,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 { name: "Porchetta", price: 3.5, diet:["carne/pesce"] },
                 { name: "Bresaola parmigiano e rughetta", price: 3.5, diet:["carne/pesce"] },
                 { name: "Tonno e pomodoro", price: 3.5, diet:["carne/pesce"] },
+                { name: "Tonno e carciofini", price: 3.5, diet:["carne/pesce"] },
                 { name: "Brasato di manzo e verdura", price: 3.5, diet:["carne/pesce"] },
                 { name: "Brasato di manzo e verdura cotta", price: 3.5, diet:["carne/pesce"] },
                 { name: "Crudo e mozzarella", price: 3.5, diet:["carne/pesce"] },
@@ -93,6 +96,13 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 { name: "Pizza con insalata di pollo con maionese", price: 3.5, diet:["carne/pesce"] },
                 { name: "Pizza classica con bresaola, filadelfia e rughetta", price: 3.5, diet:["carne/pesce"] },
                 { name: "Pizza con tacchino e verdure", price: 3.5, diet:["carne/pesce"] },
+                { name: "Crudo e mozzarella", price: 3.5, diet:["carne/pesce"] },
+                { name: "Speck stracchino e rughetta", price: 3.5, diet:["carne/pesce"] },
+                { name: "Cotto arrosto e melanzane", price: 3.5, diet:["carne/pesce"] },
+                { name: "Mortadella e stracciatella", price: 3.5, diet:["carne/pesce"] },
+                { name: "Frittata e zucchine", price: 3.5, diet:["vegetariano"] },
+                { name: "Bresaola e formaggio", price: 3.5, diet:["carne/pesce"] },
+                { name: "Cotto e stracchino", price: 3.5, diet:["carne/pesce"] },
                 { name: "Pizza ai 5 cereali bresaola formaggio spalmabile e rughetta", price: 3.5, diet:["carne/pesce"] },
                 { name: "Pizza ai 5 cereali con insalata di pollo", price: 3.5, diet:["carne/pesce"] },
                 { name: "Pizza 5 Cereali con Stracchino, Zucchine Grigliate, Pomodori Secchi", price: 3.5, diet:["vegetariano"] },
@@ -143,16 +153,35 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             user: JSON.parse(localStorage.getItem('dose_user')) || null,
             cart: [], currentView: 'menu', search: '', cat: 'all', diet: 'all', posate: false,
             custom: { base: null, subtype: null, ings: [], total: 3.5 },
-            ordersToday: [], menuData: [],
+            ordersToday: [], menuData: [], menuExtras: [], menuOverrides: new Map(), disabledProducts: new Set(),
             frige: { products: [], purchasesToday: [], refillsToday: [], selected: null, filter: 'all', paymentFilter: 'pending' },
+            customCreations: [],
+            customFilter: 'all',
             ordersPaymentFilter: 'pending',
             ordersTimeFilter: 'all',
             ordersSelected: {},
+            menuAudit: [],
+            menuAuditFilter: 'all',
+            pendingOrder: null,
             analytics: { ordersAll: [], frigeAll: [], frigeProducts: [], refillsOpen: [], unsub: {}, range: 'today', lastPreset: 'today', resolution: { orders: 'daily', frige: 'daily' }, targets: { orders: { min: null, max: null }, frige: { min: null, max: null } }, chartData: {}, zoom: { orders: null, frige: null } },
-            subs: { orders: null, frige: null },
-            role: 'user'
+            subs: { orders: null, frige: null, menu: null, myOrders: null, custom: null, menuAudit: null },
+            role: 'user',
+            menuAdminOpen: (() => {
+                try { return JSON.parse(localStorage.getItem('menu_admin_open') || 'true'); } catch(e) { return true; }
+            })()
         };
         const LOW_STOCK_THRESHOLD = 2;
+        const ORDER_CUTOFF = { hour: 11, minute: 30 };
+        const isLocalE2E = (() => {
+            try {
+                const host = window.location.hostname;
+                const params = new URLSearchParams(window.location.search);
+                const flag = localStorage.getItem('dose_e2e');
+                return (host === '127.0.0.1' || host === 'localhost') && (params.get('e2e') === '1' || flag === '1');
+            } catch(e) {
+                return false;
+            }
+        })();
 
         const ROLE_EMAILS = {
             admin: ['marco.tranquilli@dos.design'],
@@ -171,6 +200,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         const frigeProductsCol = collection(db_fb, "frige_products");
         const frigePurchasesCol = collection(db_fb, "frige_purchases");
         const frigeRefillsCol = collection(db_fb, "frige_refills");
+        const menuProductsCol = collection(db_fb, "menu_products");
+        const customCreationsCol = collection(db_fb, "custom_creations");
+        const menuAuditCol = collection(db_fb, "menu_audit");
 
         // --- GLOBAL WINDOW FUNCTIONS ---
         window.onerror = (message, source, lineno, colno) => {
@@ -186,6 +218,49 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             setTimeout(() => { el.classList.remove('toast-show'); }, 2000);
         };
 
+        const normalizeCat = (cat) => (cat || '').toString().trim().toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        const computeProductKey = (item) => `${normalizeCat(item.cat)}::${(item.name || '').toString().trim().toLowerCase()}`;
+        const buildMenuList = () => {
+            const base = state.menuData.map(i => ({ ...i, _key: computeProductKey(i) }));
+            const baseKeys = new Set(base.map(i => i._key));
+            const extras = state.menuExtras.map(i => ({ ...i, _key: computeProductKey(i) }));
+            const merged = base.map(i => {
+                const o = state.menuOverrides.get(i._key);
+                return o ? { ...i, ...o, _key: i._key } : i;
+            });
+            const mergedExtras = extras.filter(i => !baseKeys.has(i._key)).map(i => {
+                const o = state.menuOverrides.get(i._key);
+                return o ? { ...i, ...o, _key: i._key } : i;
+            });
+            return merged.concat(mergedExtras);
+        };
+
+        const loadDisabledProducts = () => {
+            // fallback cache for offline visibility
+            try {
+                const raw = JSON.parse(localStorage.getItem('dose_disabled_products') || '[]');
+                state.disabledProducts = new Set(Array.isArray(raw) ? raw : []);
+            } catch(e) {
+                state.disabledProducts = new Set();
+            }
+        };
+        const saveDisabledProducts = () => {
+            localStorage.setItem('dose_disabled_products', JSON.stringify(Array.from(state.disabledProducts)));
+        };
+
+        const isOrderWindowOpen = () => {
+            const now = new Date();
+            const h = now.getHours();
+            const m = now.getMinutes();
+            return h < ORDER_CUTOFF.hour || (h === ORDER_CUTOFF.hour && m < ORDER_CUTOFF.minute);
+        };
+
+        const ensureOrderWindow = () => {
+            if(isOrderWindowOpen()) return true;
+            window.toast("Ordini chiusi dopo le 11:30. Usa Frige.");
+            return false;
+        };
+
         window.navigate = (v) => {
             if(v === 'history' && !(isAdmin() || isRistoratore())) {
                 window.toast("Accesso non autorizzato");
@@ -199,18 +274,29 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 window.toast("Accesso non autorizzato");
                 return;
             }
+            if((v === 'menu' || v === 'custom' || v === 'cart') && !isOrderWindowOpen()) {
+                window.toast("Ordini chiusi dopo le 11:30. Usa Frige.");
+                if(isAdmin() || isRistoratore() || isFacility()) {
+                    v = 'frige';
+                }
+            }
             state.currentView = v;
             document.querySelectorAll('.view').forEach(e => e.classList.remove('active'));
             document.getElementById(`${v}-view`).classList.add('active');
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.id === `btn-${v}`));
             if(v === 'cart') renderCart();
             if(v === 'history') syncOrders();
+            if(v === 'cart' && (isAdmin() || isRistoratore())) syncOrders();
+            if(v === 'cart' && state.user && !(isAdmin() || isRistoratore())) syncMyOrders();
             if(v === 'frige') syncFrige();
             if(v === 'analytics') syncAnalytics();
+            if(v === 'menu') renderMenuAdmin();
         };
 
         window.addStdToCart = (id) => {
-            const item = state.menuData.find(i => i.id === id);
+            if(!ensureOrderWindow()) return;
+            if(state.disabledProducts.has(id)) return window.toast("Prodotto non disponibile");
+            const item = buildMenuList().find(i => i.id === id);
             const select = document.querySelector(`select[data-pid="${id}"]`);
             const price = select ? parseFloat(select.value) : item.price;
             const det = select ? `Porz: ${select.options[select.selectedIndex].text.split('-')[0]}` : "";
@@ -243,14 +329,232 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         };
 
         window.addCustomToCart = () => {
+            if(!ensureOrderWindow()) return;
             const c = state.custom;
             if(!c.subtype || c.ings.length === 0) return window.toast("Scegli gli ingredienti!");
             state.cart.push({ name: `${c.base} (${c.subtype})`, price: c.total, cat: 'Crea', details: c.ings.map(i=>i.name).join(', '), cartId: Date.now() });
             document.getElementById('cart-count').textContent = state.cart.length;
+            const saveToggle = document.getElementById('custom-save-toggle');
+            const customName = (document.getElementById('custom-name-input')?.value || '').trim();
+            if(saveToggle?.checked && customName) {
+                saveCustomCreation(customName);
+            }
             state.custom = { base:null, subtype:null, ings:[], total:3.5 };
             document.getElementById('custom-subtype-container').classList.add('hidden');
             document.getElementById('custom-ingredients-container').classList.add('hidden');
             window.navigate('menu');
+        };
+
+        async function saveCustomCreation(name) {
+            if(!state.user) return;
+            const c = state.custom;
+            const payload = {
+                name,
+                type: c.base,
+                subtype: c.subtype,
+                ingredients: c.ings.map(i => i.name),
+                ownerEmail: state.user.email,
+                ownerName: state.user.name,
+                votes: 0,
+                voters: {},
+                createdAt: serverTimestamp()
+            };
+            try {
+                await addDoc(customCreationsCol, payload);
+                window.toast("Creato nello storico");
+                const input = document.getElementById('custom-name-input');
+                if(input) input.value = '';
+            } catch(e) {
+                console.warn('save custom creation failed', e);
+                window.toast("Errore salvataggio creazione");
+            }
+        }
+
+        window.toggleProductAvailability = async (id) => {
+            if(!(isAdmin() || isRistoratore())) return;
+            const item = buildMenuList().find(i => i.id === id);
+            if(!item) return;
+            const key = computeProductKey(item);
+            const ref = doc(db_fb, "menu_products", key);
+            const shouldDisable = !state.disabledProducts.has(id);
+            try {
+                await runTransaction(db_fb, async (tx) => {
+                    const snap = await tx.get(ref);
+                    if(!snap.exists()) {
+                        tx.set(ref, {
+                            key,
+                            name: item.name,
+                            cat: item.cat,
+                            isActive: !shouldDisable,
+                            updatedAt: serverTimestamp(),
+                            updatedBy: state.user?.email || 'anon'
+                        });
+                    } else {
+                        tx.update(ref, {
+                            isActive: !shouldDisable,
+                            updatedAt: serverTimestamp(),
+                            updatedBy: state.user?.email || 'anon'
+                        });
+                    }
+                });
+                await logMenuAudit('availability', {
+                    key,
+                    name: item.name,
+                    cat: item.cat,
+                    isActive: !shouldDisable
+                });
+            } catch(e) {
+                console.warn('toggle availability failed', e);
+                window.toast("Errore salvataggio disponibilità");
+                return;
+            }
+            if(shouldDisable) state.disabledProducts.add(id);
+            else state.disabledProducts.delete(id);
+            saveDisabledProducts();
+            renderMenu();
+        };
+
+        window.upsertMenuProduct = async () => {
+            if(!(isAdmin() || isRistoratore())) return;
+            const name = (document.getElementById('menu-admin-name')?.value || '').trim();
+            const cat = (document.getElementById('menu-admin-cat')?.value || '').trim();
+            const priceVal = parseFloat(document.getElementById('menu-admin-price')?.value || '');
+            const diet = [];
+            if(document.getElementById('menu-diet-meat')?.checked) diet.push('carne/pesce');
+            if(document.getElementById('menu-diet-veg')?.checked) diet.push('vegetariano');
+            if(document.getElementById('menu-diet-vegan')?.checked) diet.push('vegano');
+            if(!name || !cat || Number.isNaN(priceVal)) return window.toast("Compila nome, categoria e prezzo");
+            const item = { name, cat, price: priceVal, diet, isActive: true };
+            const key = computeProductKey(item);
+            try {
+                let existed = false;
+                await runTransaction(db_fb, async (tx) => {
+                    const ref = doc(db_fb, "menu_products", key);
+                    const snap = await tx.get(ref);
+                    existed = snap.exists();
+                    const payload = {
+                        key,
+                        name,
+                        cat,
+                        price: priceVal,
+                        diet,
+                        isActive: snap.exists() ? (snap.data().isActive !== false) : true,
+                        updatedAt: serverTimestamp(),
+                        updatedBy: state.user?.email || 'anon'
+                    };
+                    if(!snap.exists()) payload.createdAt = serverTimestamp();
+                    tx.set(ref, payload, { merge: true });
+                });
+                await logMenuAudit(existed ? 'update' : 'create', {
+                    key,
+                    name,
+                    cat,
+                    price: priceVal,
+                    diet
+                });
+                window.toast("Prodotto salvato");
+                document.getElementById('menu-admin-name').value = '';
+                document.getElementById('menu-admin-price').value = '';
+            } catch(e) {
+                console.warn('menu upsert failed', e);
+                window.toast("Errore salvataggio prodotto");
+            }
+        };
+
+        window.updateMenuPrice = async (key) => {
+            if(!(isAdmin() || isRistoratore())) return;
+            const input = document.querySelector(`input[data-price-key="${key}"]`);
+            if(!input) return;
+            const priceVal = parseFloat(input.value || '');
+            if(Number.isNaN(priceVal)) return window.toast("Prezzo non valido");
+            try {
+                await runTransaction(db_fb, async (tx) => {
+                    const ref = doc(db_fb, "menu_products", key);
+                    const snap = await tx.get(ref);
+                    if(!snap.exists()) return;
+                    tx.update(ref, { price: priceVal, updatedAt: serverTimestamp(), updatedBy: state.user?.email || 'anon' });
+                });
+                await logMenuAudit('price', { key, price: priceVal });
+                window.toast("Prezzo aggiornato");
+            } catch(e) {
+                console.warn('update price failed', e);
+                window.toast("Errore aggiornamento prezzo");
+            }
+        };
+
+        async function logMenuAudit(action, payload = {}) {
+            try {
+                await addDoc(menuAuditCol, {
+                    action,
+                    payload,
+                    actorEmail: state.user?.email || 'anon',
+                    actorRole: state.role || 'user',
+                    createdAt: serverTimestamp()
+                });
+            } catch(e) {
+                console.warn('menu audit log failed', e);
+            }
+        }
+
+        const renderMenuAdminToggle = () => {
+            const quick = document.getElementById('role-quick');
+            const txt = document.getElementById('role-quick-text');
+            const hint = document.getElementById('role-quick-hint');
+            const btn = document.getElementById('menu-admin-toggle');
+            if(!quick || !txt || !hint || !btn) return;
+
+            const cached = (() => {
+                try { return JSON.parse(localStorage.getItem('dose_user') || 'null'); } catch(e) { return null; }
+            })();
+            const email = state.user?.email || cached?.email || '-';
+            const role = state.user ? state.role : 'non autenticato';
+            txt.textContent = `${email} · ${role}`;
+
+            if(state.user) {
+                quick.classList.remove('hidden');
+                if(isAdmin() || isRistoratore()) {
+                    btn.classList.remove('hidden');
+                    btn.textContent = state.menuAdminOpen ? 'Nascondi gestione menù' : 'Mostra gestione menù';
+                    hint.textContent = 'Accesso avanzato attivo: puoi gestire prodotti e disponibilità.';
+                } else {
+                    btn.classList.add('hidden');
+                    hint.textContent = 'Accesso standard: alcune funzioni sono riservate.';
+                }
+            } else {
+                quick.classList.add('hidden');
+            }
+        };
+
+        window.toggleMenuAdmin = () => {
+            state.menuAdminOpen = !state.menuAdminOpen;
+            localStorage.setItem('menu_admin_open', JSON.stringify(state.menuAdminOpen));
+            renderMenuAdmin();
+            renderMenuAdminToggle();
+        };
+
+        window.renderMenuAdmin = () => {
+            const panel = document.getElementById('menu-admin-panel');
+            const list = document.getElementById('menu-admin-list');
+            if(!panel || !list) return;
+            if(!(isAdmin() || isRistoratore())) { panel.classList.add('hidden'); return; }
+            if(!state.menuAdminOpen) { panel.classList.add('hidden'); return; }
+            panel.classList.remove('hidden');
+            const items = buildMenuList();
+            list.innerHTML = items.map(i => {
+                const key = computeProductKey(i);
+                const active = !state.disabledProducts.has(i.id);
+                return `
+                    <div class="flex flex-wrap items-center gap-2 bg-gray-50 p-3 rounded-2xl border border-gray-100">
+                        <div class="flex-1 min-w-[220px]">
+                            <p class="font-bold text-sm">${esc(i.name)}</p>
+                            <p class="text-[10px] text-gray-500">${esc(i.cat)}</p>
+                        </div>
+                        <input data-price-key="${key}" type="number" step="0.1" min="0" value="${i.price ?? ''}" class="p-2 rounded-xl border border-gray-200 text-[10px] font-bold w-24">
+                        <button data-action="menu-update-price" data-key="${key}" class="btn btn-ghost text-[10px] px-3 py-2">Salva prezzo</button>
+                        <button data-action="toggle-availability" data-id="${i.id}" class="btn btn-ghost text-[10px] px-3 py-2">${active ? 'Disattiva' : 'Riattiva'}</button>
+                    </div>
+                `;
+            }).join('');
         };
 
         window.removeFromCart = (id) => {
@@ -270,40 +574,133 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         const normalizeEmail = (email) => (email || '').trim().toLowerCase();
         const normalizeName = (name) => (name || '').trim().toLowerCase();
 
-        window.saveUserData = () => {
-            const name = normalizeName(document.getElementById('user-name-input').value);
-            const email = normalizeEmail(document.getElementById('user-email-input').value);
+        window.saveUserData = async () => {
+            if(!auth_fb.currentUser) {
+                window.toast("Accedi con Google per continuare");
+                return;
+            }
+            const name = normalizeName(auth_fb.currentUser.displayName || document.getElementById('user-name-input').value);
+            const email = normalizeEmail(auth_fb.currentUser.email || document.getElementById('user-email-input').value);
             if(name && email) {
                 state.user = { name, email };
                 localStorage.setItem('dose_user', JSON.stringify(state.user));
                 document.getElementById('user-modal').classList.add('hidden');
-                setRole(email);
+                await setRole(email);
+            }
+        };
+
+        window.signInWithGoogle = async () => {
+            try {
+                const provider = new GoogleAuthProvider();
+                await signInWithPopup(auth_fb, provider);
+            } catch(e) {
+                console.warn('Google sign-in failed', e);
+                window.toast("Accesso Google non riuscito");
+            }
+        };
+
+        window.signOutUser = async () => {
+            try {
+                await signOut(auth_fb);
+                state.user = null;
+                localStorage.removeItem('dose_user');
+                document.getElementById('user-modal').classList.remove('hidden');
+            } catch(e) {
+                console.warn('sign out failed', e);
+            }
+        };
+
+        window.refreshClaims = async () => {
+            try {
+                await auth_fb.currentUser?.getIdToken?.(true);
+                await setRole(state.user?.email || '');
+                window.toast("Ruoli aggiornati");
+            } catch(e) {
+                window.toast("Errore aggiornamento ruoli");
             }
         };
 
         window.sendOrder = async () => {
             if(!state.user) return document.getElementById('user-modal').classList.remove('hidden');
-            try {
-                const total = state.cart.reduce((s,i)=>s+i.price, 0);
-                const docRef = await addDoc(ordersCol, { 
-                    user: state.user.name, email: state.user.email,
-                    uid: auth_fb.currentUser.uid,
-                    items: state.cart, total, 
-                    allergies: document.getElementById('allergies-input').value,
-                    posate: state.posate ? 'Si' : 'No',
-                    paymentStatus: "pending",
-                    reconciled: false,
-                    createdAt: serverTimestamp() 
-                });
-                const summary = buildOrderConfirmSummary(docRef.id, state.cart, total);
-                showOrderConfirm(summary);
-                state.cart = []; document.getElementById('cart-count').textContent='0'; window.navigate('history'); window.toast("Inviato!");
-            } catch(e) { alert("Connessione fallita. Carica online!"); }
+            if(!ensureOrderWindow()) return;
+            if(!state.cart.length) return window.toast("Carrello vuoto");
+            const total = state.cart.reduce((s,i)=>s+i.price, 0);
+            if(total <= 0) return window.toast("Totale non valido");
+            openSendConfirm({
+                items: state.cart.slice(),
+                total,
+                allergies: document.getElementById('allergies-input').value,
+                posate: state.posate ? 'Si' : 'No'
+            });
         };
 
         function buildOrderConfirmSummary(orderId, items, total) {
             const lines = items.map(i => `• ${i.name}${i.details ? ` (${i.details})` : ''} — ${formatCurrency(i.price)}`);
             return `Ordine #${orderId}\n` + lines.join('\n') + `\nTotale: ${formatCurrency(total)}`;
+        }
+
+        function buildSendSummaryHtml(items) {
+            return items.map(i => {
+                const label = `${esc(i.name)}${i.details ? ` (${esc(i.details)})` : ''}`;
+                return `<div class="flex items-center justify-between gap-2">
+                    <span>${label}</span>
+                    <span class="text-primary font-black">${formatCurrency(i.price)}</span>
+                </div>`;
+            }).join('');
+        }
+
+        function openSendConfirm(payload) {
+            state.pendingOrder = payload;
+            const modal = document.getElementById('order-send-modal');
+            const box = document.getElementById('order-send-summary');
+            const totalEl = document.getElementById('order-send-total');
+            const countEl = document.getElementById('order-send-count');
+            const notesEl = document.getElementById('order-send-notes');
+            const check = document.getElementById('order-send-check');
+            const submit = document.getElementById('order-send-submit');
+            if(!modal || !box || !check || !submit) return;
+            box.innerHTML = buildSendSummaryHtml(payload.items);
+            if(totalEl) totalEl.textContent = formatCurrency(payload.total);
+            if(countEl) countEl.textContent = `${payload.items.length} prodotti`;
+            if(notesEl) {
+                const notes = [];
+                if(payload.allergies && payload.allergies.trim().length > 0) notes.push(`Note: ${esc(payload.allergies.trim())}`);
+                notesEl.innerHTML = notes.length ? notes.map(n => `<div>${n}</div>`).join('') : '';
+            }
+            check.checked = false;
+            submit.disabled = true;
+            modal.classList.remove('hidden');
+        }
+
+        function closeSendConfirm() {
+            const modal = document.getElementById('order-send-modal');
+            if(modal) modal.classList.add('hidden');
+            state.pendingOrder = null;
+        }
+
+        async function confirmSendOrder() {
+            if(!state.pendingOrder) return;
+            const check = document.getElementById('order-send-check');
+            if(check && !check.checked) return window.toast("Conferma l'invio");
+            const payload = state.pendingOrder;
+            try {
+                const docRef = await addDoc(ordersCol, { 
+                    user: state.user.name, email: state.user.email,
+                    uid: auth_fb.currentUser.uid,
+                    items: payload.items, total: payload.total, 
+                    allergies: payload.allergies,
+                    posate: payload.posate,
+                    paymentStatus: "pending",
+                    reconciled: false,
+                    orderStatus: "ricevuto",
+                    createdAt: serverTimestamp() 
+                });
+                closeSendConfirm();
+                const summary = buildOrderConfirmSummary(docRef.id, payload.items, payload.total);
+                showOrderConfirm(summary);
+                state.pendingOrder = null;
+                state.cart = []; document.getElementById('cart-count').textContent='0'; window.navigate('history'); window.toast("Inviato!");
+            } catch(e) { alert("Connessione fallita. Carica online!"); }
         }
 
         function showOrderConfirm(summaryText) {
@@ -331,40 +728,65 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             if(state.ordersToday.length === 0) return window.toast("Nessun ordine presente!");
 
             const chronOrder = [...state.ordersToday].reverse();
-            let text = `📋 *DOSEPRANZA - ${new Date().toLocaleDateString('it-IT')}*\n\n`;
+            const dateLabel = new Date().toLocaleDateString('it-IT');
+            const totalOrders = chronOrder.length;
+            const totalAmount = chronOrder.reduce((s, o) => s + (o.total || 0), 0);
 
-            chronOrder.forEach(o => {
-                text += `👤 *${o.user.toUpperCase()}*`;
-                if(o.createdAt) {
-                    const d = o.createdAt.toDate();
-                    text += ` (${d.getHours()}:${(d.getMinutes()<10?'0':'') + d.getMinutes()})`;
-                }
-                text += `\n`;
+            let text = `📋 *ORDINI DOSEPRANZA — ${dateLabel}*\n`;
+            text += `Totale ordini: ${totalOrders} · Totale: ${formatCurrency(totalAmount)}\n`;
+            text += `────────────────────\n\n`;
 
-                o.items.forEach(i => {
-                    text += `▪️ ${i.name}`;
-                    if(i.details && i.details !== "") text += ` _(${i.details})_`;
+            chronOrder.forEach((o, idx) => {
+                const time = o.createdAt ? o.createdAt.toDate() : null;
+                const hh = time ? String(time.getHours()).padStart(2, '0') : '--';
+                const mm = time ? String(time.getMinutes()).padStart(2, '0') : '--';
+                const orderTotal = formatCurrency(o.total || 0);
+
+                text += `${idx + 1}) *${o.user.toUpperCase()}* (${hh}:${mm}) — Totale ${orderTotal}\n`;
+                o.items.forEach((i) => {
+                    text += `• ${i.name}`;
+                    if(i.details && i.details !== "") text += ` (${i.details})`;
                     text += `\n`;
                 });
-
+                text += `Da pagare: ${orderTotal}\n`;
                 if(o.allergies && o.allergies.trim().length > 0) {
-                    text += `⚠️ NOTE: ${o.allergies}\n`;
+                    text += `⚠️ Note: ${o.allergies.trim()}\n`;
                 }
-                
-                text += `-------------------\n`;
+                text += `\n`;
             });
 
-            navigator.clipboard.writeText(text).then(() => window.toast("Copiato per WhatsApp!"));
+            navigator.clipboard.writeText(text.trim()).then(() => window.toast("Copiato per WhatsApp!"));
+        };
+
+        window.copyKitchenSummary = () => {
+            if(state.ordersToday.length === 0) return window.toast("Nessun ordine presente!");
+            const { itemsSorted, totalOrders, totalItems } = buildKitchenSummary();
+            const dateLabel = new Date().toLocaleDateString('it-IT');
+            let text = `👨‍🍳 *COMANDA CUCINA — ${dateLabel}*\n`;
+            text += `Ordini: ${totalOrders} · Pezzi totali: ${totalItems}\n`;
+            text += `────────────────────\n`;
+            itemsSorted.forEach(({ label, count }) => {
+                text += `• ${label} × ${count}\n`;
+            });
+            navigator.clipboard.writeText(text.trim()).then(() => window.toast("Copiato per Cucina!"));
         };
 
         window.exportFullHistory = async () => {
             const snap = await getDocs(query(ordersCol, orderBy("createdAt", "desc")));
-            let csv = "OrderID;TimestampISO8601;DataLeggibile;UserID;Utente;EmailUtente;Prodotto;Dettagli;CategoriaProdotto;Quantita;PrezzoUnitario;TotaleRiga;MetodoPagamento;Allergie;Posate;CanaleOrdine;StatoPagamento\n";
+            const fmt = (n) => {
+                if(n === null || n === undefined || n === '') return '';
+                const num = Number(n);
+                if(Number.isNaN(num)) return '';
+                return num.toLocaleString('it-IT', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+            };
+            let csv = "OrderID;TimestampISO8601;DataLeggibile;UserID;Utente;EmailUtente;Prodotto;Dettagli;CategoriaProdotto;Quantita;PrezzoUnitario;TotaleRiga;MetodoPagamento;Allergie;Posate;CanaleOrdine;StatoPagamento;RispostaRistoratore\n";
             snap.forEach(d => {
                 const o = d.data();
+                if(!isValidOrder(o)) return;
                 const ts = o.createdAt?.toDate();
                 o.items.forEach(i => {
-                    csv += `${d.id};${ts?.toISOString()};${ts?.toLocaleString()};${o.uid};${o.user};${o.email};${i.name};${i.details || ""};${i.cat || ""};1;${i.price};${o.total};Satispay;${o.allergies || "No"};${o.posate || "No"};Web;Da Pagare\n`;
+                    const status = o.paymentStatus === "paid" ? "Pagato" : "Da Pagare";
+                    csv += `${d.id};${ts ? ts.toISOString() : ''};${ts ? ts.toLocaleString() : ''};${o.uid || ''};${o.user || ''};${o.email || ''};${i.name || ''};${i.details || ''};${i.cat || ''};1;${fmt(i.price)};${fmt(i.price)};Satispay;${o.allergies || "No"};${o.posate || "No"};Web;${status};${o.ristoratoreResponse || ''}\n`;
                 });
             });
             const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
@@ -392,6 +814,14 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         if(paidCheckEl) {
             paidCheckEl.addEventListener('change', (e) => {
                 const btn = document.getElementById('frige-confirm-btn');
+                if(btn) btn.disabled = !e.target.checked;
+            });
+        }
+
+        const sendCheckEl = document.getElementById('order-send-check');
+        if(sendCheckEl) {
+            sendCheckEl.addEventListener('change', (e) => {
+                const btn = document.getElementById('order-send-submit');
                 if(btn) btn.disabled = !e.target.checked;
             });
         }
@@ -734,6 +1164,30 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             link.click();
         };
 
+        window.cleanupInvalidOrders = async () => {
+            if(!isRistoratore() && !isAdmin()) return;
+            const invalid = (state.ordersRawToday || []).filter(o => !isValidOrder(o));
+            if(invalid.length === 0) return window.toast("Nessun tentativo da pulire");
+            const ok = window.confirm(`Vuoi rimuovere ${invalid.length} ordini non validi di oggi?`);
+            if(!ok) return;
+            try {
+                const batch = writeBatch(db_fb);
+                invalid.forEach(o => {
+                    const ref = doc(db_fb, "orders", o.id);
+                    batch.update(ref, {
+                        orderStatus: "void",
+                        voidedAt: serverTimestamp(),
+                        voidedBy: state.user?.email || "system"
+                    });
+                });
+                await batch.commit();
+                window.toast("Tentativi rimossi");
+            } catch(e) {
+                console.warn(e);
+                window.toast("Errore pulizia");
+            }
+        };
+
         window.copyFrigeSummary = () => {
             if(state.frige.purchasesToday.length === 0) return window.toast("Nessun acquisto");
             let text = `🧊 *FRIGE - ${new Date().toLocaleDateString('it-IT')}*\n\n`;
@@ -751,7 +1205,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
 
         // --- INTERNAL LOGIC ---
         function renderMenu() {
-            const filtered = state.menuData.filter(i => {
+            const orderOpen = isOrderWindowOpen();
+            const filtered = buildMenuList().filter(i => {
                 const s = i.name.toLowerCase().includes(state.search.toLowerCase());
                 const c = state.cat === 'all' || i.cat === state.cat;
                 const d = state.diet === 'all' || (i.diet && i.diet.includes(state.diet));
@@ -762,9 +1217,17 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 let html = "";
                 if(i.cat !== cur) { cur = i.cat; html += `<div class="col-span-full mt-6 mb-2 font-black text-[10px] uppercase text-primary/60 border-b border-primary/10 tracking-widest">${esc(cur)}</div>`; }
                 const pricing = i.hasPortions ? `<select data-pid="${i.id}" class="text-[9px] p-2 border rounded-xl w-full font-bold outline-none bg-gray-50">${i.portions.map(o=>`<option value="${o.v}">${esc(o.t)}</option>`).join('')}</select>` : `<span class="font-black text-primary text-lg">${formatCurrency(i.price)}</span>`;
-                html += `<div class="card p-5 rounded-[2rem] flex flex-col justify-between">
-                    <div><h4 class="font-bold text-sm product-title leading-tight mb-1">${esc(i.name)}</h4><p class="text-[9px] text-gray-300 italic">${esc(i.cat)}</p></div>
-                    <div class="mt-4 flex justify-between items-center gap-2">${pricing}<button data-action="add-std" data-id="${i.id}" class="bg-primary text-white h-10 w-10 rounded-2xl shadow-lg flex items-center justify-center flex-shrink-0 active:scale-90"><i class="fas fa-plus"></i></button></div>
+                const isDisabled = state.disabledProducts.has(i.id);
+                const disabled = (!orderOpen || isDisabled) ? 'opacity-50 pointer-events-none' : '';
+                const canManage = isAdmin() || isRistoratore();
+                const statusBadge = isDisabled ? `<span class="badge badge-red">Non disponibile</span>` : '';
+                html += `<div class="card p-5 rounded-[2rem] flex flex-col justify-between ${disabled}">
+                    <div class="flex items-start justify-between gap-2">
+                        <div><h4 class="font-bold text-sm product-title leading-tight mb-1">${esc(i.name)}</h4><p class="text-[9px] text-gray-300 italic">${esc(i.cat)}</p></div>
+                        ${statusBadge}
+                    </div>
+                    <div class="mt-4 flex justify-between items-center gap-2">${pricing}<button data-action="add-std" data-id="${i.id}" class="bg-primary text-white h-10 w-10 rounded-2xl shadow-lg flex items-center justify-center flex-shrink-0 active:scale-90" ${(!orderOpen || isDisabled) ? 'disabled' : ''}><i class="fas fa-plus"></i></button></div>
+                    ${canManage ? `<button data-action="toggle-availability" data-id="${i.id}" class="mt-3 btn btn-ghost text-[10px] px-3 py-2">${isDisabled ? 'Riattiva' : 'Disattiva'}</button>` : ''}
                 </div>`;
                 return html;
             }).join('');
@@ -799,6 +1262,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                     </div>
                 `;
                 opts.classList.add('hidden');
+                renderMyOrderStatus();
+                renderDailySummaryInline();
                 return;
             }
             opts.classList.remove('hidden');
@@ -808,6 +1273,281 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 <button data-action="remove-from-cart" data-id="${i.cartId}" class="text-red-300 p-2"><i class="fas fa-trash-alt"></i></button>
             </div>`).join('');
             document.getElementById('cart-total-display').textContent = formatCurrency(tot);
+            renderMyOrderStatus();
+            renderDailySummaryInline();
+        }
+
+        function syncMyOrders() {
+            if(!state.user?.email || state.subs.myOrders) return;
+            state.subs.myOrders = onSnapshot(
+                query(ordersCol, where("email", "==", state.user.email), orderBy("createdAt", "desc")),
+                snap => {
+                    state.myOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    renderMyOrderStatus();
+                },
+                () => {
+                    state.subs.myOrders = null;
+                    onSnapshot(query(ordersCol, orderBy("createdAt", "desc")), snap => {
+                        state.myOrders = snap.docs
+                            .map(d => ({ id: d.id, ...d.data() }))
+                            .filter(o => o.email === state.user.email);
+                        renderMyOrderStatus();
+                    });
+                }
+            );
+        }
+
+        function renderMyOrderStatus() {
+            const el = document.getElementById('my-order-status');
+            if(!el) return;
+            if(!state.user) {
+                el.innerHTML = `<div class="text-[11px] text-gray-500 font-bold">Accedi per vedere lo stato del tuo ordine.</div>`;
+                return;
+            }
+            const orders = (state.myOrders || []).filter(isValidOrder);
+            if(!orders.length) {
+                el.innerHTML = `<div class="text-[11px] text-gray-500 font-bold">Nessun ordine inviato oggi.</div>`;
+                return;
+            }
+            const latest = orders[0];
+            const paid = latest.paymentStatus === "paid";
+            const status = latest.orderStatus || "ricevuto";
+            const time = latest.createdAt ? formatTime(latest.createdAt) : '--:--';
+            const items = (latest.items || []).map(i => `${i.name}${i.details ? ` (${i.details})` : ''}`).join(' • ');
+            el.innerHTML = `
+                <div class="bg-white p-4 rounded-2xl border border-gray-100">
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="text-[10px] uppercase text-gray-400 font-black">Il tuo ultimo ordine</p>
+                        <span class="badge ${paid ? 'badge-green' : 'badge-amber'}">${paid ? 'Pagato' : 'Da verificare'}</span>
+                    </div>
+                    <p class="text-[12px] font-black mb-1">${esc(items)}</p>
+                    <div class="text-[11px] text-gray-500 font-bold">Ore ${time} · Stato: ${status}</div>
+                </div>
+            `;
+        }
+
+        const formatTime = (ts) => {
+            if(!ts) return '--:--';
+            const d = ts.toDate ? ts.toDate() : ts;
+            const hh = String(d.getHours()).padStart(2, '0');
+            const mm = String(d.getMinutes()).padStart(2, '0');
+            return `${hh}:${mm}`;
+        };
+
+        function syncMenuAvailability() {
+            if(state.subs.menu) return;
+            state.subs.menu = onSnapshot(query(menuProductsCol, orderBy("name", "asc")), snap => {
+                const disabled = new Set();
+                const overrides = new Map();
+                const extras = [];
+                snap.docs.forEach(d => {
+                    const data = d.data();
+                    const key = data?.key || '';
+                    if(key) overrides.set(key, data);
+                    if(data && data.isActive === false && key) disabled.add(key);
+                });
+                // Map keys back to ids
+                const disabledIds = new Set();
+                state.menuData.forEach(item => {
+                    const key = computeProductKey(item);
+                    if(disabled.has(key)) disabledIds.add(item.id);
+                });
+                // Build extras for products that are only in Firestore
+                overrides.forEach((data, key) => {
+                    const exists = state.menuData.some(i => computeProductKey(i) === key);
+                    if(!exists) {
+                        extras.push({
+                            id: `custom-${key}`,
+                            name: data.name,
+                            cat: data.cat,
+                            price: data.price || 0,
+                            diet: data.diet || ['carne/pesce'],
+                            isActive: data.isActive !== false
+                        });
+                        if(data.isActive === false) disabledIds.add(`custom-${key}`);
+                    }
+                });
+                state.menuOverrides = overrides;
+                state.menuExtras = extras;
+                state.disabledProducts = disabledIds;
+                saveDisabledProducts();
+                renderMenu();
+                renderMenuAdmin();
+            });
+        }
+
+        function syncCustomCreations() {
+            if(state.subs.custom) return;
+            state.subs.custom = onSnapshot(query(customCreationsCol, orderBy("createdAt", "desc")), snap => {
+                state.customCreations = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderCustomCreations();
+            });
+        }
+
+        function syncMenuAudit() {
+            if(state.subs.menuAudit) return;
+            state.subs.menuAudit = onSnapshot(query(menuAuditCol, orderBy("createdAt", "desc"), limit(10)), snap => {
+                state.menuAudit = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderMenuAudit();
+            });
+        }
+
+        function renderMenuAudit() {
+            const list = document.getElementById('menu-audit-list');
+            const last = document.getElementById('menu-audit-last');
+            if(!list) return;
+            const items = filterMenuAudit(state.menuAudit || []);
+            if(last) {
+                if(state.menuAudit && state.menuAudit.length) {
+                    const a = state.menuAudit[0];
+                    const when = a.createdAt ? formatTime(a.createdAt) : '--:--';
+                    const who = a.actorEmail || 'utente';
+                    const what = a.payload?.name || a.payload?.key || '—';
+                    last.textContent = `${what} · ${who} · ${when}`;
+                } else {
+                    last.textContent = 'Nessuna modifica recente';
+                }
+            }
+            if(!items.length) {
+                list.innerHTML = `<div class="text-[11px] text-gray-500 font-bold">Nessuna attività recente.</div>`;
+                return;
+            }
+            list.innerHTML = items.map(a => {
+                const when = a.createdAt ? formatTime(a.createdAt) : '--:--';
+                const actor = a.actorEmail || 'utente';
+                const action = (a.action || '').toUpperCase();
+                const name = a.payload?.name || a.payload?.key || '';
+                const price = a.payload?.price ? formatCurrency(a.payload.price) : '';
+                const active = typeof a.payload?.isActive === 'boolean' ? (a.payload.isActive ? 'Attivo' : 'Disattivato') : '';
+                const detail = [name, price, active].filter(Boolean).join(' · ');
+                return `
+                    <div class="bg-white p-3 rounded-2xl border border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <p class="text-[10px] font-black uppercase text-gray-400">${action}</p>
+                            <span class="text-[10px] text-gray-400 font-bold">${when}</span>
+                        </div>
+                        <p class="text-[11px] font-bold">${esc(detail)}</p>
+                        <p class="text-[10px] text-gray-500">da ${esc(actor)}</p>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterMenuAudit(items) {
+            const f = state.menuAuditFilter;
+            if(f === 'all') return items;
+            if(f === 'price') return items.filter(i => i.action === 'price');
+            if(f === 'availability') return items.filter(i => i.action === 'availability');
+            if(f === 'create') return items.filter(i => i.action === 'create');
+            if(f === 'update') return items.filter(i => i.action === 'update');
+            return items;
+        }
+
+        window.setMenuAuditFilter = (filter) => {
+            state.menuAuditFilter = filter;
+            ['all','price','availability','create','update'].forEach(f => {
+                const btn = document.getElementById(`menu-audit-filter-${f}`);
+                if(!btn) return;
+                btn.classList.toggle('btn-primary', filter === f);
+                btn.classList.toggle('btn-ghost', filter !== f);
+            });
+            renderMenuAudit();
+        };
+
+        window.exportMenuAudit = async () => {
+            try {
+                const snap = await getDocs(query(menuAuditCol, orderBy("createdAt", "desc"), limit(200)));
+                const fmt = (n) => {
+                    if(n === null || n === undefined || n === '') return '';
+                    const num = Number(n);
+                    if(Number.isNaN(num)) return '';
+                    return num.toLocaleString('it-IT', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+                };
+                let csv = "Timestamp;Azione;Prodotto;Categoria;Prezzo;Attivo;Utente;Ruolo\n";
+                snap.forEach(d => {
+                    const a = d.data();
+                    const ts = a.createdAt?.toDate();
+                    csv += `${ts ? ts.toLocaleString() : ''};${a.action || ''};${a.payload?.name || ''};${a.payload?.cat || ''};${fmt(a.payload?.price)};${typeof a.payload?.isActive === 'boolean' ? (a.payload.isActive ? 'Si' : 'No') : ''};${a.actorEmail || ''};${a.actorRole || ''}\n`;
+                });
+                const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "Audit_Menu.csv"; link.click();
+            } catch(e) {
+                console.warn('menu audit export failed', e);
+                window.toast("Errore export audit");
+            }
+        };
+
+        window.voteCreation = async (id) => {
+            if(!state.user) return window.toast("Accedi per votare");
+            try {
+                await runTransaction(db_fb, async (tx) => {
+                    const ref = doc(db_fb, "custom_creations", id);
+                    const snap = await tx.get(ref);
+                    if(!snap.exists()) return;
+                    const data = snap.data();
+                    const voters = data.voters || {};
+                    if(voters[state.user.email]) return;
+                    if(data.ownerEmail === state.user.email) return;
+                    voters[state.user.email] = true;
+                    const votes = (data.votes || 0) + 1;
+                    tx.update(ref, { voters, votes, updatedAt: serverTimestamp() });
+                });
+            } catch(e) {
+                console.warn('vote failed', e);
+                window.toast("Errore voto");
+            }
+        };
+
+        window.setCustomFilter = (filter) => {
+            state.customFilter = filter;
+            ['all','Panino','Pizza Ripiena'].forEach(f => {
+                const btn = document.getElementById(`custom-filter-${f === 'all' ? 'all' : (f === 'Panino' ? 'panino' : 'pizza')}`);
+                if(btn) btn.classList.toggle('btn-primary', filter === f);
+                if(btn) btn.classList.toggle('btn-ghost', filter !== f);
+            });
+            renderCustomCreations();
+        };
+
+        function renderCustomCreations() {
+            const list = document.getElementById('custom-history-list');
+            const topMonth = document.getElementById('custom-top-month');
+            const topAll = document.getElementById('custom-top-all');
+            if(!list || !topMonth || !topAll) return;
+            const filter = state.customFilter;
+            const data = state.customCreations || [];
+            const filtered = filter === 'all' ? data : data.filter(c => c.type === filter);
+            const now = new Date();
+            const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+            const monthItems = filtered.filter(c => c.createdAt && c.createdAt.toDate && c.createdAt.toDate() >= monthStart);
+            const topM = [...monthItems].sort((a,b) => (b.votes||0) - (a.votes||0))[0];
+            const topA = [...filtered].sort((a,b) => (b.votes||0) - (a.votes||0))[0];
+            topMonth.textContent = topM ? `Top mese: ${topM.name} (${topM.votes||0} voti)` : 'Top mese: n.d.';
+            topAll.textContent = topA ? `Top sempre: ${topA.name} (${topA.votes||0} voti)` : 'Top sempre: n.d.';
+
+            if(!filtered.length) {
+                list.innerHTML = `<div class="text-[11px] text-gray-500 font-bold">Nessuna creazione salvata.</div>`;
+                return;
+            }
+            list.innerHTML = filtered.map(c => {
+                const ingredients = (c.ingredients || []).join(', ');
+                const isOwner = c.ownerEmail === state.user?.email;
+                const hasVoted = c.voters && state.user?.email && c.voters[state.user.email];
+                const disabled = isOwner || hasVoted;
+                const voteLabel = isOwner ? 'Tuo' : (hasVoted ? 'Votato' : 'Vota');
+                return `
+                    <div class="bg-white p-4 rounded-2xl border border-gray-100 flex flex-wrap items-center gap-3">
+                        <div class="flex-1 min-w-[220px]">
+                            <p class="font-black text-sm">${esc(c.name)} <span class="chip chip-quiet">${esc(c.type)}</span></p>
+                            <p class="text-[10px] text-gray-500">di ${esc(c.ownerName || c.ownerEmail || 'Utente')}</p>
+                            <p class="text-[11px] text-gray-700 mt-1">${esc(ingredients)}</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="badge">${c.votes || 0} voti</span>
+                            <button data-action="custom-vote" data-id="${c.id}" class="btn btn-ghost text-[10px] px-3 py-2" ${disabled ? 'disabled' : ''}>${voteLabel}</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
         function syncOrders() {
@@ -815,29 +1555,226 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             const now = new Date(); now.setHours(0,0,0,0);
             state.subs.orders = onSnapshot(query(ordersCol, orderBy("createdAt", "desc")), snap => {
                 let totalG = 0;
-                state.ordersToday = snap.docs
+                const rawToday = snap.docs
                     .map(d => ({id: d.id, ...d.data()}))
                     .filter(o => o.createdAt && o.createdAt.toDate() >= now);
-                
-                document.getElementById('all-orders-list').innerHTML = state.ordersToday.map(o => {
-                    totalG += o.total || 0;
-                    const paid = o.paymentStatus === "paid";
-                    const badge = paid ? `<span class="badge badge-green"><i class="fas fa-check"></i>Pagato</span>` : `<span class="badge badge-amber"><i class="fas fa-clock"></i>Da verificare</span>`;
-                    return `<div class="card p-4 rounded-3xl border-l-8 border-primary flex justify-between items-center text-left">
-                        <div class="min-w-0 pr-4">
-                            <p class="font-black text-sm text-gray-800">${esc(o.user)}</p>
-                            <p class="text-[9px] text-gray-300 font-bold truncate">${esc(o.items.map(i=>i.name).join(' • '))}</p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            ${badge}
-                            <p class="font-black text-primary text-lg">${formatCurrency(o.total || 0)}</p>
-                        </div>
-                    </div>`;
-                }).join('');
+                state.ordersRawToday = rawToday;
+                state.ordersToday = rawToday.filter(isValidOrder);
+                const listEl = document.getElementById('all-orders-list');
+                if(state.ordersToday.length === 0) {
+                    listEl.innerHTML = `<div class="card p-6 rounded-3xl text-center text-gray-400 font-bold uppercase">Nessun ordine valido oggi</div>`;
+                } else {
+                    listEl.innerHTML = state.ordersToday.map(o => {
+                        totalG += o.total || 0;
+                        const paid = o.paymentStatus === "paid";
+                        const badge = paid ? `<span class="badge badge-green"><i class="fas fa-check"></i>Pagato</span>` : `<span class="badge badge-amber"><i class="fas fa-clock"></i>Da verificare</span>`;
+                        const time = formatTime(o.createdAt);
+                        const items = (o.items || []).map(i => {
+                            const label = i.details && i.details !== "" ? `${i.name} (${i.details})` : i.name;
+                            return `<span class="chip chip-quiet">${esc(label)}</span>`;
+                        }).join('');
+                        const notes = o.allergies && o.allergies.trim().length > 0
+                            ? `<div class="mt-2 text-[11px] text-red-700 font-bold">⚠️ ${esc(o.allergies.trim())}</div>`
+                            : '';
+                        return `
+                            <div class="card p-5 rounded-3xl border-l-8 border-primary text-left">
+                                <div class="card-header">
+                                    <div>
+                                        <p class="font-black text-sm text-gray-800">${esc(o.user)}</p>
+                                        <div class="card-meta mt-1">
+                                            <span class="chip">${time}</span>
+                                            ${badge}
+                                            <span class="chip">Totale ${formatCurrency(o.total || 0)}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap gap-2">${items}</div>
+                                ${notes}
+                            </div>
+                        `;
+                    }).join('');
+                }
                 document.getElementById('grand-total-display').textContent = formatCurrency(totalG);
                 renderOrdersPayments();
                 renderOrdersKPIs();
+                renderKitchenSummary();
+                renderDailySummaryInline();
+                updateInvalidOrdersUI();
             });
+        }
+
+        function buildKitchenSummary() {
+            const itemCounts = new Map();
+            let totalItems = 0;
+            state.ordersToday.forEach(o => {
+                (o.items || []).forEach(i => {
+                    const label = i.details && i.details !== "" ? `${i.name} (${i.details})` : i.name;
+                    itemCounts.set(label, (itemCounts.get(label) || 0) + 1);
+                    totalItems += 1;
+                });
+            });
+            const itemsSorted = Array.from(itemCounts.entries())
+                .map(([label, count]) => ({ label, count }))
+                .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+            return { itemsSorted, totalOrders: state.ordersToday.length, totalItems };
+        }
+
+        function renderKitchenSummary() {
+            const productsEl = document.getElementById('orders-summary-products');
+            const allergiesEl = document.getElementById('orders-summary-allergies');
+            const countEl = document.getElementById('orders-summary-count');
+            if(!productsEl || !allergiesEl || !countEl) return;
+
+            if(state.ordersToday.length === 0) {
+                productsEl.innerHTML = `<p class="text-gray-400">Nessun ordine presente.</p>`;
+                allergiesEl.innerHTML = `<p class="text-gray-400">Nessuna nota.</p>`;
+                countEl.textContent = "";
+                return;
+            }
+
+            const { itemsSorted, totalOrders, totalItems } = buildKitchenSummary();
+            countEl.textContent = `${totalOrders} ordini · ${totalItems} pezzi`;
+
+            productsEl.innerHTML = itemsSorted.map(i => `
+                <div class="flex items-center justify-between gap-2 bg-white px-3 py-2 rounded-xl border border-gray-100">
+                    <span class="font-semibold text-gray-700">${esc(i.label)}</span>
+                    <span class="badge">${i.count}x</span>
+                </div>
+            `).join('');
+
+            const allergies = state.ordersToday
+                .filter(o => o.allergies && o.allergies.trim().length > 0)
+                .map(o => ({
+                    user: o.user,
+                    note: o.allergies.trim()
+                }));
+
+            allergiesEl.innerHTML = allergies.length === 0
+                ? `<p class="text-gray-400">Nessuna nota o allergia.</p>`
+                : allergies.map(a => `
+                    <div class="bg-white px-3 py-2 rounded-xl border border-red-100">
+                        <p class="text-[10px] font-black uppercase text-red-700">${esc(a.user)}</p>
+                        <p class="text-[11px] text-gray-700">${esc(a.note)}</p>
+                    </div>
+                `).join('');
+        }
+
+        function renderDailySummaryInline() {
+            const wrap = document.getElementById('daily-summary-inline');
+            const productsEl = document.getElementById('daily-summary-products');
+            const allergiesEl = document.getElementById('daily-summary-allergies');
+            const countEl = document.getElementById('daily-summary-count');
+            const titleEl = document.getElementById('daily-summary-title');
+            const adminLink = document.getElementById('daily-summary-admin-link');
+            if(!wrap || !productsEl || !allergiesEl || !countEl || !titleEl || !adminLink) return;
+
+            if(isAdmin() || isRistoratore()) {
+                wrap.classList.remove('hidden');
+                adminLink.classList.remove('hidden');
+                titleEl.textContent = "Riepilogo Ordini Oggi";
+                if(state.ordersToday.length === 0) {
+                    productsEl.innerHTML = `<p class="text-gray-400">Nessun ordine presente.</p>`;
+                    allergiesEl.innerHTML = `<p class="text-gray-400">Nessuna nota.</p>`;
+                    countEl.textContent = "";
+                    return;
+                }
+                const { itemsSorted, totalOrders, totalItems } = buildKitchenSummary();
+                countEl.textContent = `${totalOrders} ordini · ${totalItems} pezzi`;
+                productsEl.innerHTML = itemsSorted.map(i => `
+                    <div class="flex items-center justify-between gap-2 bg-white px-3 py-2 rounded-xl border border-gray-100">
+                        <span class="font-semibold text-gray-700">${esc(i.label)}</span>
+                        <span class="badge">${i.count}x</span>
+                    </div>
+                `).join('');
+                const allergies = state.ordersToday
+                    .filter(o => o.allergies && o.allergies.trim().length > 0)
+                    .map(o => ({
+                        user: o.user,
+                        note: o.allergies.trim()
+                    }));
+                allergiesEl.innerHTML = allergies.length === 0
+                    ? `<p class="text-gray-400">Nessuna nota o allergia.</p>`
+                    : allergies.map(a => `
+                        <div class="bg-white px-3 py-2 rounded-xl border border-red-100">
+                            <p class="text-[10px] font-black uppercase text-red-700">${esc(a.user)}</p>
+                            <p class="text-[11px] text-gray-700">${esc(a.note)}</p>
+                        </div>
+                    `).join('');
+                return;
+            }
+
+            // Utenti standard: mostra solo i propri ordini
+            adminLink.classList.add('hidden');
+            if(!state.user) { wrap.classList.add('hidden'); return; }
+            wrap.classList.remove('hidden');
+            titleEl.textContent = "Il tuo riepilogo oggi";
+            const now = new Date(); now.setHours(0,0,0,0);
+            const myOrdersToday = (state.myOrders || []).filter(o => {
+                if(!isValidOrder(o)) return false;
+                if(!o.createdAt) return false;
+                const d = o.createdAt.toDate ? o.createdAt.toDate() : o.createdAt;
+                return d >= now;
+            });
+            if(myOrdersToday.length === 0) {
+                productsEl.innerHTML = `<p class="text-gray-400">Nessun ordine inviato oggi.</p>`;
+                allergiesEl.innerHTML = `<p class="text-gray-400">Nessuna nota.</p>`;
+                countEl.textContent = "";
+                return;
+            }
+            const itemCounts = new Map();
+            let totalItems = 0;
+            myOrdersToday.forEach(o => {
+                (o.items || []).forEach(i => {
+                    const label = i.details && i.details !== "" ? `${i.name} (${i.details})` : i.name;
+                    itemCounts.set(label, (itemCounts.get(label) || 0) + 1);
+                    totalItems += 1;
+                });
+            });
+            const itemsSorted = Array.from(itemCounts.entries())
+                .map(([label, count]) => ({ label, count }))
+                .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+            countEl.textContent = `${myOrdersToday.length} ordini · ${totalItems} pezzi`;
+            productsEl.innerHTML = itemsSorted.map(i => `
+                <div class="flex items-center justify-between gap-2 bg-white px-3 py-2 rounded-xl border border-gray-100">
+                    <span class="font-semibold text-gray-700">${esc(i.label)}</span>
+                    <span class="badge">${i.count}x</span>
+                </div>
+            `).join('');
+            const allergies = myOrdersToday
+                .filter(o => o.allergies && o.allergies.trim().length > 0)
+                .map(o => ({
+                    user: o.user,
+                    note: o.allergies.trim()
+                }));
+            allergiesEl.innerHTML = allergies.length === 0
+                ? `<p class="text-gray-400">Nessuna nota o allergia.</p>`
+                : allergies.map(a => `
+                    <div class="bg-white px-3 py-2 rounded-xl border border-red-100">
+                        <p class="text-[10px] font-black uppercase text-red-700">${esc(a.user)}</p>
+                        <p class="text-[11px] text-gray-700">${esc(a.note)}</p>
+                    </div>
+                `).join('');
+        }
+
+        function renderRoleStatus() {
+            const el = document.getElementById('role-status');
+            const missingEl = document.getElementById('claims-missing');
+            const banner = document.getElementById('auth-banner');
+            if(!el || !missingEl) return;
+            const cached = (() => {
+                try { return JSON.parse(localStorage.getItem('dose_user') || 'null'); } catch(e) { return null; }
+            })();
+            const email = state.user?.email || cached?.email || '-';
+            const role = state.user ? state.role : 'non autenticato';
+            el.textContent = `${email} · ruolo: ${role}`;
+
+            const isMapped = ROLE_EMAILS.admin.includes(email) || ROLE_EMAILS.ristoratore.includes(email) || ROLE_EMAILS.facility.includes(email);
+            const claimsNote = (state.role === 'user' && isMapped);
+            missingEl.textContent = claimsNote ? 'Claims non ancora assegnate (utente deve fare login)' : '';
+            if(banner) {
+                if(state.user) banner.classList.add('hidden');
+                else banner.classList.remove('hidden');
+            }
         }
 
         function syncFrige() {
@@ -877,7 +1814,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             state.analytics.unsub.orders = onSnapshot(query(ordersCol, orderBy("createdAt", "desc")), snap => {
                 state.analytics.ordersAll = snap.docs
                     .map(d => ({ id: d.id, ...d.data() }))
-                    .filter(o => o.createdAt);
+                    .filter(isValidOrder);
                 renderAnalytics();
             });
 
@@ -1227,6 +2164,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             if(!y.length) {
                 const forecastEl = document.getElementById('analytics-forecast');
                 if(forecastEl) forecastEl.textContent = 'Nessun dato';
+                const formulaEl = document.getElementById('analytics-forecast-formula');
+                if(formulaEl) formulaEl.textContent = '';
                 return;
             }
             // linear regression on last N weeks
@@ -1242,6 +2181,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             const forecast = Array.from({length:4}, (_,i) => Math.max(0, Math.round(intercept + slope * (n + i + 1))));
             const forecastEl = document.getElementById('analytics-forecast');
             if(forecastEl) forecastEl.textContent = forecast.length ? forecast.map((v,i)=>`Settimana +${i+1}: ${v}`).join(' • ') : 'Nessun dato';
+            const formulaEl = document.getElementById('analytics-forecast-formula');
+            if(formulaEl) formulaEl.textContent = `Modello: regressione lineare ultime ${n} settimane`;
         }
 
         function renderMixBars(topCats, total) {
@@ -1683,6 +2624,38 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             return items;
         }
 
+        function isValidOrder(o) {
+            if(!o) return false;
+            if(!o.createdAt) return false;
+            if(!Array.isArray(o.items) || o.items.length === 0) return false;
+            if((o.total || 0) <= 0) return false;
+            const status = (o.orderStatus || '').toLowerCase();
+            if(['void','canceled','annullato','bozza','draft'].includes(status)) return false;
+            // dopo le 11:30 non sono ordini validi (solo Frige)
+            const isFrigeOrder = (o.orderType || o.source || '').toString().toLowerCase() === 'frige';
+            const allowAfterHours = o.allowAfterHours === true || o.afterHoursAllowed === true;
+            if(!isFrigeOrder && !allowAfterHours) {
+                try {
+                    const d = o.createdAt.toDate ? o.createdAt.toDate() : o.createdAt;
+                    const minutes = d.getHours() * 60 + d.getMinutes();
+                    const cutoff = 11 * 60 + 30;
+                    if(minutes > cutoff) return false;
+                } catch(e) {}
+            }
+            return true;
+        }
+
+        function updateInvalidOrdersUI() {
+            const btn = document.getElementById('orders-cleanup-btn');
+            const countEl = document.getElementById('orders-invalid-count');
+            if(!btn || !countEl) return;
+            const invalidCount = (state.ordersRawToday || []).filter(o => !isValidOrder(o)).length;
+            countEl.textContent = invalidCount ? `(${invalidCount})` : '';
+            const canSee = isAdmin() || isRistoratore();
+            btn.classList.toggle('hidden', !canSee);
+            btn.disabled = !canSee || invalidCount === 0;
+        }
+
         function updateRestockOptions() {
             const select = document.getElementById('frige-restock-product');
             if(!select) return;
@@ -1693,13 +2666,27 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         function isRistoratore() { return state.role === 'ristoratore'; }
         function isFacility() { return state.role === 'facility'; }
 
-        function setRole(email) {
+        async function setRole(email) {
             const e = normalizeEmail(email);
             const n = normalizeName(state.user?.name);
-            if(ROLE_EMAILS.admin.includes(e) || ROLE_NAMES.admin.includes(n)) state.role = 'admin';
-            else if(ROLE_EMAILS.ristoratore.includes(e)) state.role = 'ristoratore';
-            else if(ROLE_EMAILS.facility.includes(e)) state.role = 'facility';
-            else state.role = 'user';
+            let role = 'user';
+
+            // 1) Try custom claims
+            try {
+                const token = await auth_fb.currentUser?.getIdTokenResult?.();
+                const claimRole = token?.claims?.role;
+                if(['admin','ristoratore','facility','user'].includes(claimRole)) {
+                    role = claimRole;
+                }
+            } catch(e) {}
+
+            // 2) Fallback to email mapping (pre-claims)
+            if(role === 'user') {
+                if(ROLE_EMAILS.admin.includes(e) || ROLE_NAMES.admin.includes(n)) role = 'admin';
+                else if(ROLE_EMAILS.ristoratore.includes(e)) role = 'ristoratore';
+                else if(ROLE_EMAILS.facility.includes(e)) role = 'facility';
+            }
+            state.role = role;
 
             const adminExportBtn = document.getElementById('admin-export-btn');
             const adminTools = document.getElementById('frige-admin-tools');
@@ -1710,6 +2697,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             const historyBtn = document.getElementById('btn-history');
             const analyticsBtn = document.getElementById('btn-analytics');
             const frigeBtn = document.getElementById('btn-frige');
+            const frigeWip = document.getElementById('frige-wip');
 
             const hide = (el) => { if(el) el.classList.add('hidden'); };
             const show = (el) => { if(el) el.classList.remove('hidden'); };
@@ -1733,38 +2721,74 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             if(isAdmin() || isRistoratore()) show(analyticsBtn);
 
             if (frigeBtn) {
+                frigeBtn.classList.remove('hidden');
                 if (isAdmin() || isRistoratore() || isFacility()) {
-                    frigeBtn.classList.remove('hidden');
+                    frigeBtn.classList.remove('nav-disabled');
                     frigeBtn.dataset.action = 'navigate';
                     frigeBtn.dataset.view = 'frige';
                     frigeBtn.setAttribute('aria-disabled', 'false');
+                    if(frigeWip) frigeWip.classList.add('hidden');
                 } else {
-                    frigeBtn.classList.add('hidden');
+                    frigeBtn.classList.add('nav-disabled');
+                    frigeBtn.dataset.action = 'noop';
                     frigeBtn.removeAttribute('data-view');
                     frigeBtn.setAttribute('aria-disabled', 'true');
+                    if(frigeWip) frigeWip.classList.remove('hidden');
                 }
             }
+
+            renderRoleStatus();
+            renderMenuAdminToggle();
+            renderMenuAdmin();
+            if(isAdmin() || isRistoratore()) syncMenuAudit();
+            renderDailySummaryInline();
+            updateInvalidOrdersUI();
         }
 
         // --- INIT ---
-        onAuthStateChanged(auth_fb, u => { 
-            if(!u) signInAnonymously(auth_fb); 
-            if(state.user) setRole(state.user.email);
-            else document.getElementById('user-modal').classList.remove('hidden');
+        onAuthStateChanged(auth_fb, async (u) => { 
+            if(u) {
+                const email = normalizeEmail(u.email);
+                const name = normalizeName(u.displayName || u.email?.split('@')[0] || '');
+                state.user = { name, email };
+                localStorage.setItem('dose_user', JSON.stringify(state.user));
+                document.getElementById('user-modal').classList.add('hidden');
+                await setRole(email);
+                syncMyOrders();
+                renderDailySummaryInline();
+            } else {
+                if(isLocalE2E && state.user?.email) {
+                    document.getElementById('user-modal').classList.add('hidden');
+                    await setRole(state.user.email);
+                } else {
+                    document.getElementById('user-modal').classList.remove('hidden');
+                }
+            }
         });
 
         const ACTION_HANDLERS = {
             'navigate': (el) => window.navigate(el.dataset.view),
+            'noop': () => window.toast("Sezione in arrivo (WIP)"),
             'select-base': (el) => window.selectBase(el.dataset.base),
             'set-subtype': (el) => window.setSubtype(el.dataset.subtype),
             'add-std': (el) => window.addStdToCart(el.dataset.id),
             'add-ing': (el) => window.addIng(el.dataset.id),
             'remove-ing': (el) => window.removeIng(parseInt(el.dataset.index, 10)),
             'add-custom': () => window.addCustomToCart(),
+            'toggle-availability': (el) => window.toggleProductAvailability(el.dataset.id),
+            'menu-upsert': () => window.upsertMenuProduct(),
+            'menu-update-price': (el) => window.updateMenuPrice(el.dataset.key),
+            'refresh-menu-admin': () => window.renderMenuAdmin(),
+            'toggle-menu-admin': () => window.toggleMenuAdmin(),
+            'menu-audit-filter': (el) => window.setMenuAuditFilter(el.dataset.filter),
+            'menu-audit-export': () => window.exportMenuAudit(),
             'remove-from-cart': (el) => window.removeFromCart(Number(el.dataset.id)),
+            'custom-vote': (el) => window.voteCreation(el.dataset.id),
+            'custom-filter': (el) => window.setCustomFilter(el.dataset.filter),
             'toggle-posate': () => window.togglePosate(),
             'send-order': () => window.sendOrder(),
             'copy-daily-summary': () => window.copyDailySummary(),
+            'copy-kitchen-summary': () => window.copyKitchenSummary(),
             'export-history': () => window.exportFullHistory(),
             'copy-frige-summary': () => window.copyFrigeSummary(),
             'seed-frige': () => window.seedFrige(),
@@ -1787,6 +2811,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             'orders-reconcile-selected': () => window.reconcileSelectedOrders(),
             'orders-export-csv': () => window.exportOrdersReconciliation(),
             'orders-mark-payment': (el) => window.markOrderPayment(el.dataset.id, el.dataset.status),
+            'orders-cleanup-invalid': () => window.cleanupInvalidOrders(),
             'analytics-range': (el) => window.setAnalyticsRange(el.dataset.range),
             'analytics-quick': (el) => window.runQuickAnalysis(el.dataset.quick),
             'analytics-export-csv': () => window.exportAnalyticsCSV(),
@@ -1795,10 +2820,14 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             'apply-target': (el) => window.applyTarget(el.dataset.target),
             'reset-zoom': () => window.resetAnalyticsZoom(),
             'save-user': () => window.saveUserData(),
+            'signin-google': () => window.signInWithGoogle(),
+            'signout': () => window.signOutUser(),
             'close-frige-modal': () => window.closeFrigeModal(),
             'confirm-frige': () => window.confirmFrigePurchase(),
             'close-order-confirm': () => closeOrderConfirm(),
-            'copy-order-confirm': () => copyOrderConfirm()
+            'copy-order-confirm': () => copyOrderConfirm(),
+            'close-send-confirm': () => closeSendConfirm(),
+            'confirm-send-order': () => confirmSendOrder()
         };
 
         document.addEventListener('click', (event) => {
@@ -1822,16 +2851,30 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
 
         const init = () => {
             state.menuData = Object.entries(RAW_MENU).flatMap(([cat, items]) => items.map((it, idx) => ({ ...it, cat, id: cat.replace(/\s/g,'')+idx })));
+            loadDisabledProducts();
+            syncMenuAvailability();
+            renderRoleStatus();
+            renderMenuAdminToggle();
+            const frigeBtn = document.getElementById('btn-frige');
+            if(frigeBtn) frigeBtn.classList.remove('hidden');
             document.getElementById('category-select').innerHTML = `<option value="all">Tutte le Categorie</option>` + Object.keys(RAW_MENU).map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
             document.getElementById('diet-select').innerHTML = `<option value="all">Ogni Regime</option>` + Object.entries(DIETS_CONFIG).map(([k,v]) => `<option value="${esc(k)}">${esc(v)}</option>`).join('');
             document.getElementById('search-input').oninput = (e) => { state.search = e.target.value; renderMenu(); };
             document.getElementById('category-select').onchange = (e) => { state.cat = e.target.value; renderMenu(); };
             document.getElementById('diet-select').onchange = (e) => { state.diet = e.target.value; renderMenu(); };
             renderMenu();
+            // Refresh menu lock state every minute
+            setInterval(renderMenu, 60000);
             if(window.innerWidth < 430) document.body.classList.add('compact');
             loadUserTargets();
             bindChartZoom('analytics-chart-orders', 'orders');
             bindChartZoom('analytics-chart-frige', 'frige');
+            renderMenuAdmin();
+            renderMyOrderStatus();
+            syncCustomCreations();
+            if(isLocalE2E && state.user?.email) {
+                setRole(state.user.email);
+            }
         };
 
         init();
