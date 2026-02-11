@@ -162,6 +162,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             ordersSelected: {},
             menuAudit: [],
             menuAuditFilter: 'all',
+            pendingOrder: null,
             analytics: { ordersAll: [], frigeAll: [], frigeProducts: [], refillsOpen: [], unsub: {}, range: 'today', lastPreset: 'today', resolution: { orders: 'daily', frige: 'daily' }, targets: { orders: { min: null, max: null }, frige: { min: null, max: null } }, chartData: {}, zoom: { orders: null, frige: null } },
             subs: { orders: null, frige: null, menu: null, myOrders: null, custom: null, menuAudit: null },
             role: 'user',
@@ -622,32 +623,69 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         window.sendOrder = async () => {
             if(!state.user) return document.getElementById('user-modal').classList.remove('hidden');
             if(!ensureOrderWindow()) return;
-            try {
-                if(!state.cart.length) return window.toast("Carrello vuoto");
-                const total = state.cart.reduce((s,i)=>s+i.price, 0);
-                if(total <= 0) return window.toast("Totale non valido");
-                const ok = window.confirm(`Confermi l'invio dell'ordine? Totale: ${formatCurrency(total)}`);
-                if(!ok) return;
-                const docRef = await addDoc(ordersCol, { 
-                    user: state.user.name, email: state.user.email,
-                    uid: auth_fb.currentUser.uid,
-                    items: state.cart, total, 
-                    allergies: document.getElementById('allergies-input').value,
-                    posate: state.posate ? 'Si' : 'No',
-                    paymentStatus: "pending",
-                    reconciled: false,
-                    orderStatus: "ricevuto",
-                    createdAt: serverTimestamp() 
-                });
-                const summary = buildOrderConfirmSummary(docRef.id, state.cart, total);
-                showOrderConfirm(summary);
-                state.cart = []; document.getElementById('cart-count').textContent='0'; window.navigate('history'); window.toast("Inviato!");
-            } catch(e) { alert("Connessione fallita. Carica online!"); }
+            if(!state.cart.length) return window.toast("Carrello vuoto");
+            const total = state.cart.reduce((s,i)=>s+i.price, 0);
+            if(total <= 0) return window.toast("Totale non valido");
+            openSendConfirm({
+                items: state.cart.slice(),
+                total,
+                allergies: document.getElementById('allergies-input').value,
+                posate: state.posate ? 'Si' : 'No'
+            });
         };
 
         function buildOrderConfirmSummary(orderId, items, total) {
             const lines = items.map(i => `• ${i.name}${i.details ? ` (${i.details})` : ''} — ${formatCurrency(i.price)}`);
             return `Ordine #${orderId}\n` + lines.join('\n') + `\nTotale: ${formatCurrency(total)}`;
+        }
+
+        function buildSendSummary(items, total) {
+            const lines = items.map(i => `• ${i.name}${i.details ? ` (${i.details})` : ''} — ${formatCurrency(i.price)}`);
+            return lines.join('\n') + `\nTotale: ${formatCurrency(total)}`;
+        }
+
+        function openSendConfirm(payload) {
+            state.pendingOrder = payload;
+            const modal = document.getElementById('order-send-modal');
+            const box = document.getElementById('order-send-summary');
+            const check = document.getElementById('order-send-check');
+            const submit = document.getElementById('order-send-submit');
+            if(!modal || !box || !check || !submit) return;
+            box.textContent = buildSendSummary(payload.items, payload.total);
+            check.checked = false;
+            submit.disabled = true;
+            modal.classList.remove('hidden');
+        }
+
+        function closeSendConfirm() {
+            const modal = document.getElementById('order-send-modal');
+            if(modal) modal.classList.add('hidden');
+            state.pendingOrder = null;
+        }
+
+        async function confirmSendOrder() {
+            if(!state.pendingOrder) return;
+            const check = document.getElementById('order-send-check');
+            if(check && !check.checked) return window.toast("Conferma l'invio");
+            const payload = state.pendingOrder;
+            try {
+                const docRef = await addDoc(ordersCol, { 
+                    user: state.user.name, email: state.user.email,
+                    uid: auth_fb.currentUser.uid,
+                    items: payload.items, total: payload.total, 
+                    allergies: payload.allergies,
+                    posate: payload.posate,
+                    paymentStatus: "pending",
+                    reconciled: false,
+                    orderStatus: "ricevuto",
+                    createdAt: serverTimestamp() 
+                });
+                closeSendConfirm();
+                const summary = buildOrderConfirmSummary(docRef.id, payload.items, payload.total);
+                showOrderConfirm(summary);
+                state.pendingOrder = null;
+                state.cart = []; document.getElementById('cart-count').textContent='0'; window.navigate('history'); window.toast("Inviato!");
+            } catch(e) { alert("Connessione fallita. Carica online!"); }
         }
 
         function showOrderConfirm(summaryText) {
@@ -761,6 +799,14 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         if(paidCheckEl) {
             paidCheckEl.addEventListener('change', (e) => {
                 const btn = document.getElementById('frige-confirm-btn');
+                if(btn) btn.disabled = !e.target.checked;
+            });
+        }
+
+        const sendCheckEl = document.getElementById('order-send-check');
+        if(sendCheckEl) {
+            sendCheckEl.addEventListener('change', (e) => {
+                const btn = document.getElementById('order-send-submit');
                 if(btn) btn.disabled = !e.target.checked;
             });
         }
@@ -2764,7 +2810,9 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             'close-frige-modal': () => window.closeFrigeModal(),
             'confirm-frige': () => window.confirmFrigePurchase(),
             'close-order-confirm': () => closeOrderConfirm(),
-            'copy-order-confirm': () => copyOrderConfirm()
+            'copy-order-confirm': () => copyOrderConfirm(),
+            'close-send-confirm': () => closeSendConfirm(),
+            'confirm-send-order': () => confirmSendOrder()
         };
 
         document.addEventListener('click', (event) => {

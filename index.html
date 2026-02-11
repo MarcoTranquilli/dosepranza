@@ -698,6 +698,30 @@
         </div>
     </div>
 
+    <div id="order-send-modal" class="fixed inset-0 bg-gray-900/90 backdrop-blur-md flex items-center justify-center z-[100] hidden p-4">
+        <div class="bg-white p-8 rounded-[2.5rem] shadow-2xl w-full max-w-md border border-white/20">
+            <div class="flex items-start justify-between mb-4">
+                <div>
+                    <p class="text-xs font-black uppercase tracking-widest text-primary">Conferma Ordine</p>
+                    <h3 class="text-xl font-black tracking-tight">Vuoi inviare?</h3>
+                </div>
+                <button data-action="close-send-confirm" class="text-gray-400 hover:text-gray-700">✕</button>
+            </div>
+            <div class="bg-gray-50 rounded-2xl p-4 text-left mb-4">
+                <p class="text-[10px] text-gray-400 uppercase font-bold mb-2">Riepilogo</p>
+                <div id="order-send-summary" class="text-[11px] font-bold text-gray-700"></div>
+            </div>
+            <label class="flex items-center gap-3 bg-orange-50 border border-orange-100 rounded-2xl p-3">
+                <input id="order-send-check" type="checkbox" class="h-4 w-4">
+                <span class="text-[11px] font-black text-primary">Confermo di voler inviare l’ordine</span>
+            </label>
+            <div class="flex gap-2 mt-4">
+                <button data-action="close-send-confirm" class="flex-1 btn btn-ghost text-[11px] py-3">Annulla</button>
+                <button id="order-send-submit" data-action="confirm-send-order" class="flex-1 btn btn-primary text-[11px] py-3" disabled>Invia ordine</button>
+            </div>
+        </div>
+    </div>
+
     <div id="toast" class="fixed top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white py-4 px-8 rounded-full shadow-2xl z-[200] opacity-0 transition-all duration-300 pointer-events-none scale-90 text-[10px] font-black uppercase text-center tracking-widest">
         <p id="toast-message"></p>
     </div>
