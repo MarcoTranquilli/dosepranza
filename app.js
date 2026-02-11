@@ -162,7 +162,10 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             ordersSelected: {},
             analytics: { ordersAll: [], frigeAll: [], frigeProducts: [], refillsOpen: [], unsub: {}, range: 'today', lastPreset: 'today', resolution: { orders: 'daily', frige: 'daily' }, targets: { orders: { min: null, max: null }, frige: { min: null, max: null } }, chartData: {}, zoom: { orders: null, frige: null } },
             subs: { orders: null, frige: null, menu: null, myOrders: null, custom: null },
-            role: 'user'
+            role: 'user',
+            menuAdminOpen: (() => {
+                try { return JSON.parse(localStorage.getItem('menu_admin_open') || 'true'); } catch(e) { return true; }
+            })()
         };
         const LOW_STOCK_THRESHOLD = 2;
         const ORDER_CUTOFF = { hour: 11, minute: 30 };
@@ -447,11 +450,48 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             }
         };
 
+        const renderMenuAdminToggle = () => {
+            const quick = document.getElementById('role-quick');
+            const txt = document.getElementById('role-quick-text');
+            const hint = document.getElementById('role-quick-hint');
+            const btn = document.getElementById('menu-admin-toggle');
+            if(!quick || !txt || !hint || !btn) return;
+
+            const cached = (() => {
+                try { return JSON.parse(localStorage.getItem('dose_user') || 'null'); } catch(e) { return null; }
+            })();
+            const email = state.user?.email || cached?.email || '-';
+            const role = state.user ? state.role : 'non autenticato';
+            txt.textContent = `${email} · ${role}`;
+
+            if(state.user) {
+                quick.classList.remove('hidden');
+                if(isAdmin() || isRistoratore()) {
+                    btn.classList.remove('hidden');
+                    btn.textContent = state.menuAdminOpen ? 'Nascondi gestione menù' : 'Mostra gestione menù';
+                    hint.textContent = 'Accesso avanzato attivo: puoi gestire prodotti e disponibilità.';
+                } else {
+                    btn.classList.add('hidden');
+                    hint.textContent = 'Accesso standard: alcune funzioni sono riservate.';
+                }
+            } else {
+                quick.classList.add('hidden');
+            }
+        };
+
+        window.toggleMenuAdmin = () => {
+            state.menuAdminOpen = !state.menuAdminOpen;
+            localStorage.setItem('menu_admin_open', JSON.stringify(state.menuAdminOpen));
+            renderMenuAdmin();
+            renderMenuAdminToggle();
+        };
+
         window.renderMenuAdmin = () => {
             const panel = document.getElementById('menu-admin-panel');
             const list = document.getElementById('menu-admin-list');
             if(!panel || !list) return;
             if(!(isAdmin() || isRistoratore())) { panel.classList.add('hidden'); return; }
+            if(!state.menuAdminOpen) { panel.classList.add('hidden'); return; }
             panel.classList.remove('hidden');
             const items = buildMenuList();
             list.innerHTML = items.map(i => {
@@ -2296,6 +2336,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             const historyBtn = document.getElementById('btn-history');
             const analyticsBtn = document.getElementById('btn-analytics');
             const frigeBtn = document.getElementById('btn-frige');
+            const frigeWip = document.getElementById('frige-wip');
 
             const hide = (el) => { if(el) el.classList.add('hidden'); };
             const show = (el) => { if(el) el.classList.remove('hidden'); };
@@ -2320,18 +2361,22 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
 
             if (frigeBtn) {
                 if (isAdmin() || isRistoratore() || isFacility()) {
-                    frigeBtn.classList.remove('hidden');
+                    frigeBtn.classList.remove('nav-disabled');
                     frigeBtn.dataset.action = 'navigate';
                     frigeBtn.dataset.view = 'frige';
                     frigeBtn.setAttribute('aria-disabled', 'false');
+                    if(frigeWip) frigeWip.classList.add('hidden');
                 } else {
-                    frigeBtn.classList.add('hidden');
+                    frigeBtn.classList.add('nav-disabled');
+                    frigeBtn.dataset.action = 'noop';
                     frigeBtn.removeAttribute('data-view');
                     frigeBtn.setAttribute('aria-disabled', 'true');
+                    if(frigeWip) frigeWip.classList.remove('hidden');
                 }
             }
 
             renderRoleStatus();
+            renderMenuAdminToggle();
             renderMenuAdmin();
         }
 
@@ -2352,6 +2397,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
 
         const ACTION_HANDLERS = {
             'navigate': (el) => window.navigate(el.dataset.view),
+            'noop': () => window.toast("Sezione in arrivo (WIP)"),
             'select-base': (el) => window.selectBase(el.dataset.base),
             'set-subtype': (el) => window.setSubtype(el.dataset.subtype),
             'add-std': (el) => window.addStdToCart(el.dataset.id),
@@ -2362,6 +2408,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             'menu-upsert': () => window.upsertMenuProduct(),
             'menu-update-price': (el) => window.updateMenuPrice(el.dataset.key),
             'refresh-menu-admin': () => window.renderMenuAdmin(),
+            'toggle-menu-admin': () => window.toggleMenuAdmin(),
             'remove-from-cart': (el) => window.removeFromCart(Number(el.dataset.id)),
             'custom-vote': (el) => window.voteCreation(el.dataset.id),
             'custom-filter': (el) => window.setCustomFilter(el.dataset.filter),
@@ -2431,6 +2478,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             loadDisabledProducts();
             syncMenuAvailability();
             renderRoleStatus();
+            renderMenuAdminToggle();
             document.getElementById('category-select').innerHTML = `<option value="all">Tutte le Categorie</option>` + Object.keys(RAW_MENU).map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
             document.getElementById('diet-select').innerHTML = `<option value="all">Ogni Regime</option>` + Object.entries(DIETS_CONFIG).map(([k,v]) => `<option value="${esc(k)}">${esc(v)}</option>`).join('');
             document.getElementById('search-input').oninput = (e) => { state.search = e.target.value; renderMenu(); };

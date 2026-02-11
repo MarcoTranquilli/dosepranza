@@ -27,7 +27,10 @@
         <nav class="grid grid-cols-6 gap-1 glass p-2 rounded-2xl shadow-lg sticky top-2 z-50 mb-6">
             <button data-action="navigate" data-view="menu" id="btn-menu" class="nav-btn py-3 rounded-xl font-bold text-[10px] uppercase transition-all active"><i class="fas fa-utensils block text-sm mb-1"></i>Menù</button>
             <button data-action="navigate" data-view="custom" id="btn-custom" class="nav-btn py-3 rounded-xl font-bold text-[10px] uppercase transition-all"><i class="fas fa-plus-circle block text-sm mb-1"></i>Crea</button>
-            <button data-action="navigate" data-view="frige" id="btn-frige" class="nav-btn py-3 rounded-xl font-bold text-[10px] uppercase transition-all"><i class="fas fa-snowflake block text-sm mb-1"></i>Frige</button>
+            <button data-action="navigate" data-view="frige" id="btn-frige" class="nav-btn py-3 rounded-xl font-bold text-[10px] uppercase transition-all relative">
+                <i class="fas fa-snowflake block text-sm mb-1"></i>Frige
+                <span id="frige-wip" class="nav-wip hidden">WIP</span>
+            </button>
             <button data-action="navigate" data-view="cart" id="btn-cart" class="nav-btn py-3 rounded-xl font-bold text-[10px] uppercase transition-all relative">
                 <i class="fas fa-shopping-basket block text-sm mb-1"></i>Ordine
                 <span id="cart-count" class="absolute top-1 right-1 bg-red-500 text-white text-[9px] h-4 w-4 rounded-full flex items-center justify-center border border-white">0</span>
@@ -41,6 +44,14 @@
                 <button data-action="signin-google" class="btn btn-ghost text-[10px] px-3 py-2">Login Google</button>
                 <button data-action="signout" class="btn btn-ghost text-[10px] px-3 py-2">Logout</button>
             </div>
+        </div>
+        <div id="role-quick" class="hidden bg-white border border-gray-100 rounded-2xl mb-4 px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <p class="text-[10px] uppercase text-gray-400 font-black">Accesso</p>
+                <p id="role-quick-text" class="text-[11px] font-bold text-gray-700">-</p>
+                <p id="role-quick-hint" class="text-[10px] text-gray-500 font-bold mt-1"></p>
+            </div>
+            <button id="menu-admin-toggle" data-action="toggle-menu-admin" class="btn btn-ghost text-[10px] px-3 py-2 hidden">Gestione menù</button>
         </div>
 
         <main>

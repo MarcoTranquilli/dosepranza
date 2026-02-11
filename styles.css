@@ -20,6 +20,8 @@
         .ingredient-card.selected { border-color: #D6804F; background-color: #fef4ef; border-width: 3px; }
         .nav-btn { background: rgba(255,255,255,0.9); border: 1px solid rgba(214, 200, 175, 0.7); }
         .nav-btn.active { background: linear-gradient(135deg, #D6804F, #c0673a); color: white; box-shadow: 0 12px 26px rgba(208,128,79,0.28); }
+        .nav-btn.nav-disabled { opacity: 0.6; cursor: not-allowed; box-shadow: none; }
+        .nav-wip { position: absolute; top: 6px; right: 8px; background: #f7efe6; color: #8c502f; border: 1px solid #eadfce; padding: 2px 6px; border-radius: 999px; font-size: 8px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
         .glass { background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.7); box-shadow: 0 12px 26px rgba(50,40,20,0.08); }
         .card { background: rgba(255,255,255,0.95); border: 1px solid rgba(222, 212, 192, 0.65); box-shadow: 0 12px 28px rgba(50,40,20,0.1); transition: transform .2s ease, box-shadow .2s ease; }
         .card:hover { transform: translateY(-3px); box-shadow: 0 18px 32px rgba(50,40,20,0.14); }
