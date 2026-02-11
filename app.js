@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addDoc, serverTimestamp, query, orderBy, getDocs, runTransaction, doc, where, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addDoc, serverTimestamp, query, orderBy, getDocs, runTransaction, doc, where, limit, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- DATABASE PRODOTTI COMPLETO ---
         const DIETS_CONFIG = { "carne/pesce": "🥩 Carne/Pesce", "vegetariano": "🧀 Vegetariano", "vegano": "🌱 Vegano" };
@@ -623,7 +623,9 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(!state.user) return document.getElementById('user-modal').classList.remove('hidden');
             if(!ensureOrderWindow()) return;
             try {
+                if(!state.cart.length) return window.toast("Carrello vuoto");
                 const total = state.cart.reduce((s,i)=>s+i.price, 0);
+                if(total <= 0) return window.toast("Totale non valido");
                 const docRef = await addDoc(ordersCol, { 
                     user: state.user.name, email: state.user.email,
                     uid: auth_fb.currentUser.uid,
@@ -725,6 +727,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             let csv = "OrderID;TimestampISO8601;DataLeggibile;UserID;Utente;EmailUtente;Prodotto;Dettagli;CategoriaProdotto;Quantita;PrezzoUnitario;TotaleRiga;MetodoPagamento;Allergie;Posate;CanaleOrdine;StatoPagamento;RispostaRistoratore\n";
             snap.forEach(d => {
                 const o = d.data();
+                if(!isValidOrder(o)) return;
                 const ts = o.createdAt?.toDate();
                 o.items.forEach(i => {
                     const status = o.paymentStatus === "paid" ? "Pagato" : "Da Pagare";
@@ -1098,6 +1101,30 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             link.click();
         };
 
+        window.cleanupInvalidOrders = async () => {
+            if(!isRistoratore() && !isAdmin()) return;
+            const invalid = (state.ordersRawToday || []).filter(o => !isValidOrder(o));
+            if(invalid.length === 0) return window.toast("Nessun tentativo da pulire");
+            const ok = window.confirm(`Vuoi rimuovere ${invalid.length} ordini non validi di oggi?`);
+            if(!ok) return;
+            try {
+                const batch = writeBatch(db_fb);
+                invalid.forEach(o => {
+                    const ref = doc(db_fb, "orders", o.id);
+                    batch.update(ref, {
+                        orderStatus: "void",
+                        voidedAt: serverTimestamp(),
+                        voidedBy: state.user?.email || "system"
+                    });
+                });
+                await batch.commit();
+                window.toast("Tentativi rimossi");
+            } catch(e) {
+                console.warn(e);
+                window.toast("Errore pulizia");
+            }
+        };
+
         window.copyFrigeSummary = () => {
             if(state.frige.purchasesToday.length === 0) return window.toast("Nessun acquisto");
             let text = `🧊 *FRIGE - ${new Date().toLocaleDateString('it-IT')}*\n\n`;
@@ -1214,7 +1241,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 el.innerHTML = `<div class="text-[11px] text-gray-500 font-bold">Accedi per vedere lo stato del tuo ordine.</div>`;
                 return;
             }
-            const orders = (state.myOrders || []).filter(o => o.items && o.items.length > 0);
+            const orders = (state.myOrders || []).filter(isValidOrder);
             if(!orders.length) {
                 el.innerHTML = `<div class="text-[11px] text-gray-500 font-bold">Nessun ordine inviato oggi.</div>`;
                 return;
@@ -1465,11 +1492,11 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             const now = new Date(); now.setHours(0,0,0,0);
             state.subs.orders = onSnapshot(query(ordersCol, orderBy("createdAt", "desc")), snap => {
                 let totalG = 0;
-                state.ordersToday = snap.docs
+                const rawToday = snap.docs
                     .map(d => ({id: d.id, ...d.data()}))
-                    .filter(o => o.createdAt && o.createdAt.toDate() >= now)
-                    // Esclude ordini non effettuati (vuoti o con totale 0)
-                    .filter(o => Array.isArray(o.items) && o.items.length > 0 && (o.total || 0) > 0);
+                    .filter(o => o.createdAt && o.createdAt.toDate() >= now);
+                state.ordersRawToday = rawToday;
+                state.ordersToday = rawToday.filter(isValidOrder);
                 const listEl = document.getElementById('all-orders-list');
                 if(state.ordersToday.length === 0) {
                     listEl.innerHTML = `<div class="card p-6 rounded-3xl text-center text-gray-400 font-bold uppercase">Nessun ordine valido oggi</div>`;
@@ -1509,6 +1536,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 renderOrdersKPIs();
                 renderKitchenSummary();
                 renderDailySummaryInline();
+                updateInvalidOrdersUI();
             });
         }
 
@@ -1619,6 +1647,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             titleEl.textContent = "Il tuo riepilogo oggi";
             const now = new Date(); now.setHours(0,0,0,0);
             const myOrdersToday = (state.myOrders || []).filter(o => {
+                if(!isValidOrder(o)) return false;
                 if(!o.createdAt) return false;
                 const d = o.createdAt.toDate ? o.createdAt.toDate() : o.createdAt;
                 return d >= now;
@@ -1722,7 +1751,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             state.analytics.unsub.orders = onSnapshot(query(ordersCol, orderBy("createdAt", "desc")), snap => {
                 state.analytics.ordersAll = snap.docs
                     .map(d => ({ id: d.id, ...d.data() }))
-                    .filter(o => o.createdAt);
+                    .filter(isValidOrder);
                 renderAnalytics();
             });
 
@@ -2532,6 +2561,27 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             return items;
         }
 
+        function isValidOrder(o) {
+            if(!o) return false;
+            if(!o.createdAt) return false;
+            if(!Array.isArray(o.items) || o.items.length === 0) return false;
+            if((o.total || 0) <= 0) return false;
+            const status = (o.orderStatus || '').toLowerCase();
+            if(['void','canceled','annullato','bozza','draft'].includes(status)) return false;
+            return true;
+        }
+
+        function updateInvalidOrdersUI() {
+            const btn = document.getElementById('orders-cleanup-btn');
+            const countEl = document.getElementById('orders-invalid-count');
+            if(!btn || !countEl) return;
+            const invalidCount = (state.ordersRawToday || []).filter(o => !isValidOrder(o)).length;
+            countEl.textContent = invalidCount ? `(${invalidCount})` : '';
+            const canSee = isAdmin() || isRistoratore();
+            btn.classList.toggle('hidden', !canSee);
+            btn.disabled = !canSee || invalidCount === 0;
+        }
+
         function updateRestockOptions() {
             const select = document.getElementById('frige-restock-product');
             if(!select) return;
@@ -2618,6 +2668,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             renderMenuAdmin();
             if(isAdmin() || isRistoratore()) syncMenuAudit();
             renderDailySummaryInline();
+            updateInvalidOrdersUI();
         }
 
         // --- INIT ---
@@ -2686,6 +2737,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             'orders-reconcile-selected': () => window.reconcileSelectedOrders(),
             'orders-export-csv': () => window.exportOrdersReconciliation(),
             'orders-mark-payment': (el) => window.markOrderPayment(el.dataset.id, el.dataset.status),
+            'orders-cleanup-invalid': () => window.cleanupInvalidOrders(),
             'analytics-range': (el) => window.setAnalyticsRange(el.dataset.range),
             'analytics-quick': (el) => window.runQuickAnalysis(el.dataset.quick),
             'analytics-export-csv': () => window.exportAnalyticsCSV(),

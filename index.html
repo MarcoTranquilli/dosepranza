@@ -394,13 +394,14 @@
                     </div>
                  </div>
 
-                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6">
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6">
                     <div class="flex justify-between items-center mb-3">
                         <h3 class="text-xs font-black uppercase text-gray-500">Riconciliazione Ordini</h3>
                         <div class="flex gap-2">
                         <button data-action="orders-pay-filter" data-filter="pending" id="orders-pay-filter-pending" class="btn btn-primary text-[10px] px-3 py-2">Da verificare</button>
                         <button data-action="orders-pay-filter" data-filter="paid" id="orders-pay-filter-paid" class="btn btn-ghost text-[10px] px-3 py-2">Riconciliati</button>
                         <button data-action="copy-orders-payments" class="btn btn-ghost text-[10px] px-3 py-2">Copia lista</button>
+                        <button id="orders-cleanup-btn" data-action="orders-cleanup-invalid" class="btn btn-ghost text-[10px] px-3 py-2 hidden">Pulisci tentativi <span id="orders-invalid-count"></span></button>
                         </div>
                     </div>
                     <div class="flex flex-wrap items-center gap-2 mb-3">
