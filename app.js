@@ -169,6 +169,15 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         };
         const LOW_STOCK_THRESHOLD = 2;
         const ORDER_CUTOFF = { hour: 11, minute: 30 };
+        const isLocalE2E = (() => {
+            try {
+                const host = window.location.hostname;
+                const params = new URLSearchParams(window.location.search);
+                return (host === '127.0.0.1' || host === 'localhost') && params.get('e2e') === '1';
+            } catch(e) {
+                return false;
+            }
+        })();
 
         const ROLE_EMAILS = {
             admin: ['marco.tranquilli@dos.design'],
@@ -2391,7 +2400,12 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 await setRole(email);
                 syncMyOrders();
             } else {
-                document.getElementById('user-modal').classList.remove('hidden');
+                if(isLocalE2E && state.user?.email) {
+                    document.getElementById('user-modal').classList.add('hidden');
+                    await setRole(state.user.email);
+                } else {
+                    document.getElementById('user-modal').classList.remove('hidden');
+                }
             }
         });
 

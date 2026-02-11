@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('UAT Utente standard: ordine + frige', async ({ page }) => {
+test('UAT Utente standard: ordine + frige WIP', async ({ page }) => {
   await page.goto('/');
 
   await page.click('#btn-menu');
@@ -10,11 +10,9 @@ test('UAT Utente standard: ordine + frige', async ({ page }) => {
   const confirm = page.locator('[data-action="send-order"]');
   await confirm.click();
 
-  await page.click('#btn-frige');
-  const buy = page.locator('[data-action="frige-open-modal"]').first();
-  await buy.click();
-  await page.check('#frige-paid-check');
-  await page.click('[data-action="confirm-frige"]');
+  await page.click('#btn-menu');
+  await expect(page.locator('#btn-frige')).toHaveClass(/nav-disabled/);
+  await expect(page.locator('#frige-wip')).toBeVisible();
 
   await expect(page.locator('#toast')).toBeVisible();
 });

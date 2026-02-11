@@ -25,7 +25,7 @@ jobs:
       - name: Run UAT
         run: npm run test:uat
         env:
-          BASE_URL: http://127.0.0.1:8081
+          BASE_URL: http://127.0.0.1:8081/?e2e=1
       - name: Generate PDF report
         run: node scripts/render_report_pdf.mjs
       - name: Deploy summary

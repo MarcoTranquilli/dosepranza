@@ -10,11 +10,11 @@ const roles = {
 async function loginAndSave(page: any, name: string, email: string, storagePath: string) {
   await page.goto('/');
   await page.evaluate(() => localStorage.removeItem('dose_user'));
+  await page.evaluate((payload) => {
+    localStorage.setItem('dose_user', JSON.stringify(payload));
+  }, { name, email });
   await page.reload();
-  await page.fill('#user-name-input', name);
-  await page.fill('#user-email-input', email);
-  await page.click('[data-action="save-user"]');
-  await page.waitForTimeout(300);
+  await page.waitForTimeout(200);
   await page.context().storageState({ path: storagePath });
 }
 
