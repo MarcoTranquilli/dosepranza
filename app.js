@@ -2568,6 +2568,17 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if((o.total || 0) <= 0) return false;
             const status = (o.orderStatus || '').toLowerCase();
             if(['void','canceled','annullato','bozza','draft'].includes(status)) return false;
+            // dopo le 11:30 non sono ordini validi (solo Frige)
+            const isFrigeOrder = (o.orderType || o.source || '').toString().toLowerCase() === 'frige';
+            const allowAfterHours = o.allowAfterHours === true || o.afterHoursAllowed === true;
+            if(!isFrigeOrder && !allowAfterHours) {
+                try {
+                    const d = o.createdAt.toDate ? o.createdAt.toDate() : o.createdAt;
+                    const minutes = d.getHours() * 60 + d.getMinutes();
+                    const cutoff = 11 * 60 + 30;
+                    if(minutes > cutoff) return false;
+                } catch(e) {}
+            }
             return true;
         }
 
