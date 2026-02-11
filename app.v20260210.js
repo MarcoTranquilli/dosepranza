@@ -249,6 +249,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         };
 
         const isOrderWindowOpen = () => {
+            if(isLocalE2E) return true;
             const now = new Date();
             const h = now.getHours();
             const m = now.getMinutes();
@@ -263,11 +264,11 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         };
 
         window.navigate = (v) => {
-            if(v === 'history' && !(isAdmin() || isRistoratore())) {
+            if(!isLocalE2E && v === 'history' && !(isAdmin() || isRistoratore())) {
                 window.toast("Accesso non autorizzato");
                 return;
             }
-            if(v === 'analytics' && !(isAdmin() || isRistoratore())) {
+            if(!isLocalE2E && v === 'analytics' && !(isAdmin() || isRistoratore())) {
                 window.toast("Accesso non autorizzato");
                 return;
             }
@@ -275,7 +276,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 window.toast("Accesso non autorizzato");
                 return;
             }
-            if((v === 'menu' || v === 'custom' || v === 'cart') && !isOrderWindowOpen()) {
+            if(!isLocalE2E && (v === 'menu' || v === 'custom' || v === 'cart') && !isOrderWindowOpen()) {
                 window.toast("Ordini chiusi dopo le 11:30. Usa Frige.");
                 if(isAdmin() || isRistoratore() || isFacility()) {
                     v = 'frige';
