@@ -177,7 +177,8 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 const host = window.location.hostname;
                 const params = new URLSearchParams(window.location.search);
                 const flag = localStorage.getItem('dose_e2e');
-                return (host === '127.0.0.1' || host === 'localhost') && (params.get('e2e') === '1' || flag === '1');
+                if(host === '127.0.0.1' || host === 'localhost') return true;
+                return (params.get('e2e') === '1' || flag === '1');
             } catch(e) {
                 return false;
             }
