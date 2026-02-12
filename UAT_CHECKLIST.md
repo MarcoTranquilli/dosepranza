@@ -21,7 +21,7 @@
 - Admin: vede export storico
 - Ristoratore: vede “Tutti” e “Analisi”
 - Facility: accesso Frige
-- Standard: niente Frige
+- Standard: Frige non visibile (WIP) e vede solo i propri ordini
 
 ## Blocco orario
 - Dopo 11:30: menu bloccato, solo Frige (staff)
@@ -33,3 +33,5 @@
 
 ## Firestore
 - Nessun errore permission-denied
+- Utente standard: lettura consentita dei propri ordini (`uid == request.auth.uid`)
+- Staff: lettura completa ordini/frige

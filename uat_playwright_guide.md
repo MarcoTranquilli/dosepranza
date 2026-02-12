@@ -52,14 +52,14 @@ export PLAYWRIGHT_CLI_SESSION=dosepranza-uat
 "$PWCLI" snapshot
 ```
 
-5) **Frige acquisto**
+5) **Frige (WIP non visibile per standard)**
 ```bash
-"$PWCLI" click eX   # Tab Frige
-"$PWCLI" snapshot
-"$PWCLI" click eY   # Acquista prodotto
-"$PWCLI" snapshot
-"$PWCLI" check eZ   # checkbox pagamento
-"$PWCLI" click eW   # Conferma
+"$PWCLI" snapshot   # Verifica assenza tab Frige per utente standard
+```
+
+6) **Stato ordine personale**
+```bash
+"$PWCLI" click eX   # Tab Ordine
 "$PWCLI" snapshot
 ```
 

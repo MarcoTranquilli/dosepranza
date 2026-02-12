@@ -1,7 +1,12 @@
 # DOSepranza Frige MVP
 
 [![UAT Playwright](https://github.com/MarcoTranquilli/dosepranza/actions/workflows/uat.yml/badge.svg)](https://github.com/MarcoTranquilli/dosepranza/actions/workflows/uat.yml)
-[![Netlify Status](https://api.netlify.com/api/v1/badges/989e7be8-213b-469d-80d6-ce18f61a66b0/deploy-status)](https://app.netlify.com/projects/app-dosepranza/deploys)
+
+## Produzione attiva
+
+- URL live: `https://marcotranquilli.github.io/dosepranza/`
+- Deploy: GitHub Pages (branch `main`)
+- Nota: le sezioni Netlify sotto sono legacy e non usate nel flusso corrente.
 
 ## UAT (Playwright)
 
@@ -17,7 +22,7 @@ Report HTML:
 Report PDF:
 - `playwright-report/uat-report.pdf`
 
-## PDF pubblico su Netlify
+## PDF pubblico su Netlify (legacy)
 
 Se abiliti `UAT_IN_NETLIFY=1` nelle environment variables del sito, il build Netlify genererà e pubblicherà il report PDF qui:
 
@@ -27,7 +32,7 @@ Se abiliti `UAT_IN_NETLIFY=1` nelle environment variables del sito, il build Net
 
 > Nota sicurezza: per rendere i report accessibili solo internamente, abilita **Password Protection** su Netlify (richiede piano a pagamento) oppure usa **Netlify Identity** con ruoli (già predisposto).
 
-## Accesso protetto con Netlify Identity
+## Accesso protetto con Netlify Identity (legacy)
 
 1. Netlify → **Site configuration → Identity** → **Enable Identity**  
 2. Invita gli utenti e assegna il ruolo `reports` o `admin`  
@@ -113,9 +118,19 @@ Se vuoi salvare l’audit anche su S3, imposta:
 
 Il build scarica l’audit e lo carica in S3 come JSON.
 
-## CI + Netlify
+## CI + Netlify (legacy)
 
 - GitHub Actions esegue la UAT su PR e su `main`.
 - Netlify deploy può essere triggerato via **Build Hook** (se fornito).
 
 Imposta il secret GitHub `NETLIFY_BUILD_HOOK` con l’URL del build hook Netlify.
+
+## Regole Firestore raccomandate
+
+Usa il file:
+- `/Users/marcotranquilli/Documents/GitHub/dosepranza/FIRESTORE_RULES_ENTERPRISE.txt`
+
+Punti chiave:
+- utenti standard: possono leggere solo i propri ordini (`uid`).
+- staff (`admin`, `ristoratore`, `facility`): può leggere/gestire viste operative.
+- collezioni custom (`custom_creations`, `menu_audit`, `orders_audit`) incluse.

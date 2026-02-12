@@ -10,23 +10,35 @@ service cloud.firestore {
     function isStaff() {
       return isSignedIn() && (request.auth.token.role in ['admin','ristoratore','facility']);
     }
+    function isOwnerByUid() {
+      return isSignedIn() && resource.data.uid == request.auth.uid;
+    }
+    function isCreateOwnerByUid() {
+      return isSignedIn() && request.resource.data.uid == request.auth.uid;
+    }
 
-    // Ordini: lettura staff, scrittura utenti autenticati
+    // Ordini:
+    // - utenti vedono i propri ordini (uid)
+    // - staff vede tutti gli ordini
+    // - create consentita solo per il proprio uid
     match /orders/{doc} {
-      allow read: if isStaff();
-      allow create: if isSignedIn();
+      allow read: if isStaff() || isOwnerByUid();
+      allow create: if isCreateOwnerByUid();
       allow update: if isStaff();
       allow delete: if isRole('admin');
     }
 
-    // Frige: lettura staff, scrittura staff
+    // Frige prodotti: gestione staff
     match /frige_products/{doc} {
       allow read: if isStaff();
       allow write: if isStaff();
     }
+    // Frige acquisti:
+    // - utente crea e legge i propri acquisti
+    // - staff legge/aggiorna tutti
     match /frige_purchases/{doc} {
-      allow read: if isStaff();
-      allow create: if isSignedIn();
+      allow read: if isStaff() || isOwnerByUid();
+      allow create: if isCreateOwnerByUid();
       allow update: if isStaff();
     }
     match /frige_refills/{doc} {
@@ -37,6 +49,24 @@ service cloud.firestore {
     match /menu_products/{doc} {
       allow read: if isSignedIn();
       allow write: if isRole('admin') || isRole('ristoratore');
+    }
+
+    // Storico creazioni custom e voti
+    match /custom_creations/{doc} {
+      allow read: if isSignedIn();
+      allow create: if isCreateOwnerByUid();
+      allow update: if isSignedIn();
+      allow delete: if isRole('admin');
+    }
+
+    // Audit menu: solo staff
+    match /menu_audit/{doc} {
+      allow read, write: if isStaff();
+    }
+
+    // Audit ordini: solo staff
+    match /orders_audit/{doc} {
+      allow read, write: if isStaff();
     }
   }
 }

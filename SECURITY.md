@@ -1,21 +1,27 @@
 # Security Policy
 
-## Supported Versions
+## Supported Branch
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+| Branch | Supported |
+| --- | --- |
+| `main` | Yes |
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+## Security Baseline
 
-## Reporting a Vulnerability
+- Hosting: GitHub Pages (`https://marcotranquilli.github.io/dosepranza/`)
+- Auth: Firebase Authentication (Google + Anonymous enabled)
+- Authorization: Firestore Rules + role logic (custom claims with fallback email mapping)
+- Data protection: no secrets in client storage, no privileged operations without role checks
 
-Use this section to tell people how to report a vulnerability.
+## Report a Vulnerability
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+- Contact: `marco.tranquilli@dos.design`
+- Include: reproduction steps, affected URL/path, browser, timestamp, console/network evidence
+- SLA target:
+- `24h` acknowledgement
+- `72h` first triage
+
+## Out of Scope
+
+- Tailwind CDN warning in console is not a security vulnerability by itself.
+- Postimg temporary unavailability (`503`) is an external availability issue.
