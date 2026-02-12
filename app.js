@@ -2083,6 +2083,42 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             });
             const top = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0,3);
             topEl.textContent = top.length ? top.map(([n,c]) => `${n} (${c})`).join(' • ') : "Nessun dato";
+
+            renderFacilityOps();
+        }
+
+        function renderFacilityOps() {
+            const panel = document.getElementById('facility-ops');
+            if(!panel) return;
+            if(!(isFacility() || isAdmin() || isRistoratore())) { panel.classList.add('hidden'); return; }
+            panel.classList.remove('hidden');
+            const low = state.frige.products.filter(p => (p.stock ?? 0) > 0 && (p.stock ?? 0) <= LOW_STOCK_THRESHOLD);
+            const out = state.frige.products.filter(p => (p.stock ?? 0) <= 0);
+            const refillsOpen = (state.frige.refillsToday || []).filter(r => r.status !== 'closed');
+
+            const lowEl = document.getElementById('facility-kpi-low');
+            const outEl = document.getElementById('facility-kpi-out');
+            const refEl = document.getElementById('facility-kpi-refills');
+            if(lowEl) lowEl.textContent = low.length.toString();
+            if(outEl) outEl.textContent = out.length.toString();
+            if(refEl) refEl.textContent = refillsOpen.length.toString();
+
+            const actionsEl = document.getElementById('facility-actions');
+            const refillsEl = document.getElementById('facility-refills');
+            if(actionsEl) {
+                const actions = [
+                    ...out.map(p => `Prodotto esaurito: ${p.name}`),
+                    ...low.map(p => `Sotto soglia: ${p.name} (${p.stock ?? 0})`)
+                ];
+                actionsEl.innerHTML = actions.length
+                    ? actions.map(a => `<div class="bg-white px-3 py-2 rounded-xl border border-gray-100">${esc(a)}</div>`).join('')
+                    : `<div class="text-[11px] text-gray-400 font-bold">Nessuna azione urgente.</div>`;
+            }
+            if(refillsEl) {
+                refillsEl.innerHTML = refillsOpen.length
+                    ? refillsOpen.map(r => `<div class="bg-white px-3 py-2 rounded-xl border border-gray-100">${esc(r.productName || 'Prodotto')} · ${esc(r.requestedBy || 'Facility')}</div>`).join('')
+                    : `<div class="text-[11px] text-gray-400 font-bold">Nessun rifornimento aperto.</div>`;
+            }
         }
 
         function renderOrdersPayments() {

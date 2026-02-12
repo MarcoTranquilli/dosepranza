@@ -195,6 +195,37 @@
                     </ul>
                 </div>
 
+                <div id="facility-ops" class="card p-5 rounded-3xl mb-6 hidden">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-xs font-black uppercase text-gray-500">Pannello Facility</h3>
+                        <span class="text-[10px] text-gray-400 font-bold uppercase">Operativo</span>
+                    </div>
+                    <div class="grid md:grid-cols-3 gap-3">
+                        <div class="kpi-card">
+                            <p class="text-[10px] uppercase text-gray-400 font-black">Prodotti Sotto Soglia</p>
+                            <p id="facility-kpi-low" class="kpi-value">0</p>
+                        </div>
+                        <div class="kpi-card">
+                            <p class="text-[10px] uppercase text-gray-400 font-black">Prodotti Esauriti</p>
+                            <p id="facility-kpi-out" class="kpi-value">0</p>
+                        </div>
+                        <div class="kpi-card">
+                            <p class="text-[10px] uppercase text-gray-400 font-black">Rifornimenti Aperti</p>
+                            <p id="facility-kpi-refills" class="kpi-value">0</p>
+                        </div>
+                    </div>
+                    <div class="mt-4 grid md:grid-cols-2 gap-4">
+                        <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                            <p class="text-[10px] uppercase text-gray-400 font-black mb-2">Azioni Prioritarie</p>
+                            <div id="facility-actions" class="space-y-2 text-[11px]"></div>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                            <p class="text-[10px] uppercase text-gray-400 font-black mb-2">Ultimi Rifornimenti</p>
+                            <div id="facility-refills" class="space-y-2 text-[11px]"></div>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="frige-admin-tools" class="hidden card p-5 rounded-3xl mb-6">
                     <div class="flex flex-col gap-4">
                         <div class="flex items-center justify-between">
