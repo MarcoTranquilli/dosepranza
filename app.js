@@ -1200,6 +1200,30 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             }
         };
 
+        async function autoVoidInvalidOrders() {
+            if(!isAdmin() && !isRistoratore()) return;
+            try {
+                const key = 'dose_auto_void_ts';
+                const last = parseInt(localStorage.getItem(key) || '0', 10);
+                if(Date.now() - last < 15 * 60 * 1000) return; // max 1 volta ogni 15 min
+                const invalid = (state.ordersRawToday || []).filter(shouldAutoVoidOrder);
+                if(invalid.length === 0) return;
+                const batch = writeBatch(db_fb);
+                invalid.forEach(o => {
+                    const ref = doc(db_fb, "orders", o.id);
+                    batch.update(ref, {
+                        orderStatus: "void",
+                        voidedAt: serverTimestamp(),
+                        voidedBy: state.user?.email || "auto-clean"
+                    });
+                });
+                await batch.commit();
+                localStorage.setItem(key, Date.now().toString());
+            } catch(e) {
+                console.warn('auto-void failed', e);
+            }
+        }
+
         window.copyFrigeSummary = () => {
             if(state.frige.purchasesToday.length === 0) return window.toast("Nessun acquisto");
             let text = `🧊 *FRIGE - ${new Date().toLocaleDateString('it-IT')}*\n\n`;
@@ -1612,6 +1636,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 renderKitchenSummary();
                 renderDailySummaryInline();
                 updateInvalidOrdersUI();
+                autoVoidInvalidOrders();
             });
         }
 
@@ -2660,6 +2685,18 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 } catch(e) {}
             }
             return true;
+        }
+
+        function shouldAutoVoidOrder(o) {
+            if(!o || !o.createdAt) return false;
+            if(isValidOrder(o)) return false;
+            try {
+                const d = o.createdAt.toDate ? o.createdAt.toDate() : o.createdAt;
+                const ageMin = (Date.now() - d.getTime()) / 60000;
+                return ageMin >= 10; // evita di toccare ordini appena creati
+            } catch(e) {
+                return false;
+            }
         }
 
         function updateInvalidOrdersUI() {
