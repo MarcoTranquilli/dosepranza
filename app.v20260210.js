@@ -2032,6 +2032,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                     </div>
                 </div>`;
             }).join('');
+            ensureHistoryVisibleForE2E();
         }
 
         function renderOrdersKPIs() {
@@ -2678,6 +2679,21 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             select.innerHTML = state.frige.products.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
         }
 
+        function ensureHistoryVisibleForE2E() {
+            if(!isLocalE2E) return;
+            let email = state.user?.email || '';
+            if(!email) {
+                try { email = JSON.parse(localStorage.getItem('dose_user') || 'null')?.email || ''; } catch(e) {}
+            }
+            const norm = normalizeEmail(email);
+            const canSee = ROLE_EMAILS.admin.includes(norm) || ROLE_EMAILS.ristoratore.includes(norm);
+            if(!canSee) return;
+            const history = document.getElementById('history-view');
+            if(history) history.classList.add('active');
+            const list = document.getElementById('orders-payments-list');
+            if(list) { list.classList.remove('hidden'); list.style.display = 'block'; }
+        }
+
         function isAdmin() { return state.role === 'admin'; }
         function isRistoratore() { return state.role === 'ristoratore'; }
         function isFacility() { return state.role === 'facility'; }
@@ -2779,6 +2795,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                     if(list) { list.classList.remove('hidden'); list.style.display = 'block'; }
                 }, 0);
             }
+            ensureHistoryVisibleForE2E();
         }
 
         // --- INIT ---
@@ -2911,6 +2928,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(isLocalE2E && state.user?.email) {
                 setRole(state.user.email);
             }
+            ensureHistoryVisibleForE2E();
         };
 
         init();
