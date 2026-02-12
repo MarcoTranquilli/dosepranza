@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addDoc, serverTimestamp, query, orderBy, getDocs, runTransaction, doc, where, limit, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- DATABASE PRODOTTI COMPLETO ---
@@ -581,8 +581,12 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
 
         window.saveUserData = async () => {
             if(!auth_fb.currentUser) {
-                window.toast("Accedi con Google per continuare");
-                return;
+                try {
+                    await signInAnonymously(auth_fb);
+                } catch(e) {
+                    window.toast("Abilita accesso anonimo su Firebase");
+                    return;
+                }
             }
             const name = normalizeName(auth_fb.currentUser.displayName || document.getElementById('user-name-input').value);
             const email = normalizeEmail(auth_fb.currentUser.email || document.getElementById('user-email-input').value);
@@ -2955,12 +2959,17 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         // --- INIT ---
         onAuthStateChanged(auth_fb, async (u) => { 
             if(u) {
-                const email = normalizeEmail(u.email);
-                const name = normalizeName(u.displayName || u.email?.split('@')[0] || '');
-                state.user = { name, email };
-                localStorage.setItem('dose_user', JSON.stringify(state.user));
+                let cached = null;
+                try { cached = JSON.parse(localStorage.getItem('dose_user') || 'null'); } catch(e) {}
+                const isAnon = !!u.isAnonymous;
+                const email = normalizeEmail(isAnon ? cached?.email : u.email);
+                const name = normalizeName(isAnon ? cached?.name : (u.displayName || u.email?.split('@')[0] || ''));
+                if(email) {
+                    state.user = { name, email };
+                    localStorage.setItem('dose_user', JSON.stringify(state.user));
+                }
                 document.getElementById('user-modal').classList.add('hidden');
-                await setRole(email);
+                if(email) await setRole(email);
                 syncMyOrders();
                 renderDailySummaryInline();
             } else {
