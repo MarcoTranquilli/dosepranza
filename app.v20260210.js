@@ -704,7 +704,8 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                     posate: payload.posate,
                     paymentStatus: "pending",
                     reconciled: false,
-                    orderStatus: "ricevuto",
+                    orderStatus: "submitted",
+                    orderType: "order",
                     createdAt: serverTimestamp() 
                 });
                 closeSendConfirm();
@@ -1347,7 +1348,16 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             }
             const latest = orders[0];
             const paid = latest.paymentStatus === "paid";
-            const status = latest.orderStatus || "ricevuto";
+            const statusRaw = (latest.orderStatus || "submitted").toLowerCase();
+            const statusMap = {
+                submitted: "Inviato",
+                ricevuto: "Inviato",
+                accepted: "In preparazione",
+                preparing: "In preparazione",
+                completed: "Pronto",
+                delivered: "Consegnato"
+            };
+            const status = statusMap[statusRaw] || statusRaw;
             const time = latest.createdAt ? formatTime(latest.createdAt) : '--:--';
             const items = (latest.items || []).map(i => `${i.name}${i.details ? ` (${i.details})` : ''}`).join(' • ');
             el.innerHTML = `
@@ -2690,6 +2700,10 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         function shouldAutoVoidOrder(o) {
             if(!o || !o.createdAt) return false;
             if(isValidOrder(o)) return false;
+            const status = (o.orderStatus || '').toLowerCase();
+            if(status && !['draft','bozza',''].includes(status)) {
+                // se ha già uno status non-draft ma non è valido, comunque pulisci dopo timeout
+            }
             try {
                 const d = o.createdAt.toDate ? o.createdAt.toDate() : o.createdAt;
                 const ageMin = (Date.now() - d.getTime()) / 60000;
