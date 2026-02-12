@@ -197,6 +197,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         const firebaseConfig = { apiKey: "AIzaSyCQJsNbgaR89gF_1vLe6H4DPboOhQvm9nI", authDomain: "app-ordini-pranzo-alimentari.firebaseapp.com", projectId: "app-ordini-pranzo-alimentari", storageBucket: "app-ordini-pranzo-alimentari.appspot.com", messagingSenderId: "553169964686", appId: "1:553169964686:web:7f8ca6f32a301949e4c3df" };
         const app_fb = initializeApp(firebaseConfig);
         const auth_fb = getAuth(app_fb);
+        if(!window.auth_fb) window.auth_fb = auth_fb;
         const db_fb = initializeFirestore(app_fb, { experimentalForceLongPolling: true, localCache: persistentLocalCache() });
         const ordersCol = collection(db_fb, "orders");
         const ordersAuditCol = collection(db_fb, "orders_audit");
@@ -2967,9 +2968,12 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 if(email) {
                     state.user = { name, email };
                     localStorage.setItem('dose_user', JSON.stringify(state.user));
+                    document.getElementById('user-modal').classList.add('hidden');
+                    await setRole(email);
+                } else {
+                    // anon without cached identity: keep modal open for manual entry
+                    document.getElementById('user-modal').classList.remove('hidden');
                 }
-                document.getElementById('user-modal').classList.add('hidden');
-                if(email) await setRole(email);
                 syncMyOrders();
                 renderDailySummaryInline();
             } else {
@@ -3074,6 +3078,9 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         });
 
         const init = () => {
+            if(!auth_fb.currentUser) {
+                signInAnonymously(auth_fb).catch(() => {});
+            }
             state.menuData = Object.entries(RAW_MENU).flatMap(([cat, items]) => items.map((it, idx) => ({ ...it, cat, id: cat.replace(/\s/g,'')+idx })));
             loadDisabledProducts();
             syncMenuAvailability();
