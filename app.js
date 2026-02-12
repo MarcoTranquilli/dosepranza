@@ -199,6 +199,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         const auth_fb = getAuth(app_fb);
         const db_fb = initializeFirestore(app_fb, { experimentalForceLongPolling: true, localCache: persistentLocalCache() });
         const ordersCol = collection(db_fb, "orders");
+        const ordersAuditCol = collection(db_fb, "orders_audit");
         const frigeProductsCol = collection(db_fb, "frige_products");
         const frigePurchasesCol = collection(db_fb, "frige_purchases");
         const frigeRefillsCol = collection(db_fb, "frige_refills");
@@ -1101,9 +1102,30 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                         reconciledBy: state.user?.email || "ristoratore"
                     });
                 });
+                await logOrderAudit(id, "payment_status", { paymentStatus: nextStatus });
                 window.toast(nextStatus === "paid" ? "Riconciliato" : "Segnato non riconciliato");
             } catch(e) {
                 window.toast("Errore riconciliazione");
+            }
+        };
+
+        window.setOrderStatus = async (id, status) => {
+            if(!isRistoratore() && !isAdmin()) return;
+            try {
+                await runTransaction(db_fb, async (tx) => {
+                    const ref = doc(db_fb, "orders", id);
+                    const snap = await tx.get(ref);
+                    if(!snap.exists()) throw new Error("Ordine non trovato");
+                    tx.update(ref, {
+                        orderStatus: status,
+                        statusUpdatedAt: serverTimestamp(),
+                        statusUpdatedBy: state.user?.email || "ristoratore"
+                    });
+                });
+                await logOrderAudit(id, "order_status", { orderStatus: status });
+                window.toast("Stato aggiornato");
+            } catch(e) {
+                window.toast("Errore stato");
             }
         };
 
@@ -1622,6 +1644,15 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                         const notes = o.allergies && o.allergies.trim().length > 0
                             ? `<div class="mt-2 text-[11px] text-red-700 font-bold">⚠️ ${esc(o.allergies.trim())}</div>`
                             : '';
+                        const statusLabel = (o.orderStatus || 'submitted').toUpperCase();
+                        const statusBar = (isAdmin() || isRistoratore()) ? `
+                            <div class="mt-3 flex flex-wrap items-center gap-2">
+                                <span class="badge badge-quiet">Stato: ${esc(statusLabel)}</span>
+                                <button data-action="order-set-status" data-id="${o.id}" data-status="accepted" class="btn btn-ghost text-[10px] px-3 py-2">In preparazione</button>
+                                <button data-action="order-set-status" data-id="${o.id}" data-status="completed" class="btn btn-ghost text-[10px] px-3 py-2">Pronto</button>
+                                <button data-action="order-set-status" data-id="${o.id}" data-status="delivered" class="btn btn-primary text-[10px] px-3 py-2">Consegnato</button>
+                            </div>
+                        ` : '';
                         return `
                             <div class="card p-5 rounded-3xl border-l-8 border-primary text-left">
                                 <div class="card-header">
@@ -1636,6 +1667,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                                 </div>
                                 <div class="flex flex-wrap gap-2">${items}</div>
                                 ${notes}
+                                ${statusBar}
                             </div>
                         `;
                     }).join('');
@@ -2730,6 +2762,20 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             select.innerHTML = state.frige.products.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
         }
 
+        async function logOrderAudit(orderId, action, meta = {}) {
+            try {
+                await addDoc(ordersAuditCol, {
+                    orderId,
+                    action,
+                    meta,
+                    actor: state.user?.email || 'system',
+                    createdAt: serverTimestamp()
+                });
+            } catch(e) {
+                console.warn('order audit failed', e);
+            }
+        }
+
         function ensureHistoryVisibleForE2E() {
             if(!isLocalE2E) return;
             let email = state.user?.email || '';
@@ -2916,6 +2962,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             'orders-export-csv': () => window.exportOrdersReconciliation(),
             'orders-mark-payment': (el) => window.markOrderPayment(el.dataset.id, el.dataset.status),
             'orders-cleanup-invalid': () => window.cleanupInvalidOrders(),
+            'order-set-status': (el) => window.setOrderStatus(el.dataset.id, el.dataset.status),
             'analytics-range': (el) => window.setAnalyticsRange(el.dataset.range),
             'analytics-quick': (el) => window.runQuickAnalysis(el.dataset.quick),
             'analytics-export-csv': () => window.exportAnalyticsCSV(),
