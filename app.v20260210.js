@@ -3040,7 +3040,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             'export-history': () => window.exportFullHistory(),
             'copy-frige-summary': () => window.copyFrigeSummary(),
             'seed-frige': () => window.seedFrige(),
-            'add-frige-form': () => window.addFrigeFromForm(),
+            'add-frige-form': () => window.addFrigeProductFromForm(),
             'apply-restock': () => window.applyFrigeRestock(),
             'frige-filter': (el) => window.setFrigeFilter(el.dataset.filter),
             'frige-open-modal': (el) => window.openFrigeModal(el.dataset.id),
