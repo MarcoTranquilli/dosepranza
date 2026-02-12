@@ -1199,6 +1199,27 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             link.click();
         };
 
+        window.setHistoryView = (mode) => {
+            const opsBtn = document.getElementById('history-view-ops');
+            const fullBtn = document.getElementById('history-view-full');
+            const subtitle = document.getElementById('history-subtitle');
+            const opsPanel = document.getElementById('history-ops-panel');
+            const opsKitchen = document.getElementById('history-ops-kitchen');
+            const opsRecon = document.getElementById('history-ops-recon');
+            const showOps = mode === 'ops';
+            if(opsBtn && fullBtn) {
+                opsBtn.classList.toggle('btn-primary', showOps);
+                opsBtn.classList.toggle('btn-ghost', !showOps);
+                fullBtn.classList.toggle('btn-primary', !showOps);
+                fullBtn.classList.toggle('btn-ghost', showOps);
+            }
+            if(subtitle) subtitle.textContent = showOps ? 'Vista operativa ristoratore' : 'Vista completa dettagli';
+            [opsPanel, opsKitchen, opsRecon].forEach(el => {
+                if(!el) return;
+                el.classList.toggle('hidden', !showOps);
+            });
+        };
+
         window.cleanupInvalidOrders = async () => {
             if(!isRistoratore() && !isAdmin()) return;
             const invalid = (state.ordersRawToday || []).filter(o => !isValidOrder(o));
@@ -2963,6 +2984,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             'orders-mark-payment': (el) => window.markOrderPayment(el.dataset.id, el.dataset.status),
             'orders-cleanup-invalid': () => window.cleanupInvalidOrders(),
             'order-set-status': (el) => window.setOrderStatus(el.dataset.id, el.dataset.status),
+            'history-view': (el) => window.setHistoryView(el.dataset.mode),
             'analytics-range': (el) => window.setAnalyticsRange(el.dataset.range),
             'analytics-quick': (el) => window.runQuickAnalysis(el.dataset.quick),
             'analytics-export-csv': () => window.exportAnalyticsCSV(),
@@ -3026,6 +3048,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(isLocalE2E && state.user?.email) {
                 setRole(state.user.email);
             }
+            window.setHistoryView?.('ops');
             ensureHistoryVisibleForE2E();
         };
 
