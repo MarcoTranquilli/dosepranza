@@ -2973,11 +2973,17 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 syncMyOrders();
                 renderDailySummaryInline();
             } else {
-                if(isLocalE2E && state.user?.email) {
-                    document.getElementById('user-modal').classList.add('hidden');
-                    await setRole(state.user.email);
-                } else {
-                    document.getElementById('user-modal').classList.remove('hidden');
+                // ensure we have an auth session to satisfy Firestore rules
+                try {
+                    await signInAnonymously(auth_fb);
+                    return;
+                } catch(e) {
+                    if(isLocalE2E && state.user?.email) {
+                        document.getElementById('user-modal').classList.add('hidden');
+                        await setRole(state.user.email);
+                    } else {
+                        document.getElementById('user-modal').classList.remove('hidden');
+                    }
                 }
             }
         });
