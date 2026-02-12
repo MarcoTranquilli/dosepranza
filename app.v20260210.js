@@ -2926,7 +2926,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                     frigeBtn.dataset.action = 'noop';
                     frigeBtn.removeAttribute('data-view');
                     frigeBtn.setAttribute('aria-disabled', 'true');
-                    if(frigeWip) frigeWip.classList.remove('hidden');
+                    if(frigeWip) frigeWip.classList.add('hidden');
                 }
             }
 
