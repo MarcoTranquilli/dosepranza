@@ -164,6 +164,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             menuAuditFilter: 'all',
             pendingOrder: null,
             e2eNavDone: false,
+            authReady: false,
             analytics: { ordersAll: [], frigeAll: [], frigeProducts: [], refillsOpen: [], unsub: {}, range: 'today', lastPreset: 'today', resolution: { orders: 'daily', frige: 'daily' }, targets: { orders: { min: null, max: null }, frige: { min: null, max: null } }, chartData: {}, zoom: { orders: null, frige: null } },
             subs: { orders: null, frige: null, menu: null, myOrders: null, custom: null, menuAudit: null },
             role: 'user',
@@ -171,6 +172,10 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 try { return JSON.parse(localStorage.getItem('menu_admin_open') || 'true'); } catch(e) { return true; }
             })()
         };
+        if(!state.user?.email || !state.user?.name) {
+            state.user = null;
+            localStorage.removeItem('dose_user');
+        }
         const LOW_STOCK_THRESHOLD = 2;
         const ORDER_CUTOFF = { hour: 11, minute: 30 };
         const isLocalE2E = (() => {
@@ -913,7 +918,10 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         };
 
         window.addFrigeProductFromForm = async () => {
-            if(!isRistoratore() && !isAdmin()) return;
+            if(!isRistoratore() && !isAdmin()) {
+                window.toast("Permesso negato: solo admin/ristoratore");
+                return;
+            }
             const name = document.getElementById('frige-new-name').value.trim();
             const price = parseFloat(document.getElementById('frige-new-price').value);
             const stock = Math.max(0, parseInt(document.getElementById('frige-new-stock').value || "0", 10));
@@ -1363,7 +1371,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         }
 
         function syncMyOrders() {
-            if(!state.user?.email || state.subs.myOrders) return;
+            if(!state.authReady || !state.user?.email || state.subs.myOrders) return;
             state.subs.myOrders = onSnapshot(
                 query(ordersCol, where("email", "==", state.user.email), orderBy("createdAt", "desc")),
                 snap => {
@@ -1429,6 +1437,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         };
 
         function syncMenuAvailability() {
+            if(!state.authReady) return;
             if(state.subs.menu) return;
             state.subs.menu = onSnapshot(query(menuProductsCol, orderBy("name", "asc")), snap => {
                 const disabled = new Set();
@@ -1471,6 +1480,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         }
 
         function syncCustomCreations() {
+            if(!state.authReady) return;
             if(state.subs.custom) return;
             state.subs.custom = onSnapshot(query(customCreationsCol, orderBy("createdAt", "desc")), snap => {
                 state.customCreations = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -1479,6 +1489,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         }
 
         function syncMenuAudit() {
+            if(!state.authReady) return;
             if(state.subs.menuAudit) return;
             state.subs.menuAudit = onSnapshot(query(menuAuditCol, orderBy("createdAt", "desc"), limit(10)), snap => {
                 state.menuAudit = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -1645,6 +1656,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         }
 
         function syncOrders() {
+            if(!state.authReady) return;
             if(state.subs.orders) return;
             const now = new Date(); now.setHours(0,0,0,0);
             state.subs.orders = onSnapshot(query(ordersCol, orderBy("createdAt", "desc")), snap => {
@@ -1883,6 +1895,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         }
 
         function syncFrige() {
+            if(!state.authReady) return;
             if(state.subs.frige) return;
             const now = new Date(); now.setHours(0,0,0,0);
             const unsubProducts = onSnapshot(query(frigeProductsCol, orderBy("name", "asc")), snap => {
@@ -1912,6 +1925,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         }
 
         function syncAnalytics() {
+            if(!state.authReady) return;
             if(state.analytics.unsub.orders || state.analytics.unsub.frige || state.analytics.unsub.products) {
                 renderAnalytics();
                 return;
@@ -2960,6 +2974,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         // --- INIT ---
         onAuthStateChanged(auth_fb, async (u) => { 
             if(u) {
+                state.authReady = true;
                 let cached = null;
                 try { cached = JSON.parse(localStorage.getItem('dose_user') || 'null'); } catch(e) {}
                 const isAnon = !!u.isAnonymous;
@@ -2974,9 +2989,16 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                     // anon without cached identity: keep modal open for manual entry
                     document.getElementById('user-modal').classList.remove('hidden');
                 }
+                syncMenuAvailability();
+                syncCustomCreations();
+                if(isAdmin() || isRistoratore()) syncMenuAudit();
+                if(state.currentView === 'history' || (state.currentView === 'cart' && (isAdmin() || isRistoratore()))) {
+                    syncOrders();
+                }
                 syncMyOrders();
                 renderDailySummaryInline();
             } else {
+                state.authReady = false;
                 // ensure we have an auth session to satisfy Firestore rules
                 try {
                     await signInAnonymously(auth_fb);
@@ -3083,7 +3105,6 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             }
             state.menuData = Object.entries(RAW_MENU).flatMap(([cat, items]) => items.map((it, idx) => ({ ...it, cat, id: cat.replace(/\s/g,'')+idx })));
             loadDisabledProducts();
-            syncMenuAvailability();
             renderRoleStatus();
             renderMenuAdminToggle();
             const frigeBtn = document.getElementById('btn-frige');
@@ -3102,7 +3123,6 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             bindChartZoom('analytics-chart-frige', 'frige');
             renderMenuAdmin();
             renderMyOrderStatus();
-            syncCustomCreations();
             if(isLocalE2E && state.user?.email) {
                 setRole(state.user.email);
             }
