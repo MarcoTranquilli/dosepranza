@@ -8,6 +8,32 @@
 - Deploy: GitHub Pages (branch `main`)
 - Nota: le sezioni Netlify sotto sono legacy e non usate nel flusso corrente.
 
+## Rilascio rapido su Netlify
+
+1. Esegui preflight locale:
+```bash
+./scripts/netlify_preflight.sh
+```
+2. Login Netlify CLI:
+```bash
+npx netlify login
+```
+3. Collega o crea il sito:
+```bash
+npx netlify link
+```
+4. Deploy preview:
+```bash
+npx netlify deploy --dir .
+```
+5. Deploy produzione:
+```bash
+npx netlify deploy --dir . --prod
+```
+
+Configurazione pronta in:
+- `/Users/marcotranquilli/Documents/GitHub/dosepranza/netlify.toml`
+
 ## UAT (Playwright)
 
 ```bash
