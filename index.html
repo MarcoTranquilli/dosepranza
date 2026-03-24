@@ -7,7 +7,7 @@
     <link rel="icon" href="https://i.postimg.cc/L6H20zfp/logo-dosepranza-People-About-Food.png?v=20260209">
     <meta name="referrer" content="no-referrer">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; img-src 'self' data: https://i.postimg.cc https://www.datocms-assets.com https://api.qrserver.com; script-src 'self' https://www.gstatic.com https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://identity.netlify.com https://accounts.google.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; connect-src 'self' https://identity.netlify.com https://*.googleapis.com https://firestore.googleapis.com https://www.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebaseinstallations.googleapis.com https://*.firebaseio.com https://*.appspot.com https://accounts.google.com; frame-src https://identity.netlify.com https://accounts.google.com https://apis.google.com; upgrade-insecure-requests">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; img-src 'self' data: https://i.postimg.cc https://www.datocms-assets.com https://api.qrserver.com; script-src 'self' https://www.gstatic.com https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://identity.netlify.com https://accounts.google.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; connect-src 'self' https://app-dosepranza.netlify.app https://identity.netlify.com https://*.googleapis.com https://firestore.googleapis.com https://www.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebaseinstallations.googleapis.com https://*.firebaseio.com https://*.appspot.com https://accounts.google.com; frame-src https://identity.netlify.com https://accounts.google.com https://apis.google.com; upgrade-insecure-requests">
     <script src="tailwind-config.js"></script>
     <script src="https://cdn.tailwindcss.com/3.4.3"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -53,9 +53,25 @@
             </div>
             <button id="menu-admin-toggle" data-action="toggle-menu-admin" class="btn btn-ghost text-[10px] px-3 py-2 hidden">Gestione menù</button>
         </div>
+        <div id="tech-support-card" class="mb-4 px-4 py-4 rounded-2xl support-card flex flex-wrap items-center justify-between gap-3">
+            <div class="min-w-0">
+                <p class="text-[10px] uppercase font-black tracking-[0.18em] text-primary">Supporto Tecnico</p>
+                <p class="text-[11px] font-bold text-gray-700">Per problemi con la piattaforma, contatta Marco Tranquilli su Slack.</p>
+                <p class="text-[11px] text-gray-500 font-bold mt-1">Riferimento: <span class="support-contact">marco.tranquilli@dos.design</span></p>
+            </div>
+            <button data-action="copy-tech-contact" class="btn btn-ghost text-[10px] px-3 py-2">Copia contatto</button>
+        </div>
 
         <main>
             <section id="menu-view" class="view active">
+                <div class="card qr-payment-card p-5 rounded-3xl mb-4 flex items-center gap-4">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" class="w-20 h-20 rounded-2xl shadow-sm border border-gray-100" alt="QR pagamento Alimentari Russo">
+                    <div class="min-w-0">
+                        <p class="font-black text-xs uppercase text-primary mb-1 tracking-widest">Pagamento Alimentari Russo</p>
+                        <p class="text-[11px] leading-tight text-gray-500 mb-2 italic">QR disponibile per tutti gli utenti.</p>
+                        <a href="https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" target="_blank" rel="noopener noreferrer" class="btn btn-ghost text-[10px] px-3 py-2">Apri Satispay</a>
+                    </div>
+                </div>
                 <div id="menu-admin-panel" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6 hidden">
                     <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
                         <h3 class="text-xs font-black uppercase text-gray-500">Gestione Menù (Admin/Ristoratore)</h3>
@@ -126,8 +142,29 @@
                     <div class="flex flex-wrap items-center gap-3">
                         <input id="custom-name-input" type="text" placeholder="Nome del tuo panino/pizza" class="p-3 rounded-xl border border-gray-200 text-[11px] font-bold outline-none flex-1 min-w-[220px]">
                         <label class="chip" for="custom-save-toggle"><input id="custom-save-toggle" type="checkbox" class="mr-1">Salva nello storico</label>
+                        <label class="chip" for="custom-publish-toggle"><input id="custom-publish-toggle" type="checkbox" class="mr-1">Proponi nel menù</label>
+                        <label class="chip" for="custom-credit-toggle"><input id="custom-credit-toggle" type="checkbox" class="mr-1">Mostra il mio nome</label>
                     </div>
-                    <p class="text-[10px] text-gray-500 mt-2">Se salvi, la tua creazione entra nello storico e può essere votata.</p>
+                    <p class="text-[10px] text-gray-500 mt-2">Se salvi, la tua creazione entra nello storico e può essere votata. Se la proponi nel menù, comparirà nel cluster Panini/Pizze come custom; il nome dell’ideatore viene mostrato solo con il tuo consenso.</p>
+                </div>
+                <div id="daily-summary-inline-custom" class="mb-6 card p-5 rounded-3xl hidden">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <h3 id="daily-summary-title-custom" class="text-xs font-black uppercase text-gray-500">Riepilogo Ordini Oggi</h3>
+                        <div class="flex items-center gap-2">
+                            <span id="daily-summary-count-custom" class="text-[10px] text-gray-400 font-bold uppercase"></span>
+                            <button id="daily-summary-admin-link-custom" data-action="navigate" data-view="history" class="btn btn-ghost text-[10px] px-3 py-2 hidden">Vai a Tutti</button>
+                        </div>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                            <p class="text-[10px] uppercase text-gray-400 font-black mb-2">Prodotti (Totali)</p>
+                            <div id="daily-summary-products-custom" class="space-y-2 text-[11px]"></div>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                            <p class="text-[10px] uppercase text-gray-400 font-black mb-2">Allergie & Note</p>
+                            <div id="daily-summary-allergies-custom" class="space-y-2 text-[11px]"></div>
+                        </div>
+                    </div>
                 </div>
                 <div class="card p-6 rounded-3xl mb-4 text-center">
                     <h3 class="text-xs font-black text-gray-400 uppercase mb-4 tracking-widest italic">1. Scegli la base</h3>
@@ -334,6 +371,14 @@
 
             <section id="cart-view" class="view">
                 <h2 class="text-2xl font-black mb-6 tracking-tighter section-title">Riepilogo Ordine</h2>
+                <div class="card qr-payment-card p-5 rounded-3xl mb-4 flex items-center gap-4">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" class="w-20 h-20 rounded-2xl shadow-sm border border-gray-100" alt="QR pagamento Alimentari Russo">
+                    <div class="min-w-0">
+                        <p class="font-black text-xs uppercase text-primary mb-1 tracking-widest">Pagamento Alimentari Russo</p>
+                        <p class="text-[11px] leading-tight text-gray-500 mb-2 italic">QR disponibile per tutti gli utenti.</p>
+                        <a href="https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" target="_blank" rel="noopener noreferrer" class="btn btn-ghost text-[10px] px-3 py-2">Apri Satispay</a>
+                    </div>
+                </div>
                 <div id="cart-content-wrapper" class="card p-6 rounded-[2rem] mb-4">
                     <div id="cart-items-list"></div>
                     <div id="cart-options" class="mt-8 space-y-6 hidden">
@@ -515,6 +560,40 @@
                     </div>
                     <div id="role-status" class="text-[11px] text-gray-700 font-bold mt-2">-</div>
                     <div id="claims-missing" class="text-[10px] text-amber-700 font-bold mt-1"></div>
+                </div>
+
+                <div id="analytics-admin-panel" class="card p-4 rounded-2xl mb-6 hidden">
+                    <div class="flex items-center justify-between gap-2 mb-3">
+                        <p class="text-[10px] uppercase text-gray-400 font-black">Executive Snapshot</p>
+                        <span class="badge">Admin</span>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+                        <div class="kpi-card">
+                            <p class="text-[10px] uppercase text-gray-400 font-black">Utenti Unici</p>
+                            <p id="analytics-unique-users" class="kpi-value">0</p>
+                        </div>
+                        <div class="kpi-card">
+                            <p class="text-[10px] uppercase text-gray-400 font-black">Repeat Rate</p>
+                            <p id="analytics-repeat-rate" class="kpi-value">0%</p>
+                        </div>
+                        <div class="kpi-card">
+                            <p class="text-[10px] uppercase text-gray-400 font-black">Incasso per Utente</p>
+                            <p id="analytics-revenue-per-user" class="kpi-value">€0.00</p>
+                        </div>
+                        <div class="kpi-card">
+                            <p class="text-[10px] uppercase text-gray-400 font-black">Importo da Riconciliare</p>
+                            <p id="analytics-unpaid-amount" class="kpi-value">€0.00</p>
+                        </div>
+                        <div class="kpi-card">
+                            <p class="text-[10px] uppercase text-gray-400 font-black">Best Day</p>
+                            <p id="analytics-best-day" class="text-lg font-black text-primary">-</p>
+                        </div>
+                        <div class="kpi-card">
+                            <p class="text-[10px] uppercase text-gray-400 font-black">Compliance 11:30</p>
+                            <p id="analytics-cutoff-compliance" class="kpi-value">0%</p>
+                        </div>
+                    </div>
+                    <div id="analytics-admin-summary" class="text-[11px] text-gray-700 font-bold"></div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -722,7 +801,7 @@
     <div id="order-confirm-modal" class="fixed inset-0 bg-gray-900/90 backdrop-blur-md flex items-center justify-center z-[100] hidden p-4">
         <div class="bg-white p-8 rounded-[2.5rem] shadow-2xl w-full max-w-md text-center border border-white/20">
             <h3 class="text-xl font-black mb-2 uppercase tracking-tighter text-primary">Ordine Confermato</h3>
-            <p class="text-[11px] text-gray-500 mb-4">Riceverai una notifica appena il ristoratore lo prende in carico.</p>
+            <p class="text-[11px] text-gray-500 mb-4">Grazie, il tuo ordine è stato registrato con successo. Ti aggiorneremo quando verrà preso in carico.</p>
             <div class="bg-gray-50 rounded-2xl p-4 text-left mb-4">
                 <p class="text-[10px] text-gray-400 uppercase font-bold mb-2">Riepilogo</p>
                 <div id="order-confirm-summary" class="text-[11px] font-bold text-gray-700"></div>

@@ -7,6 +7,32 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         const CATEGORIES = ["Menù Combinati", "Gastronomia", "Insalatone", "Verdure", "Fritti", "Panini", "Pizze", "Dessert", "Prodotti da Forno"];
         const INGREDIENTS_DATA = [{id:'br',name:'Bresaola'},{id:'bi',name:'Brie'},{id:'bl',name:'Broccoletti'},{id:'cp',name:'Capocollo'},{id:'cr',name:'Carciofini'},{id:'ci',name:'Cicoria'},{id:'fr',name:'Frittata'},{id:'in',name:'Insalata'},{id:'lt',name:'Lattuga'},{id:'mg',name:'Melanzane Grigliate'},{id:'mo',name:'Mortadella'},{id:'mz',name:'Mozzarella'},{id:'ol',name:'Olive'},{id:'pa',name:'Parmigiano'},{id:'pe',name:'Pecorino'},{id:'pg',name:'Peperoni Grigliati'},{id:'ps',name:'Pomodori Secchi'},{id:'po',name:'Pomodoro'},{id:'pc',name:'Porchetta'},{id:'pr',name:'Primo Sale'},{id:'co',name:'Prosciutto Cotto'},{id:'cu',name:'Prosciutto Crudo'},{id:'ru',name:'Rucola'},{id:'sa',name:'Salame'},{id:'sc',name:'Scamorza'},{id:'sk',name:'Scarola'},{id:'sp',name:'Speck'},{id:'st',name:'Stracchino'},{id:'sz',name:'Stracciatella'},{id:'ta',name:'Tacchino Arrosto'},{id:'zg',name:'Zucchine Grigliate'}].sort((a,b)=>a.name.localeCompare(b.name));
 
+        const CUSTOM_MENU_PRICING = { basePrice: 3.5, includedIngredients: 3, extraIngredientPrice: 1.0 };
+        const STATIC_CUSTOM_MENU_BACKFILL = {
+            "5 cereali con zucchine grigliate, primo sale, pomodori secchi": { customSource: 'backfill' },
+            "pane ai 5 cereali con tacchino e zucchine o scarola": { customSource: 'backfill' },
+            "pane ai 5 cereali con formaggio spalmabile e salmone": { customSource: 'backfill' },
+            "pizza classica con bresaola, filadelfia e rughetta": { customSource: 'backfill' },
+            "pizza ai 5 cereali bresaola formaggio spalmabile e rughetta": { customSource: 'backfill' },
+            "pizza ai 5 cereali con insalata di pollo": { customSource: 'backfill' },
+            "pizza 5 cereali con stracchino, zucchine grigliate, pomodori secchi": { customSource: 'backfill' },
+            "pizza classica con mozzarella, pomodoro, prosciutto crudo": { customSource: 'backfill' },
+            "pizza classica con capocollo, pecorino, rucola, stracciatella, melanzane grigliate, pomodori secchi": {
+                customSource: 'backfill',
+                creatorName: 'Marco Tranquilli',
+                creatorVisible: true
+            }
+        };
+        const getStaticCustomMenuMetadata = (name) => STATIC_CUSTOM_MENU_BACKFILL[(name || '').toString().trim().toLowerCase()] || { customSource: 'backfill' };
+        const customMenuPrice = (ingredientCount) => CUSTOM_MENU_PRICING.basePrice + Math.max(0, ingredientCount - CUSTOM_MENU_PRICING.includedIngredients) * CUSTOM_MENU_PRICING.extraIngredientPrice;
+        const asCustomMenuItem = (item, ingredientCount) => ({
+            ...item,
+            price: customMenuPrice(ingredientCount),
+            isCustom: true,
+            customIngredientsCount: ingredientCount,
+            ...getStaticCustomMenuMetadata(item?.name)
+        });
+
         const FRIGE_DEFAULTS = [
             { name: "Lasagna classica al ragù (250-300g)", price: 6.0, stock: 6 },
             { name: "Lasagna bianca vegetariana ai carciofi (250-300g)", price: 6.0, stock: 6 },
@@ -88,13 +114,13 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 { name: "Fesa di tacchino e verdura", price: 3.5, diet:["carne/pesce"] },
                 { name: "Cotoletta di pollo lattuga e pomodoro", price: 3.5, diet:["carne/pesce"] },
                 { name: "Vegetariano melanzane zucchine e peperoni", price: 3.5, diet:["vegano"] },
-                { name: "5 Cereali con Zucchine Grigliate, Primo Sale, Pomodori Secchi", price: 3.5, diet:["vegetariano"] },
-                { name: "Pane ai 5 cereali con tacchino e zucchine o scarola", price: 3.5, diet:["carne/pesce"] },
-                { name: "Pane ai 5 cereali con formaggio spalmabile e salmone", price: 3.5, diet:["carne/pesce"] }
+                asCustomMenuItem({ name: "5 Cereali con Zucchine Grigliate, Primo Sale, Pomodori Secchi", diet:["vegetariano"] }, 3),
+                asCustomMenuItem({ name: "Pane ai 5 cereali con tacchino e zucchine o scarola", diet:["carne/pesce"] }, 2),
+                asCustomMenuItem({ name: "Pane ai 5 cereali con formaggio spalmabile e salmone", diet:["carne/pesce"] }, 2)
             ],
             "Pizze": [
                 { name: "Pizza con insalata di pollo con maionese", price: 3.5, diet:["carne/pesce"] },
-                { name: "Pizza classica con bresaola, filadelfia e rughetta", price: 3.5, diet:["carne/pesce"] },
+                asCustomMenuItem({ name: "Pizza classica con bresaola, filadelfia e rughetta", diet:["carne/pesce"] }, 3),
                 { name: "Pizza con tacchino e verdure", price: 3.5, diet:["carne/pesce"] },
                 { name: "Crudo e mozzarella", price: 3.5, diet:["carne/pesce"] },
                 { name: "Speck stracchino e rughetta", price: 3.5, diet:["carne/pesce"] },
@@ -103,11 +129,11 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 { name: "Frittata e zucchine", price: 3.5, diet:["vegetariano"] },
                 { name: "Bresaola e formaggio", price: 3.5, diet:["carne/pesce"] },
                 { name: "Cotto e stracchino", price: 3.5, diet:["carne/pesce"] },
-                { name: "Pizza ai 5 cereali bresaola formaggio spalmabile e rughetta", price: 3.5, diet:["carne/pesce"] },
-                { name: "Pizza ai 5 cereali con insalata di pollo", price: 3.5, diet:["carne/pesce"] },
-                { name: "Pizza 5 Cereali con Stracchino, Zucchine Grigliate, Pomodori Secchi", price: 3.5, diet:["vegetariano"] },
-                { name: "Pizza Classica con Mozzarella, Pomodoro, Prosciutto Crudo", price: 3.5, diet:["carne/pesce"] },
-                { name: "Pizza Classica con Capocollo, Pecorino, Rucola, Stracciatella, Melanzane Grigliate, Pomodori Secchi", price: 3.5, diet:["carne/pesce"] },
+                asCustomMenuItem({ name: "Pizza ai 5 cereali bresaola formaggio spalmabile e rughetta", diet:["carne/pesce"] }, 3),
+                asCustomMenuItem({ name: "Pizza ai 5 cereali con insalata di pollo", diet:["carne/pesce"] }, 1),
+                asCustomMenuItem({ name: "Pizza 5 Cereali con Stracchino, Zucchine Grigliate, Pomodori Secchi", diet:["vegetariano"] }, 3),
+                asCustomMenuItem({ name: "Pizza Classica con Mozzarella, Pomodoro, Prosciutto Crudo", diet:["carne/pesce"] }, 3),
+                asCustomMenuItem({ name: "Pizza Classica con Capocollo, Pecorino, Rucola, Stracciatella, Melanzane Grigliate, Pomodori Secchi", diet:["carne/pesce"] }, 6),
                 { name: "Pizza Rustica: Scarola e olive", price: 8.0, hasPortions:true, portions:[{t:"Intera-8€",v:8},{t:"Mezza-4€",v:4},{t:"1/4-2€",v:2}], diet:["vegano"] },
                 { name: "Pizza Rustica: Cicoria e pachino", price: 8.0, hasPortions:true, portions:[{t:"Intera-8€",v:8},{t:"Mezza-4€",v:4},{t:"1/4-2€",v:2}], diet:["vegano"] },
                 { name: "Pizza Rustica: Broccoli e salsiccia", price: 8.0, hasPortions:true, portions:[{t:"Intera-8€",v:8},{t:"Mezza-4€",v:4},{t:"1/4-2€",v:2}], diet:["carne/pesce"] }
@@ -153,7 +179,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             user: JSON.parse(localStorage.getItem('dose_user')) || null,
             cart: [], currentView: 'menu', search: '', cat: 'all', diet: 'all', posate: false,
             custom: { base: null, subtype: null, ings: [], total: 3.5 },
-            ordersToday: [], menuData: [], menuExtras: [], menuOverrides: new Map(), disabledProducts: new Set(),
+            ordersToday: [], menuData: [], menuExtras: [], customMenuItems: [], menuOverrides: new Map(), disabledProducts: new Set(),
             frige: { products: [], purchasesToday: [], refillsToday: [], selected: null, filter: 'all', paymentFilter: 'pending' },
             customCreations: [],
             customFilter: 'all',
@@ -168,6 +194,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             analytics: { ordersAll: [], frigeAll: [], frigeProducts: [], refillsOpen: [], unsub: {}, range: 'today', lastPreset: 'today', resolution: { orders: 'daily', frige: 'daily' }, targets: { orders: { min: null, max: null }, frige: { min: null, max: null } }, chartData: {}, zoom: { orders: null, frige: null } },
             subs: { orders: null, frige: null, menu: null, myOrders: null, custom: null, menuAudit: null },
             role: 'user',
+            authzSource: 'unknown',
             menuAdminOpen: (() => {
                 try { return JSON.parse(localStorage.getItem('menu_admin_open') || 'true'); } catch(e) { return true; }
             })()
@@ -178,6 +205,15 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         }
         const LOW_STOCK_THRESHOLD = 2;
         const ORDER_CUTOFF = { hour: 11, minute: 30 };
+        const ORDER_CONFIRM_ENDPOINT = (() => {
+            try {
+                const override = localStorage.getItem('dose_notify_base_url');
+                if(override) return `${override.replace(/\/$/, '')}/order_confirmation`;
+            } catch(e) {}
+            const host = window.location.hostname || '';
+            if(host.endsWith('github.io')) return 'https://app-dosepranza.netlify.app/.netlify/functions/order_confirmation';
+            return '/.netlify/functions/order_confirmation';
+        })();
         const isLocalE2E = (() => {
             try {
                 const host = window.location.hostname;
@@ -197,6 +233,10 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         };
         const ROLE_NAMES = {
             admin: ['marco tranquilli']
+        };
+        const isMappedStaffEmail = (email) => {
+            const e = normalizeEmail(email);
+            return ROLE_EMAILS.admin.includes(e) || ROLE_EMAILS.ristoratore.includes(e) || ROLE_EMAILS.facility.includes(e);
         };
 
         const firebaseConfig = { apiKey: "AIzaSyCQJsNbgaR89gF_1vLe6H4DPboOhQvm9nI", authDomain: "app-ordini-pranzo-alimentari.firebaseapp.com", projectId: "app-ordini-pranzo-alimentari", storageBucket: "app-ordini-pranzo-alimentari.appspot.com", messagingSenderId: "553169964686", appId: "1:553169964686:web:7f8ca6f32a301949e4c3df" };
@@ -229,17 +269,72 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
 
         const normalizeCat = (cat) => (cat || '').toString().trim().toLowerCase().replace(/[^a-z0-9]+/g, '-');
         const computeProductKey = (item) => `${normalizeCat(item.cat)}::${(item.name || '').toString().trim().toLowerCase()}`;
+        const CUSTOM_MEAT_FISH_INGREDIENTS = new Set(['br','cp','pc','co','cu','mo','sa','sp','ta']);
+        const CUSTOM_VEGETARIAN_INGREDIENTS = new Set(['bi','fr','mz','pa','pe','pr','sc','st','sz']);
+        const toDisplayName = (value) => String(value || '')
+            .trim()
+            .split(/\s+/)
+            .filter(Boolean)
+            .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+            .join(' ');
+        const resolveCustomMenuCategory = (type) => type === 'Panino' ? 'Panini' : 'Pizze';
+        const inferCustomDiet = (ingredients) => {
+            const ids = (ingredients || []).map(i => i.id || i);
+            if(ids.some(id => CUSTOM_MEAT_FISH_INGREDIENTS.has(id))) return ['carne/pesce'];
+            if(ids.some(id => CUSTOM_VEGETARIAN_INGREDIENTS.has(id))) return ['vegetariano'];
+            return ['vegano'];
+        };
+        const buildPublishedCustomMenuItems = (creations) => (creations || [])
+            .filter(c => c.publishToMenu && c.name && c.type && (c.type === 'Panino' || c.type === 'Pizza Ripiena'))
+            .map(c => {
+                const cat = resolveCustomMenuCategory(c.type);
+                const key = computeProductKey({ cat, name: c.name });
+                return {
+                id: `custom-${key}`,
+                name: c.name,
+                cat,
+                price: Number(c.price || customMenuPrice((c.ingredients || []).length)),
+                diet: Array.isArray(c.diet) && c.diet.length ? c.diet : ['carne/pesce', 'vegetariano', 'vegano'],
+                isCustom: true,
+                customSource: 'creation',
+                sourceCreationId: c.id,
+                creatorName: c.showCreatorName ? toDisplayName(c.ownerDisplayName || c.ownerName || '') : '',
+                creatorVisible: !!c.showCreatorName
+                };
+            });
+        const resolveItemCategory = (item) => {
+            const rawCat = (item?.cat || '').toString().trim();
+            if(rawCat && rawCat !== 'Crea') return rawCat;
+
+            const name = (item?.name || '').toString().trim();
+            const details = (item?.details || '').toString().trim();
+            const haystack = `${name} ${details}`.toLowerCase();
+
+            const directMatch = state.menuData.find((m) => (m.name || '').toLowerCase() === name.toLowerCase());
+            if(directMatch?.cat) return directMatch.cat;
+
+            if(haystack.includes('panino') || haystack.includes('ciabatt') || haystack.includes('5 cereali')) return 'Personalizzati';
+            if(haystack.includes('pizza ripiena') || haystack.includes('pizza classica personalizzato') || haystack.includes('focaccia personalizzato')) return 'Personalizzati';
+            if(rawCat === 'Crea') return 'Personalizzati';
+
+            return 'Altro';
+        };
         const buildMenuList = () => {
             const base = state.menuData.map(i => ({ ...i, _key: computeProductKey(i) }));
             const baseKeys = new Set(base.map(i => i._key));
             const extras = state.menuExtras.map(i => ({ ...i, _key: computeProductKey(i) }));
+            const customItems = state.customMenuItems.map(i => ({ ...i, _key: computeProductKey(i) }));
             const merged = base.map(i => {
                 const o = state.menuOverrides.get(i._key);
                 return o ? { ...i, ...o, _key: i._key } : i;
             });
-            const mergedExtras = extras.filter(i => !baseKeys.has(i._key)).map(i => {
+            const mergedExtras = [];
+            const seenKeys = new Set(baseKeys);
+            [...extras, ...customItems].forEach(i => {
+                if(seenKeys.has(i._key)) return;
+                seenKeys.add(i._key);
                 const o = state.menuOverrides.get(i._key);
-                return o ? { ...i, ...o, _key: i._key } : i;
+                mergedExtras.push(o ? { ...i, ...o, _key: i._key } : i);
             });
             return merged.concat(mergedExtras);
         };
@@ -343,12 +438,15 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(!ensureOrderWindow()) return;
             const c = state.custom;
             if(!c.subtype || c.ings.length === 0) return window.toast("Scegli gli ingredienti!");
-            state.cart.push({ name: `${c.base} (${c.subtype})`, price: c.total, cat: 'Crea', details: c.ings.map(i=>i.name).join(', '), cartId: Date.now() });
+            state.cart.push({ name: `${c.base} (${c.subtype})`, price: c.total, cat: 'Personalizzati', details: c.ings.map(i=>i.name).join(', '), cartId: Date.now() });
             document.getElementById('cart-count').textContent = state.cart.length;
             const saveToggle = document.getElementById('custom-save-toggle');
+            const publishToggle = document.getElementById('custom-publish-toggle');
             const customName = (document.getElementById('custom-name-input')?.value || '').trim();
             if(saveToggle?.checked && customName) {
                 saveCustomCreation(customName);
+            } else if((saveToggle?.checked || publishToggle?.checked) && !customName) {
+                window.toast("Aggiunto. Dai un nome alla creazione per salvarla.");
             }
             state.custom = { base:null, subtype:null, ings:[], total:3.5 };
             document.getElementById('custom-subtype-container').classList.add('hidden');
@@ -358,21 +456,39 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
 
         async function saveCustomCreation(name) {
             if(!state.user) return;
+            if(!auth_fb.currentUser?.uid) {
+                window.toast("Sessione non pronta, riprova tra un istante");
+                return;
+            }
             const c = state.custom;
+            const saveToggle = document.getElementById('custom-save-toggle');
+            const publishToggle = document.getElementById('custom-publish-toggle');
+            const creditToggle = document.getElementById('custom-credit-toggle');
+            const publishToMenu = !!(saveToggle?.checked && publishToggle?.checked);
+            const showCreatorName = !!(publishToMenu && creditToggle?.checked);
+            const ownerDisplayName = toDisplayName(state.user.name);
             const payload = {
                 name,
                 type: c.base,
                 subtype: c.subtype,
                 ingredients: c.ings.map(i => i.name),
+                ingredientIds: c.ings.map(i => i.id),
+                price: c.total,
+                diet: inferCustomDiet(c.ings),
+                uid: auth_fb.currentUser.uid,
+                email: state.user.email,
                 ownerEmail: state.user.email,
                 ownerName: state.user.name,
+                ownerDisplayName,
+                publishToMenu,
+                showCreatorName,
                 votes: 0,
                 voters: {},
                 createdAt: serverTimestamp()
             };
             try {
                 await addDoc(customCreationsCol, payload);
-                window.toast("Creato nello storico");
+                window.toast(publishToMenu ? "Salvato e pubblicato come custom" : "Creato nello storico");
                 const input = document.getElementById('custom-name-input');
                 if(input) input.value = '';
             } catch(e) {
@@ -529,7 +645,11 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                     hint.textContent = 'Accesso avanzato attivo: puoi gestire prodotti e disponibilità.';
                 } else {
                     btn.classList.add('hidden');
-                    hint.textContent = 'Accesso standard: alcune funzioni sono riservate.';
+                    if(isMappedStaffEmail(email) && state.authzSource !== 'claims') {
+                        hint.textContent = 'Account staff non verificato da token: esegui login Google e aggiorna claims.';
+                    } else {
+                        hint.textContent = 'Accesso standard: alcune funzioni sono riservate.';
+                    }
                 }
             } else {
                 quick.classList.add('hidden');
@@ -554,11 +674,17 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             list.innerHTML = items.map(i => {
                 const key = computeProductKey(i);
                 const active = !state.disabledProducts.has(i.id);
+                const customBadge = i.isCustom ? `<span class="badge badge-amber">Custom</span>` : '';
+                const creatorMeta = i.creatorName ? `<p class="text-[10px] text-gray-500">Creato da ${esc(i.creatorName)}</p>` : (i.customSource === 'creation' ? `<p class="text-[10px] text-gray-400">Custom della community</p>` : '');
                 return `
                     <div class="flex flex-wrap items-center gap-2 bg-gray-50 p-3 rounded-2xl border border-gray-100">
                         <div class="flex-1 min-w-[220px]">
-                            <p class="font-bold text-sm">${esc(i.name)}</p>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <p class="font-bold text-sm">${esc(i.name)}</p>
+                                ${customBadge}
+                            </div>
                             <p class="text-[10px] text-gray-500">${esc(i.cat)}</p>
+                            ${creatorMeta}
                         </div>
                         <input data-price-key="${key}" type="number" step="0.1" min="0" value="${i.price ?? ''}" class="p-2 rounded-xl border border-gray-200 text-[10px] font-bold w-24">
                         <button data-action="menu-update-price" data-key="${key}" class="btn btn-ghost text-[10px] px-3 py-2">Salva prezzo</button>
@@ -650,8 +776,61 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         };
 
         function buildOrderConfirmSummary(orderId, items, total) {
-            const lines = items.map(i => `• ${i.name}${i.details ? ` (${i.details})` : ''} — ${formatCurrency(i.price)}`);
-            return `Ordine #${orderId}\n` + lines.join('\n') + `\nTotale: ${formatCurrency(total)}`;
+            const now = new Date();
+            const dateLabel = now.toLocaleDateString('it-IT');
+            const timeLabel = now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+            const byItem = new Map();
+            (items || []).forEach((item) => {
+                const details = (item.details || '').trim();
+                const key = `${item.name}__${details}__${Number(item.price || 0)}`;
+                const existing = byItem.get(key);
+                if(existing) {
+                    existing.qty += 1;
+                    existing.lineTotal += Number(item.price || 0);
+                } else {
+                    byItem.set(key, {
+                        name: item.name,
+                        details,
+                        unitPrice: Number(item.price || 0),
+                        qty: 1,
+                        lineTotal: Number(item.price || 0)
+                    });
+                }
+            });
+            const rows = Array.from(byItem.values());
+            const textLines = rows.map((r) => {
+                const main = `${r.qty}x ${r.name}${r.details ? ` (${r.details})` : ''}`;
+                return `• ${main} — ${formatCurrency(r.lineTotal)}`;
+            });
+            const summaryText = [
+                `Ordine confermato #${orderId}`,
+                `Inviato il ${dateLabel} alle ${timeLabel}`,
+                '',
+                ...textLines,
+                '',
+                `Totale ordine: ${formatCurrency(total)}`
+            ].join('\n');
+
+            const rowsHtml = rows.map((r) => {
+                const main = `${r.qty}x ${esc(r.name)}`;
+                const details = r.details ? `<p class="text-[10px] text-gray-500 font-bold mt-0.5">${esc(r.details)}</p>` : '';
+                return `<div class="flex items-start justify-between gap-2 py-1.5 border-b border-gray-100 last:border-b-0">
+                    <div class="min-w-0">
+                        <p class="text-[11px] font-bold text-gray-800 leading-tight">${main}</p>
+                        ${details}
+                    </div>
+                    <span class="text-[11px] font-black text-primary whitespace-nowrap">${formatCurrency(r.lineTotal)}</span>
+                </div>`;
+            }).join('');
+            const summaryHtml = `
+                <div class="text-[10px] text-gray-500 font-bold mb-2">Ordine #${esc(orderId)} · ${dateLabel} ${timeLabel}</div>
+                <div class="space-y-0.5">${rowsHtml}</div>
+                <div class="mt-3 pt-2 border-t border-gray-200 flex items-center justify-between">
+                    <span class="text-[11px] uppercase tracking-wide text-gray-500 font-black">Totale</span>
+                    <span class="text-[13px] font-black text-primary">${formatCurrency(total)}</span>
+                </div>
+            `;
+            return { summaryText, summaryHtml };
         }
 
         function buildSendSummaryHtml(items) {
@@ -662,6 +841,29 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                     <span class="text-primary font-black">${formatCurrency(i.price)}</span>
                 </div>`;
             }).join('');
+        }
+
+        function formatNotificationChannels(channels) {
+            return channels.map((c) => c === 'slack' ? 'Slack' : 'email').join(' e ');
+        }
+
+        async function sendOrderConfirmationNotification(orderId) {
+            if(!auth_fb.currentUser || !orderId || isLocalE2E) return { skipped: true };
+            const token = await auth_fb.currentUser.getIdToken();
+            const res = await fetch(ORDER_CONFIRM_ENDPOINT, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ orderId })
+            });
+            let payload = {};
+            try { payload = await res.json(); } catch(e) {}
+            if(!res.ok) {
+                throw new Error(payload?.message || `HTTP ${res.status}`);
+            }
+            return payload;
         }
 
         function openSendConfirm(payload) {
@@ -722,17 +924,25 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 closeSendConfirm();
                 const summary = buildOrderConfirmSummary(docRef.id, payload.items, payload.total);
                 showOrderConfirm(summary);
+                sendOrderConfirmationNotification(docRef.id)
+                    .then((result) => {
+                        const sent = Array.isArray(result?.sentChannels) ? result.sentChannels : [];
+                        if(sent.length) window.toast(`Conferma inviata via ${formatNotificationChannels(sent)}`);
+                    })
+                    .catch((err) => {
+                        console.warn('order confirmation notification failed', err);
+                    });
                 state.pendingOrder = null;
                 state.cart = []; document.getElementById('cart-count').textContent='0'; window.navigate('history'); window.toast("Inviato!");
             } catch(e) { alert("Connessione fallita. Carica online!"); }
         }
 
-        function showOrderConfirm(summaryText) {
+        function showOrderConfirm(summary) {
             const modal = document.getElementById('order-confirm-modal');
             const box = document.getElementById('order-confirm-summary');
-            box.textContent = summaryText;
+            box.innerHTML = summary.summaryHtml;
             modal.classList.remove('hidden');
-            modal.dataset.summary = summaryText;
+            modal.dataset.summary = summary.summaryText;
         }
 
         function closeOrderConfirm() {
@@ -810,7 +1020,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 const ts = o.createdAt?.toDate();
                 o.items.forEach(i => {
                     const status = o.paymentStatus === "paid" ? "Pagato" : "Da Pagare";
-                    csv += `${d.id};${ts ? ts.toISOString() : ''};${ts ? ts.toLocaleString() : ''};${o.uid || ''};${o.user || ''};${o.email || ''};${i.name || ''};${i.details || ''};${i.cat || ''};1;${fmt(i.price)};${fmt(i.price)};Satispay;${o.allergies || "No"};${o.posate || "No"};Web;${status};${o.ristoratoreResponse || ''}\n`;
+                    csv += `${d.id};${ts ? ts.toISOString() : ''};${ts ? ts.toLocaleString() : ''};${o.uid || ''};${o.user || ''};${o.email || ''};${i.name || ''};${i.details || ''};${resolveItemCategory(i)};1;${fmt(i.price)};${fmt(i.price)};Satispay;${o.allergies || "No"};${o.posate || "No"};Web;${status};${o.ristoratoreResponse || ''}\n`;
                 });
             });
             const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
@@ -849,6 +1059,35 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 if(btn) btn.disabled = !e.target.checked;
             });
         }
+
+        const customSaveToggleEl = document.getElementById('custom-save-toggle');
+        const customPublishToggleEl = document.getElementById('custom-publish-toggle');
+        const customCreditToggleEl = document.getElementById('custom-credit-toggle');
+        const syncCustomConsentControls = () => {
+            const saveChecked = !!customSaveToggleEl?.checked;
+            const publishChecked = !!customPublishToggleEl?.checked;
+            if(customPublishToggleEl) {
+                customPublishToggleEl.disabled = !saveChecked;
+                if(!saveChecked) customPublishToggleEl.checked = false;
+            }
+            if(customCreditToggleEl) {
+                customCreditToggleEl.disabled = !saveChecked || !publishChecked;
+                if(!saveChecked || !publishChecked) customCreditToggleEl.checked = false;
+            }
+        };
+        if(customSaveToggleEl) customSaveToggleEl.addEventListener('change', () => syncCustomConsentControls());
+        if(customPublishToggleEl) customPublishToggleEl.addEventListener('change', () => {
+            if(customPublishToggleEl.checked && customSaveToggleEl) customSaveToggleEl.checked = true;
+            syncCustomConsentControls();
+        });
+        if(customCreditToggleEl) customCreditToggleEl.addEventListener('change', () => {
+            if(customCreditToggleEl.checked) {
+                if(customSaveToggleEl) customSaveToggleEl.checked = true;
+                if(customPublishToggleEl) customPublishToggleEl.checked = true;
+            }
+            syncCustomConsentControls();
+        });
+        syncCustomConsentControls();
 
         window.confirmFrigePurchase = async () => {
             const p = state.frige.selected;
@@ -1313,11 +1552,15 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 const isDisabled = state.disabledProducts.has(i.id);
                 const disabled = (!orderOpen || isDisabled) ? 'opacity-50 pointer-events-none' : '';
                 const canManage = isAdmin() || isRistoratore();
-                const statusBadge = isDisabled ? `<span class="badge badge-red">Non disponibile</span>` : '';
+                const badges = [
+                    i.isCustom ? `<span class="badge badge-amber">Custom</span>` : '',
+                    isDisabled ? `<span class="badge badge-red">Non disponibile</span>` : ''
+                ].filter(Boolean).join('');
+                const creatorMeta = i.creatorName ? `<p class="text-[10px] text-gray-500 font-bold mt-1">Creato da ${esc(i.creatorName)}</p>` : '';
                 html += `<div class="card p-5 rounded-[2rem] flex flex-col justify-between ${disabled}">
                     <div class="flex items-start justify-between gap-2">
-                        <div><h4 class="font-bold text-sm product-title leading-tight mb-1">${esc(i.name)}</h4><p class="text-[9px] text-gray-300 italic">${esc(i.cat)}</p></div>
-                        ${statusBadge}
+                        <div><h4 data-action="toggle-product-title" class="font-bold text-sm product-title expandable leading-tight mb-1" title="Tocca per espandere o ridurre">${esc(i.name)}</h4><p class="text-[9px] text-gray-300 italic">${esc(i.cat)}</p>${creatorMeta}</div>
+                        ${badges ? `<div class="flex flex-col items-end gap-1">${badges}</div>` : ''}
                     </div>
                     <div class="mt-4 flex justify-between items-center gap-2">${pricing}<button data-action="add-std" data-id="${i.id}" class="bg-primary text-white h-10 w-10 rounded-2xl shadow-lg flex items-center justify-center flex-shrink-0 active:scale-90" ${(!orderOpen || isDisabled) ? 'disabled' : ''}><i class="fas fa-plus"></i></button></div>
                     ${canManage ? `<button data-action="toggle-availability" data-id="${i.id}" class="mt-3 btn btn-ghost text-[10px] px-3 py-2">${isDisabled ? 'Riattiva' : 'Disattiva'}</button>` : ''}
@@ -1372,20 +1615,45 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
 
         function syncMyOrders() {
             if(!state.authReady || !state.user?.email || state.subs.myOrders) return;
+            const renderOrdersLoadError = () => {
+                state.subs.myOrders = null;
+                const el = document.getElementById('my-order-status');
+                if(el) {
+                    el.innerHTML = `<div class="text-[11px] text-red-500 font-bold">Impossibile caricare i tuoi ordini. Verifica permessi Firestore.</div>`;
+                }
+            };
+            const toMillis = (value) => {
+                try {
+                    if(value?.toDate) return value.toDate().getTime();
+                    if(value instanceof Date) return value.getTime();
+                    if(typeof value === "number") return value;
+                } catch(e) {}
+                return 0;
+            };
+            const applyMyOrdersSnapshot = (snap) => {
+                state.myOrders = snap.docs
+                    .map(d => ({ id: d.id, ...d.data() }))
+                    .sort((a, b) => toMillis(b.createdAt) - toMillis(a.createdAt));
+                renderMyOrderStatus();
+            };
+            const baseQuery = query(ordersCol, where("email", "==", state.user.email));
+            const orderedQuery = query(baseQuery, orderBy("createdAt", "desc"));
+            const attachFallbackQuery = () => {
+                state.subs.myOrders = onSnapshot(baseQuery, applyMyOrdersSnapshot, renderOrdersLoadError);
+            };
+
             state.subs.myOrders = onSnapshot(
-                query(ordersCol, where("email", "==", state.user.email), orderBy("createdAt", "desc")),
-                snap => {
-                    state.myOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                    renderMyOrderStatus();
-                },
-                () => {
-                    state.subs.myOrders = null;
-                    onSnapshot(query(ordersCol, orderBy("createdAt", "desc")), snap => {
-                        state.myOrders = snap.docs
-                            .map(d => ({ id: d.id, ...d.data() }))
-                            .filter(o => o.email === state.user.email);
-                        renderMyOrderStatus();
-                    });
+                orderedQuery,
+                applyMyOrdersSnapshot,
+                (err) => {
+                    // Missing composite index: fallback to email-only query and sort client-side.
+                    if(err?.code === "failed-precondition") {
+                        try { if(typeof state.subs.myOrders === "function") state.subs.myOrders(); } catch(e) {}
+                        state.subs.myOrders = null;
+                        attachFallbackQuery();
+                        return;
+                    }
+                    renderOrdersLoadError();
                 }
             );
         }
@@ -1455,9 +1723,13 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                     const key = computeProductKey(item);
                     if(disabled.has(key)) disabledIds.add(item.id);
                 });
+                state.customMenuItems.forEach(item => {
+                    const key = computeProductKey(item);
+                    if(disabled.has(key)) disabledIds.add(item.id);
+                });
                 // Build extras for products that are only in Firestore
                 overrides.forEach((data, key) => {
-                    const exists = state.menuData.some(i => computeProductKey(i) === key);
+                    const exists = state.menuData.some(i => computeProductKey(i) === key) || state.customMenuItems.some(i => computeProductKey(i) === key);
                     if(!exists) {
                         extras.push({
                             id: `custom-${key}`,
@@ -1484,7 +1756,10 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(state.subs.custom) return;
             state.subs.custom = onSnapshot(query(customCreationsCol, orderBy("createdAt", "desc")), snap => {
                 state.customCreations = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                state.customMenuItems = buildPublishedCustomMenuItems(state.customCreations);
                 renderCustomCreations();
+                renderMenu();
+                renderMenuAdmin();
             });
         }
 
@@ -1582,6 +1857,17 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             }
         };
 
+        window.copyTechContact = async () => {
+            const contact = 'marco.tranquilli@dos.design';
+            try {
+                await navigator.clipboard.writeText(contact);
+                window.toast("Contatto copiato");
+            } catch(e) {
+                console.warn('copy tech contact failed', e);
+                window.toast(contact);
+            }
+        };
+
         window.voteCreation = async (id) => {
             if(!state.user) return window.toast("Accedi per votare");
             try {
@@ -1639,11 +1925,19 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 const hasVoted = c.voters && state.user?.email && c.voters[state.user.email];
                 const disabled = isOwner || hasVoted;
                 const voteLabel = isOwner ? 'Tuo' : (hasVoted ? 'Votato' : 'Vota');
+                const creatorLabel = c.showCreatorName
+                    ? `Creato da ${esc(toDisplayName(c.ownerDisplayName || c.ownerName || c.ownerEmail || 'Utente'))}`
+                    : (isOwner ? 'Creato da te (anonimo)' : 'Autore anonimo');
+                const visibilityBadges = [
+                    `<span class="chip chip-quiet">${esc(c.type)}</span>`,
+                    c.publishToMenu ? `<span class="chip">In menu</span>` : `<span class="chip chip-quiet">Solo storico</span>`,
+                    c.publishToMenu && !c.showCreatorName ? `<span class="chip chip-quiet">Anonimo</span>` : ''
+                ].filter(Boolean).join(' ');
                 return `
                     <div class="bg-white p-4 rounded-2xl border border-gray-100 flex flex-wrap items-center gap-3">
                         <div class="flex-1 min-w-[220px]">
-                            <p class="font-black text-sm">${esc(c.name)} <span class="chip chip-quiet">${esc(c.type)}</span></p>
-                            <p class="text-[10px] text-gray-500">di ${esc(c.ownerName || c.ownerEmail || 'Utente')}</p>
+                            <p class="font-black text-sm">${esc(c.name)} ${visibilityBadges}</p>
+                            <p class="text-[10px] text-gray-500">${creatorLabel}</p>
                             <p class="text-[11px] text-gray-700 mt-1">${esc(ingredients)}</p>
                         </div>
                         <div class="flex items-center gap-2">
@@ -1777,33 +2071,112 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         }
 
         function renderDailySummaryInline() {
-            const wrap = document.getElementById('daily-summary-inline');
-            const productsEl = document.getElementById('daily-summary-products');
-            const allergiesEl = document.getElementById('daily-summary-allergies');
-            const countEl = document.getElementById('daily-summary-count');
-            const titleEl = document.getElementById('daily-summary-title');
-            const adminLink = document.getElementById('daily-summary-admin-link');
-            if(!wrap || !productsEl || !allergiesEl || !countEl || !titleEl || !adminLink) return;
+            const targets = [
+                {
+                    wrapId: 'daily-summary-inline',
+                    productsId: 'daily-summary-products',
+                    allergiesId: 'daily-summary-allergies',
+                    countId: 'daily-summary-count',
+                    titleId: 'daily-summary-title',
+                    adminLinkId: 'daily-summary-admin-link'
+                },
+                {
+                    wrapId: 'daily-summary-inline-custom',
+                    productsId: 'daily-summary-products-custom',
+                    allergiesId: 'daily-summary-allergies-custom',
+                    countId: 'daily-summary-count-custom',
+                    titleId: 'daily-summary-title-custom',
+                    adminLinkId: 'daily-summary-admin-link-custom'
+                }
+            ];
 
-            if(isAdmin() || isRistoratore()) {
+            targets.forEach((t) => {
+                const wrap = document.getElementById(t.wrapId);
+                const productsEl = document.getElementById(t.productsId);
+                const allergiesEl = document.getElementById(t.allergiesId);
+                const countEl = document.getElementById(t.countId);
+                const titleEl = document.getElementById(t.titleId);
+                const adminLink = document.getElementById(t.adminLinkId);
+                if(!wrap || !productsEl || !allergiesEl || !countEl || !titleEl || !adminLink) return;
+
+                if(isAdmin() || isRistoratore()) {
+                    wrap.classList.remove('hidden');
+                    adminLink.classList.remove('hidden');
+                    titleEl.textContent = "Riepilogo Ordini Oggi";
+                    if(state.ordersToday.length === 0) {
+                        productsEl.innerHTML = `<p class="text-gray-400">Nessun ordine presente.</p>`;
+                        allergiesEl.innerHTML = `<p class="text-gray-400">Nessuna nota.</p>`;
+                        countEl.textContent = "";
+                        return;
+                    }
+                    const { itemsSorted, totalOrders, totalItems } = buildKitchenSummary();
+                    countEl.textContent = `${totalOrders} ordini · ${totalItems} pezzi`;
+                    productsEl.innerHTML = itemsSorted.map(i => `
+                        <div class="flex items-center justify-between gap-2 bg-white px-3 py-2 rounded-xl border border-gray-100">
+                            <span class="font-semibold text-gray-700">${esc(i.label)}</span>
+                            <span class="badge">${i.count}x</span>
+                        </div>
+                    `).join('');
+                    const allergies = state.ordersToday
+                        .filter(o => o.allergies && o.allergies.trim().length > 0)
+                        .map(o => ({
+                            user: o.user,
+                            note: o.allergies.trim()
+                        }));
+                    allergiesEl.innerHTML = allergies.length === 0
+                        ? `<p class="text-gray-400">Nessuna nota o allergia.</p>`
+                        : allergies.map(a => `
+                            <div class="bg-white px-3 py-2 rounded-xl border border-red-100">
+                                <p class="text-[10px] font-black uppercase text-red-700">${esc(a.user)}</p>
+                                <p class="text-[11px] text-gray-700">${esc(a.note)}</p>
+                            </div>
+                        `).join('');
+                    return;
+                }
+
+                // Utenti standard: mostra solo i propri ordini
+                adminLink.classList.add('hidden');
                 wrap.classList.remove('hidden');
-                adminLink.classList.remove('hidden');
-                titleEl.textContent = "Riepilogo Ordini Oggi";
-                if(state.ordersToday.length === 0) {
-                    productsEl.innerHTML = `<p class="text-gray-400">Nessun ordine presente.</p>`;
+                titleEl.textContent = "Il tuo riepilogo oggi";
+                if(!state.user) {
+                    productsEl.innerHTML = `<p class="text-gray-400">Inserisci nome ed email per vedere il riepilogo.</p>`;
                     allergiesEl.innerHTML = `<p class="text-gray-400">Nessuna nota.</p>`;
                     countEl.textContent = "";
                     return;
                 }
-                const { itemsSorted, totalOrders, totalItems } = buildKitchenSummary();
-                countEl.textContent = `${totalOrders} ordini · ${totalItems} pezzi`;
+                const now = new Date(); now.setHours(0,0,0,0);
+                const myOrdersToday = (state.myOrders || []).filter(o => {
+                    if(!isValidOrder(o)) return false;
+                    if(!o.createdAt) return false;
+                    const d = o.createdAt.toDate ? o.createdAt.toDate() : o.createdAt;
+                    return d >= now;
+                });
+                if(myOrdersToday.length === 0) {
+                    productsEl.innerHTML = `<p class="text-gray-400">Nessun ordine inviato oggi.</p>`;
+                    allergiesEl.innerHTML = `<p class="text-gray-400">Nessuna nota.</p>`;
+                    countEl.textContent = "";
+                    return;
+                }
+                const itemCounts = new Map();
+                let totalItems = 0;
+                myOrdersToday.forEach(o => {
+                    (o.items || []).forEach(i => {
+                        const label = i.details && i.details !== "" ? `${i.name} (${i.details})` : i.name;
+                        itemCounts.set(label, (itemCounts.get(label) || 0) + 1);
+                        totalItems += 1;
+                    });
+                });
+                const itemsSorted = Array.from(itemCounts.entries())
+                    .map(([label, count]) => ({ label, count }))
+                    .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+                countEl.textContent = `${myOrdersToday.length} ordini · ${totalItems} pezzi`;
                 productsEl.innerHTML = itemsSorted.map(i => `
                     <div class="flex items-center justify-between gap-2 bg-white px-3 py-2 rounded-xl border border-gray-100">
                         <span class="font-semibold text-gray-700">${esc(i.label)}</span>
                         <span class="badge">${i.count}x</span>
                     </div>
                 `).join('');
-                const allergies = state.ordersToday
+                const allergies = myOrdersToday
                     .filter(o => o.allergies && o.allergies.trim().length > 0)
                     .map(o => ({
                         user: o.user,
@@ -1817,60 +2190,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                             <p class="text-[11px] text-gray-700">${esc(a.note)}</p>
                         </div>
                     `).join('');
-                return;
-            }
-
-            // Utenti standard: mostra solo i propri ordini
-            adminLink.classList.add('hidden');
-            if(!state.user) { wrap.classList.add('hidden'); return; }
-            wrap.classList.remove('hidden');
-            titleEl.textContent = "Il tuo riepilogo oggi";
-            const now = new Date(); now.setHours(0,0,0,0);
-            const myOrdersToday = (state.myOrders || []).filter(o => {
-                if(!isValidOrder(o)) return false;
-                if(!o.createdAt) return false;
-                const d = o.createdAt.toDate ? o.createdAt.toDate() : o.createdAt;
-                return d >= now;
             });
-            if(myOrdersToday.length === 0) {
-                productsEl.innerHTML = `<p class="text-gray-400">Nessun ordine inviato oggi.</p>`;
-                allergiesEl.innerHTML = `<p class="text-gray-400">Nessuna nota.</p>`;
-                countEl.textContent = "";
-                return;
-            }
-            const itemCounts = new Map();
-            let totalItems = 0;
-            myOrdersToday.forEach(o => {
-                (o.items || []).forEach(i => {
-                    const label = i.details && i.details !== "" ? `${i.name} (${i.details})` : i.name;
-                    itemCounts.set(label, (itemCounts.get(label) || 0) + 1);
-                    totalItems += 1;
-                });
-            });
-            const itemsSorted = Array.from(itemCounts.entries())
-                .map(([label, count]) => ({ label, count }))
-                .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
-            countEl.textContent = `${myOrdersToday.length} ordini · ${totalItems} pezzi`;
-            productsEl.innerHTML = itemsSorted.map(i => `
-                <div class="flex items-center justify-between gap-2 bg-white px-3 py-2 rounded-xl border border-gray-100">
-                    <span class="font-semibold text-gray-700">${esc(i.label)}</span>
-                    <span class="badge">${i.count}x</span>
-                </div>
-            `).join('');
-            const allergies = myOrdersToday
-                .filter(o => o.allergies && o.allergies.trim().length > 0)
-                .map(o => ({
-                    user: o.user,
-                    note: o.allergies.trim()
-                }));
-            allergiesEl.innerHTML = allergies.length === 0
-                ? `<p class="text-gray-400">Nessuna nota o allergia.</p>`
-                : allergies.map(a => `
-                    <div class="bg-white px-3 py-2 rounded-xl border border-red-100">
-                        <p class="text-[10px] font-black uppercase text-red-700">${esc(a.user)}</p>
-                        <p class="text-[11px] text-gray-700">${esc(a.note)}</p>
-                    </div>
-                `).join('');
         }
 
         function renderRoleStatus() {
@@ -2222,6 +2542,10 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
 
             const uniqueUsers = new Set(ordersRange.map(o => o.email || o.user)).size;
             const repeatRate = ordersRange.length ? ((ordersRange.length - uniqueUsers) / ordersRange.length) : 0;
+            const revenuePerUser = uniqueUsers ? (ordersRange.reduce((s, o) => s + (o.total || 0), 0) / uniqueUsers) : 0;
+            const unpaidAmount = state.analytics.ordersAll
+                .filter(o => o.paymentStatus !== "paid")
+                .reduce((s, o) => s + (o.total || 0), 0);
 
             const orderPaid = ordersRange.filter(o => o.paymentStatus === "paid").length;
             const orderPayRate = ordersRange.length ? (orderPaid / ordersRange.length) : 0;
@@ -2238,7 +2562,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             const catCounts = {};
             ordersRange.forEach(o => {
                 (o.items || []).forEach(i => {
-                    const c = i.cat || 'Altro';
+                    const c = resolveItemCategory(i);
                     catCounts[c] = (catCounts[c] || 0) + 1;
                 });
             });
@@ -2259,6 +2583,27 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(ordersPending > 0) alerts.push(`${ordersPending} pagamenti ordini pendenti`);
             if(frigePending > 0) alerts.push(`${frigePending} pagamenti Frige pendenti`);
             if(!alerts.length) alerts.push('Nessun alert critico');
+
+            const byDay = {};
+            ordersRange.forEach(o => {
+                const d = o.createdAt?.toDate?.();
+                if(!d) return;
+                const key = d.toISOString().slice(0, 10);
+                byDay[key] = (byDay[key] || 0) + (o.total || 0);
+            });
+            const bestDayEntry = Object.entries(byDay).sort((a, b) => b[1] - a[1])[0] || null;
+            const bestDayText = bestDayEntry
+                ? `${new Date(bestDayEntry[0]).toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' })} · €${bestDayEntry[1].toFixed(2)}`
+                : '-';
+
+            const ordersBeforeCutoff = ordersRange.filter(o => {
+                const d = o.createdAt?.toDate?.();
+                if(!d) return false;
+                const hour = d.getHours();
+                const minute = d.getMinutes();
+                return hour < ORDER_CUTOFF.hour || (hour === ORDER_CUTOFF.hour && minute <= ORDER_CUTOFF.minute);
+            }).length;
+            const cutoffCompliance = ordersRange.length ? (ordersBeforeCutoff / ordersRange.length) : 0;
 
             const setText = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
             setText('analytics-orders-today', ordersTodayCount.toString());
@@ -2286,6 +2631,21 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             setText('analytics-alerts', alerts.join(' • '));
             renderMixBars(topCats, totalCat);
             setText('analytics-slow-movers', slowMovers.length ? slowMovers.map(([c,n]) => `${c} (${n})`).join(' • ') : 'Nessun dato');
+            setText('analytics-unique-users', uniqueUsers.toString());
+            setText('analytics-repeat-rate', `${Math.round(repeatRate * 100)}%`);
+            setText('analytics-revenue-per-user', `€${revenuePerUser.toFixed(2)}`);
+            setText('analytics-unpaid-amount', `€${unpaidAmount.toFixed(2)}`);
+            setText('analytics-best-day', bestDayText);
+            setText('analytics-cutoff-compliance', `${Math.round(cutoffCompliance * 100)}%`);
+
+            const adminPanel = document.getElementById('analytics-admin-panel');
+            const adminSummary = document.getElementById('analytics-admin-summary');
+            if(adminPanel) adminPanel.classList.toggle('hidden', !isAdmin());
+            if(adminSummary) {
+                adminSummary.textContent = ordersRange.length
+                    ? `Nel periodo selezionato hai ${uniqueUsers} utenti attivi, repeat rate ${Math.round(repeatRate * 100)}%, ${ordersPending} pagamenti ordini aperti per €${unpaidAmount.toFixed(2)} e compliance cutoff ${Math.round(cutoffCompliance * 100)}%.`
+                    : 'Nessun dato nel periodo selezionato.';
+            }
 
             renderAnalyticsCharts(ordersRange, frigeRange, start, end);
             renderTargetVsActual(ordersRange, frigeRange);
@@ -2875,12 +3235,14 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             const e = normalizeEmail(email);
             const n = normalizeName(state.user?.name);
             let role = 'user';
+            state.authzSource = 'claims';
 
             if(isLocalE2E) {
                 if(ROLE_EMAILS.admin.includes(e) || ROLE_NAMES.admin.includes(n)) role = 'admin';
                 else if(ROLE_EMAILS.ristoratore.includes(e)) role = 'ristoratore';
                 else if(ROLE_EMAILS.facility.includes(e)) role = 'facility';
                 state.role = role;
+                state.authzSource = 'e2e';
             } else {
                 // 1) Try custom claims
                 try {
@@ -2888,14 +3250,25 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                     const claimRole = token?.claims?.role;
                     if(['admin','ristoratore','facility','user'].includes(claimRole)) {
                         role = claimRole;
+                    } else {
+                        state.authzSource = 'unverified';
                     }
-                } catch(e) {}
+                } catch(e) {
+                    state.authzSource = 'unverified';
+                }
 
-                // 2) Fallback to email mapping (pre-claims)
-                if(role === 'user') {
-                    if(ROLE_EMAILS.admin.includes(e) || ROLE_NAMES.admin.includes(n)) role = 'admin';
-                    else if(ROLE_EMAILS.ristoratore.includes(e)) role = 'ristoratore';
-                    else if(ROLE_EMAILS.facility.includes(e)) role = 'facility';
+                // 2) Fallback: mapped staff emails (until claims are fully propagated)
+                if(role === 'user' && state.authzSource !== 'claims') {
+                    if(ROLE_EMAILS.admin.includes(e) || ROLE_NAMES.admin.includes(n)) {
+                        role = 'admin';
+                        state.authzSource = 'email-map-fallback';
+                    } else if(ROLE_EMAILS.ristoratore.includes(e)) {
+                        role = 'ristoratore';
+                        state.authzSource = 'email-map-fallback';
+                    } else if(ROLE_EMAILS.facility.includes(e)) {
+                        role = 'facility';
+                        state.authzSource = 'email-map-fallback';
+                    }
                 }
                 state.role = role;
             }
@@ -3023,6 +3396,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             'add-ing': (el) => window.addIng(el.dataset.id),
             'remove-ing': (el) => window.removeIng(parseInt(el.dataset.index, 10)),
             'add-custom': () => window.addCustomToCart(),
+            'toggle-product-title': (el) => el.classList.toggle('product-title-expanded'),
             'toggle-availability': (el) => window.toggleProductAvailability(el.dataset.id),
             'menu-upsert': () => window.upsertMenuProduct(),
             'menu-update-price': (el) => window.updateMenuPrice(el.dataset.key),
@@ -3030,6 +3404,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             'toggle-menu-admin': () => window.toggleMenuAdmin(),
             'menu-audit-filter': (el) => window.setMenuAuditFilter(el.dataset.filter),
             'menu-audit-export': () => window.exportMenuAudit(),
+            'copy-tech-contact': () => window.copyTechContact(),
             'remove-from-cart': (el) => window.removeFromCart(Number(el.dataset.id)),
             'custom-vote': (el) => window.voteCreation(el.dataset.id),
             'custom-filter': (el) => window.setCustomFilter(el.dataset.filter),
