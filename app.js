@@ -259,6 +259,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         };
         const esc = (v) => String(v ?? '').replace(/[&<>"'`=\\/]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#x60;','=':'&#x3D;','/':'&#x2F;','\\':'&#x5C;'}[c]));
         const formatCurrency = (value) => `€${Number(value || 0).toFixed(2)}`;
+        const HIDDEN_MENU_CATEGORIES = new Set(['Personalizzati']);
 
         window.toast = (m) => {
             const el = document.getElementById('toast');
@@ -269,6 +270,8 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
 
         const normalizeCat = (cat) => (cat || '').toString().trim().toLowerCase().replace(/[^a-z0-9]+/g, '-');
         const computeProductKey = (item) => `${normalizeCat(item.cat)}::${(item.name || '').toString().trim().toLowerCase()}`;
+        const isVisibleMenuCategory = (cat) => !HIDDEN_MENU_CATEGORIES.has((cat || '').toString().trim());
+        const getVisibleMenuCategories = () => Object.keys(RAW_MENU).filter(isVisibleMenuCategory);
         const CUSTOM_MEAT_FISH_INGREDIENTS = new Set(['br','cp','pc','co','cu','mo','sa','sp','ta']);
         const CUSTOM_VEGETARIAN_INGREDIENTS = new Set(['bi','fr','mz','pa','pe','pr','sc','st','sz']);
         const toDisplayName = (value) => String(value || '')
@@ -320,7 +323,9 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             return 'Altro';
         };
         const buildMenuList = () => {
-            const base = state.menuData.map(i => ({ ...i, _key: computeProductKey(i) }));
+            const base = state.menuData
+                .filter(i => isVisibleMenuCategory(i.cat))
+                .map(i => ({ ...i, _key: computeProductKey(i) }));
             const baseKeys = new Set(base.map(i => i._key));
             const extras = state.menuExtras.map(i => ({ ...i, _key: computeProductKey(i) }));
             const customItems = state.customMenuItems.map(i => ({ ...i, _key: computeProductKey(i) }));
@@ -331,6 +336,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             const mergedExtras = [];
             const seenKeys = new Set(baseKeys);
             [...extras, ...customItems].forEach(i => {
+                if(!isVisibleMenuCategory(i.cat)) return;
                 if(seenKeys.has(i._key)) return;
                 seenKeys.add(i._key);
                 const o = state.menuOverrides.get(i._key);
@@ -338,6 +344,18 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             });
             return merged.concat(mergedExtras);
         };
+        const findMenuItemByKey = (key) => buildMenuList().find(i => computeProductKey(i) === key);
+        const buildMenuProductPayload = (item, extra = {}) => ({
+            key: computeProductKey(item),
+            name: item.name,
+            cat: item.cat,
+            price: Number(item.price || 0),
+            diet: Array.isArray(item.diet) ? item.diet : [],
+            isActive: item.isActive !== false,
+            updatedAt: serverTimestamp(),
+            updatedBy: state.user?.email || 'anon',
+            ...extra
+        });
 
         const loadDisabledProducts = () => {
             // fallback cache for offline visibility
@@ -509,12 +527,10 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                     const snap = await tx.get(ref);
                     if(!snap.exists()) {
                         tx.set(ref, {
-                            key,
-                            name: item.name,
-                            cat: item.cat,
-                            isActive: !shouldDisable,
-                            updatedAt: serverTimestamp(),
-                            updatedBy: state.user?.email || 'anon'
+                            ...buildMenuProductPayload(item, {
+                                isActive: !shouldDisable,
+                                createdAt: serverTimestamp()
+                            })
                         });
                     } else {
                         tx.update(ref, {
@@ -551,6 +567,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(document.getElementById('menu-diet-veg')?.checked) diet.push('vegetariano');
             if(document.getElementById('menu-diet-vegan')?.checked) diet.push('vegano');
             if(!name || !cat || Number.isNaN(priceVal)) return window.toast("Compila nome, categoria e prezzo");
+            if(!isVisibleMenuCategory(cat)) return window.toast("Categoria non disponibile nel menù");
             const item = { name, cat, price: priceVal, diet, isActive: true };
             const key = computeProductKey(item);
             try {
@@ -559,16 +576,11 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                     const ref = doc(db_fb, "menu_products", key);
                     const snap = await tx.get(ref);
                     existed = snap.exists();
-                    const payload = {
-                        key,
-                        name,
-                        cat,
+                    const payload = buildMenuProductPayload(item, {
                         price: priceVal,
                         diet,
-                        isActive: snap.exists() ? (snap.data().isActive !== false) : true,
-                        updatedAt: serverTimestamp(),
-                        updatedBy: state.user?.email || 'anon'
-                    };
+                        isActive: snap.exists() ? (snap.data().isActive !== false) : true
+                    });
                     if(!snap.exists()) payload.createdAt = serverTimestamp();
                     tx.set(ref, payload, { merge: true });
                 });
@@ -594,14 +606,24 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(!input) return;
             const priceVal = parseFloat(input.value || '');
             if(Number.isNaN(priceVal)) return window.toast("Prezzo non valido");
+            const item = findMenuItemByKey(key);
+            if(!item) return window.toast("Prodotto non trovato");
             try {
+                let persisted = false;
                 await runTransaction(db_fb, async (tx) => {
                     const ref = doc(db_fb, "menu_products", key);
                     const snap = await tx.get(ref);
-                    if(!snap.exists()) return;
-                    tx.update(ref, { price: priceVal, updatedAt: serverTimestamp(), updatedBy: state.user?.email || 'anon' });
+                    const payload = buildMenuProductPayload(item, {
+                        price: priceVal,
+                        isActive: snap.exists() ? (snap.data().isActive !== false) : !state.disabledProducts.has(item.id)
+                    });
+                    if(!snap.exists()) payload.createdAt = serverTimestamp();
+                    tx.set(ref, payload, { merge: true });
+                    persisted = true;
                 });
+                if(!persisted) return window.toast("Prezzo non aggiornato");
                 await logMenuAudit('price', { key, price: priceVal });
+                input.value = priceVal.toFixed(2);
                 window.toast("Prezzo aggiornato");
             } catch(e) {
                 console.warn('update price failed', e);
@@ -1729,6 +1751,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 });
                 // Build extras for products that are only in Firestore
                 overrides.forEach((data, key) => {
+                    if(!isVisibleMenuCategory(data.cat)) return;
                     const exists = state.menuData.some(i => computeProductKey(i) === key) || state.customMenuItems.some(i => computeProductKey(i) === key);
                     if(!exists) {
                         extras.push({
@@ -2531,7 +2554,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             const frigePending = frigeToday.filter(o => o.paymentStatus !== "paid").length;
 
             const lowStock = state.analytics.frigeProducts.filter(p => (p.stock ?? 0) > 0 && (p.stock ?? 0) <= LOW_STOCK_THRESHOLD).length;
-            const menuCount = state.menuData.length;
+            const menuCount = buildMenuList().length;
             const frigeCount = state.analytics.frigeProducts.length;
             const refillsOpen = state.analytics.refillsOpen.length;
             const ordersPending = state.analytics.ordersAll.filter(o => o.paymentStatus !== "paid").length;
@@ -3484,7 +3507,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             renderMenuAdminToggle();
             const frigeBtn = document.getElementById('btn-frige');
             if(frigeBtn) frigeBtn.classList.remove('hidden');
-            document.getElementById('category-select').innerHTML = `<option value="all">Tutte le Categorie</option>` + Object.keys(RAW_MENU).map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+            document.getElementById('category-select').innerHTML = `<option value="all">Tutte le Categorie</option>` + getVisibleMenuCategories().map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
             document.getElementById('diet-select').innerHTML = `<option value="all">Ogni Regime</option>` + Object.entries(DIETS_CONFIG).map(([k,v]) => `<option value="${esc(k)}">${esc(v)}</option>`).join('');
             document.getElementById('search-input').oninput = (e) => { state.search = e.target.value; renderMenu(); };
             document.getElementById('category-select').onchange = (e) => { state.cat = e.target.value; renderMenu(); };

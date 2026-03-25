@@ -7,6 +7,14 @@ service cloud.firestore {
     function isRole(role) {
       return isSignedIn() && request.auth.token.role == role;
     }
+    function isStaffEmail() {
+      return isSignedIn() && request.auth.token.email in [
+        'marco.tranquilli@dos.design',
+        'lorenzo.russo@alimentarirusso',
+        'beatrice.binini@dos.design',
+        'monica.porta@dos.design'
+      ];
+    }
     function isStaff() {
       return isSignedIn() && (request.auth.token.role in ['admin','ristoratore','facility']);
     }
@@ -48,20 +56,26 @@ service cloud.firestore {
     // Disponibilità menu: solo admin/ristoratore scrivono
     match /menu_products/{doc} {
       allow read: if isSignedIn();
-      allow write: if isRole('admin') || isRole('ristoratore');
+      allow write: if isRole('admin') || isRole('ristoratore') || isStaffEmail();
     }
 
     // Storico creazioni custom e voti
     match /custom_creations/{doc} {
       allow read: if isSignedIn();
       allow create: if isCreateOwnerByUid();
-      allow update: if isSignedIn();
+      allow update: if isOwnerByUid() || (
+        isSignedIn() &&
+        request.resource.data.uid == resource.data.uid &&
+        request.resource.data.email == resource.data.email &&
+        request.resource.data.createdAt == resource.data.createdAt &&
+        request.resource.data.diff(resource.data).changedKeys().hasOnly(['votes','voters','updatedAt'])
+      );
       allow delete: if isRole('admin');
     }
 
     // Audit menu: solo staff
     match /menu_audit/{doc} {
-      allow read, write: if isStaff();
+      allow read, write: if isStaff() || isStaffEmail();
     }
 
     // Audit ordini: solo staff
