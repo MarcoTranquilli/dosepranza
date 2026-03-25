@@ -272,6 +272,19 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         const computeProductKey = (item) => `${normalizeCat(item.cat)}::${(item.name || '').toString().trim().toLowerCase()}`;
         const isVisibleMenuCategory = (cat) => !HIDDEN_MENU_CATEGORIES.has((cat || '').toString().trim());
         const getVisibleMenuCategories = () => Object.keys(RAW_MENU).filter(isVisibleMenuCategory);
+        const hasAuthenticatedStaffSession = () => !!auth_fb.currentUser && !auth_fb.currentUser.isAnonymous;
+        const canWriteMenuAdmin = () => (isAdmin() || isRistoratore()) && (isLocalE2E || (hasAuthenticatedStaffSession() && (state.authzSource === 'claims' || state.authzSource === 'email-map-fallback')));
+        const requireMenuAdminWriteAccess = () => {
+            if(!(isAdmin() || isRistoratore())) {
+                window.toast("Funzione riservata a admin o ristoratore");
+                return false;
+            }
+            if(!canWriteMenuAdmin()) {
+                window.toast("Per modificare il menù accedi con Google");
+                return false;
+            }
+            return true;
+        };
         const CUSTOM_MEAT_FISH_INGREDIENTS = new Set(['br','cp','pc','co','cu','mo','sa','sp','ta']);
         const CUSTOM_VEGETARIAN_INGREDIENTS = new Set(['bi','fr','mz','pa','pe','pr','sc','st','sz']);
         const toDisplayName = (value) => String(value || '')
@@ -516,7 +529,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         }
 
         window.toggleProductAvailability = async (id) => {
-            if(!(isAdmin() || isRistoratore())) return;
+            if(!requireMenuAdminWriteAccess()) return;
             const item = buildMenuList().find(i => i.id === id);
             if(!item) return;
             const key = computeProductKey(item);
@@ -558,7 +571,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         };
 
         window.upsertMenuProduct = async () => {
-            if(!(isAdmin() || isRistoratore())) return;
+            if(!requireMenuAdminWriteAccess()) return;
             const name = (document.getElementById('menu-admin-name')?.value || '').trim();
             const cat = (document.getElementById('menu-admin-cat')?.value || '').trim();
             const priceVal = parseFloat(document.getElementById('menu-admin-price')?.value || '');
@@ -601,7 +614,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         };
 
         window.updateMenuPrice = async (key) => {
-            if(!(isAdmin() || isRistoratore())) return;
+            if(!requireMenuAdminWriteAccess()) return;
             const input = document.querySelector(`input[data-price-key="${key}"]`);
             if(!input) return;
             const priceVal = parseFloat(input.value || '');
@@ -664,7 +677,9 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 if(isAdmin() || isRistoratore()) {
                     btn.classList.remove('hidden');
                     btn.textContent = state.menuAdminOpen ? 'Nascondi gestione menù' : 'Mostra gestione menù';
-                    hint.textContent = 'Accesso avanzato attivo: puoi gestire prodotti e disponibilità.';
+                    hint.textContent = canWriteMenuAdmin()
+                        ? 'Accesso avanzato attivo: puoi gestire prodotti e disponibilità.'
+                        : 'Modalità sola lettura: accedi con Google per salvare prezzi e disponibilità.';
                 } else {
                     btn.classList.add('hidden');
                     if(isMappedStaffEmail(email) && state.authzSource !== 'claims') {
@@ -693,11 +708,22 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(!state.menuAdminOpen) { panel.classList.add('hidden'); return; }
             panel.classList.remove('hidden');
             const items = buildMenuList();
-            list.innerHTML = items.map(i => {
+            const canWrite = canWriteMenuAdmin();
+            panel.querySelectorAll('#menu-admin-name, #menu-admin-cat, #menu-admin-price, #menu-diet-meat, #menu-diet-veg, #menu-diet-vegan, [data-action="menu-upsert"]').forEach(el => {
+                el.disabled = !canWrite;
+                el.classList.toggle('opacity-50', !canWrite);
+                el.classList.toggle('cursor-not-allowed', !canWrite);
+            });
+            const readOnlyBanner = !canWrite
+                ? `<div class="bg-blue-50 border border-blue-200 rounded-2xl p-3 text-[11px] text-blue-900 font-bold mb-3">Sessione staff non verificata: per modificare prezzi e disponibilità devi accedere con Google.</div>`
+                : '';
+            list.innerHTML = readOnlyBanner + items.map(i => {
                 const key = computeProductKey(i);
                 const active = !state.disabledProducts.has(i.id);
                 const customBadge = i.isCustom ? `<span class="badge badge-amber">Custom</span>` : '';
                 const creatorMeta = i.creatorName ? `<p class="text-[10px] text-gray-500">Creato da ${esc(i.creatorName)}</p>` : (i.customSource === 'creation' ? `<p class="text-[10px] text-gray-400">Custom della community</p>` : '');
+                const controlAttrs = canWrite ? '' : 'disabled aria-disabled="true"';
+                const controlClass = canWrite ? '' : ' opacity-50 cursor-not-allowed';
                 return `
                     <div class="flex flex-wrap items-center gap-2 bg-gray-50 p-3 rounded-2xl border border-gray-100">
                         <div class="flex-1 min-w-[220px]">
@@ -708,9 +734,9 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                             <p class="text-[10px] text-gray-500">${esc(i.cat)}</p>
                             ${creatorMeta}
                         </div>
-                        <input data-price-key="${key}" type="number" step="0.1" min="0" value="${i.price ?? ''}" class="p-2 rounded-xl border border-gray-200 text-[10px] font-bold w-24">
-                        <button data-action="menu-update-price" data-key="${key}" class="btn btn-ghost text-[10px] px-3 py-2">Salva prezzo</button>
-                        <button data-action="toggle-availability" data-id="${i.id}" class="btn btn-ghost text-[10px] px-3 py-2">${active ? 'Disattiva' : 'Riattiva'}</button>
+                        <input data-price-key="${key}" type="number" step="0.1" min="0" value="${i.price ?? ''}" class="p-2 rounded-xl border border-gray-200 text-[10px] font-bold w-24${controlClass}" ${controlAttrs}>
+                        <button data-action="menu-update-price" data-key="${key}" class="btn btn-ghost text-[10px] px-3 py-2${controlClass}" ${controlAttrs}>Salva prezzo</button>
+                        <button data-action="toggle-availability" data-id="${i.id}" class="btn btn-ghost text-[10px] px-3 py-2${controlClass}" ${controlAttrs}>${active ? 'Disattiva' : 'Riattiva'}</button>
                     </div>
                 `;
             }).join('');
@@ -2230,7 +2256,9 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
 
             const isMapped = ROLE_EMAILS.admin.includes(email) || ROLE_EMAILS.ristoratore.includes(email) || ROLE_EMAILS.facility.includes(email);
             const claimsNote = (state.role === 'user' && isMapped);
-            missingEl.textContent = claimsNote ? 'Claims non ancora assegnate (utente deve fare login)' : '';
+            const anonymousStaffNote = isMapped && state.user && auth_fb.currentUser?.isAnonymous;
+            if(anonymousStaffNote) missingEl.textContent = 'Sessione anonima: accedi con Google per usare gli strumenti staff.';
+            else missingEl.textContent = claimsNote ? 'Claims non ancora assegnate (utente deve fare login)' : '';
             if(banner) {
                 if(state.user) banner.classList.add('hidden');
                 else banner.classList.remove('hidden');
