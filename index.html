@@ -51,7 +51,10 @@
                 <p id="role-quick-text" class="text-[11px] font-bold text-gray-700">-</p>
                 <p id="role-quick-hint" class="text-[10px] text-gray-500 font-bold mt-1"></p>
             </div>
-            <button id="menu-admin-toggle" data-action="toggle-menu-admin" class="btn btn-ghost text-[10px] px-3 py-2 hidden">Gestione menù</button>
+            <div class="flex items-center gap-2">
+                <button id="role-google-login" data-action="signin-google" class="btn btn-ghost text-[10px] px-3 py-2 hidden">Verifica Google</button>
+                <button id="menu-admin-toggle" data-action="toggle-menu-admin" class="btn btn-ghost text-[10px] px-3 py-2 hidden">Gestione menù</button>
+            </div>
         </div>
         <div id="tech-support-card" class="mb-4 px-4 py-4 rounded-2xl support-card flex flex-wrap items-center justify-between gap-3">
             <div class="min-w-0">
@@ -772,6 +775,7 @@
                 <i class="fab fa-google mr-2"></i>Accedi con Google
             </button>
             <p class="text-[9px] text-gray-400 mb-4 font-bold uppercase tracking-widest">Oppure inserisci i dati</p>
+            <p class="text-[10px] text-amber-700 mb-4 font-bold">I permessi staff si attivano solo con accesso Google verificato.</p>
             <input type="text" id="user-name-input" placeholder="Nome e Cognome" class="w-full p-5 border-2 border-gray-100 rounded-3xl mb-3 outline-none focus:border-primary text-center font-bold text-lg shadow-inner">
             <input type="email" id="user-email-input" placeholder="La tua email" class="w-full p-5 border-2 border-gray-100 rounded-3xl mb-10 outline-none focus:border-primary text-center font-bold text-sm shadow-inner">
             <button data-action="save-user" class="w-full bg-primary text-white font-black py-5 rounded-3xl shadow-lg uppercase tracking-widest active:scale-95 transition-all text-sm">Entra nell'App</button>

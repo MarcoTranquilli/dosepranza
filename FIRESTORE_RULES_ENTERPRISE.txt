@@ -7,8 +7,11 @@ service cloud.firestore {
     function isRole(role) {
       return isSignedIn() && request.auth.token.role == role;
     }
+    function isGoogleProvider() {
+      return isSignedIn() && request.auth.token.firebase.sign_in_provider == 'google.com';
+    }
     function isStaffEmail() {
-      return isSignedIn() && request.auth.token.email in [
+      return isGoogleProvider() && request.auth.token.email in [
         'marco.tranquilli@dos.design',
         'lorenzo.russo@alimentarirusso',
         'beatrice.binini@dos.design',
@@ -16,7 +19,7 @@ service cloud.firestore {
       ];
     }
     function isAdminEmail() {
-      return isSignedIn() && request.auth.token.email == 'marco.tranquilli@dos.design';
+      return isGoogleProvider() && request.auth.token.email == 'marco.tranquilli@dos.design';
     }
     function isStaff() {
       return isSignedIn() && (request.auth.token.role in ['admin','ristoratore','facility']);
