@@ -15,6 +15,9 @@ service cloud.firestore {
         'monica.porta@dos.design'
       ];
     }
+    function isAdminEmail() {
+      return isSignedIn() && request.auth.token.email == 'marco.tranquilli@dos.design';
+    }
     function isStaff() {
       return isSignedIn() && (request.auth.token.role in ['admin','ristoratore','facility']);
     }
@@ -30,27 +33,27 @@ service cloud.firestore {
     // - staff vede tutti gli ordini
     // - create consentita solo per il proprio uid
     match /orders/{doc} {
-      allow read: if isStaff() || isOwnerByUid();
+      allow read: if isStaff() || isStaffEmail() || isOwnerByUid();
       allow create: if isCreateOwnerByUid();
-      allow update: if isStaff();
-      allow delete: if isRole('admin');
+      allow update: if isStaff() || isStaffEmail();
+      allow delete: if isRole('admin') || isAdminEmail();
     }
 
     // Frige prodotti: gestione staff
     match /frige_products/{doc} {
-      allow read: if isStaff();
-      allow write: if isStaff();
+      allow read: if isStaff() || isStaffEmail();
+      allow write: if isStaff() || isStaffEmail();
     }
     // Frige acquisti:
     // - utente crea e legge i propri acquisti
     // - staff legge/aggiorna tutti
     match /frige_purchases/{doc} {
-      allow read: if isStaff() || isOwnerByUid();
+      allow read: if isStaff() || isStaffEmail() || isOwnerByUid();
       allow create: if isCreateOwnerByUid();
-      allow update: if isStaff();
+      allow update: if isStaff() || isStaffEmail();
     }
     match /frige_refills/{doc} {
-      allow read, write: if isStaff();
+      allow read, write: if isStaff() || isStaffEmail();
     }
 
     // Disponibilità menu: solo admin/ristoratore scrivono
@@ -80,7 +83,7 @@ service cloud.firestore {
 
     // Audit ordini: solo staff
     match /orders_audit/{doc} {
-      allow read, write: if isStaff();
+      allow read, write: if isStaff() || isStaffEmail();
     }
   }
 }

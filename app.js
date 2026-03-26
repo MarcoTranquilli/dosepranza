@@ -422,7 +422,15 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             document.getElementById(`${v}-view`).classList.add('active');
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.id === `btn-${v}`));
             if(v === 'cart') renderCart();
-            if(v === 'history') syncOrders();
+            if(v === 'history') {
+                if(isAdmin() || isRistoratore()) {
+                    renderOrdersPayments();
+                    renderOrdersKPIs();
+                    renderKitchenSummary();
+                    renderDailySummaryInline();
+                }
+                syncOrders();
+            }
             if(v === 'cart' && (isAdmin() || isRistoratore())) syncOrders();
             if(v === 'cart' && state.user && !(isAdmin() || isRistoratore())) syncMyOrders();
             if(v === 'frige') syncFrige();
@@ -2002,7 +2010,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(!state.authReady) return;
             if(state.subs.orders) return;
             const now = new Date(); now.setHours(0,0,0,0);
-            state.subs.orders = onSnapshot(query(ordersCol, orderBy("createdAt", "desc")), snap => {
+            const renderOrdersSnapshot = (snap) => {
                 let totalG = 0;
                 const rawToday = snap.docs
                     .map(d => ({id: d.id, ...d.data()}))
@@ -2060,7 +2068,37 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 renderDailySummaryInline();
                 updateInvalidOrdersUI();
                 autoVoidInvalidOrders();
-            });
+            };
+            const renderOrdersLoadError = (err) => {
+                console.warn('sync orders failed', err);
+                state.ordersRawToday = [];
+                state.ordersToday = [];
+                document.getElementById('grand-total-display').textContent = formatCurrency(0);
+                const listEl = document.getElementById('all-orders-list');
+                const isMapped = isMappedStaffEmail(state.user?.email || '');
+                const needsGoogle = isMapped && !hasAuthenticatedStaffSession();
+                const message = needsGoogle
+                    ? 'Accedi con Google per visualizzare il riepilogo ordini.'
+                    : 'Impossibile caricare il riepilogo ordini. Verifica permessi Firestore.';
+                if(listEl) {
+                    listEl.innerHTML = `<div class="card p-6 rounded-3xl text-center text-red-500 font-bold">${esc(message)}</div>`;
+                }
+                const wrap = document.getElementById('orders-payments-list');
+                if(wrap) {
+                    wrap.classList.remove('hidden');
+                    wrap.style.display = 'block';
+                    wrap.innerHTML = `<div class="bg-white p-4 rounded-2xl border border-red-100 text-[11px] text-red-500 font-bold">${esc(message)}</div>`;
+                }
+                const productsEl = document.getElementById('orders-summary-products');
+                if(productsEl) productsEl.innerHTML = `<p class="text-red-500 font-bold">${esc(message)}</p>`;
+                const allergiesEl = document.getElementById('orders-summary-allergies');
+                if(allergiesEl) allergiesEl.innerHTML = `<p class="text-red-500 font-bold">${esc(message)}</p>`;
+                const countEl = document.getElementById('orders-summary-count');
+                if(countEl) countEl.textContent = '0 ordini · 0 pezzi';
+                renderOrdersKPIs();
+                renderDailySummaryInline();
+            };
+            state.subs.orders = onSnapshot(query(ordersCol, orderBy("createdAt", "desc")), renderOrdersSnapshot, renderOrdersLoadError);
         }
 
         function buildKitchenSummary() {
