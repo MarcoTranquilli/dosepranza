@@ -195,6 +195,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             subs: { orders: null, frige: null, menu: null, myOrders: null, custom: null, menuAudit: null },
             role: 'user',
             authzSource: 'unknown',
+            authSignInProvider: '',
             menuAdminOpen: (() => {
                 try { return JSON.parse(localStorage.getItem('menu_admin_open') || 'true'); } catch(e) { return true; }
             })()
@@ -271,7 +272,11 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         const isVisibleMenuCategory = (cat) => !HIDDEN_MENU_CATEGORIES.has((cat || '').toString().trim());
         const getVisibleMenuCategories = () => Object.keys(RAW_MENU).filter(isVisibleMenuCategory);
         const getProviderIds = () => Array.from(new Set((auth_fb.currentUser?.providerData || []).map(p => p?.providerId).filter(Boolean)));
-        const hasGoogleSession = () => isLocalE2E || (!!auth_fb.currentUser && !auth_fb.currentUser.isAnonymous && getProviderIds().includes('google.com'));
+        const hasGoogleSession = () => {
+            if(isLocalE2E) return true;
+            if(state.authSignInProvider === 'google.com') return true;
+            return !!auth_fb.currentUser && !auth_fb.currentUser.isAnonymous && getProviderIds().includes('google.com');
+        };
         const requiresGoogleStaffVerification = (email = state.user?.email || '') => isMappedStaffEmail(email) && !hasGoogleSession();
         const canWriteMenuAdmin = () => (isAdmin() || isRistoratore()) && (isLocalE2E || (hasGoogleSession() && (state.authzSource === 'claims' || state.authzSource === 'email-map-google')));
         const requireMenuAdminWriteAccess = () => {
@@ -825,6 +830,15 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             try {
                 const provider = new GoogleAuthProvider();
                 await signInWithPopup(auth_fb, provider);
+                await auth_fb.currentUser?.getIdToken?.(true);
+                const email = normalizeEmail(auth_fb.currentUser?.email || state.user?.email || '');
+                if(email) {
+                    const name = normalizeName(auth_fb.currentUser?.displayName || state.user?.name || email.split('@')[0]);
+                    state.user = { name, email };
+                    localStorage.setItem('dose_user', JSON.stringify(state.user));
+                    await setRole(email);
+                    if(isAdmin() || isRistoratore()) syncOrders();
+                }
             } catch(e) {
                 console.warn('Google sign-in failed', e);
                 window.toast("Accesso Google non riuscito");
@@ -836,6 +850,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 resetStaffSubscriptions();
                 await signOut(auth_fb);
                 state.user = null;
+                state.authSignInProvider = '';
                 localStorage.removeItem('dose_user');
                 document.getElementById('user-modal').classList.remove('hidden');
             } catch(e) {
@@ -3368,6 +3383,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             const n = normalizeName(state.user?.name);
             let role = 'user';
             state.authzSource = 'claims';
+            state.authSignInProvider = '';
 
             if(isLocalE2E) {
                 if(ROLE_EMAILS.admin.includes(e) || ROLE_NAMES.admin.includes(n)) role = 'admin';
@@ -3375,11 +3391,15 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 else if(ROLE_EMAILS.facility.includes(e)) role = 'facility';
                 state.role = role;
                 state.authzSource = 'e2e';
+                state.authSignInProvider = 'google.com';
             } else {
-                const googleSession = hasGoogleSession();
+                let googleSession = hasGoogleSession();
                 // 1) Try custom claims
                 try {
                     const token = await auth_fb.currentUser?.getIdTokenResult?.();
+                    const signInProvider = token?.signInProvider || token?.claims?.firebase?.sign_in_provider || '';
+                    state.authSignInProvider = signInProvider;
+                    googleSession = googleSession || signInProvider === 'google.com';
                     const claimRole = token?.claims?.role;
                     if(['admin','ristoratore','facility','user'].includes(claimRole) && (claimRole === 'user' || googleSession)) {
                         role = claimRole;
@@ -3390,6 +3410,10 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                     }
                 } catch(e) {
                     state.authzSource = 'unverified';
+                    if(!state.authSignInProvider) {
+                        const providerIds = getProviderIds();
+                        if(providerIds.includes('google.com')) state.authSignInProvider = 'google.com';
+                    }
                 }
 
                 // 2) Fallback: mapped staff emails only with a verified Google session
@@ -3486,6 +3510,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             resetStaffSubscriptions();
             if(u) {
                 state.authReady = true;
+                state.authSignInProvider = u.isAnonymous ? '' : (getProviderIds().includes('google.com') ? 'google.com' : state.authSignInProvider);
                 let cached = null;
                 try { cached = JSON.parse(localStorage.getItem('dose_user') || 'null'); } catch(e) {}
                 const isAnon = !!u.isAnonymous;
@@ -3513,6 +3538,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 renderDailySummaryInline();
             } else {
                 state.authReady = false;
+                state.authSignInProvider = '';
                 // ensure we have an auth session to satisfy Firestore rules
                 try {
                     await signInAnonymously(auth_fb);
