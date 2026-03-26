@@ -318,6 +318,31 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 creatorVisible: !!c.showCreatorName
                 };
             });
+        const resetOrdersSubscription = () => {
+            if(typeof state.subs.orders === 'function') {
+                try { state.subs.orders(); } catch(e) {}
+            }
+            state.subs.orders = null;
+        };
+        const resetFrigeSubscription = () => {
+            if(typeof state.subs.frige === 'function') {
+                try { state.subs.frige(); } catch(e) {}
+            }
+            state.subs.frige = null;
+        };
+        const resetAnalyticsSubscriptions = () => {
+            Object.keys(state.analytics.unsub || {}).forEach((key) => {
+                if(typeof state.analytics.unsub[key] === 'function') {
+                    try { state.analytics.unsub[key](); } catch(e) {}
+                }
+                state.analytics.unsub[key] = null;
+            });
+        };
+        const resetStaffSubscriptions = () => {
+            resetOrdersSubscription();
+            resetFrigeSubscription();
+            resetAnalyticsSubscriptions();
+        };
         const resolveItemCategory = (item) => {
             const rawCat = (item?.cat || '').toString().trim();
             if(rawCat && rawCat !== 'Crea') return rawCat;
@@ -808,6 +833,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
 
         window.signOutUser = async () => {
             try {
+                resetStaffSubscriptions();
                 await signOut(auth_fb);
                 state.user = null;
                 localStorage.removeItem('dose_user');
@@ -821,6 +847,12 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             try {
                 await auth_fb.currentUser?.getIdToken?.(true);
                 await setRole(state.user?.email || '');
+                if(isAdmin() || isRistoratore() || isFacility()) {
+                    resetStaffSubscriptions();
+                    syncOrders();
+                    if(state.currentView === 'frige') syncFrige();
+                    if(state.currentView === 'analytics') syncAnalytics();
+                }
                 window.toast("Ruoli aggiornati");
             } catch(e) {
                 window.toast("Errore aggiornamento ruoli");
@@ -2081,6 +2113,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             };
             const renderOrdersLoadError = (err) => {
                 console.warn('sync orders failed', err);
+                resetOrdersSubscription();
                 state.ordersRawToday = [];
                 state.ordersToday = [];
                 document.getElementById('grand-total-display').textContent = formatCurrency(0);
@@ -3450,6 +3483,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
 
         // --- INIT ---
         onAuthStateChanged(auth_fb, async (u) => { 
+            resetStaffSubscriptions();
             if(u) {
                 state.authReady = true;
                 let cached = null;
@@ -3469,6 +3503,9 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 syncMenuAvailability();
                 syncCustomCreations();
                 if(isAdmin() || isRistoratore()) syncMenuAudit();
+                if(isAdmin() || isRistoratore()) {
+                    syncOrders();
+                }
                 if(state.currentView === 'history' || (state.currentView === 'cart' && (isAdmin() || isRistoratore()))) {
                     syncOrders();
                 }
