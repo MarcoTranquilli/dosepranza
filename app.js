@@ -336,6 +336,13 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             }
             state.subs.frige = null;
         };
+        const resetMyOrdersSubscription = () => {
+            if(typeof state.subs.myOrders === 'function') {
+                try { state.subs.myOrders(); } catch(e) {}
+            }
+            state.subs.myOrders = null;
+            state.myOrders = [];
+        };
         const resetAnalyticsSubscriptions = () => {
             Object.keys(state.analytics.unsub || {}).forEach((key) => {
                 if(typeof state.analytics.unsub[key] === 'function') {
@@ -828,6 +835,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         const adoptAuthenticatedUser = async (user = auth_fb.currentUser) => {
             const { email, name } = resolveAuthenticatedIdentity(user);
             if(!email) return false;
+            resetMyOrdersSubscription();
             state.user = { name, email };
             localStorage.setItem('dose_user', JSON.stringify(state.user));
             const nameInput = document.getElementById('user-name-input');
@@ -836,6 +844,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(emailInput) emailInput.value = email;
             document.getElementById('user-modal').classList.add('hidden');
             await setRole(email);
+            syncMyOrders();
             return true;
         };
 
@@ -855,10 +864,12 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             const name = normalizeName(auth_fb.currentUser.displayName || document.getElementById('user-name-input').value);
             const email = normalizeEmail(auth_fb.currentUser.email || document.getElementById('user-email-input').value);
             if(name && email) {
+                resetMyOrdersSubscription();
                 state.user = { name, email };
                 localStorage.setItem('dose_user', JSON.stringify(state.user));
                 document.getElementById('user-modal').classList.add('hidden');
                 await setRole(email);
+                syncMyOrders();
                 if(isMappedStaffEmail(email) && !isLocalE2E) {
                     window.toast("Per i permessi staff usa Accedi con Google");
                 }
@@ -903,6 +914,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         window.signOutUser = async () => {
             try {
                 resetStaffSubscriptions();
+                resetMyOrdersSubscription();
                 await signOut(auth_fb);
                 state.user = null;
                 state.authSignInProvider = '';
@@ -1809,7 +1821,26 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             const attachFallbackQuery = () => {
                 state.subs.myOrders = onSnapshot(baseQuery, applyMyOrdersSnapshot, renderOrdersLoadError);
             };
+            const preloadMyOrders = async () => {
+                try {
+                    const snap = await getDocs(orderedQuery);
+                    applyMyOrdersSnapshot(snap);
+                } catch(err) {
+                    if(err?.code === "failed-precondition") {
+                        try {
+                            const snap = await getDocs(baseQuery);
+                            applyMyOrdersSnapshot(snap);
+                            return;
+                        } catch(fallbackErr) {
+                            renderOrdersLoadError(fallbackErr);
+                            return;
+                        }
+                    }
+                    renderOrdersLoadError(err);
+                }
+            };
 
+            preloadMyOrders();
             state.subs.myOrders = onSnapshot(
                 orderedQuery,
                 applyMyOrdersSnapshot,
@@ -3589,6 +3620,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         // --- INIT ---
         onAuthStateChanged(auth_fb, async (u) => { 
             resetStaffSubscriptions();
+            resetMyOrdersSubscription();
             if(u) {
                 state.authReady = true;
                 state.authSignInProvider = u.isAnonymous ? '' : (getProviderIds().includes('google.com') ? 'google.com' : state.authSignInProvider);
