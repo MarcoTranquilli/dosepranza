@@ -803,8 +803,26 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
 
         const normalizeEmail = (email) => (email || '').trim().toLowerCase();
         const normalizeName = (name) => (name || '').trim().toLowerCase();
+        const adoptAuthenticatedUser = async (user = auth_fb.currentUser) => {
+            const email = normalizeEmail(user?.email || '');
+            if(!email) return false;
+            const name = normalizeName(user?.displayName || state.user?.name || email.split('@')[0]);
+            state.user = { name, email };
+            localStorage.setItem('dose_user', JSON.stringify(state.user));
+            const nameInput = document.getElementById('user-name-input');
+            const emailInput = document.getElementById('user-email-input');
+            if(nameInput) nameInput.value = name;
+            if(emailInput) emailInput.value = email;
+            document.getElementById('user-modal').classList.add('hidden');
+            await setRole(email);
+            return true;
+        };
 
         window.saveUserData = async () => {
+            if(auth_fb.currentUser && !auth_fb.currentUser.isAnonymous && auth_fb.currentUser.email) {
+                await adoptAuthenticatedUser(auth_fb.currentUser);
+                return;
+            }
             if(!auth_fb.currentUser) {
                 try {
                     await signInAnonymously(auth_fb);
@@ -831,12 +849,8 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 const provider = new GoogleAuthProvider();
                 await signInWithPopup(auth_fb, provider);
                 await auth_fb.currentUser?.getIdToken?.(true);
-                const email = normalizeEmail(auth_fb.currentUser?.email || state.user?.email || '');
-                if(email) {
-                    const name = normalizeName(auth_fb.currentUser?.displayName || state.user?.name || email.split('@')[0]);
-                    state.user = { name, email };
-                    localStorage.setItem('dose_user', JSON.stringify(state.user));
-                    await setRole(email);
+                const adopted = await adoptAuthenticatedUser(auth_fb.currentUser);
+                if(adopted) {
                     if(isAdmin() || isRistoratore()) syncOrders();
                 }
             } catch(e) {
@@ -3517,10 +3531,14 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 const email = normalizeEmail(isAnon ? cached?.email : u.email);
                 const name = normalizeName(isAnon ? cached?.name : (u.displayName || u.email?.split('@')[0] || ''));
                 if(email) {
-                    state.user = { name, email };
-                    localStorage.setItem('dose_user', JSON.stringify(state.user));
-                    document.getElementById('user-modal').classList.add('hidden');
-                    await setRole(email);
+                    if(!isAnon) {
+                        await adoptAuthenticatedUser(u);
+                    } else {
+                        state.user = { name, email };
+                        localStorage.setItem('dose_user', JSON.stringify(state.user));
+                        document.getElementById('user-modal').classList.add('hidden');
+                        await setRole(email);
+                    }
                 } else {
                     // anon without cached identity: keep modal open for manual entry
                     document.getElementById('user-modal').classList.remove('hidden');
