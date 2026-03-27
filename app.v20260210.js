@@ -231,7 +231,8 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             facility: ['beatrice.binini@dos.design', 'monica.porta@dos.design']
         };
         const ROLE_NAMES = {
-            admin: ['marco tranquilli']
+            admin: ['marco tranquilli'],
+            ristoratore: ['lorenzo russo']
         };
         const isMappedStaffEmail = (email) => {
             const e = normalizeEmail(email);
@@ -278,8 +279,8 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(state.authSignInProvider === 'google.com') return true;
             return !!auth_fb.currentUser && !auth_fb.currentUser.isAnonymous && getProviderIds().includes('google.com');
         };
-        const requiresGoogleStaffVerification = (email = state.user?.email || '') => isMappedStaffEmail(email) && !hasGoogleSession();
-        const canWriteMenuAdmin = () => (isAdmin() || isRistoratore()) && (isLocalE2E || (hasGoogleSession() && (state.authzSource === 'claims' || state.authzSource === 'email-map-google')));
+        const requiresGoogleStaffVerification = (email = state.user?.email || '') => isMappedStaffEmail(email) && state.authzSource !== 'claims' && !hasGoogleSession();
+        const canWriteMenuAdmin = () => (isAdmin() || isRistoratore()) && (isLocalE2E || state.authzSource === 'claims' || (hasGoogleSession() && state.authzSource === 'email-map-google'));
         const requireMenuAdminWriteAccess = () => {
             if(!(isAdmin() || isRistoratore())) {
                 window.toast("Funzione riservata a admin o ristoratore");
@@ -2221,7 +2222,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 document.getElementById('grand-total-display').textContent = formatCurrency(0);
                 const listEl = document.getElementById('all-orders-list');
                 const isMapped = isMappedStaffEmail(state.user?.email || '');
-                const needsGoogle = isMapped && !hasGoogleSession();
+                const needsGoogle = isMapped && requiresGoogleStaffVerification(state.user?.email || '');
                 const message = needsGoogle
                     ? 'Accedi con Google per visualizzare il riepilogo ordini.'
                     : 'Impossibile caricare il riepilogo ordini. Verifica permessi Firestore.';
@@ -2447,7 +2448,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             el.textContent = `${email} · ruolo: ${role}`;
 
             const isMapped = ROLE_EMAILS.admin.includes(email) || ROLE_EMAILS.ristoratore.includes(email) || ROLE_EMAILS.facility.includes(email);
-            const googleRequiredNote = isMapped && state.user && !hasGoogleSession();
+            const googleRequiredNote = isMapped && state.user && requiresGoogleStaffVerification(email);
             const claimsNote = isMapped && state.authzSource === 'unverified' && hasGoogleSession();
             if(googleRequiredNote) missingEl.textContent = 'Verifica Google richiesta: accedi con Google per usare gli strumenti staff.';
             else missingEl.textContent = claimsNote ? 'Ruoli staff non ancora sincronizzati: aggiorna ruoli dopo il login Google.' : '';
@@ -3497,10 +3498,8 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                     state.authSignInProvider = signInProvider;
                     googleSession = googleSession || signInProvider === 'google.com';
                     const claimRole = token?.claims?.role;
-                    if(['admin','ristoratore','facility','user'].includes(claimRole) && (claimRole === 'user' || googleSession)) {
+                    if(['admin','ristoratore','facility','user'].includes(claimRole)) {
                         role = claimRole;
-                    } else if(['admin','ristoratore','facility'].includes(claimRole) && !googleSession) {
-                        state.authzSource = 'google-required';
                     } else {
                         state.authzSource = 'unverified';
                     }
@@ -3517,7 +3516,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                     if(googleSession && (ROLE_EMAILS.admin.includes(e) || ROLE_NAMES.admin.includes(n))) {
                         role = 'admin';
                         state.authzSource = 'email-map-google';
-                    } else if(googleSession && ROLE_EMAILS.ristoratore.includes(e)) {
+                    } else if(googleSession && (ROLE_EMAILS.ristoratore.includes(e) || ROLE_NAMES.ristoratore.includes(n))) {
                         role = 'ristoratore';
                         state.authzSource = 'email-map-google';
                     } else if(googleSession && ROLE_EMAILS.facility.includes(e)) {
