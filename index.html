@@ -24,11 +24,11 @@
             </div>
         </header>
 
-        <nav class="grid grid-cols-6 gap-1 glass p-2 rounded-2xl shadow-lg sticky top-2 z-50 mb-6">
+        <nav id="main-nav" class="grid grid-cols-5 gap-1 glass p-2 rounded-2xl shadow-lg sticky top-2 z-50 mb-6">
             <button data-action="navigate" data-view="menu" id="btn-menu" class="nav-btn py-3 rounded-xl font-bold text-[10px] uppercase transition-all active"><i class="fas fa-utensils block text-sm mb-1"></i>Menù</button>
             <button data-action="navigate" data-view="custom" id="btn-custom" class="nav-btn py-3 rounded-xl font-bold text-[10px] uppercase transition-all"><i class="fas fa-plus-circle block text-sm mb-1"></i>Crea</button>
-            <button data-action="navigate" data-view="frige" id="btn-frige" class="nav-btn py-3 rounded-xl font-bold text-[10px] uppercase transition-all relative">
-                <i class="fas fa-snowflake block text-sm mb-1"></i>Frige
+            <button data-action="navigate" data-view="frige" id="btn-frige" class="nav-btn py-3 rounded-xl font-bold text-[10px] uppercase transition-all relative hidden">
+                <i class="fas fa-snowflake block text-sm mb-1"></i>Fridge
                 <span id="frige-wip" class="nav-wip hidden">WIP</span>
             </button>
             <button data-action="navigate" data-view="cart" id="btn-cart" class="nav-btn py-3 rounded-xl font-bold text-[10px] uppercase transition-all relative">
@@ -219,7 +219,7 @@
             <section id="frige-view" class="view">
                 <div class="flex justify-between items-start gap-4 mb-4">
                     <div>
-                        <h2 class="text-2xl font-black tracking-tighter uppercase section-title">Frige</h2>
+                        <h2 class="text-2xl font-black tracking-tighter uppercase section-title">Fridge</h2>
                         <p class="text-[11px] text-gray-500 italic">Acquista prodotti gastronomici in autonomia.</p>
                     </div>
                     <a href="https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" target="_blank" rel="noopener noreferrer" class="btn btn-ghost text-[10px] px-4 py-2">Apri Satispay</a>
@@ -269,7 +269,7 @@
                     <div class="flex flex-col gap-4">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-xs font-black uppercase text-primary">Gestione Frige</p>
+                                <p class="text-xs font-black uppercase text-primary">Gestione Fridge</p>
                                 <p class="text-[10px] text-gray-400">Rimanenze, prodotti e richieste rifornimento.</p>
                             </div>
                             <div class="flex gap-2">
@@ -604,7 +604,7 @@
                         <div id="analytics-target-orders" class="text-[11px] text-gray-700 font-bold"></div>
                     </div>
                     <div class="card p-4 rounded-2xl">
-                        <p class="text-[10px] uppercase text-gray-400 font-black mb-2">Target vs Actual (Frige)</p>
+                        <p class="text-[10px] uppercase text-gray-400 font-black mb-2">Target vs Actual (Fridge)</p>
                         <div id="analytics-target-frige" class="text-[11px] text-gray-700 font-bold"></div>
                     </div>
                     <div class="card p-4 rounded-2xl">
@@ -665,19 +665,19 @@
                 </div>
 
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-                    <div class="card p-4 rounded-2xl text-center tooltip" data-tip="Totale acquisti Frige oggi">
-                        <p class="text-[10px] uppercase text-gray-400 font-black">Frige Oggi</p>
+                    <div class="card p-4 rounded-2xl text-center tooltip" data-tip="Totale acquisti Fridge oggi">
+                        <p class="text-[10px] uppercase text-gray-400 font-black">Fridge Oggi</p>
                         <p id="analytics-frige-today" class="text-2xl font-black text-primary">0</p>
                     </div>
-                    <div class="card p-4 rounded-2xl text-center tooltip" data-tip="Somma acquisti Frige oggi">
-                        <p class="text-[10px] uppercase text-gray-400 font-black">Incasso Frige</p>
+                    <div class="card p-4 rounded-2xl text-center tooltip" data-tip="Somma acquisti Fridge oggi">
+                        <p class="text-[10px] uppercase text-gray-400 font-black">Incasso Fridge</p>
                         <p id="analytics-frige-revenue" class="text-2xl font-black text-primary">€0.00</p>
                     </div>
-                    <div class="card p-4 rounded-2xl text-center tooltip" data-tip="Pagamenti Frige non riconciliati oggi">
+                    <div class="card p-4 rounded-2xl text-center tooltip" data-tip="Pagamenti Fridge non riconciliati oggi">
                         <p class="text-[10px] uppercase text-gray-400 font-black">Da Riconciliare</p>
                         <p id="analytics-frige-pending" class="text-2xl font-black text-primary">0</p>
                     </div>
-                    <div class="card p-4 rounded-2xl text-center tooltip" data-tip="Prodotti Frige con scorte basse">
+                    <div class="card p-4 rounded-2xl text-center tooltip" data-tip="Prodotti Fridge con scorte basse">
                         <p class="text-[10px] uppercase text-gray-400 font-black">Prodotti Sotto Soglia</p>
                         <p id="analytics-frige-low" class="text-2xl font-black text-primary">0</p>
                     </div>
@@ -718,7 +718,7 @@
                         </div>
                     </div>
                     <div class="card p-4 rounded-2xl">
-                        <p class="text-[10px] uppercase text-gray-400 font-black mb-2">Frige per Giorno</p>
+                        <p class="text-[10px] uppercase text-gray-400 font-black mb-2">Fridge per Giorno</p>
                         <p class="text-[10px] text-gray-400 mb-2" id="analytics-chart-frige-sub"></p>
                         <div class="flex flex-wrap items-center gap-2 mb-3">
                             <span class="badge">Risoluzione</span>
@@ -758,7 +758,7 @@
                     <p class="text-[10px] uppercase text-gray-400 font-black mb-2">Dati di Sistema</p>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-[11px] text-gray-600 font-bold">
                         <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">Menu attivi: <span id="analytics-menu-count">0</span></div>
-                        <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">Prodotti Frige: <span id="analytics-frige-count">0</span></div>
+                        <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">Prodotti Fridge: <span id="analytics-frige-count">0</span></div>
                         <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">Rifornimenti aperti: <span id="analytics-refills-open">0</span></div>
                         <div class="bg-gray-50 p-3 rounded-xl border border-gray-100">Pagamenti ordini pendenti: <span id="analytics-orders-pending">0</span></div>
                     </div>

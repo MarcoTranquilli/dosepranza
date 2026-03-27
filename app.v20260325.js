@@ -425,7 +425,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         const ensureOrderWindow = () => {
             if(isLocalE2E) return true;
             if(isOrderWindowOpen()) return true;
-            window.toast("Ordini chiusi dopo le 11:30. Usa Frige.");
+            window.toast("Ordini chiusi dopo le 11:30. Usa Fridge.");
             return false;
         };
 
@@ -443,7 +443,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 return;
             }
             if(!isLocalE2E && (v === 'menu' || v === 'custom' || v === 'cart') && !isOrderWindowOpen()) {
-                window.toast("Ordini chiusi dopo le 11:30. Usa Frige.");
+                window.toast("Ordini chiusi dopo le 11:30. Usa Fridge.");
                 if(isAdmin() || isRistoratore() || isFacility()) {
                     v = 'frige';
                 }
@@ -2509,7 +2509,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                             <h4 class="font-black text-sm leading-tight mb-1">${esc(p.name)}</h4>
                             ${badge}
                         </div>
-                        <p class="text-[9px] text-gray-300 uppercase">Frige</p>
+                        <p class="text-[9px] text-gray-300 uppercase">Fridge</p>
                     </div>
                     <div class="mt-4 space-y-2">
                         <div class="flex items-center justify-between">
@@ -2793,7 +2793,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(refillsOpen > 0) alerts.push(`${refillsOpen} rifornimenti aperti`);
             if(lowStock > 0) alerts.push(`${lowStock} prodotti sotto soglia`);
             if(ordersPending > 0) alerts.push(`${ordersPending} pagamenti ordini pendenti`);
-            if(frigePending > 0) alerts.push(`${frigePending} pagamenti Frige pendenti`);
+            if(frigePending > 0) alerts.push(`${frigePending} pagamenti Fridge pendenti`);
             if(!alerts.length) alerts.push('Nessun alert critico');
 
             const byDay = {};
@@ -3043,7 +3043,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             });
             frigeRange.forEach(o => {
                 const ts = o.createdAt?.toDate();
-                csv += `Frige;${ts ? ts.toISOString() : ''};${o.user};${o.productName};${(o.price || 0).toFixed(2)}\\n`;
+                csv += `Fridge;${ts ? ts.toISOString() : ''};${o.user};${o.productName};${(o.price || 0).toFixed(2)}\\n`;
             });
             const blob = new Blob([`\\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
@@ -3167,7 +3167,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(frigeSub) frigeSub.textContent = `Periodo: ${rangeLabel} · ${frigeMode} · Media: ${frigeAvg.toFixed(1)}`;
             if(revenueSub) revenueSub.textContent = `Periodo: ${rangeLabel} · ${ordersMode} · Media: €${revenueAvg.toFixed(2)}`;
             drawBarChart('analytics-chart-orders', ordersSeries, 'Ordini', state.analytics.targets.orders, state.analytics.zoom.orders);
-            drawBarChart('analytics-chart-frige', frigeSeries, 'Frige', state.analytics.targets.frige, state.analytics.zoom.frige);
+            drawBarChart('analytics-chart-frige', frigeSeries, 'Fridge', state.analytics.targets.frige, state.analytics.zoom.frige);
             drawBarChart('analytics-chart-revenue', revenueSeries, '€', null, null);
         }
 
@@ -3363,7 +3363,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if((o.total || 0) <= 0) return false;
             const status = (o.orderStatus || '').toLowerCase();
             if(['void','canceled','annullato','bozza','draft'].includes(status)) return false;
-            // dopo le 11:30 non sono ordini validi (solo Frige)
+            // dopo le 11:30 non sono ordini validi (solo Fridge)
             const isFrigeOrder = (o.orderType || o.source || '').toString().toLowerCase() === 'frige';
             const allowAfterHours = o.allowAfterHours === true || o.afterHoursAllowed === true;
             if(!isFrigeOrder && !allowAfterHours) {
@@ -3507,6 +3507,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             const restockForm = document.getElementById('frige-restock-form');
             const historyBtn = document.getElementById('btn-history');
             const analyticsBtn = document.getElementById('btn-analytics');
+            const mainNav = document.getElementById('main-nav');
             const frigeBtn = document.getElementById('btn-frige');
             const frigeWip = document.getElementById('frige-wip');
 
@@ -3532,19 +3533,34 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(isAdmin() || isRistoratore()) show(analyticsBtn);
 
             if (frigeBtn) {
-                frigeBtn.classList.remove('hidden');
                 if (isAdmin() || isRistoratore() || isFacility()) {
+                    frigeBtn.classList.remove('hidden');
+                    if(mainNav) {
+                        mainNav.classList.remove('grid-cols-5');
+                        mainNav.classList.add('grid-cols-6');
+                    }
                     frigeBtn.classList.remove('nav-disabled');
                     frigeBtn.dataset.action = 'navigate';
                     frigeBtn.dataset.view = 'frige';
                     frigeBtn.setAttribute('aria-disabled', 'false');
                     if(frigeWip) frigeWip.classList.add('hidden');
                 } else {
-                    frigeBtn.classList.add('nav-disabled');
-                    frigeBtn.dataset.action = 'noop';
+                    frigeBtn.classList.add('hidden', 'nav-disabled');
+                    if(mainNav) {
+                        mainNav.classList.remove('grid-cols-6');
+                        mainNav.classList.add('grid-cols-5');
+                    }
+                    frigeBtn.dataset.action = 'navigate';
                     frigeBtn.removeAttribute('data-view');
                     frigeBtn.setAttribute('aria-disabled', 'true');
                     if(frigeWip) frigeWip.classList.add('hidden');
+                    if(state.currentView === 'frige') {
+                        state.currentView = 'menu';
+                        document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+                        document.getElementById('menu-view')?.classList.add('active');
+                        document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+                        document.getElementById('btn-menu')?.classList.add('active');
+                    }
                 }
             }
 
@@ -3718,8 +3734,6 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             loadDisabledProducts();
             renderRoleStatus();
             renderMenuAdminToggle();
-            const frigeBtn = document.getElementById('btn-frige');
-            if(frigeBtn) frigeBtn.classList.remove('hidden');
             document.getElementById('category-select').innerHTML = `<option value="all">Tutte le Categorie</option>` + getVisibleMenuCategories().map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
             document.getElementById('diet-select').innerHTML = `<option value="all">Ogni Regime</option>` + Object.entries(DIETS_CONFIG).map(([k,v]) => `<option value="${esc(k)}">${esc(v)}</option>`).join('');
             document.getElementById('search-input').oninput = (e) => { state.search = e.target.value; renderMenu(); };
