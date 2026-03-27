@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut, signInAnonymously, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addDoc, serverTimestamp, query, orderBy, getDocs, runTransaction, doc, where, limit, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- DATABASE PRODOTTI COMPLETO ---
@@ -241,6 +241,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         const firebaseConfig = { apiKey: "AIzaSyCQJsNbgaR89gF_1vLe6H4DPboOhQvm9nI", authDomain: "app-ordini-pranzo-alimentari.firebaseapp.com", projectId: "app-ordini-pranzo-alimentari", storageBucket: "app-ordini-pranzo-alimentari.appspot.com", messagingSenderId: "553169964686", appId: "1:553169964686:web:7f8ca6f32a301949e4c3df" };
         const app_fb = initializeApp(firebaseConfig);
         const auth_fb = getAuth(app_fb);
+        setPersistence(auth_fb, browserLocalPersistence).catch((e) => console.warn('auth persistence setup failed', e));
         if(!window.auth_fb) window.auth_fb = auth_fb;
         const db_fb = initializeFirestore(app_fb, { experimentalForceLongPolling: true, localCache: persistentLocalCache() });
         const ordersCol = collection(db_fb, "orders");
@@ -803,10 +804,30 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
 
         const normalizeEmail = (email) => (email || '').trim().toLowerCase();
         const normalizeName = (name) => (name || '').trim().toLowerCase();
+        const resolveAuthenticatedIdentity = (user = auth_fb.currentUser, signInResult = null) => {
+            const resultUser = signInResult?.user || user;
+            const profile = signInResult?.additionalUserInfo?.profile || {};
+            const tokenResponse = signInResult?._tokenResponse || {};
+            const providerEmail = (resultUser?.providerData || []).map(p => p?.email).find(Boolean) || '';
+            const email = normalizeEmail(
+                resultUser?.email ||
+                tokenResponse.email ||
+                profile.email ||
+                providerEmail ||
+                ''
+            );
+            const name = normalizeName(
+                resultUser?.displayName ||
+                tokenResponse.fullName ||
+                profile.name ||
+                state.user?.name ||
+                (email ? email.split('@')[0] : '')
+            );
+            return { email, name };
+        };
         const adoptAuthenticatedUser = async (user = auth_fb.currentUser) => {
-            const email = normalizeEmail(user?.email || '');
+            const { email, name } = resolveAuthenticatedIdentity(user);
             if(!email) return false;
-            const name = normalizeName(user?.displayName || state.user?.name || email.split('@')[0]);
             state.user = { name, email };
             localStorage.setItem('dose_user', JSON.stringify(state.user));
             const nameInput = document.getElementById('user-name-input');
@@ -847,11 +868,31 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         window.signInWithGoogle = async () => {
             try {
                 const provider = new GoogleAuthProvider();
-                await signInWithPopup(auth_fb, provider);
-                await auth_fb.currentUser?.getIdToken?.(true);
-                const adopted = await adoptAuthenticatedUser(auth_fb.currentUser);
+                provider.addScope('email');
+                provider.addScope('profile');
+                provider.setCustomParameters({ prompt: 'select_account' });
+                const result = await signInWithPopup(auth_fb, provider);
+                state.authSignInProvider = 'google.com';
+                await result.user?.getIdToken?.(true);
+                const { email, name } = resolveAuthenticatedIdentity(result.user, result);
+                let adopted = false;
+                if(email) {
+                    state.user = { name, email };
+                    localStorage.setItem('dose_user', JSON.stringify(state.user));
+                    const nameInput = document.getElementById('user-name-input');
+                    const emailInput = document.getElementById('user-email-input');
+                    if(nameInput) nameInput.value = name;
+                    if(emailInput) emailInput.value = email;
+                    document.getElementById('user-modal').classList.add('hidden');
+                    await setRole(email);
+                    adopted = true;
+                } else {
+                    adopted = await adoptAuthenticatedUser(result.user);
+                }
                 if(adopted) {
                     if(isAdmin() || isRistoratore()) syncOrders();
+                } else {
+                    window.toast("Login Google riuscito ma email non disponibile");
                 }
             } catch(e) {
                 console.warn('Google sign-in failed', e);
@@ -2081,9 +2122,9 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(!state.authReady) return;
             if(state.subs.orders) return;
             const now = new Date(); now.setHours(0,0,0,0);
-            const renderOrdersSnapshot = (snap) => {
+            const applyOrdersData = (docs) => {
                 let totalG = 0;
-                const rawToday = snap.docs
+                const rawToday = docs
                     .map(d => ({id: d.id, ...d.data()}))
                     .filter(o => o.createdAt && o.createdAt.toDate() >= now);
                 state.ordersRawToday = rawToday;
@@ -2140,6 +2181,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 updateInvalidOrdersUI();
                 autoVoidInvalidOrders();
             };
+            const renderOrdersSnapshot = (snap) => applyOrdersData(snap.docs);
             const renderOrdersLoadError = (err) => {
                 console.warn('sync orders failed', err);
                 resetOrdersSubscription();
@@ -2170,6 +2212,15 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 renderOrdersKPIs();
                 renderDailySummaryInline();
             };
+            const preloadOrders = async () => {
+                try {
+                    const snap = await getDocs(query(ordersCol, orderBy("createdAt", "desc")));
+                    applyOrdersData(snap.docs);
+                } catch(err) {
+                    renderOrdersLoadError(err);
+                }
+            };
+            preloadOrders();
             state.subs.orders = onSnapshot(query(ordersCol, orderBy("createdAt", "desc")), renderOrdersSnapshot, renderOrdersLoadError);
         }
 
