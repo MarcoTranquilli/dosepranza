@@ -2165,14 +2165,24 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             const now = new Date(); now.setHours(0,0,0,0);
             let serverFallbackTried = false;
             let serverFallbackApplied = false;
-            const normalizeOrderRecord = (order) => {
-                const createdAt = order?.createdAt instanceof Date
-                    ? order.createdAt
-                    : (typeof order?.createdAt === 'string' || typeof order?.createdAt === 'number')
-                        ? new Date(order.createdAt)
-                        : order?.createdAt;
-                return { ...order, createdAt };
+            const asTimestampLike = (value) => {
+                if(!value) return value;
+                if(typeof value?.toDate === 'function') return value;
+                const date = value instanceof Date ? value : new Date(value);
+                if(Number.isNaN(date.getTime())) return value;
+                return {
+                    toDate: () => new Date(date.getTime()),
+                    valueOf: () => date.getTime(),
+                    toJSON: () => date.toISOString()
+                };
             };
+            const normalizeOrderRecord = (order) => ({
+                ...order,
+                createdAt: asTimestampLike(order?.createdAt),
+                statusUpdatedAt: asTimestampLike(order?.statusUpdatedAt),
+                voidedAt: asTimestampLike(order?.voidedAt),
+                reconciledAt: asTimestampLike(order?.reconciledAt)
+            });
             const applyOrdersRecords = (records, source = 'client') => {
                 let totalG = 0;
                 const rawToday = (records || [])
