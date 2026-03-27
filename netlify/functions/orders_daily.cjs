@@ -1,15 +1,4 @@
-const admin = require('firebase-admin');
-
-const STAFF_EMAILS = [
-  'marco.tranquilli@dos.design',
-  'lorenzo.russo@alimentarirusso',
-  'beatrice.binini@dos.design',
-  'monica.porta@dos.design',
-];
-
-const STAFF_NAMES = {
-  ristoratore: ['lorenzo russo'],
-};
+const FIREBASE_PROJECT_ID = 'app-ordini-pranzo-alimentari';
 
 function json(statusCode, payload, origin) {
   const headers = {
@@ -28,36 +17,14 @@ function resolveAllowedOrigin(event) {
     'https://marcotranquilli.github.io',
   ].join(','))
     .split(',')
-    .map((v) => v.trim())
+    .map((value) => value.trim())
     .filter(Boolean);
   if (!requestOrigin) return allowed[0] || '*';
   return allowed.includes(requestOrigin) ? requestOrigin : allowed[0] || '*';
 }
 
-function getAdminApp() {
-  if (admin.apps.length) return admin.app();
-  const inlineCreds = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
-  if (inlineCreds) {
-    return admin.initializeApp({
-      credential: admin.credential.cert(JSON.parse(inlineCreds)),
-    });
-  }
-  return admin.initializeApp({
-    credential: admin.credential.applicationDefault(),
-  });
-}
-
-function normalizeEmail(value) {
-  return String(value || '').trim().toLowerCase();
-}
-
-function normalizeName(value) {
-  return String(value || '').trim().toLowerCase();
-}
-
 function getDateFromValue(value) {
   if (!value) return null;
-  if (typeof value?.toDate === 'function') return value.toDate();
   if (value instanceof Date) return value;
   if (typeof value === 'string' || typeof value === 'number') return new Date(value);
   return null;
@@ -79,29 +46,15 @@ function romeMinutes(date) {
     minute: '2-digit',
     hourCycle: 'h23',
   }).formatToParts(date);
-  const hour = Number(parts.find((p) => p.type === 'hour')?.value || '0');
-  const minute = Number(parts.find((p) => p.type === 'minute')?.value || '0');
+  const hour = Number(parts.find((part) => part.type === 'hour')?.value || '0');
+  const minute = Number(parts.find((part) => part.type === 'minute')?.value || '0');
   return hour * 60 + minute;
-}
-
-function hasStaffAccess(decoded) {
-  const role = String(decoded?.role || '').trim().toLowerCase();
-  if (['admin', 'ristoratore', 'facility'].includes(role)) return true;
-
-  const provider = String(decoded?.firebase?.sign_in_provider || '').trim().toLowerCase();
-  const email = normalizeEmail(decoded?.email);
-  const name = normalizeName(decoded?.name);
-  const emailVerified = decoded?.email_verified === true;
-
-  if (provider === 'google.com' && STAFF_EMAILS.includes(email)) return true;
-  if (provider === 'google.com' && emailVerified && STAFF_NAMES.ristoratore.includes(name)) return true;
-  return false;
 }
 
 function isValidOrder(order) {
   if (!order) return false;
   const createdAt = getDateFromValue(order.createdAt);
-  if (!createdAt) return false;
+  if (!createdAt || Number.isNaN(createdAt.getTime())) return false;
   if (!Array.isArray(order.items) || order.items.length === 0) return false;
   if (Number(order.total || 0) <= 0) return false;
   const status = String(order.orderStatus || '').trim().toLowerCase();
@@ -110,21 +63,72 @@ function isValidOrder(order) {
   const isFridgeOrder = String(order.orderType || order.source || '').trim().toLowerCase() === 'frige';
   const allowAfterHours = order.allowAfterHours === true || order.afterHoursAllowed === true;
   if (!isFridgeOrder && !allowAfterHours) {
-    const cutoff = 11 * 60 + 30;
-    if (romeMinutes(createdAt) > cutoff) return false;
+    if (romeMinutes(createdAt) > (11 * 60 + 30)) return false;
   }
   return true;
 }
 
-function serializeValue(value) {
-  if (value == null) return value;
-  if (typeof value?.toDate === 'function') return value.toDate().toISOString();
-  if (value instanceof Date) return value.toISOString();
-  if (Array.isArray(value)) return value.map(serializeValue);
-  if (typeof value === 'object') {
-    return Object.fromEntries(Object.entries(value).map(([key, inner]) => [key, serializeValue(inner)]));
+function parseFirestoreValue(node) {
+  if (node == null || typeof node !== 'object') return node;
+  if ('nullValue' in node) return null;
+  if ('stringValue' in node) return node.stringValue;
+  if ('booleanValue' in node) return node.booleanValue;
+  if ('integerValue' in node) return Number(node.integerValue);
+  if ('doubleValue' in node) return Number(node.doubleValue);
+  if ('timestampValue' in node) return node.timestampValue;
+  if ('mapValue' in node) {
+    const fields = node.mapValue?.fields || {};
+    return Object.fromEntries(
+      Object.entries(fields).map(([key, value]) => [key, parseFirestoreValue(value)]),
+    );
   }
-  return value;
+  if ('arrayValue' in node) {
+    return (node.arrayValue?.values || []).map(parseFirestoreValue);
+  }
+  if ('geoPointValue' in node) return node.geoPointValue;
+  if ('referenceValue' in node) return node.referenceValue;
+  return node;
+}
+
+function parseFirestoreDocument(document) {
+  const id = String(document?.name || '').split('/').pop() || '';
+  const fields = document?.fields || {};
+  return {
+    id,
+    ...Object.fromEntries(Object.entries(fields).map(([key, value]) => [key, parseFirestoreValue(value)])),
+  };
+}
+
+async function fetchOrdersWithUserToken(token) {
+  const res = await fetch(
+    `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents:runQuery`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        structuredQuery: {
+          from: [{ collectionId: 'orders' }],
+          orderBy: [{ field: { fieldPath: 'createdAt' }, direction: 'DESCENDING' }],
+          limit: 250,
+        },
+      }),
+    },
+  );
+
+  const payload = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const message = payload?.error?.message || payload?.message || `firestore_query_${res.status}`;
+    const err = new Error(message);
+    err.statusCode = res.status;
+    throw err;
+  }
+
+  return (Array.isArray(payload) ? payload : [])
+    .filter((entry) => entry?.document)
+    .map((entry) => parseFirestoreDocument(entry.document));
 }
 
 exports.handler = async (event) => {
@@ -137,27 +141,18 @@ exports.handler = async (event) => {
     const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
     if (!token) return json(401, { error: 'missing_token' }, origin);
 
-    getAdminApp();
-    const decoded = await admin.auth().verifyIdToken(token);
-    if (!hasStaffAccess(decoded)) {
-      return json(403, { error: 'forbidden', message: 'staff_access_required' }, origin);
-    }
-
-    const db = admin.firestore();
-    const snap = await db.collection('orders').orderBy('createdAt', 'desc').limit(250).get();
     const todayKey = romeDateKey(new Date());
-    const orders = snap.docs
-      .map((doc) => ({ id: doc.id, ...doc.data() }))
+    const orders = (await fetchOrdersWithUserToken(token))
       .filter((order) => {
         const createdAt = getDateFromValue(order.createdAt);
         return createdAt && romeDateKey(createdAt) === todayKey;
       })
-      .filter(isValidOrder)
-      .map((order) => serializeValue(order));
+      .filter(isValidOrder);
 
     return json(200, { ok: true, orders, count: orders.length }, origin);
   } catch (err) {
-    return json(500, {
+    const statusCode = err.statusCode === 401 || err.statusCode === 403 ? err.statusCode : 500;
+    return json(statusCode, {
       error: 'orders_daily_failed',
       message: err.message,
     }, origin);

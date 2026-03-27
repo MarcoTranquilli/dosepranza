@@ -2279,6 +2279,21 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                     return false;
                 }
             };
+            if(isAdmin() || isRistoratore()) {
+                const loadStaffOrders = async (silent = false) => {
+                    try {
+                        const orders = await fetchServerOrders();
+                        applyOrdersRecords(orders, 'server');
+                    } catch(err) {
+                        if(!silent) renderOrdersLoadError(err);
+                        else console.warn('staff orders refresh failed', err);
+                    }
+                };
+                void loadStaffOrders(false);
+                const timer = window.setInterval(() => { void loadStaffOrders(true); }, 30000);
+                state.subs.orders = () => window.clearInterval(timer);
+                return;
+            }
             const renderOrdersSnapshot = (snap) => applyOrdersData(snap.docs);
             const renderOrdersLoadError = (err) => {
                 console.warn('sync orders failed', err);
