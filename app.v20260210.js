@@ -215,6 +215,15 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(host.endsWith('github.io')) return 'https://app-dosepranza.netlify.app/.netlify/functions/order_confirmation';
             return '/.netlify/functions/order_confirmation';
         })();
+        const STAFF_ORDERS_ENDPOINT = (() => {
+            try {
+                const override = localStorage.getItem('dose_notify_base_url');
+                if(override) return `${override.replace(/\/$/, '')}/orders_daily`;
+            } catch(e) {}
+            const host = window.location.hostname || '';
+            if(host.endsWith('github.io')) return 'https://app-dosepranza.netlify.app/.netlify/functions/orders_daily';
+            return '/.netlify/functions/orders_daily';
+        })();
         const isLocalE2E = (() => {
             try {
                 const params = new URLSearchParams(window.location.search);
@@ -2154,13 +2163,28 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(!state.authReady) return;
             if(state.subs.orders) return;
             const now = new Date(); now.setHours(0,0,0,0);
-            const applyOrdersData = (docs) => {
+            let serverFallbackTried = false;
+            let serverFallbackApplied = false;
+            const normalizeOrderRecord = (order) => {
+                const createdAt = order?.createdAt instanceof Date
+                    ? order.createdAt
+                    : (typeof order?.createdAt === 'string' || typeof order?.createdAt === 'number')
+                        ? new Date(order.createdAt)
+                        : order?.createdAt;
+                return { ...order, createdAt };
+            };
+            const applyOrdersRecords = (records, source = 'client') => {
                 let totalG = 0;
-                const rawToday = docs
-                    .map(d => ({id: d.id, ...d.data()}))
-                    .filter(o => o.createdAt && o.createdAt.toDate() >= now);
+                const rawToday = (records || [])
+                    .map(normalizeOrderRecord)
+                    .filter(o => {
+                        if(!o.createdAt) return false;
+                        const createdAt = o.createdAt.toDate ? o.createdAt.toDate() : o.createdAt;
+                        return createdAt >= now;
+                    });
                 state.ordersRawToday = rawToday;
                 state.ordersToday = rawToday.filter(isValidOrder);
+                serverFallbackApplied = source === 'server' && state.ordersToday.length > 0;
                 const listEl = document.getElementById('all-orders-list');
                 if(state.ordersToday.length === 0) {
                     listEl.innerHTML = `<div class="card p-6 rounded-3xl text-center text-gray-400 font-bold uppercase">Nessun ordine valido oggi</div>`;
@@ -2212,10 +2236,43 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 renderDailySummaryInline();
                 updateInvalidOrdersUI();
                 autoVoidInvalidOrders();
+                if(source === 'client' && state.ordersToday.length === 0) {
+                    void tryServerOrdersFallback();
+                }
+            };
+            const applyOrdersData = (docs) => applyOrdersRecords((docs || []).map(d => ({id: d.id, ...d.data()})), 'client');
+            const fetchServerOrders = async () => {
+                const token = await auth_fb.currentUser?.getIdToken?.();
+                if(!token) throw new Error('missing_token');
+                const res = await fetch(STAFF_ORDERS_ENDPOINT, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const payload = await res.json().catch(() => ({}));
+                if(!res.ok) {
+                    throw new Error(payload?.message || payload?.error || `orders_daily_${res.status}`);
+                }
+                return Array.isArray(payload?.orders) ? payload.orders : [];
+            };
+            const tryServerOrdersFallback = async () => {
+                if(serverFallbackTried) return serverFallbackApplied;
+                if(!(isAdmin() || isRistoratore())) return false;
+                serverFallbackTried = true;
+                try {
+                    const orders = await fetchServerOrders();
+                    applyOrdersRecords(orders, 'server');
+                    return serverFallbackApplied;
+                } catch(err) {
+                    console.warn('staff orders fallback failed', err);
+                    return false;
+                }
             };
             const renderOrdersSnapshot = (snap) => applyOrdersData(snap.docs);
             const renderOrdersLoadError = (err) => {
                 console.warn('sync orders failed', err);
+                if(serverFallbackApplied && state.ordersToday.length > 0) return;
                 resetOrdersSubscription();
                 state.ordersRawToday = [];
                 state.ordersToday = [];
@@ -2249,11 +2306,21 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                     const snap = await getDocs(query(ordersCol, orderBy("createdAt", "desc")));
                     applyOrdersData(snap.docs);
                 } catch(err) {
-                    renderOrdersLoadError(err);
+                    const recovered = await tryServerOrdersFallback();
+                    if(!recovered) renderOrdersLoadError(err);
                 }
             };
             preloadOrders();
-            state.subs.orders = onSnapshot(query(ordersCol, orderBy("createdAt", "desc")), renderOrdersSnapshot, renderOrdersLoadError);
+            state.subs.orders = onSnapshot(
+                query(ordersCol, orderBy("createdAt", "desc")),
+                renderOrdersSnapshot,
+                (err) => {
+                    void (async () => {
+                        const recovered = await tryServerOrdersFallback();
+                        if(!recovered) renderOrdersLoadError(err);
+                    })();
+                }
+            );
         }
 
         function buildKitchenSummary() {
