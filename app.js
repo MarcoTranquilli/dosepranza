@@ -212,7 +212,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 if(override) return `${override.replace(/\/$/, '')}/order_confirmation`;
             } catch(e) {}
             const host = window.location.hostname || '';
-            if(host.endsWith('github.io')) return 'https://app-dosepranza.netlify.app/.netlify/functions/order_confirmation';
+            if(host.endsWith('github.io')) return '';
             return '/.netlify/functions/order_confirmation';
         })();
         const STAFF_ORDERS_ENDPOINT = (() => {
@@ -221,7 +221,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 if(override) return `${override.replace(/\/$/, '')}/orders_daily`;
             } catch(e) {}
             const host = window.location.hostname || '';
-            if(host.endsWith('github.io')) return 'https://app-dosepranza.netlify.app/.netlify/functions/orders_daily';
+            if(host.endsWith('github.io')) return '';
             return '/.netlify/functions/orders_daily';
         })();
         const isLocalE2E = (() => {
@@ -1038,7 +1038,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         }
 
         async function sendOrderConfirmationNotification(orderId) {
-            if(!auth_fb.currentUser || !orderId || isLocalE2E) return { skipped: true };
+            if(!auth_fb.currentUser || !orderId || isLocalE2E || !ORDER_CONFIRM_ENDPOINT) return { skipped: true };
             const token = await auth_fb.currentUser.getIdToken();
             const res = await fetch(ORDER_CONFIRM_ENDPOINT, {
                 method: 'POST',
@@ -2252,6 +2252,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             };
             const applyOrdersData = (docs) => applyOrdersRecords((docs || []).map(d => ({id: d.id, ...d.data()})), 'client');
             const fetchServerOrders = async () => {
+                if(!STAFF_ORDERS_ENDPOINT) throw new Error('server_orders_disabled');
                 const token = await auth_fb.currentUser?.getIdToken?.();
                 if(!token) throw new Error('missing_token');
                 const res = await fetch(STAFF_ORDERS_ENDPOINT, {
@@ -2318,6 +2319,12 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                     (snap) => applyOrdersData(snap.docs),
                     (err) => { void renderStaffClientError(err); }
                 );
+                if(!STAFF_ORDERS_ENDPOINT) {
+                    state.subs.orders = () => {
+                        try { clientUnsub(); } catch(e) {}
+                    };
+                    return;
+                }
                 void loadStaffOrders(false);
                 const timer = window.setInterval(() => { void loadStaffOrders(true); }, 30000);
                 state.subs.orders = () => {
