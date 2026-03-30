@@ -8,6 +8,24 @@
 - Deploy: GitHub Pages (branch `main`)
 - Nota: le sezioni Netlify sotto sono legacy e non usate nel flusso corrente.
 
+## Release Policy
+
+Ordine obbligatorio di rilascio:
+
+1. sviluppo locale
+2. verifica su `GitHub Pages`
+3. esecuzione `UAT`
+4. solo se necessario, deploy su `Netlify`
+
+Regola operativa:
+- `GitHub Pages` e' l'ambiente di verifica pubblica pre-produzione
+- `Netlify` si usa solo quando serve una capability backend o un deploy finale consapevole
+- non si pubblica su Netlify per provare fix frontend che possono essere validati prima su GitHub Pages
+
+Documenti di riferimento:
+- [Core Guardrails](/Users/marcotranquilli/Documents/GitHub/dosepranza/docs/CORE_GUARDRAILS.md)
+- [Secure Implementation Plan](/Users/marcotranquilli/Documents/GitHub/dosepranza/docs/SECURE_IMPLEMENTATION_PLAN.md)
+
 ## Rilascio rapido su Netlify
 
 1. Esegui preflight locale:

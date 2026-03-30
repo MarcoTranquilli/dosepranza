@@ -34,6 +34,15 @@ Data: 2026-02-10
 - Analytics: visualizzazione KPI e grafici.
 - Frige: se attivo, verifica acquisto e stock.
 
+## 6-bis) Policy di rilascio
+- Prima di qualunque deploy Netlify, validare sempre su `GitHub Pages`.
+- Flusso obbligatorio:
+  1. sviluppo locale
+  2. verifica su GitHub Pages
+  3. UAT
+  4. solo se necessario, deploy su Netlify
+- Netlify non va usato per semplici prove frontend se il comportamento puo' essere verificato prima su GitHub Pages.
+
 ## 7) Troubleshooting rapido
 - **Menu vuoto / sezioni non visibili**:
   - Hard refresh (Cmd+Shift+R).
