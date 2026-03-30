@@ -2197,7 +2197,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 serverFallbackApplied = source === 'server' && state.ordersToday.length > 0;
                 const listEl = document.getElementById('all-orders-list');
                 if(state.ordersToday.length === 0) {
-                    listEl.innerHTML = `<div class="card p-6 rounded-3xl text-center text-gray-400 font-bold uppercase">Nessun ordine valido oggi</div>`;
+                    listEl.innerHTML = `<div class="card p-6 rounded-3xl text-center text-gray-400 font-bold uppercase">Nessun ordine oggi</div>`;
                 } else {
                     listEl.innerHTML = state.ordersToday.map(o => {
                         totalG += o.total || 0;
@@ -3519,17 +3519,6 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if((o.total || 0) <= 0) return false;
             const status = (o.orderStatus || '').toLowerCase();
             if(['void','canceled','annullato','bozza','draft'].includes(status)) return false;
-            // dopo le 11:30 non sono ordini validi (solo Fridge)
-            const isFrigeOrder = (o.orderType || o.source || '').toString().toLowerCase() === 'frige';
-            const allowAfterHours = o.allowAfterHours === true || o.afterHoursAllowed === true;
-            if(!isFrigeOrder && !allowAfterHours) {
-                try {
-                    const d = o.createdAt.toDate ? o.createdAt.toDate() : o.createdAt;
-                    const minutes = d.getHours() * 60 + d.getMinutes();
-                    const cutoff = 11 * 60 + 30;
-                    if(minutes > cutoff) return false;
-                } catch(e) {}
-            }
             return true;
         }
 

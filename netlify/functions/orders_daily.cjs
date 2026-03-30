@@ -59,12 +59,6 @@ function isValidOrder(order) {
   if (Number(order.total || 0) <= 0) return false;
   const status = String(order.orderStatus || '').trim().toLowerCase();
   if (['void', 'canceled', 'annullato', 'bozza', 'draft'].includes(status)) return false;
-
-  const isFridgeOrder = String(order.orderType || order.source || '').trim().toLowerCase() === 'frige';
-  const allowAfterHours = order.allowAfterHours === true || order.afterHoursAllowed === true;
-  if (!isFridgeOrder && !allowAfterHours) {
-    if (romeMinutes(createdAt) > (11 * 60 + 30)) return false;
-  }
   return true;
 }
 
