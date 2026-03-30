@@ -236,7 +236,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
 
         const ROLE_EMAILS = {
             admin: ['marco.tranquilli@dos.design'],
-            ristoratore: ['lorenzo.russo@alimentarirusso'],
+            ristoratore: ['lorenzo.russo@alimentarirusso', 'russolorenzo11@gmail.com'],
             facility: ['beatrice.binini@dos.design', 'monica.porta@dos.design']
         };
         const ROLE_NAMES = {
@@ -2280,24 +2280,56 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 }
             };
             if(isAdmin() || isRistoratore()) {
+                const staffOrdersQuery = query(ordersCol, orderBy("createdAt", "desc"), limit(250));
+                const renderStaffClientError = async (err) => {
+                    const recovered = await tryServerOrdersFallback();
+                    if(!recovered && state.ordersToday.length === 0) renderOrdersLoadError(err);
+                };
+                const preloadClientOrders = async () => {
+                    try {
+                        const snap = await getDocs(staffOrdersQuery);
+                        applyOrdersData(snap.docs);
+                    } catch(err) {
+                        console.warn('staff client preload failed', err);
+                        await renderStaffClientError(err);
+                    }
+                };
                 const loadStaffOrders = async (silent = false) => {
                     try {
                         const orders = await fetchServerOrders();
                         applyOrdersRecords(orders, 'server');
                     } catch(err) {
-                        if(!silent) renderOrdersLoadError(err);
-                        else console.warn('staff orders refresh failed', err);
+                        if(!silent) {
+                            console.warn('staff orders server load failed', err);
+                            if(state.ordersToday.length === 0) {
+                                // Let the Firestore client mirror recover before surfacing an error.
+                                window.setTimeout(() => {
+                                    if(state.ordersToday.length === 0) renderOrdersLoadError(err);
+                                }, 1200);
+                            }
+                        } else {
+                            console.warn('staff orders refresh failed', err);
+                        }
                     }
                 };
+                void preloadClientOrders();
+                const clientUnsub = onSnapshot(
+                    staffOrdersQuery,
+                    (snap) => applyOrdersData(snap.docs),
+                    (err) => { void renderStaffClientError(err); }
+                );
                 void loadStaffOrders(false);
                 const timer = window.setInterval(() => { void loadStaffOrders(true); }, 30000);
-                state.subs.orders = () => window.clearInterval(timer);
+                state.subs.orders = () => {
+                    window.clearInterval(timer);
+                    try { clientUnsub(); } catch(e) {}
+                };
                 return;
             }
             const renderOrdersSnapshot = (snap) => applyOrdersData(snap.docs);
             const renderOrdersLoadError = (err) => {
                 console.warn('sync orders failed', err);
-                if(serverFallbackApplied && state.ordersToday.length > 0) return;
+                if(state.ordersToday.length > 0) return;
                 resetOrdersSubscription();
                 state.ordersRawToday = [];
                 state.ordersToday = [];

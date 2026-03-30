@@ -46,5 +46,5 @@ Data: 2026-02-10
 
 ## 8) Contatti
 - Admin: marco.tranquilli@dos.design
-- Ristoratore: lorenzo.russo@alimentarirusso
+- Ristoratore: russolorenzo11@gmail.com
 - Facility: beatrice.binini@dos.design, monica.porta@dos.design

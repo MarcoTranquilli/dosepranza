@@ -69,7 +69,7 @@ export PLAYWRIGHT_CLI_SESSION=dosepranza-uat
 3) Verifica che **History** e **Analisi** non siano accessibili.
 
 ## C. Ristoratore
-1) Login con `lorenzo.russo@alimentarirusso`.
+1) Login con `russolorenzo11@gmail.com`.
 2) Frige: aggiungi prodotto, cambia prezzo, rimuovi.
 3) Riconciliazione: lista pagamenti Frige + Ordini.
 

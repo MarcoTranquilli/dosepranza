@@ -3,7 +3,7 @@ import { test } from '@playwright/test';
 const roles = {
   user: { name: 'Mario Rossi', email: 'mario.rossi@dos.design' },
   facility: { name: 'Beatrice Binini', email: 'beatrice.binini@dos.design' },
-  ristoratore: { name: 'Lorenzo Russo', email: 'lorenzo.russo@alimentarirusso' },
+  ristoratore: { name: 'Lorenzo Russo', email: 'russolorenzo11@gmail.com' },
   admin: { name: 'Marco Tranquilli', email: 'marco.tranquilli@dos.design' }
 };
 

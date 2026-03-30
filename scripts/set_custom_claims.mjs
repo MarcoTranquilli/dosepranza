@@ -13,6 +13,7 @@ if (credPath && fs.existsSync(credPath)) {
 const ROLE_MAP = {
   'marco.tranquilli@dos.design': 'admin',
   'lorenzo.russo@alimentarirusso': 'ristoratore',
+  'russolorenzo11@gmail.com': 'ristoratore',
   'beatrice.binini@dos.design': 'facility',
   'monica.porta@dos.design': 'facility'
 };
