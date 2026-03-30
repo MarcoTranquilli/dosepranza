@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut, signInAnonymously, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addDoc, serverTimestamp, query, orderBy, getDocs, getDocsFromServer, runTransaction, doc, where, limit, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addDoc, serverTimestamp, query, orderBy, getDocs, runTransaction, doc, where, limit, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- DATABASE PRODOTTI COMPLETO ---
         const DIETS_CONFIG = { "carne/pesce": "🥩 Carne/Pesce", "vegetariano": "🧀 Vegetariano", "vegano": "🌱 Vegano" };
@@ -880,9 +880,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 document.getElementById('user-modal').classList.add('hidden');
                 await setRole(email);
                 syncMyOrders();
-                if(isMappedStaffEmail(email) && !isLocalE2E) {
-                    window.toast("Per i permessi staff usa Accedi con Google");
-                }
+                
             }
         };
 
@@ -2163,38 +2161,40 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(!state.authReady) return;
             if(state.subs.orders) return;
             const now = new Date(); now.setHours(0,0,0,0);
-            let serverFallbackTried = false;
-            let serverFallbackApplied = false;
-            const asTimestampLike = (value) => {
-                if(!value) return value;
-                if(typeof value?.toDate === 'function') return value;
-                const date = value instanceof Date ? value : new Date(value);
-                if(Number.isNaN(date.getTime())) return value;
-                return {
-                    toDate: () => new Date(date.getTime()),
-                    valueOf: () => date.getTime(),
-                    toJSON: () => date.toISOString()
-                };
+            const renderOrdersLoadError = (err) => {
+                console.warn('sync orders failed', err);
+                if(state.ordersToday.length > 0) return;
+                resetOrdersSubscription();
+                state.ordersRawToday = [];
+                state.ordersToday = [];
+                document.getElementById('grand-total-display').textContent = formatCurrency(0);
+                const listEl = document.getElementById('all-orders-list');
+                const message = 'Impossibile caricare il riepilogo ordini. Verifica permessi Firestore.';
+                if(listEl) {
+                    listEl.innerHTML = `<div class="card p-6 rounded-3xl text-center text-red-500 font-bold">${esc(message)}</div>`;
+                }
+                const wrap = document.getElementById('orders-payments-list');
+                if(wrap) {
+                    wrap.classList.remove('hidden');
+                    wrap.style.display = 'block';
+                    wrap.innerHTML = `<div class="bg-white p-4 rounded-2xl border border-red-100 text-[11px] text-red-500 font-bold">${esc(message)}</div>`;
+                }
+                const productsEl = document.getElementById('orders-summary-products');
+                if(productsEl) productsEl.innerHTML = `<p class="text-red-500 font-bold">${esc(message)}</p>`;
+                const allergiesEl = document.getElementById('orders-summary-allergies');
+                if(allergiesEl) allergiesEl.innerHTML = `<p class="text-red-500 font-bold">${esc(message)}</p>`;
+                const countEl = document.getElementById('orders-summary-count');
+                if(countEl) countEl.textContent = '0 ordini · 0 pezzi';
+                renderOrdersKPIs();
+                renderDailySummaryInline();
             };
-            const normalizeOrderRecord = (order) => ({
-                ...order,
-                createdAt: asTimestampLike(order?.createdAt),
-                statusUpdatedAt: asTimestampLike(order?.statusUpdatedAt),
-                voidedAt: asTimestampLike(order?.voidedAt),
-                reconciledAt: asTimestampLike(order?.reconciledAt)
-            });
-            const applyOrdersRecords = (records, source = 'client') => {
+            state.subs.orders = onSnapshot(query(ordersCol, orderBy("createdAt", "desc")), snap => {
                 let totalG = 0;
-                const rawToday = (records || [])
-                    .map(normalizeOrderRecord)
-                    .filter(o => {
-                        if(!o.createdAt) return false;
-                        const createdAt = o.createdAt.toDate ? o.createdAt.toDate() : o.createdAt;
-                        return createdAt >= now;
-                    });
+                const rawToday = snap.docs
+                    .map(d => ({id: d.id, ...d.data()}))
+                    .filter(o => o.createdAt && o.createdAt.toDate() >= now);
                 state.ordersRawToday = rawToday;
                 state.ordersToday = rawToday.filter(isValidOrder);
-                serverFallbackApplied = source === 'server' && state.ordersToday.length > 0;
                 const listEl = document.getElementById('all-orders-list');
                 if(state.ordersToday.length === 0) {
                     listEl.innerHTML = `<div class="card p-6 rounded-3xl text-center text-gray-400 font-bold uppercase">Nessun ordine oggi</div>`;
@@ -2246,212 +2246,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 renderDailySummaryInline();
                 updateInvalidOrdersUI();
                 autoVoidInvalidOrders();
-                if(source === 'client' && state.ordersToday.length === 0) {
-                    void tryServerOrdersFallback();
-                }
-            };
-            const applyOrdersData = (docs) => applyOrdersRecords((docs || []).map(d => ({id: d.id, ...d.data()})), 'client');
-            const parseFirestoreRestValue = (node) => {
-                if(node == null || typeof node !== 'object') return node;
-                if('nullValue' in node) return null;
-                if('stringValue' in node) return node.stringValue;
-                if('booleanValue' in node) return node.booleanValue;
-                if('integerValue' in node) return Number(node.integerValue);
-                if('doubleValue' in node) return Number(node.doubleValue);
-                if('timestampValue' in node) return node.timestampValue;
-                if('mapValue' in node) {
-                    const fields = node.mapValue?.fields || {};
-                    return Object.fromEntries(Object.entries(fields).map(([key, value]) => [key, parseFirestoreRestValue(value)]));
-                }
-                if('arrayValue' in node) return (node.arrayValue?.values || []).map(parseFirestoreRestValue);
-                if('geoPointValue' in node) return node.geoPointValue;
-                if('referenceValue' in node) return node.referenceValue;
-                return node;
-            };
-            const parseFirestoreRestDocument = (document) => {
-                const id = String(document?.name || '').split('/').pop() || '';
-                const fields = document?.fields || {};
-                return {
-                    id,
-                    ...Object.fromEntries(Object.entries(fields).map(([key, value]) => [key, parseFirestoreRestValue(value)]))
-                };
-            };
-            const fetchFirestoreRestOrders = async () => {
-                const token = await auth_fb.currentUser?.getIdToken?.();
-                if(!token) throw new Error('missing_token');
-                const res = await fetch(`https://firestore.googleapis.com/v1/projects/app-ordini-pranzo-alimentari/databases/(default)/documents:runQuery`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                        structuredQuery: {
-                            from: [{ collectionId: 'orders' }],
-                            orderBy: [{ field: { fieldPath: 'createdAt' }, direction: 'DESCENDING' }],
-                            limit: 250
-                        }
-                    })
-                });
-                const payload = await res.json().catch(() => ({}));
-                if(!res.ok) {
-                    throw new Error(payload?.error?.message || payload?.message || `firestore_rest_${res.status}`);
-                }
-                return (Array.isArray(payload) ? payload : [])
-                    .filter(entry => entry?.document)
-                    .map(entry => parseFirestoreRestDocument(entry.document));
-            };
-            const fetchServerOrders = async () => {
-                if(!STAFF_ORDERS_ENDPOINT) throw new Error('server_orders_disabled');
-                const token = await auth_fb.currentUser?.getIdToken?.();
-                if(!token) throw new Error('missing_token');
-                const res = await fetch(STAFF_ORDERS_ENDPOINT, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                const payload = await res.json().catch(() => ({}));
-                if(!res.ok) {
-                    throw new Error(payload?.message || payload?.error || `orders_daily_${res.status}`);
-                }
-                return Array.isArray(payload?.orders) ? payload.orders : [];
-            };
-            const tryServerOrdersFallback = async () => {
-                if(serverFallbackTried) return serverFallbackApplied;
-                if(!(isAdmin() || isRistoratore())) return false;
-                serverFallbackTried = true;
-                try {
-                    const orders = await fetchServerOrders();
-                    applyOrdersRecords(orders, 'server');
-                    return serverFallbackApplied;
-                } catch(err) {
-                    console.warn('staff orders fallback failed', err);
-                    return false;
-                }
-            };
-                if(isAdmin() || isRistoratore()) {
-                const loadStaffOrdersFromRest = async () => {
-                    const orders = await fetchFirestoreRestOrders();
-                    applyOrdersRecords(orders, 'server');
-                };
-                const staffOrdersQuery = query(ordersCol, orderBy("createdAt", "desc"), limit(250));
-                const renderStaffClientError = async (err) => {
-                    const recovered = await tryServerOrdersFallback();
-                    if(!recovered && state.ordersToday.length === 0) renderOrdersLoadError(err);
-                };
-                const loadStaffOrdersFromFirestoreServer = async () => {
-                    const snap = await getDocsFromServer(staffOrdersQuery);
-                    applyOrdersData(snap.docs);
-                    return snap.docs.length;
-                };
-                const preloadClientOrders = async () => {
-                    try {
-                        await loadStaffOrdersFromFirestoreServer();
-                    } catch(err) {
-                        console.warn('staff server preload failed', err);
-                        try {
-                            const snap = await getDocs(staffOrdersQuery);
-                            applyOrdersData(snap.docs);
-                        } catch(cacheErr) {
-                            console.warn('staff client preload failed', cacheErr);
-                            await renderStaffClientError(err);
-                        }
-                    }
-                };
-                const loadStaffOrders = async (silent = false) => {
-                    try {
-                        const count = await loadStaffOrdersFromFirestoreServer();
-                        if(count === 0) {
-                            if(STAFF_ORDERS_ENDPOINT) {
-                                const orders = await fetchServerOrders();
-                                applyOrdersRecords(orders, 'server');
-                            } else {
-                                await loadStaffOrdersFromRest();
-                            }
-                        }
-                    } catch(err) {
-                        try {
-                            if(STAFF_ORDERS_ENDPOINT) {
-                                const orders = await fetchServerOrders();
-                                applyOrdersRecords(orders, 'server');
-                            } else {
-                                await loadStaffOrdersFromRest();
-                            }
-                        } catch(fallbackErr) {
-                            if(!silent) {
-                                console.warn('staff orders server load failed', fallbackErr);
-                                if(state.ordersToday.length === 0) {
-                                    window.setTimeout(() => {
-                                        if(state.ordersToday.length === 0) renderOrdersLoadError(fallbackErr);
-                                    }, 1200);
-                                }
-                            } else {
-                                console.warn('staff orders refresh failed', fallbackErr);
-                            }
-                        }
-                    }
-                };
-                void preloadClientOrders();
-                const timer = window.setInterval(() => { void loadStaffOrders(true); }, 30000);
-                state.subs.orders = () => {
-                    window.clearInterval(timer);
-                };
-                void loadStaffOrders(false);
-                return;
-            }
-            const renderOrdersSnapshot = (snap) => applyOrdersData(snap.docs);
-            const renderOrdersLoadError = (err) => {
-                console.warn('sync orders failed', err);
-                if(state.ordersToday.length > 0) return;
-                resetOrdersSubscription();
-                state.ordersRawToday = [];
-                state.ordersToday = [];
-                document.getElementById('grand-total-display').textContent = formatCurrency(0);
-                const listEl = document.getElementById('all-orders-list');
-                const isMapped = isMappedStaffEmail(state.user?.email || '');
-                const needsGoogle = isMapped && requiresGoogleStaffVerification(state.user?.email || '');
-                const message = needsGoogle
-                    ? 'Accedi con Google per visualizzare il riepilogo ordini.'
-                    : 'Impossibile caricare il riepilogo ordini. Verifica permessi Firestore.';
-                if(listEl) {
-                    listEl.innerHTML = `<div class="card p-6 rounded-3xl text-center text-red-500 font-bold">${esc(message)}</div>`;
-                }
-                const wrap = document.getElementById('orders-payments-list');
-                if(wrap) {
-                    wrap.classList.remove('hidden');
-                    wrap.style.display = 'block';
-                    wrap.innerHTML = `<div class="bg-white p-4 rounded-2xl border border-red-100 text-[11px] text-red-500 font-bold">${esc(message)}</div>`;
-                }
-                const productsEl = document.getElementById('orders-summary-products');
-                if(productsEl) productsEl.innerHTML = `<p class="text-red-500 font-bold">${esc(message)}</p>`;
-                const allergiesEl = document.getElementById('orders-summary-allergies');
-                if(allergiesEl) allergiesEl.innerHTML = `<p class="text-red-500 font-bold">${esc(message)}</p>`;
-                const countEl = document.getElementById('orders-summary-count');
-                if(countEl) countEl.textContent = '0 ordini · 0 pezzi';
-                renderOrdersKPIs();
-                renderDailySummaryInline();
-            };
-            const preloadOrders = async () => {
-                try {
-                    const snap = await getDocs(query(ordersCol, orderBy("createdAt", "desc")));
-                    applyOrdersData(snap.docs);
-                } catch(err) {
-                    const recovered = await tryServerOrdersFallback();
-                    if(!recovered) renderOrdersLoadError(err);
-                }
-            };
-            preloadOrders();
-            state.subs.orders = onSnapshot(
-                query(ordersCol, orderBy("createdAt", "desc")),
-                renderOrdersSnapshot,
-                (err) => {
-                    void (async () => {
-                        const recovered = await tryServerOrdersFallback();
-                        if(!recovered) renderOrdersLoadError(err);
-                    })();
-                }
-            );
+            }, renderOrdersLoadError);
         }
 
         function buildKitchenSummary() {
@@ -3698,19 +3493,17 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                     }
                 }
 
-                // 2) Fallback: mapped staff emails only with a verified Google session
+                // 2) Fallback: mapped staff emails (recovery mode)
                 if(role === 'user' && state.authzSource !== 'claims') {
-                    if(googleSession && (ROLE_EMAILS.admin.includes(e) || ROLE_NAMES.admin.includes(n))) {
+                    if(ROLE_EMAILS.admin.includes(e) || ROLE_NAMES.admin.includes(n)) {
                         role = 'admin';
-                        state.authzSource = 'email-map-google';
-                    } else if(googleSession && (ROLE_EMAILS.ristoratore.includes(e) || ROLE_NAMES.ristoratore.includes(n))) {
+                        state.authzSource = 'email-map-fallback';
+                    } else if(ROLE_EMAILS.ristoratore.includes(e) || ROLE_NAMES.ristoratore.includes(n)) {
                         role = 'ristoratore';
-                        state.authzSource = 'email-map-google';
-                    } else if(googleSession && ROLE_EMAILS.facility.includes(e)) {
+                        state.authzSource = 'email-map-fallback';
+                    } else if(ROLE_EMAILS.facility.includes(e)) {
                         role = 'facility';
-                        state.authzSource = 'email-map-google';
-                    } else if(isMappedStaffEmail(e)) {
-                        state.authzSource = 'google-required';
+                        state.authzSource = 'email-map-fallback';
                     }
                 }
                 state.role = role;
