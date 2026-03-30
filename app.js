@@ -2251,6 +2251,56 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 }
             };
             const applyOrdersData = (docs) => applyOrdersRecords((docs || []).map(d => ({id: d.id, ...d.data()})), 'client');
+            const parseFirestoreRestValue = (node) => {
+                if(node == null || typeof node !== 'object') return node;
+                if('nullValue' in node) return null;
+                if('stringValue' in node) return node.stringValue;
+                if('booleanValue' in node) return node.booleanValue;
+                if('integerValue' in node) return Number(node.integerValue);
+                if('doubleValue' in node) return Number(node.doubleValue);
+                if('timestampValue' in node) return node.timestampValue;
+                if('mapValue' in node) {
+                    const fields = node.mapValue?.fields || {};
+                    return Object.fromEntries(Object.entries(fields).map(([key, value]) => [key, parseFirestoreRestValue(value)]));
+                }
+                if('arrayValue' in node) return (node.arrayValue?.values || []).map(parseFirestoreRestValue);
+                if('geoPointValue' in node) return node.geoPointValue;
+                if('referenceValue' in node) return node.referenceValue;
+                return node;
+            };
+            const parseFirestoreRestDocument = (document) => {
+                const id = String(document?.name || '').split('/').pop() || '';
+                const fields = document?.fields || {};
+                return {
+                    id,
+                    ...Object.fromEntries(Object.entries(fields).map(([key, value]) => [key, parseFirestoreRestValue(value)]))
+                };
+            };
+            const fetchFirestoreRestOrders = async () => {
+                const token = await auth_fb.currentUser?.getIdToken?.();
+                if(!token) throw new Error('missing_token');
+                const res = await fetch(`https://firestore.googleapis.com/v1/projects/app-ordini-pranzo-alimentari/databases/(default)/documents:runQuery`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        structuredQuery: {
+                            from: [{ collectionId: 'orders' }],
+                            orderBy: [{ field: { fieldPath: 'createdAt' }, direction: 'DESCENDING' }],
+                            limit: 250
+                        }
+                    })
+                });
+                const payload = await res.json().catch(() => ({}));
+                if(!res.ok) {
+                    throw new Error(payload?.error?.message || payload?.message || `firestore_rest_${res.status}`);
+                }
+                return (Array.isArray(payload) ? payload : [])
+                    .filter(entry => entry?.document)
+                    .map(entry => parseFirestoreRestDocument(entry.document));
+            };
             const fetchServerOrders = async () => {
                 if(!STAFF_ORDERS_ENDPOINT) throw new Error('server_orders_disabled');
                 const token = await auth_fb.currentUser?.getIdToken?.();
@@ -2280,7 +2330,11 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                     return false;
                 }
             };
-            if(isAdmin() || isRistoratore()) {
+                if(isAdmin() || isRistoratore()) {
+                const loadStaffOrdersFromRest = async () => {
+                    const orders = await fetchFirestoreRestOrders();
+                    applyOrdersRecords(orders, 'server');
+                };
                 const staffOrdersQuery = query(ordersCol, orderBy("createdAt", "desc"), limit(250));
                 const renderStaffClientError = async (err) => {
                     const recovered = await tryServerOrdersFallback();
@@ -2297,8 +2351,12 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 };
                 const loadStaffOrders = async (silent = false) => {
                     try {
-                        const orders = await fetchServerOrders();
-                        applyOrdersRecords(orders, 'server');
+                        if(STAFF_ORDERS_ENDPOINT) {
+                            const orders = await fetchServerOrders();
+                            applyOrdersRecords(orders, 'server');
+                        } else {
+                            await loadStaffOrdersFromRest();
+                        }
                     } catch(err) {
                         if(!silent) {
                             console.warn('staff orders server load failed', err);
@@ -2319,12 +2377,6 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                     (snap) => applyOrdersData(snap.docs),
                     (err) => { void renderStaffClientError(err); }
                 );
-                if(!STAFF_ORDERS_ENDPOINT) {
-                    state.subs.orders = () => {
-                        try { clientUnsub(); } catch(e) {}
-                    };
-                    return;
-                }
                 void loadStaffOrders(false);
                 const timer = window.setInterval(() => { void loadStaffOrders(true); }, 30000);
                 state.subs.orders = () => {
