@@ -1,6 +1,9 @@
 import { test, expect } from '@playwright/test';
+import { seedCoreOrders, seedUserOrders } from './helpers/e2e-fixtures';
 
 test('UAT Utente standard: ordine + frige WIP', async ({ page }) => {
+  await seedCoreOrders(page);
+  await seedUserOrders(page);
   await page.goto('/');
 
   await page.click('#btn-menu');
@@ -15,4 +18,5 @@ test('UAT Utente standard: ordine + frige WIP', async ({ page }) => {
   await expect(page.locator('#frige-wip')).toHaveCount(1);
 
   await expect(page.locator('#toast')).toBeVisible();
+  await expect(page.locator('#daily-summary-inline')).toContainText('Il tuo riepilogo oggi');
 });

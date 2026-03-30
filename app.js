@@ -233,6 +233,51 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 return false;
             }
         })();
+        const toTimestampLike = (value) => {
+            if(!value) return value;
+            if(typeof value?.toDate === 'function') return value;
+            const date = value instanceof Date ? value : new Date(value);
+            if(Number.isNaN(date.getTime())) return value;
+            return {
+                toDate: () => new Date(date.getTime()),
+                valueOf: () => date.getTime(),
+                toJSON: () => date.toISOString()
+            };
+        };
+        const normalizeFixtureOrder = (order = {}, fallbackId = '') => ({
+            id: order.id || fallbackId,
+            ...order,
+            createdAt: toTimestampLike(order.createdAt),
+            statusUpdatedAt: toTimestampLike(order.statusUpdatedAt),
+            voidedAt: toTimestampLike(order.voidedAt),
+            reconciledAt: toTimestampLike(order.reconciledAt)
+        });
+        const readE2EJSON = (key) => {
+            if(!isLocalE2E) return null;
+            try {
+                const raw = localStorage.getItem(key);
+                if(!raw) return null;
+                return JSON.parse(raw);
+            } catch(e) {
+                console.warn(`invalid e2e fixture for ${key}`, e);
+                return null;
+            }
+        };
+        const getE2EOrdersFixture = () => {
+            const payload = readE2EJSON('dose_e2e_orders_today');
+            if(!Array.isArray(payload)) return null;
+            return payload.map((order, index) => normalizeFixtureOrder(order, `e2e-order-${index + 1}`));
+        };
+        const getE2EMyOrdersFixture = () => {
+            const direct = readE2EJSON('dose_e2e_my_orders');
+            if(Array.isArray(direct)) {
+                return direct.map((order, index) => normalizeFixtureOrder(order, `e2e-my-order-${index + 1}`));
+            }
+            const allOrders = getE2EOrdersFixture();
+            if(!Array.isArray(allOrders) || !state.user?.email) return null;
+            const email = normalizeEmail(state.user.email);
+            return allOrders.filter((order) => normalizeEmail(order.email) === email);
+        };
 
         const ROLE_EMAILS = {
             admin: ['marco.tranquilli@dos.design'],
@@ -1803,6 +1848,17 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
 
         function syncMyOrders() {
             if(!state.authReady || !state.user?.email || state.subs.myOrders) return;
+            if(isLocalE2E) {
+                state.myOrders = (getE2EMyOrdersFixture() || [])
+                    .sort((a, b) => {
+                        const aTime = a?.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
+                        const bTime = b?.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
+                        return bTime - aTime;
+                    });
+                renderMyOrderStatus();
+                state.subs.myOrders = () => {};
+                return;
+            }
             const renderOrdersLoadError = () => {
                 state.subs.myOrders = null;
                 const el = document.getElementById('my-order-status');
@@ -2161,37 +2217,10 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(!state.authReady) return;
             if(state.subs.orders) return;
             const now = new Date(); now.setHours(0,0,0,0);
-            const renderOrdersLoadError = (err) => {
-                console.warn('sync orders failed', err);
-                if(state.ordersToday.length > 0) return;
-                resetOrdersSubscription();
-                state.ordersRawToday = [];
-                state.ordersToday = [];
-                document.getElementById('grand-total-display').textContent = formatCurrency(0);
-                const listEl = document.getElementById('all-orders-list');
-                const message = 'Impossibile caricare il riepilogo ordini. Verifica permessi Firestore.';
-                if(listEl) {
-                    listEl.innerHTML = `<div class="card p-6 rounded-3xl text-center text-red-500 font-bold">${esc(message)}</div>`;
-                }
-                const wrap = document.getElementById('orders-payments-list');
-                if(wrap) {
-                    wrap.classList.remove('hidden');
-                    wrap.style.display = 'block';
-                    wrap.innerHTML = `<div class="bg-white p-4 rounded-2xl border border-red-100 text-[11px] text-red-500 font-bold">${esc(message)}</div>`;
-                }
-                const productsEl = document.getElementById('orders-summary-products');
-                if(productsEl) productsEl.innerHTML = `<p class="text-red-500 font-bold">${esc(message)}</p>`;
-                const allergiesEl = document.getElementById('orders-summary-allergies');
-                if(allergiesEl) allergiesEl.innerHTML = `<p class="text-red-500 font-bold">${esc(message)}</p>`;
-                const countEl = document.getElementById('orders-summary-count');
-                if(countEl) countEl.textContent = '0 ordini · 0 pezzi';
-                renderOrdersKPIs();
-                renderDailySummaryInline();
-            };
-            state.subs.orders = onSnapshot(query(ordersCol, orderBy("createdAt", "desc")), snap => {
+            const applyOrdersSnapshot = (orders) => {
                 let totalG = 0;
-                const rawToday = snap.docs
-                    .map(d => ({id: d.id, ...d.data()}))
+                const rawToday = (orders || [])
+                    .map((order, index) => normalizeFixtureOrder(order, `order-${index + 1}`))
                     .filter(o => o.createdAt && o.createdAt.toDate() >= now);
                 state.ordersRawToday = rawToday;
                 state.ordersToday = rawToday.filter(isValidOrder);
@@ -2246,6 +2275,41 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 renderDailySummaryInline();
                 updateInvalidOrdersUI();
                 autoVoidInvalidOrders();
+            };
+            if(isLocalE2E) {
+                applyOrdersSnapshot(getE2EOrdersFixture() || []);
+                state.subs.orders = () => {};
+                return;
+            }
+            const renderOrdersLoadError = (err) => {
+                console.warn('sync orders failed', err);
+                if(state.ordersToday.length > 0) return;
+                resetOrdersSubscription();
+                state.ordersRawToday = [];
+                state.ordersToday = [];
+                document.getElementById('grand-total-display').textContent = formatCurrency(0);
+                const listEl = document.getElementById('all-orders-list');
+                const message = 'Impossibile caricare il riepilogo ordini. Verifica permessi Firestore.';
+                if(listEl) {
+                    listEl.innerHTML = `<div class="card p-6 rounded-3xl text-center text-red-500 font-bold">${esc(message)}</div>`;
+                }
+                const wrap = document.getElementById('orders-payments-list');
+                if(wrap) {
+                    wrap.classList.remove('hidden');
+                    wrap.style.display = 'block';
+                    wrap.innerHTML = `<div class="bg-white p-4 rounded-2xl border border-red-100 text-[11px] text-red-500 font-bold">${esc(message)}</div>`;
+                }
+                const productsEl = document.getElementById('orders-summary-products');
+                if(productsEl) productsEl.innerHTML = `<p class="text-red-500 font-bold">${esc(message)}</p>`;
+                const allergiesEl = document.getElementById('orders-summary-allergies');
+                if(allergiesEl) allergiesEl.innerHTML = `<p class="text-red-500 font-bold">${esc(message)}</p>`;
+                const countEl = document.getElementById('orders-summary-count');
+                if(countEl) countEl.textContent = '0 ordini · 0 pezzi';
+                renderOrdersKPIs();
+                renderDailySummaryInline();
+            };
+            state.subs.orders = onSnapshot(query(ordersCol, orderBy("createdAt", "desc")), snap => {
+                applyOrdersSnapshot(snap.docs.map(d => ({id: d.id, ...d.data()})));
             }, renderOrdersLoadError);
         }
 
