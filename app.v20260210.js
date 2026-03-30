@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut, signInAnonymously, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addDoc, serverTimestamp, query, orderBy, getDocs, runTransaction, doc, where, limit, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addDoc, serverTimestamp, query, orderBy, getDocs, getDocsFromServer, runTransaction, doc, where, limit, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- DATABASE PRODOTTI COMPLETO ---
         const DIETS_CONFIG = { "carne/pesce": "🥩 Carne/Pesce", "vegetariano": "🧀 Vegetariano", "vegano": "🌱 Vegano" };
@@ -2340,49 +2340,64 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                     const recovered = await tryServerOrdersFallback();
                     if(!recovered && state.ordersToday.length === 0) renderOrdersLoadError(err);
                 };
+                const loadStaffOrdersFromFirestoreServer = async () => {
+                    const snap = await getDocsFromServer(staffOrdersQuery);
+                    applyOrdersData(snap.docs);
+                    return snap.docs.length;
+                };
                 const preloadClientOrders = async () => {
                     try {
-                        const snap = await getDocs(staffOrdersQuery);
-                        applyOrdersData(snap.docs);
+                        await loadStaffOrdersFromFirestoreServer();
                     } catch(err) {
-                        console.warn('staff client preload failed', err);
-                        await renderStaffClientError(err);
+                        console.warn('staff server preload failed', err);
+                        try {
+                            const snap = await getDocs(staffOrdersQuery);
+                            applyOrdersData(snap.docs);
+                        } catch(cacheErr) {
+                            console.warn('staff client preload failed', cacheErr);
+                            await renderStaffClientError(err);
+                        }
                     }
                 };
                 const loadStaffOrders = async (silent = false) => {
                     try {
-                        if(STAFF_ORDERS_ENDPOINT) {
-                            const orders = await fetchServerOrders();
-                            applyOrdersRecords(orders, 'server');
-                        } else {
-                            await loadStaffOrdersFromRest();
+                        const count = await loadStaffOrdersFromFirestoreServer();
+                        if(count === 0) {
+                            if(STAFF_ORDERS_ENDPOINT) {
+                                const orders = await fetchServerOrders();
+                                applyOrdersRecords(orders, 'server');
+                            } else {
+                                await loadStaffOrdersFromRest();
+                            }
                         }
                     } catch(err) {
-                        if(!silent) {
-                            console.warn('staff orders server load failed', err);
-                            if(state.ordersToday.length === 0) {
-                                // Let the Firestore client mirror recover before surfacing an error.
-                                window.setTimeout(() => {
-                                    if(state.ordersToday.length === 0) renderOrdersLoadError(err);
-                                }, 1200);
+                        try {
+                            if(STAFF_ORDERS_ENDPOINT) {
+                                const orders = await fetchServerOrders();
+                                applyOrdersRecords(orders, 'server');
+                            } else {
+                                await loadStaffOrdersFromRest();
                             }
-                        } else {
-                            console.warn('staff orders refresh failed', err);
+                        } catch(fallbackErr) {
+                            if(!silent) {
+                                console.warn('staff orders server load failed', fallbackErr);
+                                if(state.ordersToday.length === 0) {
+                                    window.setTimeout(() => {
+                                        if(state.ordersToday.length === 0) renderOrdersLoadError(fallbackErr);
+                                    }, 1200);
+                                }
+                            } else {
+                                console.warn('staff orders refresh failed', fallbackErr);
+                            }
                         }
                     }
                 };
                 void preloadClientOrders();
-                const clientUnsub = onSnapshot(
-                    staffOrdersQuery,
-                    (snap) => applyOrdersData(snap.docs),
-                    (err) => { void renderStaffClientError(err); }
-                );
-                void loadStaffOrders(false);
                 const timer = window.setInterval(() => { void loadStaffOrders(true); }, 30000);
                 state.subs.orders = () => {
                     window.clearInterval(timer);
-                    try { clientUnsub(); } catch(e) {}
                 };
+                void loadStaffOrders(false);
                 return;
             }
             const renderOrdersSnapshot = (snap) => applyOrdersData(snap.docs);
