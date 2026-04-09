@@ -215,6 +215,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(host.endsWith('github.io')) return '';
             return '/.netlify/functions/order_confirmation';
         })();
+        const SATISPAY_RUSSO_URL = 'http://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0';
         const STAFF_ORDERS_ENDPOINT = (() => {
             try {
                 const override = localStorage.getItem('dose_notify_base_url');
@@ -1766,6 +1767,16 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 text += `-------------------\n`;
             });
             navigator.clipboard.writeText(text).then(() => window.toast("Copiato!"));
+        };
+
+        window.copySatispayRussoLink = async () => {
+            try {
+                await navigator.clipboard.writeText(SATISPAY_RUSSO_URL);
+                window.toast("Link Satispay copiato");
+            } catch(e) {
+                console.warn('copy satispay link failed', e);
+                window.toast("Impossibile copiare il link");
+            }
         };
 
         // --- INTERNAL LOGIC ---
@@ -3732,6 +3743,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             'menu-audit-filter': (el) => window.setMenuAuditFilter(el.dataset.filter),
             'menu-audit-export': () => window.exportMenuAudit(),
             'copy-tech-contact': () => window.copyTechContact(),
+            'copy-satispay-link': () => window.copySatispayRussoLink(),
             'remove-from-cart': (el) => window.removeFromCart(Number(el.dataset.id)),
             'custom-vote': (el) => window.voteCreation(el.dataset.id),
             'custom-filter': (el) => window.setCustomFilter(el.dataset.filter),

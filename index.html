@@ -70,11 +70,14 @@
         <main>
             <section id="menu-view" class="view active">
                 <div class="card qr-payment-card p-5 rounded-3xl mb-4 flex items-center gap-4">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" class="w-20 h-20 rounded-2xl shadow-sm border border-gray-100" alt="QR pagamento Alimentari Russo">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=http://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" class="w-20 h-20 rounded-2xl shadow-sm border border-gray-100" alt="QR pagamento Alimentari Russo">
                     <div class="min-w-0">
                         <p class="font-black text-xs uppercase text-primary mb-1 tracking-widest">Pagamento Alimentari Russo</p>
-                        <p class="text-[11px] leading-tight text-gray-500 mb-2 italic">QR disponibile per tutti gli utenti.</p>
-                        <a href="https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" target="_blank" rel="noopener noreferrer" class="btn btn-ghost text-[10px] px-3 py-2">Apri Satispay</a>
+                        <p class="text-[11px] leading-tight text-gray-500 mb-2 italic">Disponibile sia via QR code sia tramite link diretto Satispay.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <a href="http://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" target="_blank" rel="noopener noreferrer" class="btn btn-ghost text-[10px] px-3 py-2">Apri Satispay</a>
+                            <button data-action="copy-satispay-link" class="btn btn-ghost text-[10px] px-3 py-2">Copia link</button>
+                        </div>
                     </div>
                 </div>
                 <div id="menu-admin-panel" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6 hidden">
@@ -224,7 +227,10 @@
                         <h2 class="text-2xl font-black tracking-tighter uppercase section-title">Fridge</h2>
                         <p class="text-[11px] text-gray-500 italic">Acquista prodotti gastronomici in autonomia.</p>
                     </div>
-                    <a href="https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" target="_blank" rel="noopener noreferrer" class="btn btn-ghost text-[10px] px-4 py-2">Apri Satispay</a>
+                    <div class="flex flex-wrap gap-2">
+                        <a href="http://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" target="_blank" rel="noopener noreferrer" class="btn btn-ghost text-[10px] px-4 py-2">Apri Satispay</a>
+                        <button data-action="copy-satispay-link" class="btn btn-ghost text-[10px] px-4 py-2">Copia link</button>
+                    </div>
                 </div>
 
                 <div class="card p-5 rounded-3xl mb-6">
@@ -376,11 +382,14 @@
             <section id="cart-view" class="view">
                 <h2 class="text-2xl font-black mb-6 tracking-tighter section-title">Riepilogo Ordine</h2>
                 <div class="card qr-payment-card p-5 rounded-3xl mb-4 flex items-center gap-4">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" class="w-20 h-20 rounded-2xl shadow-sm border border-gray-100" alt="QR pagamento Alimentari Russo">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=http://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" class="w-20 h-20 rounded-2xl shadow-sm border border-gray-100" alt="QR pagamento Alimentari Russo">
                     <div class="min-w-0">
                         <p class="font-black text-xs uppercase text-primary mb-1 tracking-widest">Pagamento Alimentari Russo</p>
-                        <p class="text-[11px] leading-tight text-gray-500 mb-2 italic">QR disponibile per tutti gli utenti.</p>
-                        <a href="https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" target="_blank" rel="noopener noreferrer" class="btn btn-ghost text-[10px] px-3 py-2">Apri Satispay</a>
+                        <p class="text-[11px] leading-tight text-gray-500 mb-2 italic">Disponibile sia via QR code sia tramite link diretto Satispay.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <a href="http://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" target="_blank" rel="noopener noreferrer" class="btn btn-ghost text-[10px] px-3 py-2">Apri Satispay</a>
+                            <button data-action="copy-satispay-link" class="btn btn-ghost text-[10px] px-3 py-2">Copia link</button>
+                        </div>
                     </div>
                 </div>
                 <div id="cart-content-wrapper" class="card p-6 rounded-[2rem] mb-4">
@@ -501,11 +510,14 @@
                  </div>
 
                  <div class="card p-6 rounded-3xl mb-8 flex items-center gap-5">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" class="w-24 h-24 rounded-2xl shadow-sm border border-gray-100">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=http://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" class="w-24 h-24 rounded-2xl shadow-sm border border-gray-100">
                     <div>
                         <p class="font-black text-xs uppercase text-primary mb-1 tracking-widest">Saldo Alimentari Russo</p>
-                        <p class="text-[10px] leading-tight text-gray-500 mb-3 italic">Pagamento obbligatorio entro le 11:30.</p>
-                        <a href="https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" target="_blank" rel="noopener noreferrer" class="btn btn-ghost text-[10px] px-4 py-2">Apri Satispay</a>
+                        <p class="text-[10px] leading-tight text-gray-500 mb-3 italic">Pagamento obbligatorio entro le 11:30. Puoi usare QR code o link diretto Satispay.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <a href="http://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" target="_blank" rel="noopener noreferrer" class="btn btn-ghost text-[10px] px-4 py-2">Apri Satispay</a>
+                            <button data-action="copy-satispay-link" class="btn btn-ghost text-[10px] px-4 py-2">Copia link</button>
+                        </div>
                     </div>
                  </div>
 
@@ -859,7 +871,7 @@
     </div>
 
     <script type="module" src="sw-killer.js?v=20260210"></script>
-    <script type="module" src="app.v20260325.js?v=11"></script>
+    <script type="module" src="app.v20260325.js?v=12"></script>
 
 </body>
 </html>
