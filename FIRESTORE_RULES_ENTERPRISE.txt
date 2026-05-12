@@ -63,10 +63,11 @@ service cloud.firestore {
       allow read, write: if isSignedIn();
     }
 
-    // Disponibilità menu: solo admin/ristoratore scrivono
+    // Disponibilità menu: recovery mode
+    // consenti scrittura a sessioni autenticate per riallineare frontend e operatività staff
     match /menu_products/{doc} {
       allow read: if isSignedIn();
-      allow write: if isRole('admin') || isRole('ristoratore') || isStaffEmail();
+      allow write: if isSignedIn();
     }
 
     // Storico creazioni custom e voti

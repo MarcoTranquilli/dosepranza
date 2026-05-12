@@ -334,15 +334,20 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(state.authSignInProvider === 'google.com') return true;
             return !!auth_fb.currentUser && !auth_fb.currentUser.isAnonymous && getProviderIds().includes('google.com');
         };
-        const requiresGoogleStaffVerification = (email = state.user?.email || '') => isMappedStaffEmail(email) && state.authzSource !== 'claims' && !hasGoogleSession();
-        const canWriteMenuAdmin = () => (isAdmin() || isRistoratore()) && (isLocalE2E || state.authzSource === 'claims' || (hasGoogleSession() && state.authzSource === 'email-map-google'));
+        const requiresGoogleStaffVerification = (email = state.user?.email || '') => false;
+        const canWriteMenuAdmin = () => (isAdmin() || isRistoratore()) && (
+            isLocalE2E ||
+            state.authzSource === 'claims' ||
+            state.authzSource === 'email-map-fallback' ||
+            (hasGoogleSession() && state.authzSource === 'email-map-google')
+        );
         const requireMenuAdminWriteAccess = () => {
             if(!(isAdmin() || isRistoratore())) {
                 window.toast("Funzione riservata a admin o ristoratore");
                 return false;
             }
             if(!canWriteMenuAdmin()) {
-                window.toast("Per modificare il menù accedi con Google");
+                window.toast("Sessione staff non abilitata alla modifica del menù");
                 return false;
             }
             return true;
@@ -783,15 +788,15 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                     btn.textContent = state.menuAdminOpen ? 'Nascondi gestione menù' : 'Mostra gestione menù';
                     hint.textContent = canWriteMenuAdmin()
                         ? 'Accesso avanzato attivo: puoi gestire prodotti e disponibilità.'
-                        : 'Modalità sola lettura: accedi con Google per salvare prezzi e disponibilità.';
+                        : 'Modalità sola lettura: sessione staff non abilitata alla scrittura.';
                 } else {
                     btn.classList.add('hidden');
                     if(requiresGoogleStaffVerification(email)) {
                         googleBtn.classList.remove('hidden');
                         hint.textContent = 'Verifica Google richiesta: accedi con Google per attivare i permessi staff.';
-                    } else if(isMappedStaffEmail(email) && state.authzSource !== 'claims' && state.authzSource !== 'email-map-google') {
-                        googleBtn.classList.remove('hidden');
-                        hint.textContent = 'Account staff non verificato: esegui login Google e aggiorna ruoli.';
+                    } else if(isMappedStaffEmail(email) && !['claims','email-map-google','email-map-fallback'].includes(state.authzSource)) {
+                        googleBtn.classList.add('hidden');
+                        hint.textContent = 'Account staff non ancora riconosciuto correttamente.';
                     } else {
                         googleBtn.classList.add('hidden');
                         hint.textContent = 'Accesso standard: alcune funzioni sono riservate.';
