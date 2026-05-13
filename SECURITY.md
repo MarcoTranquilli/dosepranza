@@ -8,7 +8,7 @@
 
 ## Security Baseline
 
-- Hosting: GitHub Pages (`https://marcotranquilli.github.io/dosepranza/`)
+- Hosting: Netlify (`https://app-dosepranza.netlify.app`)
 - Auth: Firebase Authentication (Google + Anonymous enabled)
 - Authorization: Firestore Rules + role logic (custom claims with fallback email mapping)
 - Data protection: no secrets in client storage, no privileged operations without role checks

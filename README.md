@@ -4,9 +4,8 @@
 
 ## Produzione attiva
 
-- URL live: `https://marcotranquilli.github.io/dosepranza/`
-- Deploy: GitHub Pages (branch `main`)
-- Nota: le sezioni Netlify sotto sono legacy e non usate nel flusso corrente.
+- URL live: `https://app-dosepranza.netlify.app`
+- Deploy: Netlify
 
 ## Release Policy
 
