@@ -4,9 +4,8 @@
 
 ## Produzione attiva
 
-- URL live: `https://marcotranquilli.github.io/dosepranza/`
-- Deploy: GitHub Pages (branch `main`)
-- Nota: le sezioni Netlify sotto sono legacy e non usate nel flusso corrente.
+- URL live: `https://classy-kleicha-27d2a5.netlify.app`
+- Deploy: Netlify
 
 ## Release Policy
 
@@ -102,7 +101,7 @@ Per inviare email automatiche agli admin dopo la generazione del report:
    - `SENDGRID_API_KEY`
    - `REPORT_EMAIL_TO` (es. admin@azienda.com)
    - `REPORT_EMAIL_FROM` (es. noreply@azienda.com)
-   - `REPORT_BASE_URL` (es. https://app-dosepranza.netlify.app)
+   - `REPORT_BASE_URL` (es. https://classy-kleicha-27d2a5.netlify.app)
 
 2. Il build invierà un’email con link a `/reports` e al PDF.
 
