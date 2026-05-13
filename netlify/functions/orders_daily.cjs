@@ -13,7 +13,7 @@ function json(statusCode, payload, origin) {
 function resolveAllowedOrigin(event) {
   const requestOrigin = event.headers?.origin || event.headers?.Origin || '';
   const allowed = (process.env.ORDER_CONFIRM_ALLOWED_ORIGINS || [
-    'https://app-dosepranza.netlify.app',
+    'https://classy-kleicha-27d2a5.netlify.app',
     'https://marcotranquilli.github.io',
   ].join(','))
     .split(',')
