@@ -42,8 +42,13 @@
 
 
 [build]
-  publish = "."
   command = "bash scripts/netlify_publish_pdf.sh"
+  publish = "dist"
 
 [functions]
   directory = "netlify/functions"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
