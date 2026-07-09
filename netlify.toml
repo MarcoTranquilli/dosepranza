@@ -13,6 +13,21 @@
     Cache-Control = "no-cache, no-store, must-revalidate"
 
 [[headers]]
+  for = "/fornitori.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+[[headers]]
+  for = "/pagnottella.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+[[headers]]
+  for = "/pagnottella.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+[[headers]]
   for = "/app*.js"
   [headers.values]
     Cache-Control = "no-cache, no-store, must-revalidate"
@@ -47,6 +62,26 @@
 
 [functions]
   directory = "netlify/functions"
+
+[[redirects]]
+  from = "/"
+  to = "/fornitori.html"
+  status = 200
+
+[[redirects]]
+  from = "/fornitori"
+  to = "/fornitori.html"
+  status = 200
+
+[[redirects]]
+  from = "/pagnottella"
+  to = "/pagnottella.html"
+  status = 200
+
+[[redirects]]
+  from = "/app"
+  to = "/index.html"
+  status = 200
 
 [[redirects]]
   from = "/*"
