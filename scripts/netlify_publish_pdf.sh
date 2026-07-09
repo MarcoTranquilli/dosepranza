@@ -11,6 +11,9 @@ mkdir -p "$DIST_DIR"
 
 # 2. Copia i file fondamentali nella cartella dist
 cp index.html "$DIST_DIR/"
+cp fornitori.html "$DIST_DIR/" 2>/dev/null || echo "No suppliers landing found"
+cp pagnottella.html "$DIST_DIR/" 2>/dev/null || echo "No Pagnottella page found"
+cp pagnottella.js "$DIST_DIR/" 2>/dev/null || echo "No Pagnottella script found"
 cp app.js "$DIST_DIR/" 2>/dev/null || true
 cp app.v20260210.js "$DIST_DIR/" 2>/dev/null || true
 cp app.v20260325.js "$DIST_DIR/" 2>/dev/null || cp app.js "$DIST_DIR/index.js"
