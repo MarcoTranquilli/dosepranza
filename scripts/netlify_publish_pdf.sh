@@ -20,6 +20,7 @@ cp tailwind-config.js "$DIST_DIR/" 2>/dev/null || echo "No Tailwind config found
 cp sw-killer.js "$DIST_DIR/" 2>/dev/null || echo "No service worker helper found"
 cp favicondosepranza.png "$DIST_DIR/" 2>/dev/null || echo "No favicon found"
 cp -R login "$DIST_DIR/" 2>/dev/null || echo "No login folder"
+cp -R assets "$DIST_DIR/" 2>/dev/null || echo "No assets folder"
 cp -R russo "$DIST_DIR/" 2>/dev/null || echo "No russo folder"
 cp -R pagnottella "$DIST_DIR/" 2>/dev/null || echo "No pagnottella folder"
 cp -R reports "$DIST_DIR/" 2>/dev/null || echo "No reports folder"
