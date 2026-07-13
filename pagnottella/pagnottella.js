@@ -2,6 +2,16 @@ let DATA = null;
 let PRODUCTS = [];
 let CATS = [];
 const state = { screen:'landing', cat:'all', filter:'', query:'', sort:'recommended', cart:{}, current:null, option:null };
+const authState = { loading:false, user:null };
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCQJsNbgaR89gF_1vLe6H4DPboOhQvm9nI",
+  authDomain: "app-ordini-pranzo-alimentari.firebaseapp.com",
+  projectId: "app-ordini-pranzo-alimentari",
+  storageBucket: "app-ordini-pranzo-alimentari.appspot.com",
+  messagingSenderId: "553169964686",
+  appId: "1:553169964686:web:7f8ca6f32a301949e4c3df"
+};
+let firebaseAuthPromise = null;
 const byId = id => document.getElementById(id);
 const money = v => '€' + (Math.round(v*100)/100).toFixed(2).replace('.', ',');
 const esc = s => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
@@ -28,6 +38,7 @@ const getStoredDoseUser = () => {
   }
 };
 const authenticatedCustomerName = () => getStoredDoseUser()?.name?.trim() || '';
+const authenticatedDoseUser = () => getStoredDoseUser() || null;
 const companyCopy = () => DATA?.orderContext?.company || 'DOS Design S.p.a.';
 const deliverySiteCopy = () => DATA?.orderContext?.deliverySite || 'Via Arno, 52, 00198 Roma RM';
 const discountedPrice = v => Math.round(v * (1 - discountRate()) * 100) / 100;
@@ -41,9 +52,10 @@ async function bootstrap(){
   renderTabs();
   renderFilters();
   const params = new URLSearchParams(location.search);
-  if(params.get('store') === 'pagnottella') openShop(false);
+  if(params.get('store') === 'pagnottella' && ensureAuthenticated()) openShop(false);
   renderCatalog();
   renderCart();
+  syncAuthGate();
   updateAdmin();
 }
 
@@ -97,6 +109,8 @@ function hydrateStatic(){
 }
 
 function bind(){
+  const googleBtn = byId('authGateGoogle');
+  if(googleBtn) googleBtn.addEventListener('click', signInWithGoogleGate);
   byId('search').addEventListener('input', e => { state.query = e.target.value.trim().toLowerCase(); renderCatalog(); });
   byId('sort').addEventListener('change', e => { state.sort = e.target.value; renderCatalog(); });
   ['customer','notes'].forEach(id => {
@@ -107,6 +121,7 @@ function bind(){
 }
 
 function openShop(save=true){
+  if(!ensureAuthenticated()) return;
   state.screen='shop';
   sessionStorage.setItem('dosepranza_store','pagnottella');
   byId('landing').classList.add('hidden');
@@ -124,6 +139,84 @@ function backLanding(){
 function renderTabs(){
   byId('tabs').innerHTML = CATS.map(c => `<button class="tab" data-cat="${c.id}" onclick="setCat('${c.id}')">${esc(c.label)}</button>`).join('');
   updateTabs();
+}
+function ensureAuthenticated(){
+  const user = authenticatedDoseUser();
+  if(user?.email && user?.name){
+    authState.user = user;
+    syncAuthGate();
+    return true;
+  }
+  syncAuthGate(true);
+  return false;
+}
+function syncAuthGate(forceLocked=false){
+  const gate = byId('authGate');
+  const status = byId('authGateStatus');
+  const landing = byId('landing');
+  const user = authenticatedDoseUser();
+  authState.user = user;
+  if(!gate || !status || !landing) return;
+  const resolved = !!(user?.email && user?.name);
+  landing.classList.toggle('authResolved', resolved);
+  landing.classList.toggle('authLocked', forceLocked || !resolved);
+  if(resolved){
+    status.textContent = `Riconosciuto come ${user.name} · ${user.email}`;
+  }else if(location.protocol === 'file:'){
+    status.textContent = 'Preview locale: per simulare l’accesso usa una sessione dose_user già presente.';
+  }else{
+    status.textContent = authState.loading ? 'Accesso Google in corso...' : 'Nessuna sessione Google attiva.';
+  }
+}
+async function loadFirebaseAuth(){
+  if(firebaseAuthPromise) return firebaseAuthPromise;
+  firebaseAuthPromise = (async () => {
+    const [{ initializeApp }, { getAuth, GoogleAuthProvider, signInWithPopup, browserLocalPersistence, setPersistence }] = await Promise.all([
+      import("https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"),
+      import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js")
+    ]);
+    const app = initializeApp(FIREBASE_CONFIG, 'dosepranza-pagnottella-preview');
+    const auth = getAuth(app);
+    await setPersistence(auth, browserLocalPersistence);
+    return { auth, GoogleAuthProvider, signInWithPopup };
+  })();
+  return firebaseAuthPromise;
+}
+async function signInWithGoogleGate(){
+  if(location.protocol === 'file:'){
+    syncAuthGate(true);
+    return;
+  }
+  authState.loading = true;
+  syncAuthGate(true);
+  try{
+    const { auth, GoogleAuthProvider, signInWithPopup } = await loadFirebaseAuth();
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+    const result = await signInWithPopup(auth, provider);
+    const user = result?.user;
+    const payload = {
+      name: user?.displayName || user?.email?.split('@')[0] || 'Utente DOS',
+      email: user?.email || ''
+    };
+    if(payload.email){
+      localStorage.setItem('dose_user', JSON.stringify(payload));
+      authState.user = payload;
+      hydrateStatic();
+      renderCart();
+      syncAuthGate();
+      const params = new URLSearchParams(location.search);
+      if(params.get('store') === 'pagnottella') openShop(false);
+    }else{
+      byId('authGateStatus').textContent = 'Login Google completato ma email non disponibile.';
+    }
+  }catch(err){
+    console.warn('Pagnottella Google gate failed', err);
+    byId('authGateStatus').textContent = 'Accesso Google non riuscito. Riprova.';
+  }finally{
+    authState.loading = false;
+    syncAuthGate(!authenticatedDoseUser());
+  }
 }
 function updateTabs(){ document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.cat === state.cat)); }
 function renderFilters(){

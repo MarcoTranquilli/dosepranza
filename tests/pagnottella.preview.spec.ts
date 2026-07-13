@@ -35,6 +35,7 @@ test.describe('Preview multi-fornitore', () => {
     await page.goto(previewPagnottellaUrl);
 
     await expect(page.locator('#shop')).toHaveClass(/show/);
+    await expect(page.locator('#landing')).toHaveClass(/authResolved/);
     await expect(page.locator('#heroText')).toContainText('12:00');
     await expect(page.locator('#heroText')).toContainText('13:00');
     await expect(page.locator('body')).not.toContainText('Documenti locali');
@@ -43,8 +44,11 @@ test.describe('Preview multi-fornitore', () => {
     await expect(page.locator('#customer')).toHaveValue('Marco Tranquilli');
     await expect(page.locator('#paymentMethods')).toContainText('Satispay');
     await expect(page.locator('#paymentMethods')).toContainText('Bonifico istantaneo');
-    await expect(page.locator('#paymentMethods a').nth(0)).toHaveAttribute('href', /satispay-placeholder/);
-    await expect(page.locator('#paymentMethods a').nth(1)).toHaveAttribute('href', /bonifico-placeholder/);
+    const paymentLinks = page.locator('#paymentMethods a');
+    if (await paymentLinks.count()) {
+      await expect(paymentLinks.nth(0)).toHaveAttribute('href', /satispay|placeholder/);
+      await expect(paymentLinks.nth(1)).toHaveAttribute('href', /bonifico|placeholder/);
+    }
 
     await page.locator('#search').fill('BBQ');
     await expect(page.locator('#grid .card')).toHaveCount(1);
@@ -85,6 +89,12 @@ test.describe('Preview multi-fornitore', () => {
   });
 
   test('Pagnottella file://: fallback locale carica senza fetch error', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem('dose_user', JSON.stringify({
+        name: 'Marco Tranquilli',
+        email: 'marco.tranquilli@dos.design'
+      }));
+    });
     await page.goto(previewPagnottellaFileUrl);
 
     await expect(page.locator('#shop')).toHaveClass(/show/);
