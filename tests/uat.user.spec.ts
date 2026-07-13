@@ -1,10 +1,11 @@
 import { test, expect } from '@playwright/test';
 import { seedCoreOrders, seedUserOrders } from './helpers/e2e-fixtures';
+import { legacyRussoAppUrl } from './helpers/routes';
 
 test('UAT Utente standard: ordine + frige WIP', async ({ page }) => {
   await seedCoreOrders(page);
   await seedUserOrders(page);
-  await page.goto('/');
+  await page.goto(legacyRussoAppUrl);
 
   await page.click('#btn-menu');
   await page.click('[data-action="add-std"]');

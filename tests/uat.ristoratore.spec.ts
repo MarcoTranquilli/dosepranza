@@ -1,9 +1,10 @@
 import { test, expect } from '@playwright/test';
 import { seedCoreOrders } from './helpers/e2e-fixtures';
+import { legacyRussoAppUrl } from './helpers/routes';
 
 test('UAT Ristoratore: gestione frige + riconciliazione', async ({ page }) => {
   await seedCoreOrders(page);
-  await page.goto('/');
+  await page.goto(legacyRussoAppUrl);
 
   await page.click('#btn-frige');
   const price = page.locator('[data-action="frige-update-price"]').first();

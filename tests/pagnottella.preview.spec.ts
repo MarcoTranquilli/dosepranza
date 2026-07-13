@@ -1,10 +1,14 @@
 import { test, expect } from '@playwright/test';
-
-const FILE_PREVIEW = 'file:///Users/marcotranquilli/Documents/dosepranza-preview/pagnottella/index.html?store=pagnottella';
+import {
+  previewHubUrl,
+  previewRussoUrl,
+  previewPagnottellaUrl,
+  previewPagnottellaFileUrl
+} from './helpers/routes';
 
 test.describe('Preview multi-fornitore', () => {
-  test('Hub: espone entrambi i fornitori con link separati', async ({ page, baseURL }) => {
-    await page.goto(baseURL || 'http://127.0.0.1:4174');
+  test('Hub: espone entrambi i fornitori con link separati', async ({ page }) => {
+    await page.goto(previewHubUrl);
 
     await expect(page.getByRole('heading', { name: /evoluzione multi-fornitore/i })).toBeVisible();
     await expect(page.getByRole('link', { name: /apri preview russo/i })).toBeVisible();
@@ -12,8 +16,8 @@ test.describe('Preview multi-fornitore', () => {
     await expect(page.getByText(/nessun impatto sul live/i)).toBeVisible();
   });
 
-  test('Russo: la preview operativa resta accessibile', async ({ page, baseURL }) => {
-    await page.goto(`${baseURL || 'http://127.0.0.1:4174'}/russo/`);
+  test('Russo: la preview operativa resta accessibile', async ({ page }) => {
+    await page.goto(previewRussoUrl);
 
     await expect(page.locator('#btn-menu')).toBeVisible();
     await expect(page.locator('#btn-cart')).toBeVisible();
@@ -21,8 +25,8 @@ test.describe('Preview multi-fornitore', () => {
     await expect(page.getByRole('link', { name: /apri satispay/i })).toHaveAttribute('href', /satispay/i);
   });
 
-  test('Pagnottella: catalogo, sconto, carrello e riepilogo WhatsApp', async ({ page, baseURL }) => {
-    await page.goto(`${baseURL || 'http://127.0.0.1:4174'}/pagnottella/?store=pagnottella`);
+  test('Pagnottella: catalogo, sconto, carrello e riepilogo WhatsApp', async ({ page }) => {
+    await page.goto(previewPagnottellaUrl);
 
     await expect(page.locator('#shop')).toHaveClass(/show/);
     await expect(page.locator('#heroText')).toContainText('12:00');
@@ -59,7 +63,7 @@ test.describe('Preview multi-fornitore', () => {
   });
 
   test('Pagnottella file://: fallback locale carica senza fetch error', async ({ page }) => {
-    await page.goto(FILE_PREVIEW);
+    await page.goto(previewPagnottellaFileUrl);
 
     await expect(page.locator('#shop')).toHaveClass(/show/);
     await expect(page.locator('#sectionTitle')).toContainText('Tutto il menu');

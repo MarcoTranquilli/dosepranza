@@ -1,9 +1,10 @@
 import { test, expect } from '@playwright/test';
 import { seedCoreOrders } from './helpers/e2e-fixtures';
+import { legacyRussoAppUrl } from './helpers/routes';
 
 test('UAT Admin: analytics + export', async ({ page }) => {
   await seedCoreOrders(page);
-  await page.goto('/');
+  await page.goto(legacyRussoAppUrl);
 
   await page.click('#btn-history');
   await expect(page.locator('#orders-summary-count')).toHaveText('2 ordini · 6 pezzi');
