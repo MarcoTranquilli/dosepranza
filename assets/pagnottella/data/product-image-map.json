@@ -1,0 +1,98 @@
+[
+  {
+    "name": "Saporito",
+    "cat": "panini-carne",
+    "filename": "panino_saporito.jpg",
+    "source": "complete",
+    "confidence": "alta",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/416fa1ae-6eef-441f-9031-1bb2374d295f/saporito.jpg"
+  },
+  {
+    "name": "Tartare",
+    "cat": "panini-carne",
+    "filename": "panino_tartare.jpg",
+    "source": "complete",
+    "confidence": "alta",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1708349693859-NY2MW1I5AZGLNHSEAUFQ/tartare.jpg"
+  },
+  {
+    "name": "Toscanaccio",
+    "cat": "panini-carne",
+    "filename": "panino_toscanaccio.jpg",
+    "source": "complete",
+    "confidence": "alta",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1708349844523-PM8UKIU0C2V7OSB5J32P/toscanaccio.jpg"
+  },
+  {
+    "name": "Messicano",
+    "cat": "panini-pesce",
+    "filename": "panino_messicano.jpg",
+    "source": "complete",
+    "confidence": "media",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337627814-2Y536XYYBYCYKGYYMP9M/DSCF7425.jpg"
+  },
+  {
+    "name": "Baccala",
+    "cat": "panini-pesce",
+    "filename": "panino_baccala.jpg",
+    "source": "complete",
+    "confidence": "alta",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913550178-57I6DBH7IDA5ZAKY2YKO/baccala_panino.jpg"
+  },
+  {
+    "name": "Burrata",
+    "cat": "panini-veg",
+    "filename": "panino_burrata.jpg",
+    "source": "complete",
+    "confidence": "alta",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337806242-QRTKSCRHFYN3AQS4L821/DSCF8503.jpg"
+  },
+  {
+    "name": "Baccala",
+    "cat": "insalate-pesce",
+    "filename": "insalata_baccala.jpg",
+    "source": "complete",
+    "confidence": "alta",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913547258-U44KCIU4E8WMLA1A6W8Z/baccala_insalata.jpg"
+  },
+  {
+    "name": "Cefalu",
+    "cat": "insalate-pesce",
+    "filename": "insalata_cefalu.jpg",
+    "source": "complete",
+    "confidence": "alta",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341646194-RUG4C2J6ZQBUI485YMKR/DSCF9302.jpg"
+  },
+  {
+    "name": "Salentina",
+    "cat": "insalate-pesce",
+    "filename": "insalata_salentina.jpg",
+    "source": "complete",
+    "confidence": "alta",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341641448-ERIUQ6ZDTVGB0K9D0OEJ/DSCF3962.jpg"
+  },
+  {
+    "name": "Trapanese",
+    "cat": "insalate-pesce",
+    "filename": "insalata_trapanese.jpg",
+    "source": "complete",
+    "confidence": "alta",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341597598-9O2HBC5LSQNYBC3SG687/trapanese.jpg"
+  },
+  {
+    "name": "Reginella",
+    "cat": "insalate-veg",
+    "filename": "insalata_reginella.jpg",
+    "source": "complete",
+    "confidence": "alta",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341540039-MUG7YLZM6E4THD2RNKXH/DSCF7331.jpg"
+  },
+  {
+    "name": "Apollo",
+    "cat": "speciali",
+    "filename": "insalata_apollo.jpg",
+    "source": "associated",
+    "confidence": "alta",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913541674-LEKZU93QZGKVQJ2LGHN2/apollo_3.jpg"
+  }
+]

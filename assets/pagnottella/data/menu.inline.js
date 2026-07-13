@@ -10,7 +10,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Panino",
         "Proteico"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-carne-bbq-1",
@@ -23,7 +29,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Panino",
         "Proteico",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-carne-brontolo-2",
@@ -35,7 +47,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Panino",
         "Frutta secca"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-carne-cipollini-3",
@@ -46,7 +64,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "img": "../assets/pagnottella/images/optimized/saporito.webp",
       "tags": [
         "Panino"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-carne-contadino-4",
@@ -57,7 +81,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "img": "../assets/pagnottella/images/optimized/saporito.webp",
       "tags": [
         "Panino"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-carne-delicato-5",
@@ -69,7 +99,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Panino",
         "Proteico"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-carne-delizioso-6",
@@ -81,7 +117,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Panino",
         "Proteico"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-carne-dolcetto-7",
@@ -92,7 +134,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "img": "../assets/pagnottella/images/optimized/saporito.webp",
       "tags": [
         "Panino"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-carne-emiliano-8",
@@ -104,7 +152,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Panino",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-carne-fumino-9",
@@ -116,7 +170,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Panino",
         "Proteico"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-carne-goloso-10",
@@ -129,7 +189,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Panino",
         "Frutta secca",
         "Top"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-carne-gustoso-11",
@@ -140,7 +206,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "img": "../assets/pagnottella/images/optimized/saporito.webp",
       "tags": [
         "Panino"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-carne-marchigiano-12",
@@ -151,7 +223,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "img": "../assets/pagnottella/images/optimized/saporito.webp",
       "tags": [
         "Panino"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-carne-montanaro-13",
@@ -162,7 +240,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "img": "../assets/pagnottella/images/optimized/saporito.webp",
       "tags": [
         "Panino"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-carne-newyorkese-14",
@@ -174,7 +258,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Panino",
         "Proteico"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-carne-norcino-15",
@@ -186,7 +276,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Panino",
         "Frutta secca"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-carne-oregan-16",
@@ -197,7 +293,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "img": "../assets/pagnottella/images/optimized/saporito.webp",
       "tags": [
         "Panino"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-carne-paesano-17",
@@ -208,7 +310,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "img": "../assets/pagnottella/images/optimized/saporito.webp",
       "tags": [
         "Panino"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-carne-pagnottella-18",
@@ -220,7 +328,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Panino",
         "Top"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-carne-quirino-19",
@@ -232,7 +346,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Panino",
         "Proteico"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-carne-rucolino-20",
@@ -245,7 +365,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Panino",
         "Proteico",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-carne-saporito-21",
@@ -253,11 +379,21 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "mortadella, crema al tartufo, mozzarella, insalata",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": true,
+        "source": "complete",
+        "confidence": "alta",
+        "label": "Foto prodotto",
+        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/416fa1ae-6eef-441f-9031-1bb2374d295f/saporito.jpg",
+        "filename": "panino_saporito.jpg",
+        "basis": "filename + ingredienti",
+        "notes": "Panino con mortadella/crema scura, mozzarella e insalata; coerente con Saporito."
+      }
     },
     {
       "id": "panini-carne-soprana-22",
@@ -268,7 +404,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "img": "../assets/pagnottella/images/optimized/saporito.webp",
       "tags": [
         "Panino"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-carne-spock-23",
@@ -279,7 +421,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "img": "../assets/pagnottella/images/optimized/saporito.webp",
       "tags": [
         "Panino"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-carne-tartare-24",
@@ -287,13 +435,23 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 10,
       "desc": "tartare di manzo al coltello condita con capperi, senape al miele, tabasco, pepe, sale, olio e cavolo rosso, insalata",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/tartare.webp",
+      "img": "../assets/pagnottella/images/products/panino_tartare.jpg",
       "tags": [
         "Panino",
         "Proteico",
         "Fresco",
         "Top"
-      ]
+      ],
+      "imageMeta": {
+        "specific": true,
+        "source": "complete",
+        "confidence": "alta",
+        "label": "Foto prodotto",
+        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1708349693859-NY2MW1I5AZGLNHSEAUFQ/tartare.jpg",
+        "filename": "panino_tartare.jpg",
+        "basis": "filename + ingredienti",
+        "notes": "Panino con tartare di manzo; coerente con Tartare panino."
+      }
     },
     {
       "id": "panini-carne-tirolo-25",
@@ -305,7 +463,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Panino",
         "Frutta secca"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-carne-tonnato-26",
@@ -317,7 +481,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Panino",
         "Proteico"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-carne-toscanaccio-27",
@@ -325,11 +495,21 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 9,
       "desc": "finocchiona IGP, hummus di ceci, friarielli sott'olio",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/toscanaccio.webp",
+      "img": "../assets/pagnottella/images/products/panino_toscanaccio.jpg",
       "tags": [
         "Panino",
         "Top"
-      ]
+      ],
+      "imageMeta": {
+        "specific": true,
+        "source": "complete",
+        "confidence": "alta",
+        "label": "Foto prodotto",
+        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1708349844523-PM8UKIU0C2V7OSB5J32P/toscanaccio.jpg",
+        "filename": "panino_toscanaccio.jpg",
+        "basis": "filename + ingredienti",
+        "notes": "Panino con finocchiona, hummus e friarielli; coerente con Toscanaccio."
+      }
     },
     {
       "id": "panini-carne-toscano-28",
@@ -341,7 +521,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Panino",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-carne-transalpino-29",
@@ -354,7 +540,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Panino",
         "Proteico",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-carne-trentino-30",
@@ -365,7 +557,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "img": "../assets/pagnottella/images/optimized/saporito.webp",
       "tags": [
         "Panino"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-carne-trevigiano-31",
@@ -377,7 +575,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Panino",
         "Frutta secca"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-carne-valtella-32",
@@ -390,7 +594,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Panino",
         "Proteico",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-carne-violotto-33",
@@ -401,7 +611,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "img": "../assets/pagnottella/images/optimized/saporito.webp",
       "tags": [
         "Panino"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-pesce-cefalu-0",
@@ -414,7 +630,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Panino",
         "Proteico",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-pesce-fumarello-1",
@@ -426,7 +648,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Panino",
         "Proteico"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-pesce-lampedusa-2",
@@ -439,7 +667,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Panino",
         "Proteico",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-pesce-maestrale-3",
@@ -451,7 +685,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Panino",
         "Proteico"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-pesce-marinaro-4",
@@ -462,7 +702,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "img": "../assets/pagnottella/images/optimized/baccala_panino.webp",
       "tags": [
         "Panino"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-pesce-mediterraneo-5",
@@ -474,7 +720,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Panino",
         "Proteico"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-pesce-messicano-6",
@@ -482,12 +734,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "tonno, pomodoro, guacamole, jalapenos, insalata",
       "cat": "panini-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_panino.webp",
+      "img": "../assets/pagnottella/images/products/panino_messicano.jpg",
       "tags": [
         "Panino",
         "Proteico",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": true,
+        "source": "complete",
+        "confidence": "media",
+        "label": "Foto associata",
+        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337627814-2Y536XYYBYCYKGYYMP9M/DSCF7425.jpg",
+        "filename": "panino_messicano.jpg",
+        "basis": "attribuzione visiva ingredienti",
+        "notes": "Panino con guacamole, tonno, jalapeno/cetriolini e insalata; attribuzione visiva a Messicano."
+      }
     },
     {
       "id": "panini-pesce-norvegese-7",
@@ -499,7 +761,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Panino",
         "Proteico"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-pesce-pantelleria-8",
@@ -512,7 +780,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Panino",
         "Proteico",
         "Frutta secca"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-pesce-parigino-9",
@@ -525,7 +799,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Panino",
         "Proteico",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-pesce-baccala-10",
@@ -533,12 +813,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 10,
       "desc": "baccala mantecato, pomodori secchi, olive, origano",
       "cat": "panini-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_panino.webp",
+      "img": "../assets/pagnottella/images/products/panino_baccala.jpg",
       "tags": [
         "Panino",
         "Proteico",
         "Top"
-      ]
+      ],
+      "imageMeta": {
+        "specific": true,
+        "source": "complete",
+        "confidence": "alta",
+        "label": "Foto prodotto",
+        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913550178-57I6DBH7IDA5ZAKY2YKO/baccala_panino.jpg",
+        "filename": "panino_baccala.jpg",
+        "basis": "filename + ingredienti",
+        "notes": "Panino con baccala mantecato, pomodori secchi, olive, origano; coerente con Baccala panino."
+      }
     },
     {
       "id": "panini-pesce-san-jose-11",
@@ -550,7 +840,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Panino",
         "Proteico"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-pesce-scirocco-12",
@@ -563,7 +859,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Panino",
         "Proteico",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-pesce-verduzzo-13",
@@ -576,7 +878,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Panino",
         "Proteico",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-veg-burrata-0",
@@ -584,13 +892,23 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 9,
       "desc": "burrata, pomodori secchi, pinoli, rucola",
       "cat": "panini-veg",
-      "img": "../assets/pagnottella/images/optimized/toscanaccio.webp",
+      "img": "../assets/pagnottella/images/products/panino_burrata.jpg",
       "tags": [
         "Panino",
         "Vegetariano",
         "Fresco",
         "Frutta secca"
-      ]
+      ],
+      "imageMeta": {
+        "specific": true,
+        "source": "complete",
+        "confidence": "alta",
+        "label": "Foto prodotto",
+        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337806242-QRTKSCRHFYN3AQS4L821/DSCF8503.jpg",
+        "filename": "panino_burrata.jpg",
+        "basis": "ingredienti",
+        "notes": "Panino con burrata, pomodori secchi, pinoli, rucola; coerente con Burrata panino."
+      }
     },
     {
       "id": "panini-veg-campagnolo-1",
@@ -602,7 +920,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Panino",
         "Vegetariano"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-veg-caprese-2",
@@ -616,7 +940,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Vegetariano",
         "Fresco",
         "Leggero"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-veg-ortolino-3",
@@ -629,7 +959,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Panino",
         "Vegetariano",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-veg-spaccanapoli-4",
@@ -641,7 +977,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Panino",
         "Vegetariano"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-veg-tricolore-5",
@@ -653,7 +995,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Panino",
         "Vegetariano"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "panini-veg-veg-6",
@@ -666,7 +1014,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Panino",
         "Vegetariano",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "insalate-carne-giardiniera-0",
@@ -678,7 +1032,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Insalata",
         "Proteico"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "insalate-carne-leggera-1",
@@ -691,7 +1051,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Insalata",
         "Fresco",
         "Leggero"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "insalate-carne-suprema-2",
@@ -704,7 +1070,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Insalata",
         "Proteico",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "insalate-carne-tartare-3",
@@ -718,7 +1090,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Proteico",
         "Fresco",
         "Top"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "insalate-carne-trevigiana-4",
@@ -730,7 +1108,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Insalata",
         "Frutta secca"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "insalate-carne-valtellina-5",
@@ -743,7 +1127,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Insalata",
         "Proteico",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "insalate-carne-newyorkese-6",
@@ -756,7 +1146,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Insalata",
         "Proteico",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "insalate-pesce-asiatica-0",
@@ -768,7 +1164,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Insalata",
         "Proteico"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "insalate-pesce-baccala-1",
@@ -776,12 +1178,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 12,
       "desc": "baccala mantecato, cicoria ripassata, ceci, pomodori secchi",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_panino.webp",
+      "img": "../assets/pagnottella/images/products/insalata_baccala.jpg",
       "tags": [
         "Insalata",
         "Proteico",
         "Top"
-      ]
+      ],
+      "imageMeta": {
+        "specific": true,
+        "source": "complete",
+        "confidence": "alta",
+        "label": "Foto prodotto",
+        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913547258-U44KCIU4E8WMLA1A6W8Z/baccala_insalata.jpg",
+        "filename": "insalata_baccala.jpg",
+        "basis": "filename + ingredienti",
+        "notes": "Insalata con baccala, ceci, cicoria, pomodori secchi; coerente con Baccala insalata."
+      }
     },
     {
       "id": "insalate-pesce-cefalu-2",
@@ -789,11 +1201,21 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 11,
       "desc": "carpaccio di pesce spada, mozzarella, pomodoro, origano, olive**",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_panino.webp",
+      "img": "../assets/pagnottella/images/products/insalata_cefalu.jpg",
       "tags": [
         "Insalata",
         "Proteico"
-      ]
+      ],
+      "imageMeta": {
+        "specific": true,
+        "source": "complete",
+        "confidence": "alta",
+        "label": "Foto prodotto",
+        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341646194-RUG4C2J6ZQBUI485YMKR/DSCF9302.jpg",
+        "filename": "insalata_cefalu.jpg",
+        "basis": "ingredienti",
+        "notes": "Insalata con carpaccio di pesce spada, mozzarella, pomodoro, origano, olive; coerente con Cefalu."
+      }
     },
     {
       "id": "insalate-pesce-delicata-3",
@@ -807,7 +1229,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Proteico",
         "Fresco",
         "Leggero"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "insalate-pesce-estiva-4",
@@ -820,7 +1248,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Insalata",
         "Proteico",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "insalate-pesce-fresca-5",
@@ -833,7 +1267,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Insalata",
         "Proteico",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "insalate-pesce-hawaii-6",
@@ -847,7 +1287,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Proteico",
         "Frutta secca",
         "Top"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "insalate-pesce-isolana-7",
@@ -859,7 +1305,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Insalata",
         "Proteico"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "insalate-pesce-lampedusa-8",
@@ -872,7 +1324,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Insalata",
         "Proteico",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "insalate-pesce-mediterranea-9",
@@ -886,7 +1344,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Proteico",
         "Fresco",
         "Leggero"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "insalate-pesce-osaka-10",
@@ -899,7 +1363,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Insalata",
         "Proteico",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "insalate-pesce-pantelleria-11",
@@ -912,7 +1382,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Insalata",
         "Proteico",
         "Frutta secca"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "insalate-pesce-salentina-12",
@@ -920,10 +1396,20 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 11,
       "desc": "Burrata pugliese, pomodoro, acciughe, capperi, olive**, origano",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_insalata.webp",
+      "img": "../assets/pagnottella/images/products/insalata_salentina.jpg",
       "tags": [
         "Insalata"
-      ]
+      ],
+      "imageMeta": {
+        "specific": true,
+        "source": "complete",
+        "confidence": "alta",
+        "label": "Foto prodotto",
+        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341641448-ERIUQ6ZDTVGB0K9D0OEJ/DSCF3962.jpg",
+        "filename": "insalata_salentina.jpg",
+        "basis": "ingredienti",
+        "notes": "Insalata con burrata/mozzarella, pomodoro, acciughe, capperi, olive, origano; coerente con Salentina."
+      }
     },
     {
       "id": "insalate-pesce-san-jose-13",
@@ -935,7 +1421,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Insalata",
         "Proteico"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "insalate-pesce-sicula-14",
@@ -948,7 +1440,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Insalata",
         "Fresco",
         "Frutta secca"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "insalate-pesce-siracusa-15",
@@ -960,7 +1458,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Insalata",
         "Proteico"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "insalate-pesce-sportiva-16",
@@ -974,7 +1478,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Proteico",
         "Frutta secca",
         "Top"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "insalate-pesce-trapanese-17",
@@ -982,12 +1492,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 10,
       "desc": "tonno, melanzane e zucchine grigliate*, pomodori secchi, pesto, granella di pistacchio",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/optimized/trapanese.webp",
+      "img": "../assets/pagnottella/images/products/insalata_trapanese.jpg",
       "tags": [
         "Insalata",
         "Proteico",
         "Frutta secca"
-      ]
+      ],
+      "imageMeta": {
+        "specific": true,
+        "source": "complete",
+        "confidence": "alta",
+        "label": "Foto prodotto",
+        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341597598-9O2HBC5LSQNYBC3SG687/trapanese.jpg",
+        "filename": "insalata_trapanese.jpg",
+        "basis": "filename + ingredienti",
+        "notes": "Insalata con tonno, grigliate, pomodori secchi, pesto e pistacchio; coerente con Trapanese."
+      }
     },
     {
       "id": "insalate-pesce-vanitosa-18",
@@ -1000,7 +1520,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Insalata",
         "Proteico",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "insalate-veg-burrata-0",
@@ -1014,7 +1540,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Vegetariano",
         "Fresco",
         "Frutta secca"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "insalate-veg-caprese-1",
@@ -1028,7 +1560,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Vegetariano",
         "Fresco",
         "Leggero"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "insalate-veg-greca-2",
@@ -1041,7 +1579,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Insalata",
         "Vegetariano",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "insalate-veg-ortolana-3",
@@ -1055,7 +1599,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Vegetariano",
         "Fresco",
         "Frutta secca"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "insalate-veg-reginella-4",
@@ -1063,14 +1613,24 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 12,
       "desc": "mozzarella di Bufala DOP 125gr, pachino gialli e rossi, melanzane e zucchine grigliate, pinoli, basilico",
       "cat": "insalate-veg",
-      "img": "../assets/pagnottella/images/optimized/apollo_3.webp",
+      "img": "../assets/pagnottella/images/products/insalata_reginella.jpg",
       "tags": [
         "Insalata",
         "Vegetariano",
         "Fresco",
         "Frutta secca",
         "Top"
-      ]
+      ],
+      "imageMeta": {
+        "specific": true,
+        "source": "complete",
+        "confidence": "alta",
+        "label": "Foto prodotto",
+        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341540039-MUG7YLZM6E4THD2RNKXH/DSCF7331.jpg",
+        "filename": "insalata_reginella.jpg",
+        "basis": "ingredienti",
+        "notes": "Insalata con bufala, pomodorini gialli/rossi, melanzane/zucchine e pinoli; coerente con Reginella."
+      }
     },
     {
       "id": "insalate-veg-vegetariana-5",
@@ -1084,7 +1644,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Vegetariano",
         "Fresco",
         "Leggero"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "speciali-apollo-0",
@@ -1092,13 +1658,23 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 12,
       "desc": "Pollo CBT, uovo sodo, pachino, salsa tartara, rucola e sesamo nero.",
       "cat": "speciali",
-      "img": "../assets/pagnottella/images/optimized/apollo_3.webp",
+      "img": "../assets/pagnottella/images/products/insalata_apollo.jpg",
       "tags": [
         "Top",
         "Insalata",
         "Proteico",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": true,
+        "source": "associated",
+        "confidence": "alta",
+        "label": "Foto prodotto",
+        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913541674-LEKZU93QZGKVQJ2LGHN2/apollo_3.jpg",
+        "filename": "insalata_apollo.jpg",
+        "basis": "filename ufficiale apollo_3.jpg + immagine insalata con pollo/uovo",
+        "notes": "Nome non presente nel menu testuale estratto"
+      }
     },
     {
       "id": "insalate-pesce-tropicana-19",
@@ -1111,7 +1687,13 @@ window.__PAGNOTTELLA_MENU__ = {
         "Insalata",
         "Fresco",
         "Top"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "bevande-acqua-0",
@@ -1123,7 +1705,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Bevanda",
         "Leggero"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "bevande-bibite-1",
@@ -1134,7 +1722,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "img": "../assets/pagnottella/images/optimized/DSCF7425.webp",
       "tags": [
         "Bevanda"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "bevande-macedonia-2",
@@ -1146,7 +1740,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Dessert",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "bevande-birre-3",
@@ -1157,7 +1757,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "img": "../assets/pagnottella/images/optimized/DSCF7425.webp",
       "tags": [
         "Bevanda"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "bevande-pane-nutella-4",
@@ -1168,7 +1774,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "img": "../assets/pagnottella/images/optimized/DSCF7425.webp",
       "tags": [
         "Dessert"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "succo-0",
@@ -1180,7 +1792,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Bevanda",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "succo-1",
@@ -1192,7 +1810,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Bevanda",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "succo-2",
@@ -1204,7 +1828,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Bevanda",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "succo-3",
@@ -1216,7 +1846,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Bevanda",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "succo-4",
@@ -1228,7 +1864,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Bevanda",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "succo-5",
@@ -1240,7 +1882,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Bevanda",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "succo-6",
@@ -1252,7 +1900,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Bevanda",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     },
     {
       "id": "succo-7",
@@ -1264,7 +1918,13 @@ window.__PAGNOTTELLA_MENU__ = {
       "tags": [
         "Bevanda",
         "Fresco"
-      ]
+      ],
+      "imageMeta": {
+        "specific": false,
+        "source": "fallback",
+        "confidence": "nessuna",
+        "label": "Immagine categoria"
+      }
     }
   ],
   "cats": [
@@ -1413,15 +2073,15 @@ window.__PAGNOTTELLA_MENU__ = {
     },
     {
       "name": "Baccalà mantecato",
-      "price": 4.0
+      "price": 4
     },
     {
       "name": "Bresaola",
-      "price": 3.0
+      "price": 3
     },
     {
       "name": "Brie",
-      "price": 1.0
+      "price": 1
     },
     {
       "name": "Bufala",
@@ -1437,7 +2097,7 @@ window.__PAGNOTTELLA_MENU__ = {
     },
     {
       "name": "Carciofini",
-      "price": 1.0
+      "price": 1
     },
     {
       "name": "Cavolo rosso",
@@ -1457,7 +2117,7 @@ window.__PAGNOTTELLA_MENU__ = {
     },
     {
       "name": "Ciauscolo",
-      "price": 2.0
+      "price": 2
     },
     {
       "name": "Cicoria",
@@ -1477,11 +2137,11 @@ window.__PAGNOTTELLA_MENU__ = {
     },
     {
       "name": "Culatta",
-      "price": 3.0
+      "price": 3
     },
     {
       "name": "Edamame",
-      "price": 1.0
+      "price": 1
     },
     {
       "name": "Feta",
@@ -1489,7 +2149,7 @@ window.__PAGNOTTELLA_MENU__ = {
     },
     {
       "name": "Finocchiona",
-      "price": 2.0
+      "price": 2
     },
     {
       "name": "Friarielli",
@@ -1513,7 +2173,7 @@ window.__PAGNOTTELLA_MENU__ = {
     },
     {
       "name": "Melanzane",
-      "price": 1.0
+      "price": 1
     },
     {
       "name": "Miele",
@@ -1533,11 +2193,11 @@ window.__PAGNOTTELLA_MENU__ = {
     },
     {
       "name": "Olive",
-      "price": 1.0
+      "price": 1
     },
     {
       "name": "Pachino",
-      "price": 1.0
+      "price": 1
     },
     {
       "name": "Pastrami",
@@ -1553,11 +2213,11 @@ window.__PAGNOTTELLA_MENU__ = {
     },
     {
       "name": "Pollo CBT",
-      "price": 4.0
+      "price": 4
     },
     {
       "name": "Pomodori secchi",
-      "price": 1.0
+      "price": 1
     },
     {
       "name": "Pomodoro",
@@ -1565,7 +2225,7 @@ window.__PAGNOTTELLA_MENU__ = {
     },
     {
       "name": "Provola",
-      "price": 1.0
+      "price": 1
     },
     {
       "name": "Radicchio",
@@ -1573,7 +2233,7 @@ window.__PAGNOTTELLA_MENU__ = {
     },
     {
       "name": "Ricotta",
-      "price": 1.0
+      "price": 1
     },
     {
       "name": "Rucola",
@@ -1589,7 +2249,7 @@ window.__PAGNOTTELLA_MENU__ = {
     },
     {
       "name": "Spada affumicato",
-      "price": 4.0
+      "price": 4
     },
     {
       "name": "Speck",
@@ -1601,7 +2261,7 @@ window.__PAGNOTTELLA_MENU__ = {
     },
     {
       "name": "Stracchino",
-      "price": 1.0
+      "price": 1
     },
     {
       "name": "Tacchino",
@@ -1609,7 +2269,7 @@ window.__PAGNOTTELLA_MENU__ = {
     },
     {
       "name": "Tartare",
-      "price": 4.0
+      "price": 4
     },
     {
       "name": "Tonno affumicato",

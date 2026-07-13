@@ -34,6 +34,11 @@ test.describe('Preview multi-fornitore', () => {
     await expect(page.locator('#grid .card')).toHaveCount(1);
     await expect(page.locator('#grid .card').first()).toContainText('BBQ');
 
+    await page.locator('#search').fill('Saporito');
+    await expect(page.locator('#grid .card')).toHaveCount(1);
+    await expect(page.locator('#grid .card img').first()).toHaveAttribute('src', /panino_saporito\.jpg/);
+    await expect(page.locator('#grid .card').first()).toContainText('Foto prodotto');
+
     await page.locator('#grid .card .add').first().click();
     await expect(page.locator('#cartCount')).toHaveText('1');
     await expect(page.locator('#finalTotal')).toContainText('€6,40');

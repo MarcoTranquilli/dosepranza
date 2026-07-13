@@ -155,7 +155,10 @@ function renderCatalog(){
   byId('grid').innerHTML = arr.map(p => card(p)).join('');
 }
 function card(p){
-  return `<article class="card"><div class="pic"><img src="${p.img}" alt="${esc(p.name)}" loading="lazy"><div class="badges">${(p.tags||[]).slice(0,2).map(t=>`<span class="badge">${esc(t)}</span>`).join('')}</div></div><div class="body"><div class="nameRow"><h4>${esc(p.name)}</h4><div class="price"><span class="old">${money(p.price)}</span>${money(discountedPrice(p.price))}</div></div><p class="desc">${esc(p.desc)}</p><div class="meta"><span class="tag">${esc(catLabel(p.cat))}</span>${(p.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div><div class="actions"><button class="details" onclick="openDetails('${p.id}')">Dettagli</button><button class="add" aria-label="Aggiungi ${esc(p.name)}" onclick="quickAdd('${p.id}')">+</button></div></div></article>`;
+  const badges = [];
+  if(p.imageMeta?.specific) badges.push(p.imageMeta.label);
+  badges.push(...(p.tags || []).slice(0,2));
+  return `<article class="card"><div class="pic"><img src="${p.img}" alt="${esc(p.name)}" loading="lazy"><div class="badges">${badges.map(t=>`<span class="badge">${esc(t)}</span>`).join('')}</div></div><div class="body"><div class="nameRow"><h4>${esc(p.name)}</h4><div class="price"><span class="old">${money(p.price)}</span>${money(discountedPrice(p.price))}</div></div><p class="desc">${esc(p.desc)}</p><div class="meta"><span class="tag">${esc(catLabel(p.cat))}</span>${(p.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div><div class="actions"><button class="details" onclick="openDetails('${p.id}')">Dettagli</button><button class="add" aria-label="Aggiungi ${esc(p.name)}" onclick="quickAdd('${p.id}')">+</button></div></div></article>`;
 }
 function openDetails(id){
   const p = PRODUCTS.find(x => x.id === id);
@@ -165,7 +168,18 @@ function openDetails(id){
   byId('drawerImg').alt = p.name;
   byId('drawerName').textContent = p.name;
   byId('drawerDesc').textContent = p.desc;
-  byId('drawerTags').innerHTML = (p.tags||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join('');
+  byId('drawerTags').innerHTML = [
+    ...(p.imageMeta?.specific ? [p.imageMeta.label] : []),
+    ...((p.tags||[]))
+  ].map(t=>`<span class="tag">${esc(t)}</span>`).join('');
+  const imageMetaEl = byId('drawerImageMeta');
+  if(p.imageMeta?.specific){
+    imageMetaEl.classList.remove('hidden');
+    imageMetaEl.textContent = `${p.imageMeta.label} · confidenza ${p.imageMeta.confidence}. ${p.imageMeta.basis || ''}`.trim();
+  } else {
+    imageMetaEl.classList.add('hidden');
+    imageMetaEl.textContent = '';
+  }
   byId('optionTitle').textContent = isSalad(p) ? 'Scegli la base dell’insalata' : (p.cat.startsWith('panini') ? 'Scegli il tipo di pane' : 'Configurazione');
   byId('optionHelp').textContent = isSalad(p) ? 'Il riso venere aggiunge +€1,50 prima dello sconto.' : (p.cat.startsWith('panini') ? 'Il pane integrale ai cereali aggiunge +€0,50 prima dello sconto.' : 'Per questa voce non sono previste varianti di base.');
   byId('options').innerHTML = optionList(p).map((o,i)=>`<button class="opt ${i===0?'on':''}" onclick="pickOption(${i})">${esc(o.label)}${o.extra?` +${money(o.extra)}`:''}</button>`).join('');
