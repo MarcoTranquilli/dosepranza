@@ -27,6 +27,17 @@ const inferType = cat => {
   return 'other';
 };
 
+const categoryHeroOverrides = {
+  all: '../assets/pagnottella/images/products/insalata_apollo.jpg',
+  'panini-carne': '../assets/pagnottella/images/products/panino_saporito.jpg',
+  'panini-pesce': '../assets/pagnottella/images/products/panino_baccala.jpg',
+  'panini-veg': '../assets/pagnottella/images/products/panino_burrata.jpg',
+  'insalate-carne': '../assets/pagnottella/images/optimized/vitella_insalata.webp',
+  'insalate-pesce': '../assets/pagnottella/images/products/insalata_baccala.jpg',
+  'insalate-veg': '../assets/pagnottella/images/products/insalata_reginella.jpg',
+  speciali: '../assets/pagnottella/images/products/insalata_apollo.jpg'
+};
+
 const localPathFor = filename => `../assets/pagnottella/images/products/${filename}`;
 
 const curated = new Map();
@@ -117,6 +128,17 @@ const fetchImage = async (filename, url) => {
 
 for (const [filename, url] of downloadQueue) {
   await fetchImage(filename, url);
+}
+
+for (const category of menu.cats) {
+  if (categoryHeroOverrides[category.id]) category.hero = categoryHeroOverrides[category.id];
+}
+
+const heroByCategory = Object.fromEntries(menu.cats.map(category => [category.id, category.hero]));
+for (const product of menu.products) {
+  if (!product.imageMeta?.specific && heroByCategory[product.cat]) {
+    product.img = heroByCategory[product.cat];
+  }
 }
 
 writeFileSync(menuPath, JSON.stringify(menu, null, 2) + '\n');

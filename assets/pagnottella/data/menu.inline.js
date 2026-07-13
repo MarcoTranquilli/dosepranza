@@ -6,7 +6,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "petto di tacchino arrosto, provola affumicata, salsa tonnata, melanzane grigliate*",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino",
         "Proteico"
@@ -24,7 +24,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "pastrami di manzo, pomodoro, provola affumicata, salsa bbq, insalata",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino",
         "Proteico",
@@ -43,7 +43,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "mortadella, provola affumicata, salsa di noci",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino",
         "Frutta secca"
@@ -61,7 +61,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "crudo, zucchine grigliate*, cipolla, provola affumicata, riduzione di balsamico",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino"
       ],
@@ -78,7 +78,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "crudo, mozzarella, melanzane grigliate*, pomodori secchi",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino"
       ],
@@ -95,7 +95,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "petto di tacchino arrosto, zucchine grigliate*, mozzarella",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino",
         "Proteico"
@@ -113,7 +113,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "petto di tacchino arrosto, ricotta, pesto, olive**",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino",
         "Proteico"
@@ -131,7 +131,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "cotto, gorgonzola, miele, spinaci",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino"
       ],
@@ -148,7 +148,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "crudo, stracchino, rucola",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino",
         "Fresco"
@@ -166,7 +166,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "pastrami di manzo, melanzane e zucchine grigliate*, salsa tartara",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino",
         "Proteico"
@@ -184,7 +184,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "burrata, mortadella, granella di pistacchio",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino",
         "Frutta secca",
@@ -203,7 +203,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "speck, ricotta, melanzane grigliate*",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino"
       ],
@@ -220,7 +220,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "ciauscolo IGP, stracchino, pomodori secchi",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino"
       ],
@@ -237,7 +237,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "crudo, crema al tartufo, brie, pomodoro, spinaci",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino"
       ],
@@ -254,7 +254,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "pastrami di manzo, pomodoro, salsa tartara, cetriolini",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino",
         "Proteico"
@@ -272,7 +272,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "crudo, salsa di noci, funghi champignon crudi",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino",
         "Frutta secca"
@@ -290,7 +290,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "crudo, pomodoro, origano",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino"
       ],
@@ -307,7 +307,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "crudo, melanzane grigliate*, provola affumicata",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino"
       ],
@@ -324,7 +324,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 9,
       "desc": "culatta, pomodoro, riduzione di balsamico, Grana Padano DOP",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino",
         "Top"
@@ -342,7 +342,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "pastrami di manzo, mozzarella, pomodori secchi",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino",
         "Proteico"
@@ -360,7 +360,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "bresaola, rucola, ricotta",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino",
         "Proteico",
@@ -401,7 +401,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "crudo, pomodoro, brie, olio al tartufo, spinaci",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino"
       ],
@@ -418,7 +418,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "speck, pomodoro, provola affumicata, melanzane grigliate*",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino"
       ],
@@ -459,7 +459,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "speck, crema di noci, brie, spinaci",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino",
         "Frutta secca"
@@ -477,7 +477,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "pastrami di manzo, salsa tonnata, funghi champignon crudi",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino",
         "Proteico"
@@ -517,7 +517,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "finocchiona, pomodoro, olio al tartufo, insalata, provola affumicata",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino",
         "Fresco"
@@ -535,7 +535,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "petto di tacchino arrosto, senape al miele, provola affumicata, insalata",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino",
         "Proteico",
@@ -554,7 +554,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "speck, brie, funghi champignon crudi",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino"
       ],
@@ -571,7 +571,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "speck, gorgonzola, miele, noci, radicchio",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino",
         "Frutta secca"
@@ -589,7 +589,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "bresaola, pomodoro, rucola, riduzione di balsamico",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino",
         "Proteico",
@@ -608,7 +608,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "cotto, provola affumicata, pomodori secchi, spinaci",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/saporito.webp",
+      "img": "../assets/pagnottella/images/products/panino_saporito.jpg",
       "tags": [
         "Panino"
       ],
@@ -625,7 +625,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 10,
       "desc": "carpaccio di pesce spada, pachino, mozzarella, olive**, origano",
       "cat": "panini-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_panino.webp",
+      "img": "../assets/pagnottella/images/products/panino_baccala.jpg",
       "tags": [
         "Panino",
         "Proteico",
@@ -644,7 +644,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "salmone, carciofini, provola affumicata",
       "cat": "panini-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_panino.webp",
+      "img": "../assets/pagnottella/images/products/panino_baccala.jpg",
       "tags": [
         "Panino",
         "Proteico"
@@ -662,7 +662,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 9,
       "desc": "carpaccio di tonno, zucchine grigliate*, capperi, insalata, carpaccio di limone, basilico",
       "cat": "panini-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_panino.webp",
+      "img": "../assets/pagnottella/images/products/panino_baccala.jpg",
       "tags": [
         "Panino",
         "Proteico",
@@ -681,7 +681,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "tonno, pomodoro, cipolla rossa, olive**",
       "cat": "panini-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_panino.webp",
+      "img": "../assets/pagnottella/images/products/panino_baccala.jpg",
       "tags": [
         "Panino",
         "Proteico"
@@ -699,7 +699,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "mozzarella, pomodoro, acciughe, origano",
       "cat": "panini-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_panino.webp",
+      "img": "../assets/pagnottella/images/products/panino_baccala.jpg",
       "tags": [
         "Panino"
       ],
@@ -716,7 +716,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "tonno, pate di olive, pomodoro",
       "cat": "panini-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_panino.webp",
+      "img": "../assets/pagnottella/images/products/panino_baccala.jpg",
       "tags": [
         "Panino",
         "Proteico"
@@ -757,7 +757,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "salmone, zucchine grigliate*, mozzarella",
       "cat": "panini-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_panino.webp",
+      "img": "../assets/pagnottella/images/products/panino_baccala.jpg",
       "tags": [
         "Panino",
         "Proteico"
@@ -775,7 +775,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 10,
       "desc": "carpaccio di pesce spada, melanzane grigliate*, pomodori secchi, granella di pistacchio",
       "cat": "panini-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_panino.webp",
+      "img": "../assets/pagnottella/images/products/panino_baccala.jpg",
       "tags": [
         "Panino",
         "Proteico",
@@ -794,7 +794,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "tonno, carciofini, salsa tartara, insalata",
       "cat": "panini-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_panino.webp",
+      "img": "../assets/pagnottella/images/products/panino_baccala.jpg",
       "tags": [
         "Panino",
         "Proteico",
@@ -836,7 +836,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 9,
       "desc": "carpaccio di tonno, guacamole, pomodoro, cavolo rosso",
       "cat": "panini-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_panino.webp",
+      "img": "../assets/pagnottella/images/products/panino_baccala.jpg",
       "tags": [
         "Panino",
         "Proteico"
@@ -854,7 +854,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 10,
       "desc": "carpaccio di tonno, pate di olive, pomodoro, mozzarella, insalata",
       "cat": "panini-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_panino.webp",
+      "img": "../assets/pagnottella/images/products/panino_baccala.jpg",
       "tags": [
         "Panino",
         "Proteico",
@@ -873,7 +873,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "salmone, guacamole, rucola, riduzione di balsamico",
       "cat": "panini-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_panino.webp",
+      "img": "../assets/pagnottella/images/products/panino_baccala.jpg",
       "tags": [
         "Panino",
         "Proteico",
@@ -916,7 +916,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "melanzane e zucchine grigliate*, pomodori secchi, ricotta",
       "cat": "panini-veg",
-      "img": "../assets/pagnottella/images/optimized/toscanaccio.webp",
+      "img": "../assets/pagnottella/images/products/panino_burrata.jpg",
       "tags": [
         "Panino",
         "Vegetariano"
@@ -934,7 +934,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "mozzarella, pomodoro, basilico",
       "cat": "panini-veg",
-      "img": "../assets/pagnottella/images/optimized/toscanaccio.webp",
+      "img": "../assets/pagnottella/images/products/panino_burrata.jpg",
       "tags": [
         "Panino",
         "Vegetariano",
@@ -954,7 +954,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "melanzane e zucchine grigliate*, senape al miele, insalata",
       "cat": "panini-veg",
-      "img": "../assets/pagnottella/images/optimized/toscanaccio.webp",
+      "img": "../assets/pagnottella/images/products/panino_burrata.jpg",
       "tags": [
         "Panino",
         "Vegetariano",
@@ -973,7 +973,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "friarielli sott'olio, mozzarella, pomodori secchi",
       "cat": "panini-veg",
-      "img": "../assets/pagnottella/images/optimized/toscanaccio.webp",
+      "img": "../assets/pagnottella/images/products/panino_burrata.jpg",
       "tags": [
         "Panino",
         "Vegetariano"
@@ -991,7 +991,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "mozzarella, pomodoro, pesto",
       "cat": "panini-veg",
-      "img": "../assets/pagnottella/images/optimized/toscanaccio.webp",
+      "img": "../assets/pagnottella/images/products/panino_burrata.jpg",
       "tags": [
         "Panino",
         "Vegetariano"
@@ -1009,7 +1009,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "guacamole, carciofini, zucchine grigliate*, provola affumicata, rucola",
       "cat": "panini-veg",
-      "img": "../assets/pagnottella/images/optimized/toscanaccio.webp",
+      "img": "../assets/pagnottella/images/products/panino_burrata.jpg",
       "tags": [
         "Panino",
         "Vegetariano",
@@ -1084,7 +1084,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 11,
       "desc": "tartare di manzo al coltello condita con capperi, senape al miele, tabasco, pepe, sale, olio, cavolo rosso, insalata",
       "cat": "insalate-carne",
-      "img": "../assets/pagnottella/images/optimized/tartare.webp",
+      "img": "../assets/pagnottella/images/optimized/vitella_insalata.webp",
       "tags": [
         "Insalata",
         "Proteico",
@@ -1160,7 +1160,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 10,
       "desc": "salmone, edamame*, cavolo rosso, salsa di soia, sesamo",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_insalata.webp",
+      "img": "../assets/pagnottella/images/products/insalata_baccala.jpg",
       "tags": [
         "Insalata",
         "Proteico"
@@ -1223,7 +1223,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 10,
       "desc": "salmone, zucchine grigliate*, rucola",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_insalata.webp",
+      "img": "../assets/pagnottella/images/products/insalata_baccala.jpg",
       "tags": [
         "Insalata",
         "Proteico",
@@ -1243,7 +1243,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 10,
       "desc": "gamberetti, mozzarella, pachino, mais",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_insalata.webp",
+      "img": "../assets/pagnottella/images/products/insalata_baccala.jpg",
       "tags": [
         "Insalata",
         "Proteico",
@@ -1262,7 +1262,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 10,
       "desc": "salmone, feta, cetriolo, semi di chia, rucola",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_insalata.webp",
+      "img": "../assets/pagnottella/images/products/insalata_baccala.jpg",
       "tags": [
         "Insalata",
         "Proteico",
@@ -1281,7 +1281,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 11,
       "desc": "salmone, anacardi, edamame, hummus di ceci, cavolo rosso, sesamo nero",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_insalata.webp",
+      "img": "../assets/pagnottella/images/products/insalata_baccala.jpg",
       "tags": [
         "Insalata",
         "Proteico",
@@ -1301,7 +1301,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 9,
       "desc": "tonno, feta, olive**, carciofini",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_insalata.webp",
+      "img": "../assets/pagnottella/images/products/insalata_baccala.jpg",
       "tags": [
         "Insalata",
         "Proteico"
@@ -1319,7 +1319,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 11,
       "desc": "carpaccio di tonno, capperi, carpaccio di limone, basilico, insalata, zucchine grigliate*",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_insalata.webp",
+      "img": "../assets/pagnottella/images/products/insalata_baccala.jpg",
       "tags": [
         "Insalata",
         "Proteico",
@@ -1338,7 +1338,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 9,
       "desc": "tonno, pachino, basilico",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_insalata.webp",
+      "img": "../assets/pagnottella/images/products/insalata_baccala.jpg",
       "tags": [
         "Insalata",
         "Proteico",
@@ -1358,7 +1358,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 11,
       "desc": "gamberetti, cetriolo, uovo, spinaci, edamame*, semi di sesamo, salsa di soia",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_insalata.webp",
+      "img": "../assets/pagnottella/images/products/insalata_baccala.jpg",
       "tags": [
         "Insalata",
         "Proteico",
@@ -1377,7 +1377,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 11,
       "desc": "carpaccio di pesce spada, melanzane grigliate*, pomodori secchi, granella di pistacchio",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_panino.webp",
+      "img": "../assets/pagnottella/images/products/insalata_baccala.jpg",
       "tags": [
         "Insalata",
         "Proteico",
@@ -1417,7 +1417,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 11,
       "desc": "carpaccio di tonno, guacamole, pomodoro, cavolo rosso",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_insalata.webp",
+      "img": "../assets/pagnottella/images/products/insalata_baccala.jpg",
       "tags": [
         "Insalata",
         "Proteico"
@@ -1435,7 +1435,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 10,
       "desc": "acciughe, pinoli, uvetta, mozzarella, pachino, origano",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_insalata.webp",
+      "img": "../assets/pagnottella/images/products/insalata_baccala.jpg",
       "tags": [
         "Insalata",
         "Fresco",
@@ -1454,7 +1454,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 9,
       "desc": "tonno, capperi, feta, cipolla, radicchio",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_insalata.webp",
+      "img": "../assets/pagnottella/images/products/insalata_baccala.jpg",
       "tags": [
         "Insalata",
         "Proteico"
@@ -1472,7 +1472,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 12,
       "desc": "tonno, guacamole, uovo sodo, spinaci, noci, pinoli",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_insalata.webp",
+      "img": "../assets/pagnottella/images/products/insalata_baccala.jpg",
       "tags": [
         "Insalata",
         "Proteico",
@@ -1515,7 +1515,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 10,
       "desc": "salmone, ceci, pachino, cavolo rosso",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/optimized/baccala_insalata.webp",
+      "img": "../assets/pagnottella/images/products/insalata_baccala.jpg",
       "tags": [
         "Insalata",
         "Proteico",
@@ -1534,7 +1534,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 11,
       "desc": "burrata pugliese, pomodori secchi, pinoli, rucola",
       "cat": "insalate-veg",
-      "img": "../assets/pagnottella/images/optimized/trapanese.webp",
+      "img": "../assets/pagnottella/images/products/insalata_reginella.jpg",
       "tags": [
         "Insalata",
         "Vegetariano",
@@ -1554,7 +1554,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 9,
       "desc": "mozzarella, pachino, basilico, olive**",
       "cat": "insalate-veg",
-      "img": "../assets/pagnottella/images/optimized/trapanese.webp",
+      "img": "../assets/pagnottella/images/products/insalata_reginella.jpg",
       "tags": [
         "Insalata",
         "Vegetariano",
@@ -1574,7 +1574,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 9,
       "desc": "feta, pachino, olive**, pesto",
       "cat": "insalate-veg",
-      "img": "../assets/pagnottella/images/optimized/trapanese.webp",
+      "img": "../assets/pagnottella/images/products/insalata_reginella.jpg",
       "tags": [
         "Insalata",
         "Vegetariano",
@@ -1593,7 +1593,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 10,
       "desc": "melanzane e zucchine grigliate*, ceci, noci, pesto, rucola",
       "cat": "insalate-veg",
-      "img": "../assets/pagnottella/images/optimized/trapanese.webp",
+      "img": "../assets/pagnottella/images/products/insalata_reginella.jpg",
       "tags": [
         "Insalata",
         "Vegetariano",
@@ -1638,7 +1638,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 9,
       "desc": "melanzane e zucchine grigliate*, pomodori secchi, basilico",
       "cat": "insalate-veg",
-      "img": "../assets/pagnottella/images/optimized/trapanese.webp",
+      "img": "../assets/pagnottella/images/products/insalata_reginella.jpg",
       "tags": [
         "Insalata",
         "Vegetariano",
@@ -1682,7 +1682,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 12,
       "desc": "Gamberetti, mango, pachino, guacamole, rucola, menta e lime.",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/optimized/trapanese.webp",
+      "img": "../assets/pagnottella/images/products/insalata_baccala.jpg",
       "tags": [
         "Insalata",
         "Fresco",
@@ -1931,22 +1931,22 @@ window.__PAGNOTTELLA_MENU__ = {
     {
       "id": "all",
       "label": "Tutto",
-      "hero": "../assets/pagnottella/images/optimized/apollo_3.webp"
+      "hero": "../assets/pagnottella/images/products/insalata_apollo.jpg"
     },
     {
       "id": "panini-carne",
       "label": "Panini carne",
-      "hero": "../assets/pagnottella/images/optimized/saporito.webp"
+      "hero": "../assets/pagnottella/images/products/panino_saporito.jpg"
     },
     {
       "id": "panini-pesce",
       "label": "Panini pesce",
-      "hero": "../assets/pagnottella/images/optimized/baccala_panino.webp"
+      "hero": "../assets/pagnottella/images/products/panino_baccala.jpg"
     },
     {
       "id": "panini-veg",
       "label": "Panini vegetariani",
-      "hero": "../assets/pagnottella/images/optimized/toscanaccio.webp"
+      "hero": "../assets/pagnottella/images/products/panino_burrata.jpg"
     },
     {
       "id": "insalate-carne",
@@ -1956,17 +1956,17 @@ window.__PAGNOTTELLA_MENU__ = {
     {
       "id": "insalate-pesce",
       "label": "Insalate pesce",
-      "hero": "../assets/pagnottella/images/optimized/baccala_insalata.webp"
+      "hero": "../assets/pagnottella/images/products/insalata_baccala.jpg"
     },
     {
       "id": "insalate-veg",
       "label": "Insalate vegetariane",
-      "hero": "../assets/pagnottella/images/optimized/trapanese.webp"
+      "hero": "../assets/pagnottella/images/products/insalata_reginella.jpg"
     },
     {
       "id": "speciali",
       "label": "Speciali del punto vendita",
-      "hero": "../assets/pagnottella/images/optimized/apollo_3.webp"
+      "hero": "../assets/pagnottella/images/products/insalata_apollo.jpg"
     },
     {
       "id": "bevande-dolci",

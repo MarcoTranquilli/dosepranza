@@ -60,8 +60,6 @@ function hydrateStatic(){
   byId('price-validity-note').textContent = DATA.notes.priceValidity;
   byId('heroStats').innerHTML = DATA.highlights.map(h => `<span class="heroStat"><strong>${esc(h.label)}</strong> · ${esc(h.value)}</span>`).join('');
   byId('hero-highlight-list').innerHTML = DATA.highlights.map((h, idx) => `<span class="serviceChip ${idx===0?'serviceChipPrimary':''}" role="listitem">${esc(h.value)}</span>`).join('');
-  byId('docsLinks').innerHTML = DATA.docs.map(d => `<a href="${d.href}" target="_blank" rel="noopener">${esc(d.label)}</a>`).join('');
-  byId('docsGrid').innerHTML = DATA.docs.map(d => `<a href="${d.href}" target="_blank" rel="noopener">${esc(d.label)}</a>`).join('');
   byId('extrasPreview').innerHTML = DATA.extras.slice(0, 8).map(x => `<span class="extraChip">${esc(x.name)} <span>${money(x.price)}</span></span>`).join('');
   byId('extrasGrid').innerHTML = DATA.extras.map(x => `<span class="extraChip">${esc(x.name)} <span>${money(x.price)}</span></span>`).join('');
   byId('notesList').innerHTML = [
