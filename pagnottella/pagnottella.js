@@ -23,9 +23,7 @@ const paymentStatusCopy = () => `${DATA.payment.model}. ${DATA.payment.pickup}.`
 const discountedPrice = v => Math.round(v * (1 - discountRate()) * 100) / 100;
 
 async function bootstrap(){
-  const res = await fetch('../assets/pagnottella/data/menu.json', { cache: 'no-store' });
-  if(!res.ok) throw new Error(`Impossibile caricare menu.json (${res.status})`);
-  DATA = await res.json();
+  DATA = await loadData();
   PRODUCTS = DATA.products;
   CATS = DATA.cats;
   hydrateStatic();
@@ -37,6 +35,18 @@ async function bootstrap(){
   renderCatalog();
   renderCart();
   updateAdmin();
+}
+
+async function loadData(){
+  if(location.protocol === 'file:' && window.__PAGNOTTELLA_MENU__) return window.__PAGNOTTELLA_MENU__;
+  try{
+    const res = await fetch('../assets/pagnottella/data/menu.json', { cache: 'no-store' });
+    if(!res.ok) throw new Error(`Impossibile caricare menu.json (${res.status})`);
+    return await res.json();
+  }catch(err){
+    if(window.__PAGNOTTELLA_MENU__) return window.__PAGNOTTELLA_MENU__;
+    throw err;
+  }
 }
 
 function hydrateStatic(){

@@ -5,6 +5,8 @@ echo "--- Inizio Build DOSepranza ---"
 
 DIST_DIR="dist"
 
+node scripts/build_pagnottella_inline_menu.mjs
+
 # 1. Crea una cartella pulita per il deploy
 rm -rf "$DIST_DIR"
 mkdir -p "$DIST_DIR"
