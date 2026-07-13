@@ -31,11 +31,36 @@ const categoryHeroOverrides = {
   all: '../assets/pagnottella/images/products/insalata_apollo.jpg',
   'panini-carne': '../assets/pagnottella/images/products/panini_saporito__panino_saporito.jpg',
   'panini-pesce': '../assets/pagnottella/images/products/panini_baccala__panino_baccala.jpg',
-  'panini-veg': '../assets/pagnottella/images/products/panini_burrata__panino_burrata_gallery.jpg',
+  'panini-veg': '../assets/pagnottella/images/products/panini_burrata__panino_burrata.jpg',
   'insalate-carne': '../assets/pagnottella/images/products/insalate_leggera__asset_home_vitella_insalata.jpg',
   'insalate-pesce': '../assets/pagnottella/images/products/insalate_baccala__insalata_baccala.jpg',
   'insalate-veg': '../assets/pagnottella/images/products/insalate_reginella__insalata_reginella.jpg',
   speciali: '../assets/pagnottella/images/products/insalata_apollo.jpg'
+};
+
+const strictSpecificMatches = new Set([
+  'saporito|panino',
+  'tartare|panino',
+  'toscanaccio|panino',
+  'baccala|panino',
+  'burrata|panino',
+  'baccala|insalata',
+  'cefalu|insalata',
+  'salentina|insalata',
+  'trapanese|insalata',
+  'reginella|insalata',
+  'apollo|insalata'
+]);
+
+const normalizeMappingForPreview = (row, key) => {
+  const normalized = { ...row };
+  if (normalized.mapping_type !== 'foto_specifica_o_quasi_specifica') return normalized;
+  if (strictSpecificMatches.has(key)) return normalized;
+  normalized.mapping_type = 'riuso_affine_per_ingrediente';
+  normalized.confidence = 'bassa';
+  normalized.needs_supplier_confirmation = 'si';
+  normalized.assignment_reason = `Preview conservativa: immagine mantenuta come riuso affine, non come foto specifica verificata dal sito. ${normalized.assignment_reason || ''}`.trim();
+  return normalized;
 };
 
 const mappingLabel = row => {
@@ -78,7 +103,8 @@ const downloadQueue = new Map();
 for (const product of menu.products) {
   const type = inferType(product.cat);
   const key = `${slugify(product.name)}|${type}`;
-  const row = mappingIndex.get(key);
+  const rawRow = mappingIndex.get(key);
+  const row = rawRow ? normalizeMappingForPreview(rawRow, key) : null;
 
   if (!row) {
     if (product.name === 'Apollo' && product.cat === 'speciali') {

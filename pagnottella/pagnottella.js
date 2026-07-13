@@ -154,7 +154,6 @@ function renderCatalog(){
 }
 function card(p){
   const badges = [];
-  if(p.imageMeta?.specific) badges.push(p.imageMeta.label);
   badges.push(...(p.tags || []).slice(0,2));
   return `<article class="card"><div class="pic"><img src="${p.img}" alt="${esc(p.name)}" loading="lazy"><div class="badges">${badges.map(t=>`<span class="badge">${esc(t)}</span>`).join('')}</div></div><div class="body"><div class="nameRow"><h4>${esc(p.name)}</h4><div class="price"><span class="old">${money(p.price)}</span>${money(discountedPrice(p.price))}</div></div><p class="desc">${esc(p.desc)}</p><div class="meta"><span class="tag">${esc(catLabel(p.cat))}</span>${(p.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div><div class="actions"><button class="details" onclick="openDetails('${p.id}')">Dettagli</button><button class="add" aria-label="Aggiungi ${esc(p.name)}" onclick="quickAdd('${p.id}')">+</button></div></div></article>`;
 }
@@ -166,18 +165,7 @@ function openDetails(id){
   byId('drawerImg').alt = p.name;
   byId('drawerName').textContent = p.name;
   byId('drawerDesc').textContent = p.desc;
-  byId('drawerTags').innerHTML = [
-    ...(p.imageMeta?.specific ? [p.imageMeta.label] : []),
-    ...((p.tags||[]))
-  ].map(t=>`<span class="tag">${esc(t)}</span>`).join('');
-  const imageMetaEl = byId('drawerImageMeta');
-  if(p.imageMeta?.specific){
-    imageMetaEl.classList.remove('hidden');
-    imageMetaEl.textContent = `${p.imageMeta.label} · confidenza ${p.imageMeta.confidence}. ${p.imageMeta.basis || ''}`.trim();
-  } else {
-    imageMetaEl.classList.add('hidden');
-    imageMetaEl.textContent = '';
-  }
+  byId('drawerTags').innerHTML = (p.tags || []).map(t=>`<span class="tag">${esc(t)}</span>`).join('');
   byId('optionTitle').textContent = isSalad(p) ? 'Scegli la base dell’insalata' : (p.cat.startsWith('panini') ? 'Scegli il tipo di pane' : 'Configurazione');
   byId('optionHelp').textContent = isSalad(p) ? 'Il riso venere aggiunge +€1,50 prima dello sconto.' : (p.cat.startsWith('panini') ? 'Il pane integrale ai cereali aggiunge +€0,50 prima dello sconto.' : 'Per questa voce non sono previste varianti di base.');
   byId('options').innerHTML = optionList(p).map((o,i)=>`<button class="opt ${i===0?'on':''}" onclick="pickOption(${i})">${esc(o.label)}${o.extra?` +${money(o.extra)}`:''}</button>`).join('');
@@ -247,7 +235,19 @@ function newOrder(){ state.cart = {}; byId('notes').value = ''; byId('confirm').
 function openCart(){ byId('cart').classList.add('open'); byId('cartBackdrop').classList.add('show'); }
 function closeCart(){ byId('cart').classList.remove('open'); byId('cartBackdrop').classList.remove('show'); }
 function toast(txt){ const el = byId('toast'); el.textContent = txt; el.classList.add('show'); clearTimeout(window.__toast); window.__toast = setTimeout(() => el.classList.remove('show'), 1600); }
-function updateAdmin(){ const logs = JSON.parse(localStorage.getItem('pg_demo_orders')||'[]'); byId('mProducts').textContent = PRODUCTS.length; byId('mCart').textContent = totals().count; byId('mOrders').textContent = logs.length; byId('mValue').textContent = money(logs.reduce((a,o)=>a+Number(o.total||0),0)); }
+function updateAdmin(){
+  const logs = JSON.parse(localStorage.getItem('pg_demo_orders')||'[]');
+  const imageMapped = PRODUCTS.filter(p => p.imageMeta?.assigned).length;
+  const supplierCheck = PRODUCTS.filter(p => p.imageMeta?.needsSupplierConfirmation).length;
+  const specificShots = PRODUCTS.filter(p => p.imageMeta?.mappingType === 'foto_specifica_o_quasi_specifica').length;
+  byId('mProducts').textContent = PRODUCTS.length;
+  byId('mCart').textContent = totals().count;
+  byId('mOrders').textContent = logs.length;
+  byId('mValue').textContent = money(logs.reduce((a,o)=>a+Number(o.total||0),0));
+  byId('mImageCoverage').textContent = `${imageMapped}/${PRODUCTS.length}`;
+  byId('mSupplierCheck').textContent = String(supplierCheck);
+  byId('mSpecificShots').textContent = String(specificShots);
+}
 function exportCSV(){ const logs = JSON.parse(localStorage.getItem('pg_demo_orders')||'[]'); const rows = [['timestamp','cliente','azienda','centro_costo','prodotti','totale','messaggio'], ...logs.map(o=>[o.ts,o.customer,o.company||'',o.costCenter||'',o.count,o.total,o.message])]; const csv = rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n'); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download = 'ordini-pagnottella-demo.csv'; a.click(); URL.revokeObjectURL(a.href); }
 function escJs(s){ return String(s).replace(/[\\']/g, m => m === '\\' ? '\\\\' : "\\'"); }
 

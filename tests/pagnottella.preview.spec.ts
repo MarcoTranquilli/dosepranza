@@ -43,7 +43,16 @@ test.describe('Preview multi-fornitore', () => {
     await page.locator('#search').fill('Saporito');
     await expect(page.locator('#grid .card')).toHaveCount(1);
     await expect(page.locator('#grid .card img').first()).toHaveAttribute('src', /panini_saporito__panino_saporito\.jpg/);
-    await expect(page.locator('#grid .card').first()).toContainText('Foto prodotto');
+    await expect(page.locator('#grid .card').first()).not.toContainText('Foto prodotto');
+    await expect(page.locator('#grid .card').first()).not.toContainText('Foto associata');
+    await expect(page.locator('#grid .card').first()).not.toContainText('Foto categoria');
+
+    await page.locator('#grid .card .details').first().click();
+    await expect(page.locator('#drawer')).toContainText('Saporito');
+    await expect(page.locator('#drawer')).not.toContainText('confidenza');
+    await expect(page.locator('#drawer')).not.toContainText('Foto prodotto');
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#drawer')).not.toHaveClass(/show/);
 
     await page.locator('#grid .card .add').first().click();
     await expect(page.locator('#cartCount')).toHaveText('1');
