@@ -1,20 +1,18 @@
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync, readdirSync, unlinkSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const root = resolve(import.meta.dirname, '..');
 const menuPath = resolve(root, 'assets/pagnottella/data/menu.json');
-const completePath = resolve(root, 'assets/pagnottella/data/source/mappatura_prodotti_completa.json');
-const associatedPath = resolve(root, 'assets/pagnottella/data/source/product_image_map.json');
+const mappingPath = resolve(root, 'assets/pagnottella/data/source-1to1/mappatura_1a1_prodotti_immagini.json');
 const outputMapPath = resolve(root, 'assets/pagnottella/data/product-image-map.json');
 const imageDir = resolve(root, 'assets/pagnottella/images/products');
 
 mkdirSync(imageDir, { recursive: true });
 
 const menu = JSON.parse(readFileSync(menuPath, 'utf8'));
-const complete = JSON.parse(readFileSync(completePath, 'utf8'));
-const associated = JSON.parse(readFileSync(associatedPath, 'utf8'));
+const mapping = JSON.parse(readFileSync(mappingPath, 'utf8'));
 
-const slugify = value => value
+const slugify = value => String(value || '')
   .normalize('NFKD')
   .replace(/[\u0300-\u036f]/g, '')
   .toLowerCase()
@@ -27,54 +25,51 @@ const inferType = cat => {
   return 'other';
 };
 
+const localPathFor = filename => `../assets/pagnottella/images/products/${filename}`;
+
 const categoryHeroOverrides = {
   all: '../assets/pagnottella/images/products/insalata_apollo.jpg',
-  'panini-carne': '../assets/pagnottella/images/products/panino_saporito.jpg',
-  'panini-pesce': '../assets/pagnottella/images/products/panino_baccala.jpg',
-  'panini-veg': '../assets/pagnottella/images/products/panino_burrata.jpg',
-  'insalate-carne': '../assets/pagnottella/images/optimized/vitella_insalata.webp',
-  'insalate-pesce': '../assets/pagnottella/images/products/insalata_baccala.jpg',
-  'insalate-veg': '../assets/pagnottella/images/products/insalata_reginella.jpg',
+  'panini-carne': '../assets/pagnottella/images/products/panini_saporito__panino_saporito.jpg',
+  'panini-pesce': '../assets/pagnottella/images/products/panini_baccala__panino_baccala.jpg',
+  'panini-veg': '../assets/pagnottella/images/products/panini_burrata__panino_burrata_gallery.jpg',
+  'insalate-carne': '../assets/pagnottella/images/products/insalate_leggera__asset_home_vitella_insalata.jpg',
+  'insalate-pesce': '../assets/pagnottella/images/products/insalate_baccala__insalata_baccala.jpg',
+  'insalate-veg': '../assets/pagnottella/images/products/insalate_reginella__insalata_reginella.jpg',
   speciali: '../assets/pagnottella/images/products/insalata_apollo.jpg'
 };
 
-const localPathFor = filename => `../assets/pagnottella/images/products/${filename}`;
+const mappingLabel = row => {
+  switch (row.mapping_type) {
+    case 'foto_specifica_o_quasi_specifica':
+      return 'Foto prodotto';
+    case 'riuso_affine_per_ingrediente':
+      return 'Foto associata';
+    default:
+      return 'Foto categoria';
+  }
+};
 
-const curated = new Map();
+const mappingDetails = row => ({
+  assigned: true,
+  specific: row.mapping_type === 'foto_specifica_o_quasi_specifica',
+  source: 'mapping-1to1',
+  confidence: row.confidence?.toLowerCase() || 'bassa',
+  label: mappingLabel(row),
+  mappingType: row.mapping_type,
+  originalUrl: row.assigned_image_url,
+  filename: row.assigned_image_filename,
+  basis: row.assignment_reason,
+  needsSupplierConfirmation: String(row.needs_supplier_confirmation || '').toLowerCase() === 'si',
+  sourcePage: row.source_page,
+  sourceAsset: row.source_image_asset_key,
+  sourceOriginalFilename: row.source_original_filename
+});
 
-for (const row of complete) {
-  if (!row.image_url) continue;
-  if (!['alta', 'media'].includes((row.confidence || '').toLowerCase())) continue;
+const mappingIndex = new Map();
+for (const row of mapping) {
   const type = row.product_type?.toLowerCase().startsWith('panini') ? 'panino' : 'insalata';
   const key = `${slugify(row.product_name)}|${type}`;
-  curated.set(key, {
-    productName: row.product_name,
-    type,
-    confidence: row.confidence.toLowerCase(),
-    source: 'complete',
-    filename: row.suggested_image_filename,
-    imageUrl: row.image_url,
-    notes: row.notes,
-    basis: row.mapping_basis
-  });
-}
-
-for (const row of associated) {
-  const confidence = (row.confidence || '').toLowerCase();
-  if (!['alta', 'media'].includes(confidence)) continue;
-  const type = row.category?.toLowerCase().startsWith('pan') ? 'panino' : 'insalata';
-  const key = `${slugify(row.product_name)}|${type}`;
-  if (curated.has(key)) continue;
-  curated.set(key, {
-    productName: row.product_name,
-    type,
-    confidence,
-    source: 'associated',
-    filename: row.suggested_filename,
-    imageUrl: row.image_url,
-    notes: row.menu_notes,
-    basis: row.association_basis
-  });
+  mappingIndex.set(key, row);
 }
 
 const results = [];
@@ -83,9 +78,40 @@ const downloadQueue = new Map();
 for (const product of menu.products) {
   const type = inferType(product.cat);
   const key = `${slugify(product.name)}|${type}`;
-  const match = curated.get(key);
-  if (!match) {
+  const row = mappingIndex.get(key);
+
+  if (!row) {
+    if (product.name === 'Apollo' && product.cat === 'speciali') {
+      product.img = '../assets/pagnottella/images/products/insalata_apollo.jpg';
+      product.imageMeta = {
+        assigned: true,
+        specific: true,
+        source: 'associated-home',
+        confidence: 'alta',
+        label: 'Foto prodotto',
+        mappingType: 'foto_specifica_o_quasi_specifica',
+        originalUrl: 'https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913541674-LEKZU93QZGKVQJ2LGHN2/apollo_3.jpg',
+        filename: 'insalata_apollo.jpg',
+        basis: 'Asset home Apollo mantenuto come riferimento per lo speciale.',
+        needsSupplierConfirmation: false,
+        sourcePage: 'Home',
+        sourceAsset: 'home_apollo'
+      };
+      downloadQueue.set('insalata_apollo.jpg', 'https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913541674-LEKZU93QZGKVQJ2LGHN2/apollo_3.jpg');
+      results.push({
+        name: product.name,
+        cat: product.cat,
+        filename: 'insalata_apollo.jpg',
+        confidence: 'alta',
+        mappingType: 'foto_specifica_o_quasi_specifica',
+        imageUrl: 'https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913541674-LEKZU93QZGKVQJ2LGHN2/apollo_3.jpg',
+        needsSupplierConfirmation: false
+      });
+      continue;
+    }
+
     product.imageMeta = {
+      assigned: false,
       specific: false,
       source: 'fallback',
       confidence: 'nessuna',
@@ -93,26 +119,19 @@ for (const product of menu.products) {
     };
     continue;
   }
-  product.img = localPathFor(match.filename);
-  product.imageMeta = {
-    specific: true,
-    source: match.source,
-    confidence: match.confidence,
-    label: match.confidence === 'alta' ? 'Foto prodotto' : 'Foto associata',
-    originalUrl: match.imageUrl,
-    filename: match.filename,
-    basis: match.basis,
-    notes: match.notes
-  };
+
+  product.img = localPathFor(row.assigned_image_filename);
+  product.imageMeta = mappingDetails(row);
   results.push({
     name: product.name,
     cat: product.cat,
-    filename: match.filename,
-    source: match.source,
-    confidence: match.confidence,
-    imageUrl: match.imageUrl
+    filename: row.assigned_image_filename,
+    confidence: row.confidence?.toLowerCase() || 'bassa',
+    mappingType: row.mapping_type,
+    imageUrl: row.assigned_image_url,
+    needsSupplierConfirmation: String(row.needs_supplier_confirmation || '').toLowerCase() === 'si'
   });
-  downloadQueue.set(match.filename, match.imageUrl);
+  downloadQueue.set(row.assigned_image_filename, row.assigned_image_url);
 }
 
 const fetchImage = async (filename, url) => {
@@ -130,13 +149,19 @@ for (const [filename, url] of downloadQueue) {
   await fetchImage(filename, url);
 }
 
+for (const existingFile of readdirSync(imageDir)) {
+  if (!downloadQueue.has(existingFile)) {
+    unlinkSync(resolve(imageDir, existingFile));
+  }
+}
+
 for (const category of menu.cats) {
   if (categoryHeroOverrides[category.id]) category.hero = categoryHeroOverrides[category.id];
 }
 
 const heroByCategory = Object.fromEntries(menu.cats.map(category => [category.id, category.hero]));
 for (const product of menu.products) {
-  if (!product.imageMeta?.specific && heroByCategory[product.cat]) {
+  if (!product.imageMeta?.assigned && heroByCategory[product.cat]) {
     product.img = heroByCategory[product.cat];
   }
 }
@@ -144,4 +169,4 @@ for (const product of menu.products) {
 writeFileSync(menuPath, JSON.stringify(menu, null, 2) + '\n');
 writeFileSync(outputMapPath, JSON.stringify(results, null, 2) + '\n');
 
-console.log(`Updated ${results.length} product images`);
+console.log(`Updated ${results.length} product image assignments`);

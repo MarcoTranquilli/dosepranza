@@ -1,98 +1,794 @@
 [
   {
+    "name": "#10",
+    "cat": "panini-carne",
+    "filename": "panini_numero_10__asset_home_vitella_panino.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "BBQ",
+    "cat": "panini-carne",
+    "filename": "panini_bbq__asset_home_vitella_panino.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Brontolo",
+    "cat": "panini-carne",
+    "filename": "panini_brontolo__panino_brontolo_probabile.jpg",
+    "confidence": "bassa",
+    "mappingType": "foto_specifica_o_quasi_specifica",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337807126-3RCGVSO1HZIL2Y211EGE/IMG_1441.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Cipollini",
+    "cat": "panini-carne",
+    "filename": "panini_cipollini__asset_home_vitella_panino.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Contadino",
+    "cat": "panini-carne",
+    "filename": "panini_contadino__asset_home_vitella_panino.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Delicato",
+    "cat": "panini-carne",
+    "filename": "panini_delicato__asset_home_vitella_panino.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Delizioso",
+    "cat": "panini-carne",
+    "filename": "panini_delizioso__asset_home_vitella_panino.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Dolcetto",
+    "cat": "panini-carne",
+    "filename": "panini_dolcetto__panino_brontolo_probabile.jpg",
+    "confidence": "bassa",
+    "mappingType": "riuso_affine_per_ingrediente",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337807126-3RCGVSO1HZIL2Y211EGE/IMG_1441.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Emiliano",
+    "cat": "panini-carne",
+    "filename": "panini_emiliano__asset_home_vitella_panino.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Fumino",
+    "cat": "panini-carne",
+    "filename": "panini_fumino__asset_home_vitella_panino.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Goloso",
+    "cat": "panini-carne",
+    "filename": "panini_goloso__panino_brontolo_probabile.jpg",
+    "confidence": "media",
+    "mappingType": "riuso_affine_per_ingrediente",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337807126-3RCGVSO1HZIL2Y211EGE/IMG_1441.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Gustoso",
+    "cat": "panini-carne",
+    "filename": "panini_gustoso__asset_home_vitella_panino.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Marchigiano",
+    "cat": "panini-carne",
+    "filename": "panini_marchigiano__asset_home_vitella_panino.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Montanaro",
+    "cat": "panini-carne",
+    "filename": "panini_montanaro__asset_home_vitella_panino.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Newyorkese",
+    "cat": "panini-carne",
+    "filename": "panini_newyorkese__asset_home_vitella_panino.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Norcino",
+    "cat": "panini-carne",
+    "filename": "panini_norcino__panino_brontolo_probabile.jpg",
+    "confidence": "bassa",
+    "mappingType": "riuso_affine_per_ingrediente",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337807126-3RCGVSO1HZIL2Y211EGE/IMG_1441.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Oregan",
+    "cat": "panini-carne",
+    "filename": "panini_oregan__asset_home_vitella_panino.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Paesano",
+    "cat": "panini-carne",
+    "filename": "panini_paesano__asset_home_vitella_panino.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Pagnottella",
+    "cat": "panini-carne",
+    "filename": "panini_pagnottella__asset_home_vitella_panino.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Quirino",
+    "cat": "panini-carne",
+    "filename": "panini_quirino__asset_home_vitella_panino.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Rucolino",
+    "cat": "panini-carne",
+    "filename": "panini_rucolino__asset_home_vitella_panino.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
     "name": "Saporito",
     "cat": "panini-carne",
-    "filename": "panino_saporito.jpg",
-    "source": "complete",
+    "filename": "panini_saporito__panino_saporito.jpg",
     "confidence": "alta",
-    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/416fa1ae-6eef-441f-9031-1bb2374d295f/saporito.jpg"
+    "mappingType": "foto_specifica_o_quasi_specifica",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/416fa1ae-6eef-441f-9031-1bb2374d295f/saporito.jpg",
+    "needsSupplierConfirmation": false
+  },
+  {
+    "name": "Soprana",
+    "cat": "panini-carne",
+    "filename": "panini_soprana__asset_home_vitella_panino.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Spock",
+    "cat": "panini-carne",
+    "filename": "panini_spock__asset_home_vitella_panino.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
+    "needsSupplierConfirmation": true
   },
   {
     "name": "Tartare",
     "cat": "panini-carne",
-    "filename": "panino_tartare.jpg",
-    "source": "complete",
+    "filename": "panini_tartare__panino_tartare.jpg",
     "confidence": "alta",
-    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1708349693859-NY2MW1I5AZGLNHSEAUFQ/tartare.jpg"
+    "mappingType": "foto_specifica_o_quasi_specifica",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1708349693859-NY2MW1I5AZGLNHSEAUFQ/tartare.jpg",
+    "needsSupplierConfirmation": false
+  },
+  {
+    "name": "Tirolo",
+    "cat": "panini-carne",
+    "filename": "panini_tirolo__panino_brontolo_probabile.jpg",
+    "confidence": "bassa",
+    "mappingType": "riuso_affine_per_ingrediente",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337807126-3RCGVSO1HZIL2Y211EGE/IMG_1441.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Tonnato",
+    "cat": "panini-carne",
+    "filename": "panini_tonnato__asset_home_vitella_panino.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
+    "needsSupplierConfirmation": true
   },
   {
     "name": "Toscanaccio",
     "cat": "panini-carne",
-    "filename": "panino_toscanaccio.jpg",
-    "source": "complete",
+    "filename": "panini_toscanaccio__panino_toscanaccio.jpg",
     "confidence": "alta",
-    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1708349844523-PM8UKIU0C2V7OSB5J32P/toscanaccio.jpg"
+    "mappingType": "foto_specifica_o_quasi_specifica",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1708349844523-PM8UKIU0C2V7OSB5J32P/toscanaccio.jpg",
+    "needsSupplierConfirmation": false
+  },
+  {
+    "name": "Toscano",
+    "cat": "panini-carne",
+    "filename": "panini_toscano__panino_toscanaccio.jpg",
+    "confidence": "alta",
+    "mappingType": "foto_specifica_o_quasi_specifica",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1708349844523-PM8UKIU0C2V7OSB5J32P/toscanaccio.jpg",
+    "needsSupplierConfirmation": false
+  },
+  {
+    "name": "Transalpino",
+    "cat": "panini-carne",
+    "filename": "panini_transalpino__asset_home_vitella_panino.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Trentino",
+    "cat": "panini-carne",
+    "filename": "panini_trentino__asset_home_vitella_panino.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Trevigiano",
+    "cat": "panini-carne",
+    "filename": "panini_trevigiano__panino_brontolo_probabile.jpg",
+    "confidence": "bassa",
+    "mappingType": "riuso_affine_per_ingrediente",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337807126-3RCGVSO1HZIL2Y211EGE/IMG_1441.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Valtella",
+    "cat": "panini-carne",
+    "filename": "panini_valtella__asset_home_vitella_panino.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Violotto",
+    "cat": "panini-carne",
+    "filename": "panini_violotto__asset_home_vitella_panino.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Cefalu",
+    "cat": "panini-pesce",
+    "filename": "panini_cefalu__panino_baccala.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913550178-57I6DBH7IDA5ZAKY2YKO/baccala_panino.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Fumarello",
+    "cat": "panini-pesce",
+    "filename": "panini_fumarello__panino_baccala.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913550178-57I6DBH7IDA5ZAKY2YKO/baccala_panino.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Lampedusa",
+    "cat": "panini-pesce",
+    "filename": "panini_lampedusa__panino_messicano.jpg",
+    "confidence": "media",
+    "mappingType": "riuso_affine_per_ingrediente",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337627814-2Y536XYYBYCYKGYYMP9M/DSCF7425.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Maestrale",
+    "cat": "panini-pesce",
+    "filename": "panini_maestrale__panino_messicano.jpg",
+    "confidence": "media",
+    "mappingType": "riuso_affine_per_ingrediente",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337627814-2Y536XYYBYCYKGYYMP9M/DSCF7425.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Marinaro",
+    "cat": "panini-pesce",
+    "filename": "panini_marinaro__panino_baccala.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913550178-57I6DBH7IDA5ZAKY2YKO/baccala_panino.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Mediterraneo",
+    "cat": "panini-pesce",
+    "filename": "panini_mediterraneo__panino_messicano.jpg",
+    "confidence": "media",
+    "mappingType": "riuso_affine_per_ingrediente",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337627814-2Y536XYYBYCYKGYYMP9M/DSCF7425.jpg",
+    "needsSupplierConfirmation": true
   },
   {
     "name": "Messicano",
     "cat": "panini-pesce",
-    "filename": "panino_messicano.jpg",
-    "source": "complete",
+    "filename": "panini_messicano__panino_messicano.jpg",
     "confidence": "media",
-    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337627814-2Y536XYYBYCYKGYYMP9M/DSCF7425.jpg"
+    "mappingType": "foto_specifica_o_quasi_specifica",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337627814-2Y536XYYBYCYKGYYMP9M/DSCF7425.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Norvegese",
+    "cat": "panini-pesce",
+    "filename": "panini_norvegese__panino_baccala.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913550178-57I6DBH7IDA5ZAKY2YKO/baccala_panino.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Pantelleria",
+    "cat": "panini-pesce",
+    "filename": "panini_pantelleria__panino_baccala.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913550178-57I6DBH7IDA5ZAKY2YKO/baccala_panino.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Parigino",
+    "cat": "panini-pesce",
+    "filename": "panini_parigino__panino_messicano.jpg",
+    "confidence": "media",
+    "mappingType": "riuso_affine_per_ingrediente",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337627814-2Y536XYYBYCYKGYYMP9M/DSCF7425.jpg",
+    "needsSupplierConfirmation": true
   },
   {
     "name": "Baccala",
     "cat": "panini-pesce",
-    "filename": "panino_baccala.jpg",
-    "source": "complete",
+    "filename": "panini_baccala__panino_baccala.jpg",
     "confidence": "alta",
-    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913550178-57I6DBH7IDA5ZAKY2YKO/baccala_panino.jpg"
+    "mappingType": "foto_specifica_o_quasi_specifica",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913550178-57I6DBH7IDA5ZAKY2YKO/baccala_panino.jpg",
+    "needsSupplierConfirmation": false
+  },
+  {
+    "name": "San Jose",
+    "cat": "panini-pesce",
+    "filename": "panini_san_jose__panino_messicano.jpg",
+    "confidence": "media",
+    "mappingType": "riuso_affine_per_ingrediente",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337627814-2Y536XYYBYCYKGYYMP9M/DSCF7425.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Scirocco",
+    "cat": "panini-pesce",
+    "filename": "panini_scirocco__panino_messicano.jpg",
+    "confidence": "media",
+    "mappingType": "riuso_affine_per_ingrediente",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337627814-2Y536XYYBYCYKGYYMP9M/DSCF7425.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Verduzzo",
+    "cat": "panini-pesce",
+    "filename": "panini_verduzzo__panino_messicano.jpg",
+    "confidence": "media",
+    "mappingType": "riuso_affine_per_ingrediente",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337627814-2Y536XYYBYCYKGYYMP9M/DSCF7425.jpg",
+    "needsSupplierConfirmation": true
   },
   {
     "name": "Burrata",
     "cat": "panini-veg",
-    "filename": "panino_burrata.jpg",
-    "source": "complete",
+    "filename": "panini_burrata__panino_burrata.jpg",
     "confidence": "alta",
-    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337806242-QRTKSCRHFYN3AQS4L821/DSCF8503.jpg"
+    "mappingType": "foto_specifica_o_quasi_specifica",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337806242-QRTKSCRHFYN3AQS4L821/DSCF8503.jpg",
+    "needsSupplierConfirmation": false
+  },
+  {
+    "name": "Campagnolo",
+    "cat": "panini-veg",
+    "filename": "panini_campagnolo__panino_burrata.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337806242-QRTKSCRHFYN3AQS4L821/DSCF8503.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Caprese",
+    "cat": "panini-veg",
+    "filename": "panini_caprese__panino_burrata.jpg",
+    "confidence": "media",
+    "mappingType": "riuso_affine_per_ingrediente",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337806242-QRTKSCRHFYN3AQS4L821/DSCF8503.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Ortolino",
+    "cat": "panini-veg",
+    "filename": "panini_ortolino__panino_burrata.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337806242-QRTKSCRHFYN3AQS4L821/DSCF8503.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Spaccanapoli",
+    "cat": "panini-veg",
+    "filename": "panini_spaccanapoli__panino_burrata.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337806242-QRTKSCRHFYN3AQS4L821/DSCF8503.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Tricolore",
+    "cat": "panini-veg",
+    "filename": "panini_tricolore__panino_burrata.jpg",
+    "confidence": "media",
+    "mappingType": "riuso_affine_per_ingrediente",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337806242-QRTKSCRHFYN3AQS4L821/DSCF8503.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "VEG",
+    "cat": "panini-veg",
+    "filename": "panini_veg__panino_messicano.jpg",
+    "confidence": "media",
+    "mappingType": "riuso_affine_per_ingrediente",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337627814-2Y536XYYBYCYKGYYMP9M/DSCF7425.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Giardiniera",
+    "cat": "insalate-carne",
+    "filename": "insalate_giardiniera__insalata_trapanese.jpg",
+    "confidence": "media",
+    "mappingType": "riuso_affine_per_ingrediente",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341597598-9O2HBC5LSQNYBC3SG687/trapanese.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Leggera",
+    "cat": "insalate-carne",
+    "filename": "insalate_leggera__asset_home_vitella_insalata.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913819124-6F2GES795B4JPNYTT4UZ/vitella_insalata.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Suprema",
+    "cat": "insalate-carne",
+    "filename": "insalate_suprema__insalata_reginella.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341540039-MUG7YLZM6E4THD2RNKXH/DSCF7331.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Tartare",
+    "cat": "insalate-carne",
+    "filename": "insalate_tartare__insalata_salentina.jpg",
+    "confidence": "media",
+    "mappingType": "riuso_affine_per_ingrediente",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341641448-ERIUQ6ZDTVGB0K9D0OEJ/DSCF3962.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Trevigiana",
+    "cat": "insalate-carne",
+    "filename": "insalate_trevigiana__asset_insalata_gorgonzola_non_menu.jpg",
+    "confidence": "bassa",
+    "mappingType": "riuso_affine_per_ingrediente",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341796636-YOBM8D003EPXBSW3IPRM/insalata_gorgonzola_2.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Valtellina",
+    "cat": "insalate-carne",
+    "filename": "insalate_valtellina__asset_home_vitella_insalata.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913819124-6F2GES795B4JPNYTT4UZ/vitella_insalata.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Newyorkese",
+    "cat": "insalate-carne",
+    "filename": "insalate_newyorkese__asset_home_vitella_insalata.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913819124-6F2GES795B4JPNYTT4UZ/vitella_insalata.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Asiatica",
+    "cat": "insalate-pesce",
+    "filename": "insalate_asiatica__insalata_trapanese.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341597598-9O2HBC5LSQNYBC3SG687/trapanese.jpg",
+    "needsSupplierConfirmation": true
   },
   {
     "name": "Baccala",
     "cat": "insalate-pesce",
-    "filename": "insalata_baccala.jpg",
-    "source": "complete",
+    "filename": "insalate_baccala__insalata_baccala.jpg",
     "confidence": "alta",
-    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913547258-U44KCIU4E8WMLA1A6W8Z/baccala_insalata.jpg"
+    "mappingType": "foto_specifica_o_quasi_specifica",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913547258-U44KCIU4E8WMLA1A6W8Z/baccala_insalata.jpg",
+    "needsSupplierConfirmation": false
   },
   {
     "name": "Cefalu",
     "cat": "insalate-pesce",
-    "filename": "insalata_cefalu.jpg",
-    "source": "complete",
+    "filename": "insalate_cefalu__insalata_cefalu.jpg",
     "confidence": "alta",
-    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341646194-RUG4C2J6ZQBUI485YMKR/DSCF9302.jpg"
+    "mappingType": "foto_specifica_o_quasi_specifica",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341646194-RUG4C2J6ZQBUI485YMKR/DSCF9302.jpg",
+    "needsSupplierConfirmation": false
+  },
+  {
+    "name": "Delicata",
+    "cat": "insalate-pesce",
+    "filename": "insalate_delicata__insalata_reginella.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341540039-MUG7YLZM6E4THD2RNKXH/DSCF7331.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Estiva",
+    "cat": "insalate-pesce",
+    "filename": "insalate_estiva__insalata_reginella.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341540039-MUG7YLZM6E4THD2RNKXH/DSCF7331.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Fresca",
+    "cat": "insalate-pesce",
+    "filename": "insalate_fresca__insalata_reginella.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341540039-MUG7YLZM6E4THD2RNKXH/DSCF7331.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Hawaii",
+    "cat": "insalate-pesce",
+    "filename": "insalate_hawaii__insalata_trapanese.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341597598-9O2HBC5LSQNYBC3SG687/trapanese.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Isolana",
+    "cat": "insalate-pesce",
+    "filename": "insalate_isolana__insalata_reginella.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341540039-MUG7YLZM6E4THD2RNKXH/DSCF7331.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Lampedusa",
+    "cat": "insalate-pesce",
+    "filename": "insalate_lampedusa__insalata_trapanese.jpg",
+    "confidence": "media",
+    "mappingType": "riuso_affine_per_ingrediente",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341597598-9O2HBC5LSQNYBC3SG687/trapanese.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Mediterranea",
+    "cat": "insalate-pesce",
+    "filename": "insalate_mediterranea__insalata_trapanese.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341597598-9O2HBC5LSQNYBC3SG687/trapanese.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Osaka",
+    "cat": "insalate-pesce",
+    "filename": "insalate_osaka__insalata_trapanese.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341597598-9O2HBC5LSQNYBC3SG687/trapanese.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Pantelleria",
+    "cat": "insalate-pesce",
+    "filename": "insalate_pantelleria__insalata_cefalu.jpg",
+    "confidence": "media",
+    "mappingType": "foto_specifica_o_quasi_specifica",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341646194-RUG4C2J6ZQBUI485YMKR/DSCF9302.jpg",
+    "needsSupplierConfirmation": true
   },
   {
     "name": "Salentina",
     "cat": "insalate-pesce",
-    "filename": "insalata_salentina.jpg",
-    "source": "complete",
+    "filename": "insalate_salentina__insalata_salentina.jpg",
     "confidence": "alta",
-    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341641448-ERIUQ6ZDTVGB0K9D0OEJ/DSCF3962.jpg"
+    "mappingType": "foto_specifica_o_quasi_specifica",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341641448-ERIUQ6ZDTVGB0K9D0OEJ/DSCF3962.jpg",
+    "needsSupplierConfirmation": false
+  },
+  {
+    "name": "San Jose",
+    "cat": "insalate-pesce",
+    "filename": "insalate_san_jose__insalata_trapanese.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341597598-9O2HBC5LSQNYBC3SG687/trapanese.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Sicula",
+    "cat": "insalate-pesce",
+    "filename": "insalate_sicula__insalata_salentina.jpg",
+    "confidence": "media",
+    "mappingType": "riuso_affine_per_ingrediente",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341641448-ERIUQ6ZDTVGB0K9D0OEJ/DSCF3962.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Siracusa",
+    "cat": "insalate-pesce",
+    "filename": "insalate_siracusa__insalata_salentina.jpg",
+    "confidence": "media",
+    "mappingType": "riuso_affine_per_ingrediente",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341641448-ERIUQ6ZDTVGB0K9D0OEJ/DSCF3962.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Sportiva",
+    "cat": "insalate-pesce",
+    "filename": "insalate_sportiva__asset_insalata_gorgonzola_non_menu.jpg",
+    "confidence": "bassa",
+    "mappingType": "riuso_affine_per_ingrediente",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341796636-YOBM8D003EPXBSW3IPRM/insalata_gorgonzola_2.jpg",
+    "needsSupplierConfirmation": true
   },
   {
     "name": "Trapanese",
     "cat": "insalate-pesce",
-    "filename": "insalata_trapanese.jpg",
-    "source": "complete",
+    "filename": "insalate_trapanese__insalata_trapanese.jpg",
     "confidence": "alta",
-    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341597598-9O2HBC5LSQNYBC3SG687/trapanese.jpg"
+    "mappingType": "foto_specifica_o_quasi_specifica",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341597598-9O2HBC5LSQNYBC3SG687/trapanese.jpg",
+    "needsSupplierConfirmation": false
+  },
+  {
+    "name": "Vanitosa",
+    "cat": "insalate-pesce",
+    "filename": "insalate_vanitosa__insalata_trapanese.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341597598-9O2HBC5LSQNYBC3SG687/trapanese.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Burrata",
+    "cat": "insalate-veg",
+    "filename": "insalate_burrata__insalata_salentina.jpg",
+    "confidence": "media",
+    "mappingType": "riuso_affine_per_ingrediente",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341641448-ERIUQ6ZDTVGB0K9D0OEJ/DSCF3962.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Caprese",
+    "cat": "insalate-veg",
+    "filename": "insalate_caprese__insalata_reginella.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341540039-MUG7YLZM6E4THD2RNKXH/DSCF7331.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Greca",
+    "cat": "insalate-veg",
+    "filename": "insalate_greca__insalata_reginella.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341540039-MUG7YLZM6E4THD2RNKXH/DSCF7331.jpg",
+    "needsSupplierConfirmation": true
+  },
+  {
+    "name": "Ortolana",
+    "cat": "insalate-veg",
+    "filename": "insalate_ortolana__insalata_reginella.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341540039-MUG7YLZM6E4THD2RNKXH/DSCF7331.jpg",
+    "needsSupplierConfirmation": true
   },
   {
     "name": "Reginella",
     "cat": "insalate-veg",
-    "filename": "insalata_reginella.jpg",
-    "source": "complete",
+    "filename": "insalate_reginella__insalata_reginella.jpg",
     "confidence": "alta",
-    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341540039-MUG7YLZM6E4THD2RNKXH/DSCF7331.jpg"
+    "mappingType": "foto_specifica_o_quasi_specifica",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341540039-MUG7YLZM6E4THD2RNKXH/DSCF7331.jpg",
+    "needsSupplierConfirmation": false
+  },
+  {
+    "name": "Vegetariana",
+    "cat": "insalate-veg",
+    "filename": "insalate_vegetariana__insalata_reginella.jpg",
+    "confidence": "bassa",
+    "mappingType": "fallback_categoria",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341540039-MUG7YLZM6E4THD2RNKXH/DSCF7331.jpg",
+    "needsSupplierConfirmation": true
   },
   {
     "name": "Apollo",
     "cat": "speciali",
     "filename": "insalata_apollo.jpg",
-    "source": "associated",
     "confidence": "alta",
-    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913541674-LEKZU93QZGKVQJ2LGHN2/apollo_3.jpg"
+    "mappingType": "foto_specifica_o_quasi_specifica",
+    "imageUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913541674-LEKZU93QZGKVQJ2LGHN2/apollo_3.jpg",
+    "needsSupplierConfirmation": false
   }
 ]

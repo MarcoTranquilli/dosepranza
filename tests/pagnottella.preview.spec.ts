@@ -31,6 +31,8 @@ test.describe('Preview multi-fornitore', () => {
     await expect(page.locator('#shop')).toHaveClass(/show/);
     await expect(page.locator('#heroText')).toContainText('12:00');
     await expect(page.locator('#heroText')).toContainText('13:00');
+    await expect(page.locator('body')).not.toContainText('Documenti locali');
+    await expect(page.locator('body')).not.toContainText('Materiali commerciali');
     await expect(page.locator('#paymentMethods')).toContainText('Satispay');
     await expect(page.locator('#paymentMethods')).toContainText('Bonifico istantaneo');
 
@@ -40,7 +42,7 @@ test.describe('Preview multi-fornitore', () => {
 
     await page.locator('#search').fill('Saporito');
     await expect(page.locator('#grid .card')).toHaveCount(1);
-    await expect(page.locator('#grid .card img').first()).toHaveAttribute('src', /panino_saporito\.jpg/);
+    await expect(page.locator('#grid .card img').first()).toHaveAttribute('src', /panini_saporito__panino_saporito\.jpg/);
     await expect(page.locator('#grid .card').first()).toContainText('Foto prodotto');
 
     await page.locator('#grid .card .add').first().click();
