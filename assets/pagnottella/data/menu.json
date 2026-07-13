@@ -1319,7 +1319,12 @@
       "hero": "../assets/pagnottella/images/optimized/DSCF7425.webp"
     }
   ],
-  "discount": 0.1,
+  "discount": {
+    "rate": 0.2,
+    "label": "Sconto lancio estate",
+    "activeUntil": "2026-08-23",
+    "fallbackRate": 0
+  },
   "whatsapp": "393921512515",
   "bread": [
     {
@@ -1354,11 +1359,11 @@
     }
   ],
   "copy": {
-    "delivery": "Consegna gratuita prima di pranzo",
+    "delivery": "Ordini e pagamenti entro le 12:00, consegna entro le 13:00",
     "brand": "La Pagnottella Gourmet",
     "powered": "DOSepranza",
     "eyebrow": "Punto vendita Quintino Sella",
-    "headline": "Panini e insalate gourmet, ordinati in pochi tap.",
+    "headline": "Panini e insalate gourmet, con sconto estivo e consegna in pausa pranzo.",
     "subheadline": "Catalogo ufficiale basato su sito, volantino del punto vendita e listino ingredienti aggiuntivi."
   },
   "docs": [
@@ -1385,20 +1390,17 @@
   },
   "payment": {
     "methods": [
-      "Carta",
-      "Bancomat",
-      "PayPal",
-      "Google Pay",
-      "Apple Pay"
+      "Satispay",
+      "Bonifico istantaneo"
     ],
-    "model": "Pagamento alla consegna",
-    "pickup": "Pick&Pay disponibile in punto vendita"
+    "model": "Pagamento anticipato entro le 12:00",
+    "pickup": "PayPal in valutazione con Isidoro"
   },
   "notes": {
     "allergens": "1 glutine, 2 crostacei, 3 uova, 4 pesce, 5 arachidi, 6 soia, 7 latte, 8 frutta a guscio, 9 sedano, 10 senape, 11 sesamo, 12 solfiti, 13 lupini, 14 molluschi.",
     "frozen": "* Prodotto surgelato.",
     "olive": "** Le olive potrebbero contenere eccezionalmente noccioli.",
-    "priceValidity": "Ricette e prezzi indicati nel volantino validi fino al 30/05/2026."
+    "priceValidity": "Ricette e prezzi indicati nel volantino validi fino a verifica con il punto vendita. Promo estate 2026: sconto 20% fino al 23/08/2026."
   },
   "extras": [
     {
@@ -1632,16 +1634,16 @@
   ],
   "highlights": [
     {
-      "label": "Consegna gratuita",
-      "value": "prima di pranzo"
+      "label": "Cutoff operativo",
+      "value": "ordine e pagamento entro le 12:00"
     },
     {
-      "label": "Convenzione aziendale",
-      "value": "-10% automatico"
+      "label": "Promo estate",
+      "value": "-20% fino al 23 agosto"
     },
     {
-      "label": "Punto vendita",
-      "value": "Via Quintino Sella 53, Roma"
+      "label": "Consegna",
+      "value": "entro le 13:00 del giorno stesso"
     }
   ]
 }

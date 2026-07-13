@@ -5,7 +5,22 @@ const state = { screen:'landing', cat:'all', filter:'', query:'', sort:'recommen
 const byId = id => document.getElementById(id);
 const money = v => '€' + (Math.round(v*100)/100).toFixed(2).replace('.', ',');
 const esc = s => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-const discount = v => Math.round(v * (1 - DATA.discount) * 100) / 100;
+const discountRate = () => {
+  const cfg = DATA?.discount;
+  if(typeof cfg === 'number') return cfg;
+  if(!cfg || typeof cfg !== 'object') return 0;
+  const today = new Date();
+  const limit = cfg.activeUntil ? new Date(`${cfg.activeUntil}T23:59:59`) : null;
+  return !limit || today <= limit ? Number(cfg.rate || 0) : Number(cfg.fallbackRate || 0);
+};
+const discountLabel = () => {
+  const rate = Math.round(discountRate() * 100);
+  if(!rate) return 'Prezzo standard';
+  return `${DATA.discount.label || 'Sconto attivo'} -${rate}%`;
+};
+const deliveryCopy = () => DATA?.copy?.delivery || 'Ordini e pagamenti entro le 12:00, consegna entro le 13:00';
+const paymentStatusCopy = () => `${DATA.payment.model}. ${DATA.payment.pickup}.`;
+const discountedPrice = v => Math.round(v * (1 - discountRate()) * 100) / 100;
 
 async function bootstrap(){
   const res = await fetch('../assets/pagnottella/data/menu.json', { cache: 'no-store' });
@@ -27,7 +42,7 @@ async function bootstrap(){
 function hydrateStatic(){
   byId('brand-subtitle').textContent = `${DATA.copy.eyebrow} · ordine in pochi tap`;
   byId('heroTitle').textContent = DATA.copy.headline;
-  byId('heroText').textContent = `${DATA.copy.subheadline} Prezzi originali e scontati sempre visibili. Scegli pane o base, aggiungi note/allergie e apri WhatsApp con un messaggio già compilato correttamente.`;
+  byId('heroText').textContent = `${DATA.copy.subheadline} Prezzi originali e scontati sempre visibili. Ordina e paga entro le 12:00, poi consegna entro le 13:00.`;
   byId('contact-address').textContent = DATA.contact.address;
   byId('contact-hours').textContent = DATA.contact.hours;
   byId('contact-whatsapp').href = DATA.contact.whatsappUrl;
@@ -42,9 +57,14 @@ function hydrateStatic(){
   byId('notesList').innerHTML = [
     { title:'Allergeni', body: DATA.notes.allergens },
     { title:'Prodotti', body: `${DATA.notes.frozen} ${DATA.notes.olive}` },
-    { title:'Pagamento', body: `${DATA.payment.model}. ${DATA.payment.pickup}.` },
+    { title:'Pagamento', body: paymentStatusCopy() },
   ].map(n => `<div class="noteItem"><strong>${esc(n.title)}</strong>${esc(n.body)}</div>`).join('');
   byId('paymentMethods').innerHTML = DATA.payment.methods.map(m => `<span class="methodChip">${esc(m)}</span>`).join('');
+  byId('cartDeliveryText').textContent = deliveryCopy();
+  byId('discountLabel').textContent = discountLabel();
+  byId('deliveryCardText').textContent = `${deliveryCopy()}.`;
+  byId('paymentCardTitle').textContent = DATA.payment.model;
+  byId('paymentCardText').textContent = `${DATA.payment.pickup}.`;
   const allCat = CATS.find(c => c.id === 'all');
   if(allCat) byId('heroImage').src = allCat.hero;
 }
@@ -119,12 +139,13 @@ function renderCatalog(){
   const arr = filtered();
   const cat = CATS.find(c => c.id === state.cat);
   byId('sectionTitle').textContent = state.cat === 'all' ? 'Tutto il menu' : cat.label;
-  byId('sectionSub').textContent = `${arr.length} prodotti disponibili · prezzi già scontati del 10%`;
+  const rate = Math.round(discountRate() * 100);
+  byId('sectionSub').textContent = `${arr.length} prodotti disponibili · ${rate ? `prezzi già scontati del ${rate}%` : 'prezzi standard attivi'}`;
   byId('empty').classList.toggle('show', arr.length === 0);
   byId('grid').innerHTML = arr.map(p => card(p)).join('');
 }
 function card(p){
-  return `<article class="card"><div class="pic"><img src="${p.img}" alt="${esc(p.name)}" loading="lazy"><div class="badges">${(p.tags||[]).slice(0,2).map(t=>`<span class="badge">${esc(t)}</span>`).join('')}</div></div><div class="body"><div class="nameRow"><h4>${esc(p.name)}</h4><div class="price"><span class="old">${money(p.price)}</span>${money(discount(p.price))}</div></div><p class="desc">${esc(p.desc)}</p><div class="meta"><span class="tag">${esc(catLabel(p.cat))}</span>${(p.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div><div class="actions"><button class="details" onclick="openDetails('${p.id}')">Dettagli</button><button class="add" aria-label="Aggiungi ${esc(p.name)}" onclick="quickAdd('${p.id}')">+</button></div></div></article>`;
+  return `<article class="card"><div class="pic"><img src="${p.img}" alt="${esc(p.name)}" loading="lazy"><div class="badges">${(p.tags||[]).slice(0,2).map(t=>`<span class="badge">${esc(t)}</span>`).join('')}</div></div><div class="body"><div class="nameRow"><h4>${esc(p.name)}</h4><div class="price"><span class="old">${money(p.price)}</span>${money(discountedPrice(p.price))}</div></div><p class="desc">${esc(p.desc)}</p><div class="meta"><span class="tag">${esc(catLabel(p.cat))}</span>${(p.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div><div class="actions"><button class="details" onclick="openDetails('${p.id}')">Dettagli</button><button class="add" aria-label="Aggiungi ${esc(p.name)}" onclick="quickAdd('${p.id}')">+</button></div></div></article>`;
 }
 function openDetails(id){
   const p = PRODUCTS.find(x => x.id === id);
@@ -142,20 +163,20 @@ function openDetails(id){
   byId('drawer').classList.add('show');
 }
 function pickOption(i){ state.option = optionList(state.current)[i]; document.querySelectorAll('.opt').forEach((b,idx)=>b.classList.toggle('on', idx===i)); updateDrawerPrice(); }
-function updateDrawerPrice(){ const p = state.current, o = state.option || defaultOption(p); byId('drawerOld').textContent = money(p.price + o.extra); byId('drawerPrice').textContent = money(discount(p.price + o.extra)); }
+function updateDrawerPrice(){ const p = state.current, o = state.option || defaultOption(p); byId('drawerOld').textContent = money(p.price + o.extra); byId('drawerPrice').textContent = money(discountedPrice(p.price + o.extra)); }
 function closeDrawer(){ byId('drawer').classList.remove('show'); }
 function quickAdd(id){ const p = PRODUCTS.find(x => x.id === id); addToCart(p, defaultOption(p)); }
 function drawerAdd(){ addToCart(state.current, state.option || defaultOption(state.current)); closeDrawer(); }
 function addToCart(p,o){ const originalUnit = Math.round((p.price + o.extra) * 100) / 100; const key = p.id + '|' + o.label; if(!state.cart[key]) state.cart[key] = {...p,opt:o.label,optExtra:o.extra,originalUnit,qty:0}; state.cart[key].qty++; toast(`${p.name} aggiunto al carrello`); renderCart(); }
 function changeQty(key,delta){ if(!state.cart[key]) return; state.cart[key].qty += delta; if(state.cart[key].qty <= 0) delete state.cart[key]; renderCart(); }
-function totals(){ const items = Object.values(state.cart); const orig = items.reduce((a,i)=>a+i.originalUnit*i.qty,0); const total = discount(orig); return {items, count:items.reduce((a,i)=>a+i.qty,0), orig, total, saving:orig-total}; }
+function totals(){ const items = Object.values(state.cart); const orig = items.reduce((a,i)=>a+i.originalUnit*i.qty,0); const total = discountedPrice(orig); return {items, count:items.reduce((a,i)=>a+i.qty,0), orig, total, saving:orig-total}; }
 function renderCart(){
   const t = totals();
   byId('cartCount').textContent = t.count;
   byId('mobileCount').textContent = t.count;
   byId('mobileTotal').textContent = money(t.total);
   byId('mobileBar').classList.toggle('hidden', t.count === 0);
-  const lines = t.items.map(i => `<div class="cartItem checkoutItem"><img src="${i.img}" alt="${esc(i.name)}"><div class="ciMain"><div class="ciName">${esc(i.name)}</div><div class="ciMeta">${esc(i.opt)}${i.optExtra?` · supplemento ${money(i.optExtra)}`:''}<br>${money(discount(i.originalUnit))} cad.</div><div class="qty stepper"><button aria-label="Diminuisci" onclick="changeQty('${escKey(i.id+'|'+i.opt)}',-1)">−</button><b>${i.qty}</b><button aria-label="Aumenta" onclick="changeQty('${escKey(i.id+'|'+i.opt)}',1)">+</button></div></div><div class="ciPrice">${money(discount(i.originalUnit)*i.qty)}</div></div>`).join('');
+  const lines = t.items.map(i => `<div class="cartItem checkoutItem"><img src="${i.img}" alt="${esc(i.name)}"><div class="ciMain"><div class="ciName">${esc(i.name)}</div><div class="ciMeta">${esc(i.opt)}${i.optExtra?` · supplemento ${money(i.optExtra)}`:''}<br>${money(discountedPrice(i.originalUnit))} cad.</div><div class="qty stepper"><button aria-label="Diminuisci" onclick="changeQty('${escKey(i.id+'|'+i.opt)}',-1)">−</button><b>${i.qty}</b><button aria-label="Aumenta" onclick="changeQty('${escKey(i.id+'|'+i.opt)}',1)">+</button></div></div><div class="ciPrice">${money(discountedPrice(i.originalUnit)*i.qty)}</div></div>`).join('');
   byId('cartItems').innerHTML = t.count ? lines : `<div class="cartEmpty">Il carrello è vuoto. Aggiungi panini, insalate o bevande dal catalogo.</div>`;
   byId('summary').classList.toggle('hidden', !t.count);
   byId('checkout').classList.toggle('hidden', !t.count);
@@ -184,18 +205,21 @@ function buildMessage(){
   if(purpose) msg += `\nTipo ordine: ${purpose}`;
   msg += `\nData: ${cap(date)} - ${time}`;
   msg += `\nPunto vendita: ${DATA.contact.address}`;
-  msg += `\nConsegna: prima di pranzo`;
+  msg += `\nFinestra servizio: ${deliveryCopy()}`;
   msg += `\n\nOrdine:\n`;
-  t.items.forEach(i => { msg += `${i.qty}x ${i.name} (${i.opt}) - ${money(discount(i.originalUnit)*i.qty)}\n`; });
-  msg += `\nTotale: ${money(t.total)} (sconto convenzione -10% applicato)`;
+  t.items.forEach(i => { msg += `${i.qty}x ${i.name} (${i.opt}) - ${money(discountedPrice(i.originalUnit)*i.qty)}\n`; });
+  const rate = Math.round(discountRate() * 100);
+  msg += `\nTotale: ${money(t.total)}${rate ? ` (${discountLabel()} applicato)` : ''}`;
   msg += `\nPagamento: ${DATA.payment.model}`;
+  msg += `\nMetodi: ${DATA.payment.methods.join(', ')}`;
+  msg += `\nNota pagamenti: ${DATA.payment.pickup}`;
   if(notes) msg += `\nNote/allergie: ${notes}`;
   msg += `\n\nOrdine effettuato tramite DOSepranza`;
   return msg;
 }
 function cap(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
 function whatsappUrl(){ const params = new URLSearchParams({ phone:DATA.whatsapp, text:buildMessage(), type:'phone_number', app_absent:'0' }); return 'https://api.whatsapp.com/send/?' + params.toString(); }
-function sendWA(){ if(totals().count === 0) return; logOrder(); window.open(whatsappUrl(),'_blank'); byId('confirm').classList.add('show'); byId('confirm').textContent = 'Ordine pronto: WhatsApp è stato aperto con il messaggio già compilato.'; }
+function sendWA(){ if(totals().count === 0) return; logOrder(); window.open(whatsappUrl(),'_blank'); byId('confirm').classList.add('show'); byId('confirm').textContent = 'Ordine pronto: WhatsApp è stato aperto con il riepilogo completo, incluso il promemoria di pagamento entro le 12:00.'; }
 function logOrder(){ const logs = JSON.parse(localStorage.getItem('pg_demo_orders')||'[]'); const t = totals(); logs.unshift({ ts:new Date().toISOString(), customer:(byId('customer').value||'Cliente').trim(), company:(byId('company')?.value||'').trim(), costCenter:(byId('costCenter')?.value||'').trim(), count:t.count, total:t.total, message:buildMessage() }); localStorage.setItem('pg_demo_orders', JSON.stringify(logs.slice(0,25))); updateAdmin(); }
 function newOrder(){ state.cart = {}; byId('notes').value = ''; byId('confirm').classList.remove('show'); renderCart(); closeCart(); }
 function openCart(){ byId('cart').classList.add('open'); byId('cartBackdrop').classList.add('show'); }
@@ -203,7 +227,7 @@ function closeCart(){ byId('cart').classList.remove('open'); byId('cartBackdrop'
 function toast(txt){ const el = byId('toast'); el.textContent = txt; el.classList.add('show'); clearTimeout(window.__toast); window.__toast = setTimeout(() => el.classList.remove('show'), 1600); }
 function updateAdmin(){ const logs = JSON.parse(localStorage.getItem('pg_demo_orders')||'[]'); byId('mProducts').textContent = PRODUCTS.length; byId('mCart').textContent = totals().count; byId('mOrders').textContent = logs.length; byId('mValue').textContent = money(logs.reduce((a,o)=>a+Number(o.total||0),0)); }
 function exportCSV(){ const logs = JSON.parse(localStorage.getItem('pg_demo_orders')||'[]'); const rows = [['timestamp','cliente','azienda','centro_costo','prodotti','totale','messaggio'], ...logs.map(o=>[o.ts,o.customer,o.company||'',o.costCenter||'',o.count,o.total,o.message])]; const csv = rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n'); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download = 'ordini-pagnottella-demo.csv'; a.click(); URL.revokeObjectURL(a.href); }
-function escJs(s){ return String(s).replace(/'/g, "\\'"); }
+function escJs(s){ return String(s).replace(/[\\']/g, m => m === '\\' ? '\\\\' : "\\'"); }
 
 Object.assign(window, { openShop, backLanding, setCat, setFilter, openDetails, pickOption, closeDrawer, quickAdd, drawerAdd, changeQty, sendWA, newOrder, openCart, closeCart, exportCSV });
 bootstrap().catch(err => {

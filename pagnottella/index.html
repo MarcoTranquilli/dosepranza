@@ -32,7 +32,7 @@
             </a>
             <button class="provider" type="button" onclick="openShop()">
               <div class="providerTop"><img class="providerLogo" src="../assets/pagnottella/images/optimized/logo_pagnottella.webp" alt="Logo La Pagnottella Gourmet"><div><h3>La Pagnottella Gourmet</h3><p>Panini e insalate gourmet</p></div></div>
-              <p>Catalogo ufficiale alleggerito e reso stabile: consegna gratuita, sconto convenzione, documenti locali e ordine WhatsApp pronto.</p>
+              <p>Catalogo ufficiale alleggerito e reso stabile: promo estate, documenti locali, pagamenti anticipati e ordine WhatsApp pronto.</p>
               <span class="choose">Scegli e ordina</span>
             </button>
           </div>
@@ -69,7 +69,7 @@
         <img class="heroLogo" src="../assets/pagnottella/images/optimized/logo_pagnottella.webp" alt="La Pagnottella Gourmet">
         <div class="eyebrow" id="heroKicker">Menu completo</div>
         <h2 id="heroTitle">Panini e insalate gourmet, ordinati in pochi secondi.</h2>
-        <p id="heroText">Prezzi originali e scontati sempre visibili. Scegli pane o base, aggiungi note/allergie e apri WhatsApp con un messaggio già compilato correttamente.</p>
+        <p id="heroText">Prezzi originali e scontati sempre visibili. Ordina e paga entro le 12:00, poi consegna entro le 13:00.</p>
         <div class="heroStats" id="heroStats"></div>
       </div>
     </section>
@@ -138,7 +138,7 @@
         <div class="cartHead checkoutHead">
           <div>
             <h3>Carrello</h3>
-            <p class="cartDelivery"><span class="cartDeliveryIcon">⌚</span>Consegna gratuita · prima di pranzo</p>
+            <p class="cartDelivery"><span class="cartDeliveryIcon">⌚</span><span id="cartDeliveryText">Ordini e pagamenti entro le 12:00, consegna entro le 13:00</span></p>
           </div>
           <span class="cartCount" id="cartCount">0</span>
         </div>
@@ -146,14 +146,14 @@
           <div id="cartItems"></div>
           <div id="summary" class="summary checkoutSummary hidden">
             <div class="sumRow"><span>Subtotale originale</span><span id="origTotal">€0,00</span></div>
-            <div class="sumRow"><span>Sconto convenzione -10%</span><span id="saving">-€0,00</span></div>
+            <div class="sumRow"><span id="discountLabel">Sconto attivo</span><span id="saving">-€0,00</span></div>
             <div class="sumDivider"></div>
             <div class="sumRow total"><span>Totale</span><span id="finalTotal">€0,00</span></div>
           </div>
           <div id="checkout" class="form checkoutForm hidden">
             <div class="field prettyField"><label for="customer">Nome e cognome</label><div class="inputShell"><span class="inputIcon">♡</span><input id="customer" placeholder="Inserisci nome e cognome" autocomplete="name"></div></div>
             <details class="optionalDetails"><summary>Dati aziendali (opzionale)</summary><div class="optionalHint">Aggiungi solo le informazioni utili per la rendicontazione del tuo ordine.</div><div class="optionalBody"><div class="businessGrid"><div class="field prettyField"><label for="company">Azienda</label><div class="inputShell"><span class="inputIcon">▣</span><input id="company" placeholder="Es. DOSepranza" autocomplete="organization"></div></div><div class="field prettyField"><label for="costCenter">Centro di costo</label><div class="inputShell"><span class="inputIcon">#</span><input id="costCenter" placeholder="Es. HQ-Roma / Team Sales"></div></div></div><div class="businessGrid"><div class="field prettyField"><label for="approver">Referente</label><div class="inputShell"><span class="inputIcon">✓</span><input id="approver" placeholder="Nome referente (opzionale)"></div></div><div class="field prettyField"><label for="purpose">Tipo ordine</label><div class="inputShell"><span class="inputIcon">•</span><select id="purpose"><option>Pranzo dipendenti</option><option>Meeting interno</option><option>Ospiti / clienti</option><option>Evento aziendale</option></select></div></div></div></div></details>
-            <div class="infoCards"><div class="serviceCard deliveryCard"><div class="serviceIcon">↻</div><div><strong>Consegna gratuita</strong><span>Prima di pranzo, senza scelta oraria. L'ordine viene recapitato in fascia pranzo.</span></div></div><div class="serviceCard paymentCard"><div class="serviceIcon">¤</div><div><strong>Pagamento alla consegna</strong><span>Metodi digitali e carte come indicato dal punto vendita.</span><div class="paymentMethods" id="paymentMethods"></div></div></div></div>
+            <div class="infoCards"><div class="serviceCard deliveryCard"><div class="serviceIcon">↻</div><div><strong>Consegna pausa pranzo</strong><span id="deliveryCardText">Ordini e pagamenti entro le 12:00, consegna entro le 13:00.</span></div></div><div class="serviceCard paymentCard"><div class="serviceIcon">¤</div><div><strong id="paymentCardTitle">Pagamento anticipato entro le 12:00</strong><span id="paymentCardText">PayPal in valutazione con Isidoro.</span><div class="paymentMethods" id="paymentMethods"></div></div></div></div>
             <div class="field prettyField"><label for="notes">Note / allergie</label><div class="inputShell textareaShell"><span class="inputIcon">✎</span><textarea id="notes" placeholder="Es. senza noci, senza glutine, no cipolla..."></textarea></div></div>
             <div class="waBlock"><div class="waTitle">Riepilogo ordine da inviare su WhatsApp</div><div class="waCard"><div class="waMark">☎</div><div id="waPreview" class="waPreview"></div></div></div>
             <button class="waBtn whatsappMain" onclick="sendWA()"><span class="waBtnIcon">☎</span><span>Invia ordine su WhatsApp</span><span class="waArrow">›</span></button>
