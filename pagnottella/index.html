@@ -17,6 +17,13 @@
     <div class="landingCard">
       <div class="landingHero">
         <div class="landingCopy">
+          <div class="suiteBadge" aria-label="Suite DOSepranza">
+            <img class="suiteBadgeLogo" src="../assets/branding/dosepranza-suite-logo.png" alt="Logo DOSepranza">
+            <div>
+              <strong>Suite DOSepranza</strong>
+              <span>Preview stakeholder multi-fornitore</span>
+            </div>
+          </div>
           <div class="eyebrow">DOSepranza x La Pagnottella Gourmet</div>
           <div class="motherLockup textLockup">
             <span class="motherPill">Preview fornitore</span>
@@ -40,7 +47,7 @@
         <div class="landingVisual">
           <img class="photo" src="../assets/pagnottella/images/optimized/apollo_3.webp" alt="Selezione Pagnottella Gourmet" loading="eager">
           <div class="visualLogos">
-            <div class="logoBig mother textOnly">DOSepranza</div>
+            <img class="logoBig suiteMasterLogo" src="../assets/branding/dosepranza-suite-logo.png" alt="DOSepranza">
             <img class="partnerLogo" src="../assets/pagnottella/images/optimized/logo_pagnottella.webp" alt="La Pagnottella Gourmet">
           </div>
         </div>
@@ -51,10 +58,11 @@
   <main id="shop" class="shop" aria-label="Catalogo La Pagnottella Gourmet">
     <header class="topbar">
       <div class="brand brandExtended">
+        <img class="suiteInlineLogo" src="../assets/branding/dosepranza-suite-logo.png" alt="DOSepranza">
         <img class="brandLogo" src="../assets/pagnottella/images/optimized/logo_pagnottella.webp" alt="Logo La Pagnottella Gourmet">
         <div>
           <h1>La Pagnottella Gourmet</h1>
-          <p id="brand-subtitle">Punto vendita Quintino Sella · ordine in pochi tap</p>
+          <p id="brand-subtitle">Suite DOSepranza · Punto vendita Quintino Sella · ordine in pochi tap</p>
         </div>
       </div>
       <div class="topActions serviceBar" aria-label="Vantaggi e azioni Pagnottella">
@@ -79,6 +87,7 @@
         <p class="briefEyebrow">Punto vendita</p>
         <h3 id="contact-address">Via Quintino Sella 53, Roma</h3>
         <p id="contact-hours">Lun-Ven 8:30 - 16:30</p>
+        <p class="suiteDeliveryCopy">Ordine destinato a DOS Design S.p.a. · consegna in Via Arno 52, Roma.</p>
         <div class="briefActions">
           <a id="contact-whatsapp" class="ghost" href="#" target="_blank" rel="noopener">Apri WhatsApp</a>
           <a id="contact-site" class="ghost" href="#" target="_blank" rel="noopener">Sito ufficiale</a>
@@ -142,7 +151,6 @@
           </div>
           <div id="checkout" class="form checkoutForm hidden">
             <div class="field prettyField"><label for="customer">Nome e cognome</label><div class="inputShell"><span class="inputIcon">♡</span><input id="customer" placeholder="Inserisci nome e cognome" autocomplete="name"></div></div>
-            <details class="optionalDetails"><summary>Dati aziendali (opzionale)</summary><div class="optionalHint">Aggiungi solo le informazioni utili per la rendicontazione del tuo ordine.</div><div class="optionalBody"><div class="businessGrid"><div class="field prettyField"><label for="company">Azienda</label><div class="inputShell"><span class="inputIcon">▣</span><input id="company" placeholder="Es. DOSepranza" autocomplete="organization"></div></div><div class="field prettyField"><label for="costCenter">Centro di costo</label><div class="inputShell"><span class="inputIcon">#</span><input id="costCenter" placeholder="Es. HQ-Roma / Team Sales"></div></div></div><div class="businessGrid"><div class="field prettyField"><label for="approver">Referente</label><div class="inputShell"><span class="inputIcon">✓</span><input id="approver" placeholder="Nome referente (opzionale)"></div></div><div class="field prettyField"><label for="purpose">Tipo ordine</label><div class="inputShell"><span class="inputIcon">•</span><select id="purpose"><option>Pranzo dipendenti</option><option>Meeting interno</option><option>Ospiti / clienti</option><option>Evento aziendale</option></select></div></div></div></div></details>
             <div class="infoCards"><div class="serviceCard deliveryCard"><div class="serviceIcon">↻</div><div><strong>Consegna pausa pranzo</strong><span id="deliveryCardText">Ordini e pagamenti entro le 12:00, consegna entro le 13:00.</span></div></div><div class="serviceCard paymentCard"><div class="serviceIcon">¤</div><div><strong id="paymentCardTitle">Pagamento anticipato entro le 12:00</strong><span id="paymentCardText">PayPal in valutazione con Isidoro.</span><div class="paymentMethods" id="paymentMethods"></div></div></div></div>
             <div class="field prettyField"><label for="notes">Note / allergie</label><div class="inputShell textareaShell"><span class="inputIcon">✎</span><textarea id="notes" placeholder="Es. senza noci, senza glutine, no cipolla..."></textarea></div></div>
             <div class="waBlock"><div class="waTitle">Riepilogo ordine da inviare su WhatsApp</div><div class="waCard"><div class="waMark">☎</div><div id="waPreview" class="waPreview"></div></div></div>

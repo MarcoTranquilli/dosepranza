@@ -20,6 +20,16 @@ const discountLabel = () => {
 };
 const deliveryCopy = () => DATA?.copy?.delivery || 'Ordini e pagamenti entro le 12:00, consegna entro le 13:00';
 const paymentStatusCopy = () => `${DATA.payment.model}. ${DATA.payment.pickup}.`;
+const getStoredDoseUser = () => {
+  try {
+    return JSON.parse(localStorage.getItem('dose_user') || 'null');
+  } catch (e) {
+    return null;
+  }
+};
+const authenticatedCustomerName = () => getStoredDoseUser()?.name?.trim() || '';
+const companyCopy = () => DATA?.orderContext?.company || 'DOS Design S.p.a.';
+const deliverySiteCopy = () => DATA?.orderContext?.deliverySite || 'Via Arno, 52, 00198 Roma RM';
 const discountedPrice = v => Math.round(v * (1 - discountRate()) * 100) / 100;
 
 async function bootstrap(){
@@ -50,7 +60,7 @@ async function loadData(){
 }
 
 function hydrateStatic(){
-  byId('brand-subtitle').textContent = `${DATA.copy.eyebrow} · ordine in pochi tap`;
+  byId('brand-subtitle').textContent = `Suite DOSepranza · ${DATA.copy.eyebrow} · ordine in pochi tap`;
   byId('heroTitle').textContent = DATA.copy.headline;
   byId('heroText').textContent = `${DATA.copy.subheadline} Prezzi originali e scontati sempre visibili. Ordina e paga entro le 12:00, poi consegna entro le 13:00.`;
   byId('contact-address').textContent = DATA.contact.address;
@@ -67,12 +77,21 @@ function hydrateStatic(){
     { title:'Prodotti', body: `${DATA.notes.frozen} ${DATA.notes.olive}` },
     { title:'Pagamento', body: paymentStatusCopy() },
   ].map(n => `<div class="noteItem"><strong>${esc(n.title)}</strong>${esc(n.body)}</div>`).join('');
-  byId('paymentMethods').innerHTML = DATA.payment.methods.map(m => `<span class="methodChip">${esc(m)}</span>`).join('');
+  byId('paymentMethods').innerHTML = DATA.payment.methods.map(method => {
+    if(typeof method === 'string') return `<span class="methodChip">${esc(method)}</span>`;
+    return `<a class="methodChip methodChipLink" href="${esc(method.href)}" target="_blank" rel="noopener">${esc(method.label)}</a>`;
+  }).join('');
   byId('cartDeliveryText').textContent = deliveryCopy();
   byId('discountLabel').textContent = discountLabel();
   byId('deliveryCardText').textContent = `${deliveryCopy()}.`;
   byId('paymentCardTitle').textContent = DATA.payment.model;
   byId('paymentCardText').textContent = `${DATA.payment.pickup}.`;
+  const customerInput = byId('customer');
+  const recognizedName = authenticatedCustomerName();
+  if(customerInput && recognizedName){
+    customerInput.value = recognizedName;
+    customerInput.readOnly = true;
+  }
   const allCat = CATS.find(c => c.id === 'all');
   if(allCat) byId('heroImage').src = allCat.hero;
 }
@@ -80,7 +99,7 @@ function hydrateStatic(){
 function bind(){
   byId('search').addEventListener('input', e => { state.query = e.target.value.trim().toLowerCase(); renderCatalog(); });
   byId('sort').addEventListener('change', e => { state.sort = e.target.value; renderCatalog(); });
-  ['customer','notes','company','costCenter','approver','purpose'].forEach(id => {
+  ['customer','notes'].forEach(id => {
     const el = byId(id);
     if(el) el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', renderCart);
   });
@@ -199,20 +218,16 @@ function renderCart(){
 function escKey(s){ return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
 function buildMessage(){
   const t = totals();
-  const name = (byId('customer')?.value || 'Cliente').trim();
-  const company = (byId('company')?.value || '').trim();
-  const costCenter = (byId('costCenter')?.value || '').trim();
-  const approver = (byId('approver')?.value || '').trim();
-  const purpose = (byId('purpose')?.value || '').trim();
+  const name = (byId('customer')?.value || authenticatedCustomerName() || 'Cliente').trim();
+  const company = companyCopy().trim();
+  const costCenter = deliverySiteCopy().trim();
   const notes = (byId('notes')?.value || '').trim();
   const now = new Date();
   const date = now.toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   const time = now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
   let msg = `Ordine ${DATA.copy.brand} - DOSepranza\nCliente: ${name}`;
-  if(company) msg += `\nAzienda: ${company}`;
-  if(costCenter) msg += `\nCentro di costo: ${costCenter}`;
-  if(approver) msg += `\nReferente: ${approver}`;
-  if(purpose) msg += `\nTipo ordine: ${purpose}`;
+  msg += `\nAzienda: ${company}`;
+  msg += `\nSede di consegna: ${costCenter}`;
   msg += `\nData: ${cap(date)} - ${time}`;
   msg += `\nPunto vendita: ${DATA.contact.address}`;
   msg += `\nFinestra servizio: ${deliveryCopy()}`;
@@ -221,7 +236,7 @@ function buildMessage(){
   const rate = Math.round(discountRate() * 100);
   msg += `\nTotale: ${money(t.total)}${rate ? ` (${discountLabel()} applicato)` : ''}`;
   msg += `\nPagamento: ${DATA.payment.model}`;
-  msg += `\nMetodi: ${DATA.payment.methods.join(', ')}`;
+  msg += `\nMetodi: ${DATA.payment.methods.map(method => typeof method === 'string' ? method : method.label).join(', ')}`;
   msg += `\nNota pagamenti: ${DATA.payment.pickup}`;
   if(notes) msg += `\nNote/allergie: ${notes}`;
   msg += `\n\nOrdine effettuato tramite DOSepranza`;
@@ -230,7 +245,7 @@ function buildMessage(){
 function cap(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
 function whatsappUrl(){ const params = new URLSearchParams({ phone:DATA.whatsapp, text:buildMessage(), type:'phone_number', app_absent:'0' }); return 'https://api.whatsapp.com/send/?' + params.toString(); }
 function sendWA(){ if(totals().count === 0) return; logOrder(); window.open(whatsappUrl(),'_blank'); byId('confirm').classList.add('show'); byId('confirm').textContent = 'Ordine pronto: WhatsApp è stato aperto con il riepilogo completo, incluso il promemoria di pagamento entro le 12:00.'; }
-function logOrder(){ const logs = JSON.parse(localStorage.getItem('pg_demo_orders')||'[]'); const t = totals(); logs.unshift({ ts:new Date().toISOString(), customer:(byId('customer').value||'Cliente').trim(), company:(byId('company')?.value||'').trim(), costCenter:(byId('costCenter')?.value||'').trim(), count:t.count, total:t.total, message:buildMessage() }); localStorage.setItem('pg_demo_orders', JSON.stringify(logs.slice(0,25))); updateAdmin(); }
+function logOrder(){ const logs = JSON.parse(localStorage.getItem('pg_demo_orders')||'[]'); const t = totals(); logs.unshift({ ts:new Date().toISOString(), customer:(byId('customer')?.value||authenticatedCustomerName()||'Cliente').trim(), company:companyCopy(), costCenter:deliverySiteCopy(), count:t.count, total:t.total, message:buildMessage() }); localStorage.setItem('pg_demo_orders', JSON.stringify(logs.slice(0,25))); updateAdmin(); }
 function newOrder(){ state.cart = {}; byId('notes').value = ''; byId('confirm').classList.remove('show'); renderCart(); closeCart(); }
 function openCart(){ byId('cart').classList.add('open'); byId('cartBackdrop').classList.add('show'); }
 function closeCart(){ byId('cart').classList.remove('open'); byId('cartBackdrop').classList.remove('show'); }

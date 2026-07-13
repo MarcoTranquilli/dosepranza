@@ -26,6 +26,12 @@ test.describe('Preview multi-fornitore', () => {
   });
 
   test('Pagnottella: catalogo, sconto, carrello e riepilogo WhatsApp', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem('dose_user', JSON.stringify({
+        name: 'Marco Tranquilli',
+        email: 'marco.tranquilli@dos.design'
+      }));
+    });
     await page.goto(previewPagnottellaUrl);
 
     await expect(page.locator('#shop')).toHaveClass(/show/);
@@ -33,8 +39,12 @@ test.describe('Preview multi-fornitore', () => {
     await expect(page.locator('#heroText')).toContainText('13:00');
     await expect(page.locator('body')).not.toContainText('Documenti locali');
     await expect(page.locator('body')).not.toContainText('Materiali commerciali');
+    await expect(page.locator('body')).not.toContainText('Dati aziendali (opzionale)');
+    await expect(page.locator('#customer')).toHaveValue('Marco Tranquilli');
     await expect(page.locator('#paymentMethods')).toContainText('Satispay');
     await expect(page.locator('#paymentMethods')).toContainText('Bonifico istantaneo');
+    await expect(page.locator('#paymentMethods a').nth(0)).toHaveAttribute('href', /satispay-placeholder/);
+    await expect(page.locator('#paymentMethods a').nth(1)).toHaveAttribute('href', /bonifico-placeholder/);
 
     await page.locator('#search').fill('BBQ');
     await expect(page.locator('#grid .card')).toHaveCount(1);
@@ -59,8 +69,9 @@ test.describe('Preview multi-fornitore', () => {
     await expect(page.locator('#finalTotal')).toContainText('€6,40');
     await expect(page.locator('#discountLabel')).toContainText('20%');
 
-    await page.locator('#customer').fill('Marco Tranquilli');
     await page.locator('#notes').fill('No cipolla');
+    await expect(page.locator('#waPreview')).toContainText('Azienda: DOS Design S.p.a.');
+    await expect(page.locator('#waPreview')).toContainText('Sede di consegna: Via Arno, 52, 00198 Roma RM');
     await expect(page.locator('#waPreview')).toContainText('Pagamento anticipato entro le 12:00');
     await expect(page.locator('#waPreview')).toContainText('Satispay, Bonifico istantaneo');
     await expect(page.locator('#waPreview')).toContainText('No cipolla');
