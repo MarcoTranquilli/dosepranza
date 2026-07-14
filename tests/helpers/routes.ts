@@ -13,3 +13,5 @@ export const legacyRussoAppUrl = `${origin}/russo/${e2e ? `?e2e=${encodeURICompo
 
 const localPreviewPath = resolve(process.cwd(), 'pagnottella', 'index.html');
 export const previewPagnottellaFileUrl = `${pathToFileURL(localPreviewPath).href}?store=pagnottella`;
+const localRussoPath = resolve(process.cwd(), 'russo', 'index.html');
+export const previewRussoFileUrl = pathToFileURL(localRussoPath).href;

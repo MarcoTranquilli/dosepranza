@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>DOSepranza · La Pagnottella Gourmet</title>
-<meta name="description" content="Catalogo Pagnottella Gourmet integrato in DOSepranza con layout demo-inspired, asset locali e dati ottimizzati.">
+<meta name="description" content="Catalogo La Pagnottella Gourmet integrato in DOSepranza con accesso Google, sconto estivo e checkout rapido.">
 <link rel="icon" href="../favicondosepranza.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,7 +13,7 @@
 </head>
 <body>
 <div class="wrap">
-  <section id="landing" class="landing" aria-label="Selezione fornitore">
+  <section id="landing" class="landing" aria-label="Accesso La Pagnottella Gourmet">
     <div class="landingCard">
       <div class="landingHero">
         <div class="landingCopy">
@@ -24,7 +24,7 @@
               <p id="authGateCopy">La suite DOSepranza usa il tuo profilo Google per precompilare nome e contesto ordine.</p>
               <div class="authGateActions">
                 <button id="authGateGoogle" type="button" class="primary gold">Continua con Google</button>
-                <button id="authGateLocal" type="button" class="ghost authLocalBtn">Usa preview locale</button>
+                <button id="authGateLocal" type="button" class="ghost authLocalBtn">Usa accesso locale</button>
                 <span id="authGateStatus" class="authGateStatus">Nessuna sessione Google attiva.</span>
               </div>
             </div>
@@ -33,26 +33,21 @@
             <img class="suiteBadgeLogo" src="../assets/branding/dosepranza-suite-logo.png" alt="Logo DOSepranza">
             <div>
               <strong>Suite DOSepranza</strong>
-              <span>Preview stakeholder multi-fornitore</span>
+              <span>Accesso fornitori</span>
             </div>
           </div>
-          <div class="eyebrow">DOSepranza x La Pagnottella Gourmet</div>
+          <div class="eyebrow">La Pagnottella Gourmet</div>
           <div class="motherLockup textLockup">
-            <span class="motherPill">Preview fornitore</span>
+            <span class="motherPill">Supplier</span>
             <img src="../assets/pagnottella/images/optimized/logo_pagnottella.webp" alt="La Pagnottella Gourmet">
           </div>
-          <h2>Un layout più vicino alla demo, con contenuti reali e asset locali.</h2>
-          <p>Questa anteprima usa dati raccolti dal sito ufficiale, dal volantino del punto vendita di Via Quintino Sella e dal listino ingredienti aggiuntivi. Il flusso resta leggero, indipendente da blob inline e pronto per una review stakeholder ordinata.</p>
-          <div class="providers">
-            <a class="provider providerLink" href="../russo/">
-              <div class="providerTop"><div class="providerLogoWrap providerLogoWrapRusso"><span class="providerMarkSmall">AR</span></div><div><h3>Alimentari Russo</h3><p>Spesa e alimentari di quartiere</p></div></div>
-              <p>Flusso operativo esistente DOSepranza, mantenuto separato e accessibile in preview dedicata.</p>
-              <span class="choose">Apri preview Russo</span>
-            </a>
+          <h2>Panini e insalate gourmet, ordinabili in pausa pranzo.</h2>
+          <p>Accedi con il tuo account Google per consultare il menu, comporre il carrello e inviare l’ordine con i dati già riconosciuti dalla suite DOSepranza.</p>
+          <div class="providers single-provider">
             <button class="provider" type="button" onclick="openShop()">
               <div class="providerTop"><img class="providerLogo" src="../assets/pagnottella/images/optimized/logo_pagnottella.webp" alt="Logo La Pagnottella Gourmet"><div><h3>La Pagnottella Gourmet</h3><p>Panini e insalate gourmet</p></div></div>
-              <p>Catalogo ufficiale alleggerito e reso stabile: promo estate, immagini prodotto curate, pagamenti anticipati e ordine WhatsApp pronto.</p>
-              <span class="choose">Scegli e ordina</span>
+              <p>Menu dedicato con sconto estivo, pagamento anticipato e riepilogo WhatsApp.</p>
+              <span class="choose">Apri il catalogo</span>
             </button>
           </div>
         </div>
@@ -126,7 +121,7 @@
         <div class="infoGrid">
           <div class="info"><h4>Opzioni panini</h4><p>Pane bianco incluso. Integrale ai cereali +€0,50 prima dello sconto.</p></div>
           <div class="info"><h4>Basi insalate</h4><p>Insalata, cous cous, farro e riso inclusi. Riso venere +€1,50 prima dello sconto.</p></div>
-          <div class="info"><h4>Validità fonti</h4><p id="price-validity-note">Prezzi e ricette controllati su sito, volantino e listino extra.</p></div>
+          <div class="info"><h4>Validità prezzi</h4><p id="price-validity-note">Ricette e prezzi soggetti a conferma del punto vendita.</p></div>
         </div>
 
         <section class="supportBlocks supportBlocksCompact">
@@ -141,7 +136,6 @@
           </article>
         </section>
 
-        <section class="admin"><details><summary>Admin demo - log e metriche Pagnottella</summary><div class="adminGrid"><div class="metric"><b id="mProducts">0</b><span>prodotti catalogo</span></div><div class="metric"><b id="mCart">0</b><span>pezzi nel carrello</span></div><div class="metric"><b id="mOrders">0</b><span>ordini demo salvati</span></div><div class="metric"><b id="mValue">€0,00</b><span>totale log demo</span></div></div><div class="adminGrid adminGridSecondary"><div class="metric"><b id="mImageCoverage">0/0</b><span>copertura immagini</span></div><div class="metric"><b id="mSpecificShots">0</b><span>foto specifiche o quasi</span></div><div class="metric"><b id="mSupplierCheck">0</b><span>da validare col fornitore</span></div></div><p class="footer">Questa sezione simula il log admin locale. In produzione i dati andrebbero isolati per fornitore, con collection e analytics dedicate. I metadati sulla qualità delle immagini restano qui come supporto interno e non vengono mostrati agli utenti.</p><button class="ghost" onclick="exportCSV()">Esporta CSV demo</button></details></section>
       </section>
 
       <div id="cartBackdrop" class="cartBackdrop" onclick="closeCart()"></div>

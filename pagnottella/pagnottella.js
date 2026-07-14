@@ -28,6 +28,7 @@ const discountLabel = () => {
   if(!rate) return 'Prezzo standard';
   return `${DATA.discount.label || 'Sconto attivo'} -${rate}%`;
 };
+const ORDER_LOG_KEY = 'pg_order_logs';
 const deliveryCopy = () => DATA?.copy?.delivery || 'Ordini e pagamenti entro le 12:00, consegna entro le 13:00';
 const paymentStatusCopy = () => `${DATA.payment.model}. ${DATA.payment.pickup}.`;
 const getStoredDoseUser = () => {
@@ -51,6 +52,11 @@ const setAuthButtonsDisabled = (disabled) => {
 };
 
 async function bootstrap(){
+  if(!isLocalPreview() && !authenticatedDoseUser()){
+    const next = encodeURIComponent('pagnottella');
+    window.location.replace(`../?next=${next}`);
+    return;
+  }
   DATA = await loadData();
   PRODUCTS = DATA.products;
   CATS = DATA.cats;
@@ -58,8 +64,7 @@ async function bootstrap(){
   bind();
   renderTabs();
   renderFilters();
-  const params = new URLSearchParams(location.search);
-  if(params.get('store') === 'pagnottella' && ensureAuthenticated()) openShop(false);
+  if(ensureAuthenticated()) openShop(false);
   renderCatalog();
   renderCart();
   syncAuthGate();
@@ -81,12 +86,12 @@ async function loadData(){
 function hydrateStatic(){
   byId('brand-subtitle').textContent = `Suite DOSepranza · ${DATA.copy.eyebrow} · ordine in pochi tap`;
   byId('heroTitle').textContent = DATA.copy.headline;
-  byId('heroText').textContent = `${DATA.copy.subheadline} Prezzi originali e scontati sempre visibili. Ordina e paga entro le 12:00, poi consegna entro le 13:00.`;
+  byId('heroText').textContent = `Menu dedicato con prezzi originali e scontati sempre visibili. Ordina e paga entro le 12:00, poi consegna entro le 13:00.`;
   byId('contact-address').textContent = DATA.contact.address;
   byId('contact-hours').textContent = DATA.contact.hours;
   byId('contact-whatsapp').href = DATA.contact.whatsappUrl;
   byId('contact-site').href = DATA.contact.website;
-  byId('price-validity-note').textContent = DATA.notes.priceValidity;
+  byId('price-validity-note').textContent = 'Ricette e prezzi soggetti a conferma del punto vendita. Lo sconto estivo viene applicato automaticamente fino al 23/08/2026.';
   byId('heroStats').innerHTML = DATA.highlights.map(h => `<span class="heroStat"><strong>${esc(h.label)}</strong> · ${esc(h.value)}</span>`).join('');
   byId('hero-highlight-list').innerHTML = DATA.highlights.map((h, idx) => `<span class="serviceChip ${idx===0?'serviceChipPrimary':''}" role="listitem">${esc(h.value)}</span>`).join('');
   byId('extrasPreview').innerHTML = DATA.extras.slice(0, 8).map(x => `<span class="extraChip">${esc(x.name)} <span>${money(x.price)}</span></span>`).join('');
@@ -139,11 +144,7 @@ function openShop(save=true){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function backLanding(){
-  state.screen='landing';
-  sessionStorage.removeItem('dosepranza_store');
-  byId('shop').classList.remove('show');
-  byId('landing').classList.remove('hidden');
-  history.replaceState(null,'',location.pathname);
+  window.location.href = '../';
 }
 function renderTabs(){
   byId('tabs').innerHTML = CATS.map(c => `<button class="tab" data-cat="${c.id}" onclick="setCat('${c.id}')">${esc(c.label)}</button>`).join('');
@@ -176,7 +177,7 @@ function syncAuthGate(forceLocked=false){
   }else if(authState.message){
     status.textContent = authState.message;
   }else if(isLocalPreview()){
-    status.textContent = 'Preview locale: Google non parte da file diretto. Usa il fallback demo oppure apri la preview web.';
+    status.textContent = 'Accesso locale disponibile per la verifica offline del catalogo.';
   }else{
     status.textContent = authState.loading ? 'Accesso Google in corso...' : 'Nessuna sessione Google attiva.';
   }
@@ -188,7 +189,7 @@ async function loadFirebaseAuth(){
       import("https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"),
       import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js")
     ]);
-    const app = initializeApp(FIREBASE_CONFIG, 'dosepranza-pagnottella-preview');
+    const app = initializeApp(FIREBASE_CONFIG, 'dosepranza-pagnottella');
     const auth = getAuth(app);
     await setPersistence(auth, browserLocalPersistence);
     return { auth, GoogleAuthProvider, signInWithPopup };
@@ -251,7 +252,7 @@ function activateLocalPreviewAccess(){
   const fallbackUser = {
     name: 'Marco Tranquilli',
     email: 'marco.tranquilli@dos.design',
-    source: 'local-preview'
+    source: 'local-access'
   };
   localStorage.setItem('dose_user', JSON.stringify(fallbackUser));
   authState.user = fallbackUser;
@@ -380,13 +381,14 @@ function buildMessage(){
 function cap(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
 function whatsappUrl(){ const params = new URLSearchParams({ phone:DATA.whatsapp, text:buildMessage(), type:'phone_number', app_absent:'0' }); return 'https://api.whatsapp.com/send/?' + params.toString(); }
 function sendWA(){ if(totals().count === 0) return; logOrder(); window.open(whatsappUrl(),'_blank'); byId('confirm').classList.add('show'); byId('confirm').textContent = 'Ordine pronto: WhatsApp è stato aperto con il riepilogo completo, incluso il promemoria di pagamento entro le 12:00.'; }
-function logOrder(){ const logs = JSON.parse(localStorage.getItem('pg_demo_orders')||'[]'); const t = totals(); logs.unshift({ ts:new Date().toISOString(), customer:(byId('customer')?.value||authenticatedCustomerName()||'Cliente').trim(), company:companyCopy(), costCenter:deliverySiteCopy(), count:t.count, total:t.total, message:buildMessage() }); localStorage.setItem('pg_demo_orders', JSON.stringify(logs.slice(0,25))); updateAdmin(); }
+function logOrder(){ const logs = JSON.parse(localStorage.getItem(ORDER_LOG_KEY)||'[]'); const t = totals(); logs.unshift({ ts:new Date().toISOString(), customer:(byId('customer')?.value||authenticatedCustomerName()||'Cliente').trim(), company:companyCopy(), costCenter:deliverySiteCopy(), count:t.count, total:t.total, message:buildMessage() }); localStorage.setItem(ORDER_LOG_KEY, JSON.stringify(logs.slice(0,25))); updateAdmin(); }
 function newOrder(){ state.cart = {}; byId('notes').value = ''; byId('confirm').classList.remove('show'); renderCart(); closeCart(); }
 function openCart(){ byId('cart').classList.add('open'); byId('cartBackdrop').classList.add('show'); }
 function closeCart(){ byId('cart').classList.remove('open'); byId('cartBackdrop').classList.remove('show'); }
 function toast(txt){ const el = byId('toast'); el.textContent = txt; el.classList.add('show'); clearTimeout(window.__toast); window.__toast = setTimeout(() => el.classList.remove('show'), 1600); }
 function updateAdmin(){
-  const logs = JSON.parse(localStorage.getItem('pg_demo_orders')||'[]');
+  if(!byId('mProducts')) return;
+  const logs = JSON.parse(localStorage.getItem(ORDER_LOG_KEY)||'[]');
   const imageMapped = PRODUCTS.filter(p => p.imageMeta?.assigned).length;
   const supplierCheck = PRODUCTS.filter(p => p.imageMeta?.needsSupplierConfirmation).length;
   const specificShots = PRODUCTS.filter(p => p.imageMeta?.mappingType === 'foto_specifica_o_quasi_specifica').length;
@@ -398,11 +400,11 @@ function updateAdmin(){
   byId('mSupplierCheck').textContent = String(supplierCheck);
   byId('mSpecificShots').textContent = String(specificShots);
 }
-function exportCSV(){ const logs = JSON.parse(localStorage.getItem('pg_demo_orders')||'[]'); const rows = [['timestamp','cliente','azienda','centro_costo','prodotti','totale','messaggio'], ...logs.map(o=>[o.ts,o.customer,o.company||'',o.costCenter||'',o.count,o.total,o.message])]; const csv = rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n'); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download = 'ordini-pagnottella-demo.csv'; a.click(); URL.revokeObjectURL(a.href); }
+function exportCSV(){ const logs = JSON.parse(localStorage.getItem(ORDER_LOG_KEY)||'[]'); const rows = [['timestamp','cliente','azienda','centro_costo','prodotti','totale','messaggio'], ...logs.map(o=>[o.ts,o.customer,o.company||'',o.costCenter||'',o.count,o.total,o.message])]; const csv = rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n'); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download = 'ordini-pagnottella.csv'; a.click(); URL.revokeObjectURL(a.href); }
 function escJs(s){ return String(s).replace(/[\\']/g, m => m === '\\' ? '\\\\' : "\\'"); }
 
 Object.assign(window, { openShop, backLanding, setCat, setFilter, openDetails, pickOption, closeDrawer, quickAdd, drawerAdd, changeQty, sendWA, newOrder, openCart, closeCart, exportCSV });
 bootstrap().catch(err => {
   console.error(err);
-  document.body.innerHTML = `<div style="max-width:720px;margin:48px auto;padding:24px;border-radius:24px;background:#fff;border:1px solid #eadfce;font-family:Manrope,sans-serif"><h1 style="margin-top:0">Errore caricamento preview Pagnottella</h1><p>${esc(err.message || 'Errore sconosciuto')}</p><p>Verifica il file <code>assets/pagnottella/data/menu.json</code> e gli asset locali.</p></div>`;
+  document.body.innerHTML = `<div style="max-width:720px;margin:48px auto;padding:24px;border-radius:24px;background:#fff;border:1px solid #eadfce;font-family:Manrope,sans-serif"><h1 style="margin-top:0">Errore caricamento catalogo Pagnottella</h1><p>${esc(err.message || 'Errore sconosciuto')}</p><p>Verifica il file <code>assets/pagnottella/data/menu.json</code> e gli asset locali.</p></div>`;
 });

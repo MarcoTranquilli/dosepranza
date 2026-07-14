@@ -3,20 +3,53 @@ import {
   previewHubUrl,
   previewRussoUrl,
   previewPagnottellaUrl,
-  previewPagnottellaFileUrl
+  previewPagnottellaFileUrl,
+  previewRussoFileUrl
 } from './helpers/routes';
 
 test.describe('Preview multi-fornitore', () => {
   test('Hub: espone entrambi i fornitori con link separati', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem('dose_user', JSON.stringify({
+        name: 'Marco Tranquilli',
+        email: 'marco.tranquilli@dos.design'
+      }));
+    });
     await page.goto(previewHubUrl);
 
-    await expect(page.getByRole('heading', { name: /evoluzione multi-fornitore/i })).toBeVisible();
-    await expect(page.getByRole('link', { name: /apri preview russo/i })).toBeVisible();
-    await expect(page.getByRole('link', { name: /apri preview pagnottella/i })).toBeVisible();
-    await expect(page.getByText(/nessun impatto sul live/i)).toBeVisible();
+    await expect(page.getByRole('heading', { name: /accedi e scegli il fornitore/i })).toBeVisible();
+    await expect(page.locator('#hub-auth-status')).toContainText('Marco Tranquilli');
+    await expect(page.getByRole('link', { name: /apri alimentari russo/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /apri pagnottella gourmet/i })).toBeVisible();
+  });
+
+  test('Supplier guard: senza sessione rimanda all’hub', async ({ page }) => {
+    await page.goto(previewRussoUrl);
+
+    await expect(page).toHaveURL(/\/\?next=russo$/);
+    await expect(page.locator('#hub-auth-status')).toContainText('Nessuna sessione Google attiva');
+  });
+
+  test('Hub: con sessione e parametro next apre direttamente il fornitore richiesto', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem('dose_user', JSON.stringify({
+        name: 'Marco Tranquilli',
+        email: 'marco.tranquilli@dos.design'
+      }));
+    });
+    await page.goto(`${previewHubUrl}?next=pagnottella`);
+
+    await expect(page).toHaveURL(/\/pagnottella\/\?store=pagnottella$/);
+    await expect(page.locator('#shop')).toHaveClass(/show/);
   });
 
   test('Russo: la preview operativa resta accessibile', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem('dose_user', JSON.stringify({
+        name: 'Marco Tranquilli',
+        email: 'marco.tranquilli@dos.design'
+      }));
+    });
     await page.goto(previewRussoUrl);
 
     await expect(page.locator('#btn-menu')).toBeVisible();
@@ -36,6 +69,10 @@ test.describe('Preview multi-fornitore', () => {
 
     await expect(page.locator('#shop')).toHaveClass(/show/);
     await expect(page.locator('#landing')).toHaveClass(/authResolved/);
+    await expect(page.locator('body')).not.toContainText('Un layout più vicino alla demo');
+    await expect(page.locator('body')).not.toContainText('volantino del punto vendita');
+    await expect(page.locator('body')).not.toContainText('review stakeholder');
+    await expect(page.locator('body')).not.toContainText('Admin demo');
     await expect(page.locator('#heroText')).toContainText('12:00');
     await expect(page.locator('#heroText')).toContainText('13:00');
     await expect(page.locator('body')).not.toContainText('Documenti locali');
@@ -101,6 +138,14 @@ test.describe('Preview multi-fornitore', () => {
     await expect(page.locator('#sectionTitle')).toContainText('Tutto il menu');
     await expect(page.locator('#grid .card').first()).toBeVisible();
     await expect(page.locator('#paymentMethods')).toContainText('Satispay');
-    await expect(page.locator('body')).not.toContainText('Errore caricamento preview Pagnottella');
+    await expect(page.locator('body')).not.toContainText('Errore caricamento catalogo Pagnottella');
+  });
+
+  test('Russo file://: apertura diretta resta disponibile per verifica locale', async ({ page }) => {
+    await page.goto(previewRussoFileUrl);
+
+    await expect(page).toHaveURL(/^file:\/\//);
+    await expect(page.locator('#btn-menu')).toBeVisible();
+    await expect(page.locator('body')).toContainText('DOSepranza');
   });
 });

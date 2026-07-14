@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DOSepranza Preview | Hub Fornitori</title>
-  <meta name="description" content="Preview multi-fornitore DOSepranza per review stakeholder: accesso separato ad Alimentari Russo e La Pagnottella Gourmet.">
+  <title>DOSepranza | Hub Fornitori</title>
+  <meta name="description" content="Hub fornitori DOSepranza con accesso centralizzato e percorsi dedicati per Alimentari Russo e La Pagnottella Gourmet.">
   <link rel="icon" href="./favicondosepranza.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,22 +15,34 @@
   <div class="page-shell">
     <header class="hero">
       <div class="hero-copy">
-        <p class="eyebrow">Preview stakeholder</p>
-        <img src="https://i.postimg.cc/L6H20zfp/logo-dosepranza-People-About-Food.png?v=20260209" alt="DOSepranza" class="brandmark">
-        <h1>Evoluzione multi-fornitore di DOSepranza.</h1>
-        <p class="lede">Questa anteprima separa chiaramente il servizio attuale da quello in evoluzione, così possiamo validare esperienza, posizionamento e flussi prima dell’industrializzazione.</p>
+        <p class="eyebrow">DOSepranza</p>
+        <img src="./assets/branding/dosepranza-suite-logo.png" alt="DOSepranza" class="brandmark">
+        <h1>Accedi e scegli il fornitore.</h1>
+        <p class="lede">Un unico punto di ingresso per autenticarti con Google e aprire il servizio corretto senza reinserire nome ed email.</p>
+        <div class="auth-card" id="hub-auth-card">
+          <div>
+            <p class="auth-label">Accesso Google</p>
+            <h2 class="auth-title">Riconoscimento utente prima della scelta fornitore</h2>
+            <p class="auth-copy">L’accesso abilita i percorsi operativi di Alimentari Russo e La Pagnottella Gourmet con il tuo profilo DOS.</p>
+          </div>
+          <div class="auth-actions">
+            <button id="hub-google-login" class="btn btn-primary" type="button">Continua con Google</button>
+            <button id="hub-local-login" class="btn btn-secondary auth-local-btn" type="button">Usa accesso locale</button>
+            <span id="hub-auth-status" class="auth-status">Nessuna sessione Google attiva.</span>
+          </div>
+        </div>
         <div class="hero-pills">
-          <span>Review protetta</span>
-          <span>Link separati</span>
-          <span>Nessun impatto sul live</span>
+          <span>Accesso centralizzato</span>
+          <span>Fornitori separati</span>
+          <span>Sessione condivisa</span>
         </div>
       </div>
       <aside class="hero-panel">
-        <p class="panel-label">Obiettivo preview</p>
+        <p class="panel-label">Flusso operativo</p>
         <ul>
-          <li>mantenere stabile l’esperienza Alimentari Russo</li>
-          <li>presentare un nuovo supplier con identità distinta</li>
-          <li>validare l’architettura a hub prima della messa in produzione</li>
+          <li>autenticazione Google una sola volta</li>
+          <li>instradamento diretto verso il fornitore corretto</li>
+          <li>continuità di esperienza tra suite e cataloghi</li>
         </ul>
       </aside>
     </header>
@@ -39,45 +51,45 @@
       <section class="section-head">
         <div>
           <p class="eyebrow">Percorsi disponibili</p>
-          <h2>Scegli il fornitore da mostrare.</h2>
+          <h2>Scegli il fornitore da utilizzare.</h2>
         </div>
-        <p class="section-note">Entrambi i percorsi restano accessibili con URL dedicati, utili per sponsor, stakeholder e test mirati.</p>
+        <p class="section-note">I collegamenti vengono attivati dopo il riconoscimento Google e aprono direttamente il flusso operativo del fornitore selezionato.</p>
       </section>
 
-      <section class="suppliers-grid">
+      <section class="suppliers-grid auth-locked" id="suppliers-grid">
         <article class="supplier-card supplier-card--russo">
           <div class="supplier-top">
-            <span class="supplier-badge">Attuale</span>
+            <span class="supplier-badge">Alimentari</span>
             <span class="supplier-icon">AR</span>
           </div>
           <h3>Alimentari Russo</h3>
-          <p>Esperienza operativa attuale DOSepranza: ordini giornalieri, personalizzazione, riepiloghi e presidio amministrativo.</p>
+          <p>Servizio DOSepranza per ordini giornalieri, personalizzazioni, riconciliazione e gestione amministrativa.</p>
           <dl>
-            <div><dt>Posizionamento</dt><dd>Baseline operativa</dd></div>
-            <div><dt>Uso</dt><dd>Flusso consolidato</dd></div>
-            <div><dt>Accesso</dt><dd>Preview dedicata</dd></div>
+            <div><dt>Posizionamento</dt><dd>Servizio attivo</dd></div>
+            <div><dt>Uso</dt><dd>Flusso completo</dd></div>
+            <div><dt>Accesso</dt><dd>Login condiviso</dd></div>
           </dl>
           <div class="card-actions">
-            <a class="btn btn-primary" href="./russo/">Apri preview Russo</a>
-            <a class="btn btn-secondary" href="./russo/?swreset=1">Apri con reset cache</a>
+            <a class="btn btn-primary protected-link" data-target="russo" href="./russo/">Apri Alimentari Russo</a>
+            <a class="btn btn-secondary protected-link" data-target="russo" href="./russo/?swreset=1">Apri con reset cache</a>
           </div>
         </article>
 
         <article class="supplier-card supplier-card--pagnottella">
           <div class="supplier-top">
-            <span class="supplier-badge">Nuovo</span>
+            <span class="supplier-badge">Gourmet</span>
             <span class="supplier-icon">PG</span>
           </div>
           <h3>La Pagnottella Gourmet</h3>
-          <p>Nuovo fornitore integrato su base demo: catalogo dedicato, esperienza branded, carrello e checkout WhatsApp in una preview autonoma.</p>
+          <p>Catalogo branded per panini e insalate gourmet con sconto stagionale, checkout rapido e riepilogo WhatsApp.</p>
           <dl>
-            <div><dt>Posizionamento</dt><dd>Nuova estensione</dd></div>
-            <div><dt>Uso</dt><dd>Catalogo standalone</dd></div>
-            <div><dt>Accesso</dt><dd>Preview dedicata</dd></div>
+            <div><dt>Posizionamento</dt><dd>Nuovo fornitore</dd></div>
+            <div><dt>Uso</dt><dd>Catalogo dedicato</dd></div>
+            <div><dt>Accesso</dt><dd>Login condiviso</dd></div>
           </dl>
           <div class="card-actions">
-            <a class="btn btn-primary" href="./pagnottella/">Apri preview Pagnottella</a>
-            <a class="btn btn-secondary" href="./pagnottella/?store=pagnottella">Apri direttamente lo shop</a>
+            <a class="btn btn-primary protected-link" data-target="pagnottella" href="./pagnottella/">Apri Pagnottella Gourmet</a>
+            <a class="btn btn-secondary protected-link" data-target="pagnottella" href="./pagnottella/?store=pagnottella">Apri direttamente lo shop</a>
           </div>
         </article>
       </section>
@@ -85,12 +97,13 @@
       <section class="link-board">
         <h2>Link rapidi da condividere</h2>
         <div class="link-list">
-          <a href="./">Hub preview</a>
-          <a href="./russo/">Preview Alimentari Russo</a>
-          <a href="./pagnottella/">Preview La Pagnottella Gourmet</a>
+          <a href="./">Hub fornitori</a>
+          <a class="protected-link" data-target="russo" href="./russo/">Alimentari Russo</a>
+          <a class="protected-link" data-target="pagnottella" href="./pagnottella/">La Pagnottella Gourmet</a>
         </div>
       </section>
     </main>
   </div>
+  <script type="module" src="./hub-auth.js"></script>
 </body>
 </html>

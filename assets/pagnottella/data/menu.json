@@ -2805,13 +2805,23 @@
     "hours": "Lun-Ven 8:30 - 16:30",
     "website": "https://www.lapagnottellagourmet.it/"
   },
+  "orderContext": {
+    "company": "DOS Design S.p.a.",
+    "deliverySite": "Via Arno, 52, 00198 Roma RM"
+  },
   "payment": {
     "methods": [
-      "Satispay",
-      "Bonifico istantaneo"
+      {
+        "label": "Satispay",
+        "href": "https://example.com/payment/satispay-placeholder"
+      },
+      {
+        "label": "Bonifico istantaneo",
+        "href": "https://example.com/payment/bonifico-placeholder"
+      }
     ],
     "model": "Pagamento anticipato entro le 12:00",
-    "pickup": "PayPal in valutazione con Isidoro"
+    "pickup": "PayPal in valutazione con Isidoro. I pulsanti sotto puntano a link placeholder."
   },
   "notes": {
     "allergens": "1 glutine, 2 crostacei, 3 uova, 4 pesce, 5 arachidi, 6 soia, 7 latte, 8 frutta a guscio, 9 sedano, 10 senape, 11 sesamo, 12 solfiti, 13 lupini, 14 molluschi.",
