@@ -2,7 +2,7 @@ let DATA = null;
 let PRODUCTS = [];
 let CATS = [];
 const state = { screen:'landing', cat:'all', filter:'', query:'', sort:'recommended', cart:{}, current:null, option:null };
-const authState = { loading:false, user:null };
+const authState = { loading:false, user:null, message:'' };
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyCQJsNbgaR89gF_1vLe6H4DPboOhQvm9nI",
   authDomain: "app-ordini-pranzo-alimentari.firebaseapp.com",
@@ -42,6 +42,13 @@ const authenticatedDoseUser = () => getStoredDoseUser() || null;
 const companyCopy = () => DATA?.orderContext?.company || 'DOS Design S.p.a.';
 const deliverySiteCopy = () => DATA?.orderContext?.deliverySite || 'Via Arno, 52, 00198 Roma RM';
 const discountedPrice = v => Math.round(v * (1 - discountRate()) * 100) / 100;
+const isLocalPreview = () => location.protocol === 'file:';
+const setAuthButtonsDisabled = (disabled) => {
+  ['authGateGoogle', 'authGateLocal'].forEach((id) => {
+    const el = byId(id);
+    if(el) el.disabled = !!disabled;
+  });
+};
 
 async function bootstrap(){
   DATA = await loadData();
@@ -111,6 +118,8 @@ function hydrateStatic(){
 function bind(){
   const googleBtn = byId('authGateGoogle');
   if(googleBtn) googleBtn.addEventListener('click', signInWithGoogleGate);
+  const localBtn = byId('authGateLocal');
+  if(localBtn) localBtn.addEventListener('click', activateLocalPreviewAccess);
   byId('search').addEventListener('input', e => { state.query = e.target.value.trim().toLowerCase(); renderCatalog(); });
   byId('sort').addEventListener('change', e => { state.sort = e.target.value; renderCatalog(); });
   ['customer','notes'].forEach(id => {
@@ -157,13 +166,17 @@ function syncAuthGate(forceLocked=false){
   const user = authenticatedDoseUser();
   authState.user = user;
   if(!gate || !status || !landing) return;
+  landing.classList.toggle('isLocalPreview', isLocalPreview());
   const resolved = !!(user?.email && user?.name);
   landing.classList.toggle('authResolved', resolved);
   landing.classList.toggle('authLocked', forceLocked || !resolved);
   if(resolved){
+    authState.message = '';
     status.textContent = `Riconosciuto come ${user.name} · ${user.email}`;
-  }else if(location.protocol === 'file:'){
-    status.textContent = 'Preview locale: per simulare l’accesso usa una sessione dose_user già presente.';
+  }else if(authState.message){
+    status.textContent = authState.message;
+  }else if(isLocalPreview()){
+    status.textContent = 'Preview locale: Google non parte da file diretto. Usa il fallback demo oppure apri la preview web.';
   }else{
     status.textContent = authState.loading ? 'Accesso Google in corso...' : 'Nessuna sessione Google attiva.';
   }
@@ -183,15 +196,19 @@ async function loadFirebaseAuth(){
   return firebaseAuthPromise;
 }
 async function signInWithGoogleGate(){
-  if(location.protocol === 'file:'){
+  if(isLocalPreview()){
     syncAuthGate(true);
     return;
   }
   authState.loading = true;
+  authState.message = '';
+  setAuthButtonsDisabled(true);
   syncAuthGate(true);
   try{
     const { auth, GoogleAuthProvider, signInWithPopup } = await loadFirebaseAuth();
     const provider = new GoogleAuthProvider();
+    provider.addScope('email');
+    provider.addScope('profile');
     provider.setCustomParameters({ prompt: 'select_account' });
     const result = await signInWithPopup(auth, provider);
     const user = result?.user;
@@ -202,21 +219,46 @@ async function signInWithGoogleGate(){
     if(payload.email){
       localStorage.setItem('dose_user', JSON.stringify(payload));
       authState.user = payload;
+      authState.message = '';
       hydrateStatic();
       renderCart();
       syncAuthGate();
       const params = new URLSearchParams(location.search);
       if(params.get('store') === 'pagnottella') openShop(false);
     }else{
-      byId('authGateStatus').textContent = 'Login Google completato ma email non disponibile.';
+      authState.message = 'Login Google completato ma email non disponibile.';
     }
   }catch(err){
     console.warn('Pagnottella Google gate failed', err);
-    byId('authGateStatus').textContent = 'Accesso Google non riuscito. Riprova.';
+    const code = err?.code || '';
+    if(code === 'auth/popup-closed-by-user'){
+      authState.message = 'Accesso annullato: popup Google chiuso prima del completamento.';
+    }else if(code === 'auth/cancelled-popup-request'){
+      authState.message = 'Accesso Google già in corso in un altro popup.';
+    }else if(code === 'auth/unauthorized-domain'){
+      authState.message = `Dominio non autorizzato su Firebase Auth: ${location.hostname}.`;
+    }else{
+      authState.message = `Accesso Google non riuscito${code ? ` (${code})` : ''}. Riprova.`;
+    }
   }finally{
     authState.loading = false;
+    setAuthButtonsDisabled(false);
     syncAuthGate(!authenticatedDoseUser());
   }
+}
+function activateLocalPreviewAccess(){
+  if(!isLocalPreview()) return;
+  const fallbackUser = {
+    name: 'Marco Tranquilli',
+    email: 'marco.tranquilli@dos.design',
+    source: 'local-preview'
+  };
+  localStorage.setItem('dose_user', JSON.stringify(fallbackUser));
+  authState.user = fallbackUser;
+  hydrateStatic();
+  renderCart();
+  syncAuthGate();
+  openShop(false);
 }
 function updateTabs(){ document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.cat === state.cat)); }
 function renderFilters(){
