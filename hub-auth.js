@@ -10,6 +10,8 @@ const FIREBASE_CONFIG = {
 let firebaseAuthPromise = null;
 const byId = (id) => document.getElementById(id);
 const isLocalPreview = () => location.protocol === 'file:';
+const isGitHubPagesPreview = () => location.hostname.endsWith('github.io') || new URLSearchParams(location.search).get('preview') === '1';
+const isPreviewAccess = () => isLocalPreview() || isGitHubPagesPreview();
 
 function getStoredDoseUser() {
   try {
@@ -45,7 +47,10 @@ function syncHubAuth(message = '') {
   const locked = !(user?.email && user?.name);
   document.body.classList.toggle('auth-locked', locked);
   document.body.classList.toggle('auth-resolved', !locked);
-  document.body.classList.toggle('is-local-preview', isLocalPreview());
+  document.body.classList.toggle('is-local-preview', isPreviewAccess());
+
+  const previewButton = byId('hub-local-login');
+  if (previewButton && isPreviewAccess()) previewButton.textContent = 'Usa accesso preview';
 
   const status = byId('hub-auth-status');
   if (!status) return;
@@ -53,8 +58,8 @@ function syncHubAuth(message = '') {
     status.textContent = `Riconosciuto come ${user.name} · ${user.email}`;
   } else if (message) {
     status.textContent = message;
-  } else if (isLocalPreview()) {
-    status.textContent = 'Accesso locale disponibile per la verifica offline del catalogo.';
+  } else if (isPreviewAccess()) {
+    status.textContent = 'Accesso preview disponibile per testare come utente finale senza usare Netlify.';
   } else {
     status.textContent = 'Nessuna sessione Google attiva.';
   }
@@ -77,7 +82,7 @@ async function loadFirebaseAuth() {
 
 async function signInWithGoogleHub() {
   if (isLocalPreview()) {
-    syncHubAuth('Accesso locale disponibile per la verifica offline del catalogo.');
+    syncHubAuth('Accesso preview disponibile per la verifica offline del catalogo.');
     return;
   }
   setAuthButtonsDisabled(true);
@@ -106,6 +111,7 @@ async function signInWithGoogleHub() {
     const code = err?.code || '';
     if (code === 'auth/popup-closed-by-user') syncHubAuth('Accesso annullato: popup Google chiuso prima del completamento.');
     else if (code === 'auth/cancelled-popup-request') syncHubAuth('Accesso Google già in corso in un altro popup.');
+    else if (code === 'auth/unauthorized-domain' && isGitHubPagesPreview()) syncHubAuth('Dominio GitHub Pages non autorizzato su Firebase: usa Accesso preview per testare senza Netlify.');
     else if (code === 'auth/unauthorized-domain') syncHubAuth(`Dominio non autorizzato su Firebase Auth: ${location.hostname}.`);
     else syncHubAuth(`Accesso Google non riuscito${code ? ` (${code})` : ''}. Riprova.`);
   } finally {
@@ -114,11 +120,12 @@ async function signInWithGoogleHub() {
 }
 
 function activateLocalPreviewAccess() {
-  if (!isLocalPreview()) return;
+  if (!isPreviewAccess()) return;
+  localStorage.setItem('dose_preview', '1');
   localStorage.setItem('dose_user', JSON.stringify({
-    name: 'Marco Tranquilli',
-    email: 'marco.tranquilli@dos.design',
-    source: 'local-access'
+    name: 'Utente Preview Sponsor',
+    email: 'preview.sponsor@dosepranza.test',
+    source: isGitHubPagesPreview() ? 'github-pages-preview' : 'local-access'
   }));
   syncHubAuth();
   const next = getNextTarget();
@@ -133,8 +140,8 @@ function protectLinks() {
       event.preventDefault();
       const target = link.dataset.target || '';
       const message = target
-        ? `Accedi con Google per aprire ${target === 'russo' ? 'Alimentari Russo' : 'La Pagnottella Gourmet'}.`
-        : 'Accedi con Google per continuare.';
+        ? `Accedi con Google o usa Accesso preview per aprire ${target === 'russo' ? 'Alimentari Russo' : 'La Pagnottella Gourmet'}.`
+        : 'Accedi con Google o usa Accesso preview per continuare.';
       syncHubAuth(message);
     });
   });
