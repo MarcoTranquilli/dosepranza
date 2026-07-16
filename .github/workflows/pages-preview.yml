@@ -1,0 +1,21 @@
+name: GitHub Pages Preview
+
+on:
+  push:
+    branches:
+      - feature/dosepranza-2-preview-clean
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dosepranza-pages-preview
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    name: Build and publish gh-pages preview
+    runs-on: ubuntu-latest
+    steps:
+     
