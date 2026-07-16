@@ -38,10 +38,10 @@ function setAuthState(session, message = '') {
 
   const status = byId('hub-auth-status');
   if (!status) return;
-  if (authenticated) {
-    status.textContent = `Riconosciuto come ${session.name} · ${session.email}`;
-  } else if (message) {
+  if (message) {
     status.textContent = message;
+  } else if (authenticated) {
+    status.textContent = `Riconosciuto come ${session.name} · ${session.email}`;
   } else if (access.isFilePreview()) {
     status.textContent = 'Accesso locale disponibile per la verifica offline.';
   } else {
@@ -55,37 +55,57 @@ function redirectTo(target) {
   window.location.replace(resolveTargetHref(target));
 }
 
+function scrollAdminPanelIntoView() {
+  const panel = byId('supplier-control-panel') || byId('suppliers-grid');
+  if (!panel) return;
+  window.requestAnimationFrame(() => panel.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+}
+
 function renderSupplierSettings(settings) {
   currentSettings = settings;
   const enabled = settings?.pagnottella?.enabledForUsers === true;
   const toggle = byId('pagnottella-enabled');
   if (toggle) toggle.checked = enabled;
-  if (byId('pagnottella-toggle-label')) {
-    byId('pagnottella-toggle-label').textContent = enabled ? 'Abilitata agli utenti' : 'Solo amministratore';
-  }
-  if (byId('supplier-control-copy')) {
-    byId('supplier-control-copy').textContent = enabled
-      ? 'La Pagnottella è raggiungibile dagli utenti tramite il suo collegamento diretto.'
-      : 'La Pagnottella è raggiungibile solo dall’amministratore; gli utenti restano su Alimentari Russo.';
-  }
-  if (byId('pagnottella-visibility-status')) {
-    byId('pagnottella-visibility-status').textContent = enabled ? 'Attiva per gli utenti' : 'Solo amministratore';
-  }
+  if (byId('pagnottella-toggle-label')) byId('pagnottella-toggle-label').textContent = enabled ? 'Abilitata agli utenti' : 'Solo amministratore';
+  if (byId('supplier-control-copy')) byId('supplier-control-copy').textContent = enabled ? 'La Pagnottella è raggiungibile dagli utenti tramite il suo collegamento diretto.' : 'La Pagnottella è raggiungibile solo dall’amministratore; gli utenti restano su Alimentari Russo.';
+  if (byId('pagnottella-visibility-status')) byId('pagnottella-visibility-status').textContent = enabled ? 'Attiva per gli utenti' : 'Solo amministratore';
 }
 
 async function activateSession(session, honorNext = true) {
   currentSession = session;
   setAuthState(session);
-  if (!session?.isAdmin) {
+
+  if (!session?.email) {
+    setAuthState(null, 'Accesso non completato. Riprova con Google.');
+    return;
+  }
+
+  if (!session.isAdmin) {
     redirectTo('russo');
     return;
   }
-  const settings = await access.getSupplierSettings();
+
+  let settings = access.DEFAULT_SETTINGS;
+  let settingsWarning = '';
+  try {
+    settings = await access.getSupplierSettings();
+  } catch (error) {
+    console.warn('Supplier settings unavailable; admin defaults applied.', error);
+    settingsWarning = ' Configurazione fornitori non disponibile: uso impostazioni sicure di default.';
+  }
+
   renderSupplierSettings(settings);
+  setAuthState(session, `Accesso amministratore completato. Puoi gestire i fornitori qui sotto.${settingsWarning}`);
+
   if (honorNext) {
     const next = getNextTarget();
-    if (next) redirectTo(next);
+    if (next) {
+      redirectTo(next);
+      return;
+    }
   }
+
+  scrollAdminPanelIntoView();
 }
 
 function friendlyAuthError(error) {
@@ -161,9 +181,7 @@ async function updatePagnottellaVisibility(event) {
   try {
     const settings = await access.setSupplierEnabled('pagnottella', requested);
     renderSupplierSettings(settings);
-    if (status) status.textContent = requested
-      ? 'La Pagnottella è ora abilitata per gli utenti con link diretto.'
-      : 'La Pagnottella è ora riservata all’amministratore.';
+    if (status) status.textContent = requested ? 'La Pagnottella è ora abilitata per gli utenti con link diretto.' : 'La Pagnottella è ora riservata all’amministratore.';
   } catch (error) {
     toggle.checked = currentSettings?.pagnottella?.enabledForUsers === true;
     if (status) status.textContent = error?.message || 'Impossibile aggiornare la configurazione.';
