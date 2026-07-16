@@ -9,7 +9,7 @@ import {
 
 test.describe('Preview multi-fornitore', () => {
   test('Hub: completa il login Google ufficiale e non espone il bypass locale su HTTP', async ({ page }) => {
-    await page.route('**/supplier-access.js', async route => {
+    await page.route('**/supplier-access.js*', async route => {
       await route.fulfill({
         contentType: 'application/javascript',
         body: `
