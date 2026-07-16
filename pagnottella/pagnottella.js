@@ -522,7 +522,7 @@ async function sendWA(){
   try{
     const payload = buildOrderPayload();
     const result = await supplierAccess.createPagnottellaOrder(payload);
-    logOrder(result.id, payload);
+    logOrder(result.id);
     state.lastSubmittedMessage = message;
     const target = whatsappUrl();
     if(popup) popup.location.replace(target);
@@ -542,7 +542,7 @@ function copyPaymentIban(){
   if(!iban) return;
   navigator.clipboard?.writeText(iban).then(() => toast('IBAN copiato')).catch(() => toast(`IBAN: ${iban}`));
 }
-function logOrder(orderId, payload){ const logs = JSON.parse(localStorage.getItem(ORDER_LOG_KEY)||'[]'); const t = totals(); logs.unshift({ id:orderId, ts:new Date().toISOString(), supplierId:'pagnottella', customer:(byId('customer')?.value||authenticatedCustomerName()||'Cliente').trim(), company:companyCopy(), costCenter:deliverySiteCopy(), paymentMethod:selectedPaymentMethod(), count:t.count, total:t.total, message:payload?.restaurateurSummary || buildMessage() }); localStorage.setItem(ORDER_LOG_KEY, JSON.stringify(logs.slice(0,25))); updateAdmin(); }
+function logOrder(orderId){ const logs = JSON.parse(localStorage.getItem(ORDER_LOG_KEY)||'[]'); const t = totals(); logs.unshift({ id:orderId, ts:new Date().toISOString(), supplierId:'pagnottella', customer:(byId('customer')?.value||authenticatedCustomerName()||'Cliente').trim(), company:companyCopy(), costCenter:deliverySiteCopy(), paymentMethod:selectedPaymentMethod(), count:t.count, total:t.total, message:`Ordine ${orderId} · ${t.count} prodotti · ${money(t.total)}` }); localStorage.setItem(ORDER_LOG_KEY, JSON.stringify(logs.slice(0,25))); updateAdmin(); }
 function newOrder(){ state.cart = {}; state.lastSubmittedMessage=''; byId('notes').value = ''; byId('confirm').classList.remove('show', 'isError'); renderCart(); closeCart(); }
 function openCart(){ byId('cart').classList.add('open'); byId('cartBackdrop').classList.add('show'); }
 function closeCart(){ byId('cart').classList.remove('open'); byId('cartBackdrop').classList.remove('show'); }

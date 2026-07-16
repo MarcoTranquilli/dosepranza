@@ -97,7 +97,7 @@
 
   async function firebaseUserPayload(firebaseUser) {
     if (!firebaseUser || firebaseUser.isAnonymous || !firebaseUser.email) return null;
-    const providerIds = (firebaseUser.providerData || []).map(item => item?.providerId).filter(Boolean);
+    const hasGoogleProvider = (firebaseUser.providerData || []).some(item => item?.providerId === 'google.com');
     let tokenResult = null;
     try {
       tokenResult = await firebaseUser.getIdTokenResult();
@@ -105,7 +105,7 @@
       tokenResult = null;
     }
     const signInProvider = tokenResult?.signInProvider || tokenResult?.claims?.firebase?.sign_in_provider || '';
-    if (!providerIds.includes('google.com') && signInProvider !== 'google.com') return null;
+    if (!hasGoogleProvider && signInProvider !== 'google.com') return null;
     const email = normalizeEmail(firebaseUser.email);
     const claimRole = tokenResult?.claims?.role;
     const isAdmin = email === ADMIN_EMAIL || claimRole === 'admin';
