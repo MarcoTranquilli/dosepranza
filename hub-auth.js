@@ -33,10 +33,10 @@ function setAuthState(session, message = '') {
 
   const status = byId('hub-auth-status');
   if (!status) return;
-  if (authenticated) {
-    status.textContent = `Riconosciuto come ${session.name} · ${session.email}`;
-  } else if (message) {
+  if (message) {
     status.textContent = message;
+  } else if (authenticated) {
+    status.textContent = `Riconosciuto come ${session.name} · ${session.email}`;
   } else if (access.isFilePreview()) {
     status.textContent = 'Accesso locale disponibile per la verifica offline.';
   } else {
@@ -47,7 +47,17 @@ function setAuthState(session, message = '') {
 function redirectTo(target) {
   if (redirecting) return;
   redirecting = true;
+  const status = byId('hub-auth-status');
+  if (status) status.textContent = 'Accesso completato. Apertura del servizio...';
   window.location.replace(resolveTargetHref(target));
+}
+
+function scrollAdminPanelIntoView() {
+  const panel = byId('supplier-control-panel') || byId('suppliers-grid');
+  if (!panel) return;
+  window.setTimeout(() => {
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 80);
 }
 
 function renderSupplierSettings(settings) {
@@ -71,16 +81,38 @@ function renderSupplierSettings(settings) {
 async function activateSession(session, honorNext = true) {
   currentSession = session;
   setAuthState(session);
-  if (!session?.isAdmin) {
+
+  if (!session?.email) {
+    setAuthState(null, 'Accesso non completato. Riprova con Google.');
+    return;
+  }
+
+  if (!session.isAdmin) {
     redirectTo('russo');
     return;
   }
-  const settings = await access.getSupplierSettings();
+
+  let settings = access.DEFAULT_SETTINGS;
+  let settingsWarning = '';
+  try {
+    settings = await access.getSupplierSettings();
+  } catch (error) {
+    console.warn('Supplier settings unavailable; admin defaults applied.', error);
+    settingsWarning = ' Configurazione fornitori non disponibile: uso impostazioni sicure di default.';
+  }
+
   renderSupplierSettings(settings);
+  setAuthState(session, `Accesso amministratore completato. Puoi gestire i fornitori qui sotto.${settingsWarning}`);
+
   if (honorNext) {
     const next = getNextTarget();
-    if (next) redirectTo(next);
+    if (next) {
+      redirectTo(next);
+      return;
+    }
   }
+
+  scrollAdminPanelIntoView();
 }
 
 function friendlyAuthError(error) {
