@@ -7,4 +7,10 @@
     if (access.isE2E()) return;
     try {
       const session = await access.resolveSession();
-      if
+      if (!session) redirectToHub();
+    } catch (error) {
+      redirectToHub();
+    }
+  };
+  verify();
+})();
