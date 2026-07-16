@@ -1,12 +1,15 @@
 (() => {
-  try {
-    if (window.location.protocol === 'file:') return;
-    const params = new URLSearchParams(window.location.search);
-    const isE2E = params.get('e2e') === '1' || localStorage.getItem('dose_e2e') === '1';
-    const user = JSON.parse(localStorage.getItem('dose_user') || 'null');
-    const hasUser = !!(user && user.email && user.name);
-    if (!hasUser && !isE2E) {
-      window.location.replace('../?next=russo');
+  const redirectToHub = () => window.location.replace('../?next=russo');
+  const verify = async () => {
+    const access = window.DoseSupplierAccess;
+    if (!access || access.isFilePreview()) return;
+    if (access.isE2E()) return;
+    try {
+      const session = await access.resolveSession();
+      if (!session) redirectToHub();
+    } catch (error) {
+      redirectToHub();
     }
-  } catch (e) {}
+  };
+  verify();
 })();

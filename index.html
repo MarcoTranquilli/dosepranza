@@ -11,19 +11,19 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./preview-hub.css">
 </head>
-<body>
+<body class="access-pending auth-locked">
   <div class="page-shell">
     <header class="hero">
       <div class="hero-copy">
         <p class="eyebrow">DOSepranza</p>
         <img src="./assets/branding/dosepranza-suite-logo.png" alt="DOSepranza" class="brandmark">
-        <h1>Accedi e scegli il fornitore.</h1>
-        <p class="lede">Un unico punto di ingresso per autenticarti con Google e aprire il servizio corretto senza reinserire nome ed email.</p>
+        <h1>Accedi a DOSepranza.</h1>
+        <p class="lede">Un unico punto di ingresso per autenticarti con Google. Gli utenti vengono indirizzati ad Alimentari Russo; l’amministratore può gestire e verificare tutti i fornitori.</p>
         <div class="auth-card" id="hub-auth-card">
           <div>
             <p class="auth-label">Accesso Google</p>
-            <h2 class="auth-title">Riconoscimento utente prima della scelta fornitore</h2>
-            <p class="auth-copy">L’accesso abilita i percorsi operativi di Alimentari Russo e La Pagnottella Gourmet con il tuo profilo DOS.</p>
+            <h2 class="auth-title">Riconoscimento utente prima dell’accesso</h2>
+            <p class="auth-copy">La sessione Google identifica il profilo e apre automaticamente il percorso autorizzato.</p>
           </div>
           <div class="auth-actions">
             <button id="hub-google-login" class="btn btn-primary" type="button">Continua con Google</button>
@@ -41,22 +41,36 @@
         <p class="panel-label">Flusso operativo</p>
         <ul>
           <li>autenticazione Google una sola volta</li>
-          <li>instradamento diretto verso il fornitore corretto</li>
+          <li>instradamento automatico verso Alimentari Russo</li>
           <li>continuità di esperienza tra suite e cataloghi</li>
         </ul>
       </aside>
     </header>
 
     <main>
-      <section class="section-head">
+      <section class="section-head supplier-admin-only">
         <div>
           <p class="eyebrow">Percorsi disponibili</p>
-          <h2>Scegli il fornitore da utilizzare.</h2>
+          <h2>Gestisci e apri i fornitori.</h2>
         </div>
-        <p class="section-note">I collegamenti vengono attivati dopo il riconoscimento Google e aprono direttamente il flusso operativo del fornitore selezionato.</p>
+        <p class="section-note">Questa area è riservata all’amministratore. La visibilità per gli utenti non limita mai il tuo accesso.</p>
       </section>
 
-      <section class="suppliers-grid auth-locked" id="suppliers-grid">
+      <section id="supplier-control-panel" class="control-panel supplier-admin-only" aria-labelledby="supplier-control-title">
+        <div>
+          <p class="eyebrow">Controllo pubblicazione</p>
+          <h2 id="supplier-control-title">Disponibilità La Pagnottella Gourmet</h2>
+          <p id="supplier-control-copy">Il fornitore è visibile solo all’amministratore.</p>
+        </div>
+        <label class="supplier-toggle" for="pagnottella-enabled">
+          <input id="pagnottella-enabled" type="checkbox" role="switch" aria-describedby="supplier-control-copy">
+          <span class="supplier-toggle-track" aria-hidden="true"><span></span></span>
+          <span id="pagnottella-toggle-label">Solo amministratore</span>
+        </label>
+        <p id="supplier-control-status" class="control-status" role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="suppliers-grid auth-locked supplier-admin-only" id="suppliers-grid">
         <article class="supplier-card supplier-card--russo">
           <div class="supplier-top">
             <span class="supplier-badge">Alimentari</span>
@@ -65,7 +79,7 @@
           <h3>Alimentari Russo</h3>
           <p>Servizio DOSepranza per ordini giornalieri, personalizzazioni, riconciliazione e gestione amministrativa.</p>
           <dl>
-            <div><dt>Posizionamento</dt><dd>Servizio attivo</dd></div>
+            <div><dt>Disponibilità</dt><dd id="russo-visibility-status">Attivo per gli utenti</dd></div>
             <div><dt>Uso</dt><dd>Flusso completo</dd></div>
             <div><dt>Accesso</dt><dd>Login condiviso</dd></div>
           </dl>
@@ -83,7 +97,7 @@
           <h3>La Pagnottella Gourmet</h3>
           <p>Catalogo branded per panini e insalate gourmet con sconto stagionale, checkout rapido e riepilogo WhatsApp.</p>
           <dl>
-            <div><dt>Posizionamento</dt><dd>Nuovo fornitore</dd></div>
+            <div><dt>Disponibilità</dt><dd id="pagnottella-visibility-status">Solo amministratore</dd></div>
             <div><dt>Uso</dt><dd>Catalogo dedicato</dd></div>
             <div><dt>Accesso</dt><dd>Login condiviso</dd></div>
           </dl>
@@ -94,7 +108,7 @@
         </article>
       </section>
 
-      <section class="link-board">
+      <section class="link-board supplier-admin-only">
         <h2>Link rapidi da condividere</h2>
         <div class="link-list">
           <a href="./">Hub fornitori</a>
@@ -104,6 +118,7 @@
       </section>
     </main>
   </div>
+  <script src="./supplier-access.js"></script>
   <script type="module" src="./hub-auth.js"></script>
 </body>
 </html>

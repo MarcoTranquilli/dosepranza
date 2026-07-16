@@ -1,161 +1,166 @@
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyCQJsNbgaR89gF_1vLe6H4DPboOhQvm9nI",
-  authDomain: "app-ordini-pranzo-alimentari.firebaseapp.com",
-  projectId: "app-ordini-pranzo-alimentari",
-  storageBucket: "app-ordini-pranzo-alimentari.appspot.com",
-  messagingSenderId: "553169964686",
-  appId: "1:553169964686:web:7f8ca6f32a301949e4c3df"
-};
-
-let firebaseAuthPromise = null;
+const access = window.DoseSupplierAccess;
 const byId = (id) => document.getElementById(id);
-const isLocalPreview = () => location.protocol === 'file:';
-const isGitHubPagesPreview = () => location.hostname.endsWith('github.io') || new URLSearchParams(location.search).get('preview') === '1';
-const isPreviewAccess = () => isLocalPreview() || isGitHubPagesPreview();
 
-function getStoredDoseUser() {
-  try {
-    return JSON.parse(localStorage.getItem('dose_user') || 'null');
-  } catch (e) {
-    return null;
-  }
-}
+let currentSession = null;
+let currentSettings = null;
+let redirecting = false;
 
 function getNextTarget() {
-  try {
-    return new URLSearchParams(location.search).get('next') || '';
-  } catch (e) {
-    return '';
-  }
+  const target = new URLSearchParams(window.location.search).get('next') || '';
+  return ['russo', 'pagnottella'].includes(target) ? target : '';
 }
 
 function resolveTargetHref(target) {
-  if (target === 'russo') return './russo/';
   if (target === 'pagnottella') return './pagnottella/?store=pagnottella';
-  return './';
+  return './russo/';
 }
 
 function setAuthButtonsDisabled(disabled) {
   ['hub-google-login', 'hub-local-login'].forEach((id) => {
-    const el = byId(id);
-    if (el) el.disabled = !!disabled;
+    const element = byId(id);
+    if (element) element.disabled = !!disabled;
   });
 }
 
-function syncHubAuth(message = '') {
-  const user = getStoredDoseUser();
-  const locked = !(user?.email && user?.name);
-  document.body.classList.toggle('auth-locked', locked);
-  document.body.classList.toggle('auth-resolved', !locked);
-  document.body.classList.toggle('is-local-preview', isPreviewAccess());
-
-  const previewButton = byId('hub-local-login');
-  if (previewButton && isPreviewAccess()) previewButton.textContent = 'Usa accesso preview';
+function setAuthState(session, message = '') {
+  const authenticated = !!session?.email;
+  const isAdmin = !!session?.isAdmin;
+  document.body.classList.remove('access-pending');
+  document.body.classList.toggle('auth-locked', !authenticated);
+  document.body.classList.toggle('auth-resolved', authenticated);
+  document.body.classList.toggle('is-admin', isAdmin);
+  document.body.classList.toggle('is-local-preview', access.isFilePreview());
 
   const status = byId('hub-auth-status');
   if (!status) return;
-  if (!locked) {
-    status.textContent = `Riconosciuto come ${user.name} · ${user.email}`;
+  if (authenticated) {
+    status.textContent = `Riconosciuto come ${session.name} · ${session.email}`;
   } else if (message) {
     status.textContent = message;
-  } else if (isPreviewAccess()) {
-    status.textContent = 'Accesso preview disponibile per testare come utente finale senza usare Netlify.';
+  } else if (access.isFilePreview()) {
+    status.textContent = 'Accesso locale disponibile per la verifica offline.';
   } else {
     status.textContent = 'Nessuna sessione Google attiva.';
   }
 }
 
-async function loadFirebaseAuth() {
-  if (firebaseAuthPromise) return firebaseAuthPromise;
-  firebaseAuthPromise = (async () => {
-    const [{ initializeApp }, { getAuth, GoogleAuthProvider, signInWithPopup, browserLocalPersistence, setPersistence }] = await Promise.all([
-      import("https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"),
-      import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js")
-    ]);
-    const app = initializeApp(FIREBASE_CONFIG, 'dosepranza-hub');
-    const auth = getAuth(app);
-    await setPersistence(auth, browserLocalPersistence);
-    return { auth, GoogleAuthProvider, signInWithPopup };
-  })();
-  return firebaseAuthPromise;
+function redirectTo(target) {
+  if (redirecting) return;
+  redirecting = true;
+  window.location.replace(resolveTargetHref(target));
+}
+
+function renderSupplierSettings(settings) {
+  currentSettings = settings;
+  const enabled = settings?.pagnottella?.enabledForUsers === true;
+  const toggle = byId('pagnottella-enabled');
+  if (toggle) toggle.checked = enabled;
+  if (byId('pagnottella-toggle-label')) {
+    byId('pagnottella-toggle-label').textContent = enabled ? 'Abilitata agli utenti' : 'Solo amministratore';
+  }
+  if (byId('supplier-control-copy')) {
+    byId('supplier-control-copy').textContent = enabled
+      ? 'La Pagnottella è raggiungibile dagli utenti tramite il suo collegamento diretto.'
+      : 'La Pagnottella è raggiungibile solo dall’amministratore; gli utenti restano su Alimentari Russo.';
+  }
+  if (byId('pagnottella-visibility-status')) {
+    byId('pagnottella-visibility-status').textContent = enabled ? 'Attiva per gli utenti' : 'Solo amministratore';
+  }
+}
+
+async function activateSession(session, honorNext = true) {
+  currentSession = session;
+  setAuthState(session);
+  if (!session?.isAdmin) {
+    redirectTo('russo');
+    return;
+  }
+  const settings = await access.getSupplierSettings();
+  renderSupplierSettings(settings);
+  if (honorNext) {
+    const next = getNextTarget();
+    if (next) redirectTo(next);
+  }
+}
+
+function friendlyAuthError(error) {
+  const code = error?.code || '';
+  if (code === 'auth/popup-closed-by-user') return 'Accesso annullato: popup Google chiuso prima del completamento.';
+  if (code === 'auth/cancelled-popup-request') return 'Accesso Google già in corso in un altro popup.';
+  if (code === 'auth/unauthorized-domain') return `Dominio non autorizzato su Firebase Auth: ${window.location.hostname}.`;
+  return `Accesso Google non riuscito${code ? ` (${code})` : ''}. Riprova.`;
 }
 
 async function signInWithGoogleHub() {
-  if (isLocalPreview()) {
-    syncHubAuth('Accesso preview disponibile per la verifica offline del catalogo.');
-    return;
-  }
   setAuthButtonsDisabled(true);
-  syncHubAuth('Accesso Google in corso...');
+  setAuthState(null, 'Accesso Google in corso...');
   try {
-    const { auth, GoogleAuthProvider, signInWithPopup } = await loadFirebaseAuth();
-    const provider = new GoogleAuthProvider();
-    provider.addScope('email');
-    provider.addScope('profile');
-    provider.setCustomParameters({ prompt: 'select_account' });
-    const result = await signInWithPopup(auth, provider);
-    const user = result?.user;
-    const payload = {
-      name: user?.displayName || user?.email?.split('@')[0] || 'Utente DOS',
-      email: user?.email || ''
-    };
-    if (!payload.email) {
-      syncHubAuth('Login Google completato ma email non disponibile.');
-      return;
-    }
-    localStorage.setItem('dose_user', JSON.stringify(payload));
-    syncHubAuth();
-    const next = getNextTarget();
-    if (next) location.href = resolveTargetHref(next);
-  } catch (err) {
-    const code = err?.code || '';
-    if (code === 'auth/popup-closed-by-user') syncHubAuth('Accesso annullato: popup Google chiuso prima del completamento.');
-    else if (code === 'auth/cancelled-popup-request') syncHubAuth('Accesso Google già in corso in un altro popup.');
-    else if (code === 'auth/unauthorized-domain' && isGitHubPagesPreview()) syncHubAuth('Dominio GitHub Pages non autorizzato su Firebase: usa Accesso preview per testare senza Netlify.');
-    else if (code === 'auth/unauthorized-domain') syncHubAuth(`Dominio non autorizzato su Firebase Auth: ${location.hostname}.`);
-    else syncHubAuth(`Accesso Google non riuscito${code ? ` (${code})` : ''}. Riprova.`);
+    const session = await access.signInWithGoogle();
+    await activateSession(session, true);
+  } catch (error) {
+    setAuthState(null, friendlyAuthError(error));
   } finally {
     setAuthButtonsDisabled(false);
   }
 }
 
-function activateLocalPreviewAccess() {
-  if (!isPreviewAccess()) return;
-  localStorage.setItem('dose_preview', '1');
-  localStorage.setItem('dose_user', JSON.stringify({
-    name: 'Utente Preview Sponsor',
-    email: 'preview.sponsor@dosepranza.test',
-    source: isGitHubPagesPreview() ? 'github-pages-preview' : 'local-access'
+async function activateLocalPreviewAccess() {
+  if (!access.isFilePreview()) return;
+  window.localStorage.setItem('dose_user', JSON.stringify({
+    uid: 'local-preview-admin',
+    name: 'Marco Tranquilli',
+    email: access.ADMIN_EMAIL,
+    role: 'admin',
+    isAdmin: true,
+    provider: 'local-preview'
   }));
-  syncHubAuth();
-  const next = getNextTarget();
-  if (next) location.href = resolveTargetHref(next);
+  const session = await access.resolveSession();
+  await activateSession(session, true);
+}
+
+async function updatePagnottellaVisibility(event) {
+  if (!currentSession?.isAdmin) return;
+  const toggle = event.currentTarget;
+  const requested = !!toggle.checked;
+  const status = byId('supplier-control-status');
+  toggle.disabled = true;
+  if (status) status.textContent = 'Aggiornamento in corso...';
+  try {
+    const settings = await access.setSupplierEnabled('pagnottella', requested);
+    renderSupplierSettings(settings);
+    if (status) status.textContent = requested
+      ? 'La Pagnottella è ora abilitata per gli utenti con link diretto.'
+      : 'La Pagnottella è ora riservata all’amministratore.';
+  } catch (error) {
+    toggle.checked = currentSettings?.pagnottella?.enabledForUsers === true;
+    if (status) status.textContent = error?.message || 'Impossibile aggiornare la configurazione.';
+  } finally {
+    toggle.disabled = false;
+  }
 }
 
 function protectLinks() {
   document.querySelectorAll('.protected-link').forEach((link) => {
     link.addEventListener('click', (event) => {
-      const user = getStoredDoseUser();
-      if (user?.email && user?.name) return;
+      if (currentSession?.isAdmin) return;
       event.preventDefault();
-      const target = link.dataset.target || '';
-      const message = target
-        ? `Accedi con Google o usa Accesso preview per aprire ${target === 'russo' ? 'Alimentari Russo' : 'La Pagnottella Gourmet'}.`
-        : 'Accedi con Google o usa Accesso preview per continuare.';
-      syncHubAuth(message);
+      setAuthState(currentSession, 'Questa scelta è riservata all’amministratore.');
     });
   });
 }
 
-function init() {
+async function init() {
+  if (!access) throw new Error('Modulo di accesso fornitori non disponibile.');
   byId('hub-google-login')?.addEventListener('click', signInWithGoogleHub);
   byId('hub-local-login')?.addEventListener('click', activateLocalPreviewAccess);
+  byId('pagnottella-enabled')?.addEventListener('change', updatePagnottellaVisibility);
   protectLinks();
-  syncHubAuth();
-  const user = getStoredDoseUser();
-  const next = getNextTarget();
-  if (user?.email && user?.name && next) {
-    location.replace(resolveTargetHref(next));
+  setAuthState(null);
+  try {
+    const session = await access.resolveSession();
+    if (session) await activateSession(session, true);
+  } catch (error) {
+    setAuthState(null, 'Impossibile verificare la sessione Google. Riprova.');
   }
 }
 

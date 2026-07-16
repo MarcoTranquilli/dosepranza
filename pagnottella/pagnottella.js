@@ -1,17 +1,9 @@
 let DATA = null;
 let PRODUCTS = [];
 let CATS = [];
-const state = { screen:'landing', cat:'all', filter:'', query:'', sort:'recommended', cart:{}, current:null, option:null };
+const state = { screen:'landing', cat:'all', filter:'', query:'', sort:'recommended', cart:{}, current:null, option:null, sending:false, lastSubmittedMessage:'' };
 const authState = { loading:false, user:null, message:'' };
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyCQJsNbgaR89gF_1vLe6H4DPboOhQvm9nI",
-  authDomain: "app-ordini-pranzo-alimentari.firebaseapp.com",
-  projectId: "app-ordini-pranzo-alimentari",
-  storageBucket: "app-ordini-pranzo-alimentari.appspot.com",
-  messagingSenderId: "553169964686",
-  appId: "1:553169964686:web:7f8ca6f32a301949e4c3df"
-};
-let firebaseAuthPromise = null;
+const supplierAccess = window.DoseSupplierAccess;
 const byId = id => document.getElementById(id);
 const money = v => '€' + (Math.round(v*100)/100).toFixed(2).replace('.', ',');
 const esc = s => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
@@ -39,11 +31,12 @@ const getStoredDoseUser = () => {
   }
 };
 const authenticatedCustomerName = () => getStoredDoseUser()?.name?.trim() || '';
-const authenticatedDoseUser = () => getStoredDoseUser() || null;
+const authenticatedDoseUser = () => supplierAccess?.getStoredUser?.() || getStoredDoseUser() || null;
 const companyCopy = () => DATA?.orderContext?.company || 'DOS Design S.p.a.';
 const deliverySiteCopy = () => DATA?.orderContext?.deliverySite || 'Via Arno, 52, 00198 Roma RM';
 const paymentBeneficiary = () => DATA?.payment?.beneficiary || '';
 const paymentIban = () => DATA?.payment?.iban || '';
+const paymentNoteCopy = () => 'Contanti, POS, Bonifico e Satispay disponibili. PayPal e Nexi saranno attivati da settembre.';
 const discountedPrice = v => Math.round(v * (1 - discountRate()) * 100) / 100;
 const isLocalPreview = () => location.protocol === 'file:';
 const setAuthButtonsDisabled = (disabled) => {
@@ -54,10 +47,18 @@ const setAuthButtonsDisabled = (disabled) => {
 };
 
 async function bootstrap(){
-  if(!isLocalPreview() && !authenticatedDoseUser()){
-    const next = encodeURIComponent('pagnottella');
-    window.location.replace(`../?next=${next}`);
-    return;
+  if(!supplierAccess) throw new Error('Modulo di accesso fornitori non disponibile.');
+  if(!isLocalPreview()){
+    const session = await supplierAccess.resolveSession();
+    if(!session){
+      window.location.replace('../?next=pagnottella');
+      return;
+    }
+    if(!session.isAdmin && !(await supplierAccess.canAccessSupplier('pagnottella', session))){
+      window.location.replace('../russo/');
+      return;
+    }
+    authState.user = session;
   }
   DATA = await loadData();
   PRODUCTS = DATA.products;
@@ -85,6 +86,89 @@ async function loadData(){
   }
 }
 
+function paymentMethodLabel(method){
+  return typeof method === 'string' ? method : method?.label || '';
+}
+
+function paymentMethodMeta(label){
+  const methods = {
+    'Contanti': { icon:'€', description:'Pagamento alla consegna' },
+    'POS': { icon:'▣', description:'Carta alla consegna' },
+    'Bonifico bancario': { icon:'↗', description:'Bonifico entro le 12:00' },
+    'Satispay': { icon:'S', description:'QR entro le 12:00' },
+    'PayPal': { icon:'P', description:'Disponibile da settembre' },
+    'Nexi': { icon:'N', description:'Disponibile da settembre' }
+  };
+  return methods[label] || { icon:'¤', description:'Metodo di pagamento' };
+}
+
+function renderPaymentOptions(){
+  const activeMethods = (DATA.payment.methods || []).map(paymentMethodLabel).filter(Boolean);
+  const futureMethods = (DATA.payment.futureMethods || []).map(method => ({
+    label: paymentMethodLabel(method),
+    availableFrom: method.availableFrom || 'settembre',
+    enabled: method.enabled === true
+  })).filter(method => method.label);
+  const selectable = [
+    ...activeMethods.map(label => ({ label, enabled:true })),
+    ...futureMethods
+  ];
+  const selected = document.querySelector('input[name="paymentMethod"]:checked')?.value || activeMethods[0] || '';
+  const options = byId('paymentOptions');
+  if(options){
+    options.innerHTML = selectable.map((method, index) => {
+      const meta = paymentMethodMeta(method.label);
+      const disabled = !method.enabled;
+      const checked = !disabled && (method.label === selected || (!selected && index === 0));
+      return `<label class="paymentOption ${disabled ? 'isDisabled' : ''}">
+        <input type="radio" name="paymentMethod" value="${esc(method.label)}" ${checked ? 'checked' : ''} ${disabled ? 'disabled' : ''}>
+        <span class="paymentOptionIcon" aria-hidden="true">${esc(meta.icon)}</span>
+        <span class="paymentOptionCopy"><strong>${esc(method.label)}</strong><small>${esc(meta.description)}</small></span>
+        <span class="paymentOptionState">${disabled ? 'Prossimamente' : 'Seleziona'}</span>
+      </label>`;
+    }).join('');
+  }
+  const summary = byId('paymentMethods');
+  if(summary){
+    summary.innerHTML = [
+      ...activeMethods.map(label => `<span class="methodChip">${esc(label)}</span>`),
+      ...futureMethods.map(method => `<span class="methodChip methodChipDisabled" aria-disabled="true">${esc(method.label)} · da settembre</span>`)
+    ].join('');
+  }
+}
+
+function renderPaymentDetails(){
+  const container = byId('paymentDetails');
+  if(!container) return;
+  const method = selectedPaymentMethod();
+  if(method === 'Bonifico bancario'){
+    container.innerHTML = `<div class="paymentInstruction">
+      <strong>Bonifico bancario</strong>
+      <p>Completa il pagamento entro le 12:00 e indica il tuo nome nella causale.</p>
+      <div class="paymentDetailRow"><span class="paymentDetailLabel">Intestatario</span><span class="paymentDetailValue">${esc(paymentBeneficiary())}</span></div>
+      <div class="paymentDetailRow"><span class="paymentDetailLabel">IBAN</span><span class="paymentDetailValue">${esc(paymentIban())}</span></div>
+      <button type="button" class="paymentActionBtn" onclick="copyPaymentIban()">Copia IBAN</button>
+    </div>`;
+    return;
+  }
+  if(method === 'Satispay'){
+    const qrImage = DATA.payment.qrImage || '';
+    container.innerHTML = `<div class="paymentQrCard">
+      <img src="${esc(qrImage)}" alt="QR code Satispay La Pagnottella Gourmet" loading="lazy">
+      <div class="paymentQrBody">
+        <strong>Satispay</strong>
+        <p>Scansiona il QR e completa il pagamento entro le 12:00.</p>
+        <div class="paymentQrActions"><a class="paymentActionBtn" href="${esc(qrImage)}" target="_blank" rel="noopener">Apri QR</a></div>
+      </div>
+    </div>`;
+    return;
+  }
+  const copy = method === 'POS'
+    ? 'Paga con carta al momento della consegna.'
+    : 'Paga in contanti al momento della consegna.';
+  container.innerHTML = `<div class="paymentInstruction compact"><strong>${esc(method)}</strong><p>${esc(copy)}</p></div>`;
+}
+
 function hydrateStatic(){
   byId('brand-subtitle').textContent = `Suite DOSepranza · ${DATA.copy.eyebrow} · ordine in pochi tap`;
   byId('heroTitle').textContent = DATA.copy.headline;
@@ -103,37 +187,8 @@ function hydrateStatic(){
     { title:'Prodotti', body: `${DATA.notes.frozen} ${DATA.notes.olive}` },
     { title:'Pagamento', body: paymentStatusCopy() },
   ].map(n => `<div class="noteItem"><strong>${esc(n.title)}</strong>${esc(n.body)}</div>`).join('');
-  byId('paymentMethods').innerHTML = DATA.payment.methods.map(method => {
-    if(typeof method === 'string') return `<span class="methodChip">${esc(method)}</span>`;
-    return `<a class="methodChip methodChipLink" href="${esc(method.href)}" target="_blank" rel="noopener">${esc(method.label)}</a>`;
-  }).join('');
-  const paymentDetails = byId('paymentDetails');
-  if(paymentDetails){
-    const beneficiary = paymentBeneficiary();
-    const iban = paymentIban();
-    const qrImage = DATA.payment.qrImage || '';
-    paymentDetails.innerHTML = `
-      <div class="paymentDetailRow">
-        <span class="paymentDetailLabel">Intestatario</span>
-        <span class="paymentDetailValue">${esc(beneficiary)}</span>
-      </div>
-      <div class="paymentDetailRow">
-        <span class="paymentDetailLabel">IBAN</span>
-        <span class="paymentDetailValue">${esc(iban)}</span>
-      </div>
-      ${qrImage ? `<div class="paymentQrCard">
-        <img src="${esc(qrImage)}" alt="QR code Satispay La Pagnottella Gourmet" loading="lazy">
-        <div class="paymentQrBody">
-          <strong>QR Satispay</strong>
-          <p>Apri il QR dal checkout oppure copia l'IBAN per il bonifico. PayPal e Nexi saranno disponibili da settembre.</p>
-          <div class="paymentQrActions">
-            <a class="paymentActionBtn" href="${esc(qrImage)}" target="_blank" rel="noopener">Apri QR</a>
-            <button type="button" class="paymentActionBtn" onclick="copyPaymentIban()">Copia IBAN</button>
-          </div>
-        </div>
-      </div>` : ''}
-    `;
-  }
+  renderPaymentOptions();
+  renderPaymentDetails();
   byId('cartDeliveryText').textContent = deliveryCopy();
   byId('discountLabel').textContent = discountLabel();
   byId('deliveryCardText').textContent = `${deliveryCopy()}.`;
@@ -158,7 +213,12 @@ function bind(){
   byId('sort').addEventListener('change', e => { state.sort = e.target.value; renderCatalog(); });
   ['customer','notes'].forEach(id => {
     const el = byId(id);
-    if(el) el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', renderCart);
+    if(el) el.addEventListener('input', () => { state.lastSubmittedMessage=''; renderCart(); });
+  });
+  byId('paymentOptions')?.addEventListener('change', () => {
+    state.lastSubmittedMessage='';
+    renderPaymentDetails();
+    renderCart();
   });
   document.addEventListener('keydown', e => { if(e.key === 'Escape'){ closeDrawer(); closeCart(); } });
 }
@@ -211,20 +271,6 @@ function syncAuthGate(forceLocked=false){
     status.textContent = authState.loading ? 'Accesso Google in corso...' : 'Nessuna sessione Google attiva.';
   }
 }
-async function loadFirebaseAuth(){
-  if(firebaseAuthPromise) return firebaseAuthPromise;
-  firebaseAuthPromise = (async () => {
-    const [{ initializeApp }, { getAuth, GoogleAuthProvider, signInWithPopup, browserLocalPersistence, setPersistence }] = await Promise.all([
-      import("https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"),
-      import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js")
-    ]);
-    const app = initializeApp(FIREBASE_CONFIG, 'dosepranza-pagnottella');
-    const auth = getAuth(app);
-    await setPersistence(auth, browserLocalPersistence);
-    return { auth, GoogleAuthProvider, signInWithPopup };
-  })();
-  return firebaseAuthPromise;
-}
 async function signInWithGoogleGate(){
   if(isLocalPreview()){
     syncAuthGate(true);
@@ -235,19 +281,8 @@ async function signInWithGoogleGate(){
   setAuthButtonsDisabled(true);
   syncAuthGate(true);
   try{
-    const { auth, GoogleAuthProvider, signInWithPopup } = await loadFirebaseAuth();
-    const provider = new GoogleAuthProvider();
-    provider.addScope('email');
-    provider.addScope('profile');
-    provider.setCustomParameters({ prompt: 'select_account' });
-    const result = await signInWithPopup(auth, provider);
-    const user = result?.user;
-    const payload = {
-      name: user?.displayName || user?.email?.split('@')[0] || 'Utente DOS',
-      email: user?.email || ''
-    };
+    const payload = await supplierAccess.signInWithGoogle();
     if(payload.email){
-      localStorage.setItem('dose_user', JSON.stringify(payload));
       authState.user = payload;
       authState.message = '';
       hydrateStatic();
@@ -279,9 +314,12 @@ async function signInWithGoogleGate(){
 function activateLocalPreviewAccess(){
   if(!isLocalPreview()) return;
   const fallbackUser = {
+    uid: 'local-preview-admin',
     name: 'Marco Tranquilli',
     email: 'marco.tranquilli@dos.design',
-    source: 'local-access'
+    role: 'admin',
+    isAdmin: true,
+    provider: 'local-preview'
   };
   localStorage.setItem('dose_user', JSON.stringify(fallbackUser));
   authState.user = fallbackUser;
@@ -339,7 +377,9 @@ function renderCatalog(){
 function card(p){
   const badges = [];
   badges.push(...(p.tags || []).slice(0,2));
-  return `<article class="card"><div class="pic"><img src="${p.img}" alt="${esc(p.name)}" loading="lazy"><div class="badges">${badges.map(t=>`<span class="badge">${esc(t)}</span>`).join('')}</div></div><div class="body"><div class="nameRow"><h4>${esc(p.name)}</h4><div class="price"><span class="old">${money(p.price)}</span>${money(discountedPrice(p.price))}</div></div><p class="desc">${esc(p.desc)}</p><div class="meta"><span class="tag">${esc(catLabel(p.cat))}</span>${(p.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div><div class="actions"><button class="details" onclick="openDetails('${p.id}')">Dettagli</button><button class="add" aria-label="Aggiungi ${esc(p.name)}" onclick="quickAdd('${p.id}')">+</button></div></div></article>`;
+  const hasSpecificImage = p.imageMeta?.specific === true;
+  const alt = hasSpecificImage ? p.name : `La Pagnottella Gourmet - foto specifica non disponibile per ${p.name}`;
+  return `<article class="card ${hasSpecificImage ? '' : 'imageFallback'}"><div class="pic"><img src="${p.img}" alt="${esc(alt)}" loading="lazy"><div class="badges">${badges.map(t=>`<span class="badge">${esc(t)}</span>`).join('')}</div>${hasSpecificImage ? '' : '<span class="imageNotice">Foto specifica non disponibile</span>'}</div><div class="body"><div class="nameRow"><h4>${esc(p.name)}</h4><div class="price"><span class="old">${money(p.price)}</span>${money(discountedPrice(p.price))}</div></div><p class="desc">${esc(p.desc)}</p><div class="meta"><span class="tag">${esc(catLabel(p.cat))}</span>${(p.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div><div class="actions"><button class="details" onclick="openDetails('${p.id}')">Dettagli</button><button class="add" aria-label="Aggiungi ${esc(p.name)}" onclick="quickAdd('${p.id}')">+</button></div></div></article>`;
 }
 function openDetails(id){
   const p = PRODUCTS.find(x => x.id === id);
@@ -361,8 +401,8 @@ function updateDrawerPrice(){ const p = state.current, o = state.option || defau
 function closeDrawer(){ byId('drawer').classList.remove('show'); }
 function quickAdd(id){ const p = PRODUCTS.find(x => x.id === id); addToCart(p, defaultOption(p)); }
 function drawerAdd(){ addToCart(state.current, state.option || defaultOption(state.current)); closeDrawer(); }
-function addToCart(p,o){ const originalUnit = Math.round((p.price + o.extra) * 100) / 100; const key = p.id + '|' + o.label; if(!state.cart[key]) state.cart[key] = {...p,opt:o.label,optExtra:o.extra,originalUnit,qty:0}; state.cart[key].qty++; toast(`${p.name} aggiunto al carrello`); renderCart(); }
-function changeQty(key,delta){ if(!state.cart[key]) return; state.cart[key].qty += delta; if(state.cart[key].qty <= 0) delete state.cart[key]; renderCart(); }
+function addToCart(p,o){ const originalUnit = Math.round((p.price + o.extra) * 100) / 100; const key = p.id + '|' + o.label; if(!state.cart[key]) state.cart[key] = {...p,opt:o.label,optExtra:o.extra,originalUnit,qty:0}; state.cart[key].qty++; state.lastSubmittedMessage=''; toast(`${p.name} aggiunto al carrello`); renderCart(); }
+function changeQty(key,delta){ if(!state.cart[key]) return; state.cart[key].qty += delta; if(state.cart[key].qty <= 0) delete state.cart[key]; state.lastSubmittedMessage=''; renderCart(); }
 function totals(){ const items = Object.values(state.cart); const orig = items.reduce((a,i)=>a+i.originalUnit*i.qty,0); const total = discountedPrice(orig); return {items, count:items.reduce((a,i)=>a+i.qty,0), orig, total, saving:orig-total}; }
 function renderCart(){
   const t = totals();
@@ -381,44 +421,129 @@ function renderCart(){
   updateAdmin();
 }
 function escKey(s){ return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+function selectedPaymentMethod(){
+  const value = (document.querySelector('input[name="paymentMethod"]:checked')?.value || '').trim();
+  if(value) return value;
+  const first = DATA?.payment?.methods?.[0];
+  return typeof first === 'string' ? first : first?.label || '';
+}
 function buildMessage(){
   const t = totals();
   const name = (byId('customer')?.value || authenticatedCustomerName() || 'Cliente').trim();
   const company = companyCopy().trim();
   const costCenter = deliverySiteCopy().trim();
   const notes = (byId('notes')?.value || '').trim();
+  const paymentMethod = selectedPaymentMethod();
   const now = new Date();
   const date = now.toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   const time = now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
-  let msg = `Ordine ${DATA.copy.brand} - DOSepranza\nCliente: ${name}`;
-  msg += `\nAzienda: ${company}`;
-  msg += `\nSede di consegna: ${costCenter}`;
+  let msg = `📦 Riepilogo Ordine – ${DATA.copy.brand}`;
+  msg += `\nOrdine tramite DOSepranza`;
+  msg += `\n\n👤 Cliente`;
+  msg += `\n${name} – ${company}`;
+  msg += `\nConsegna: ${costCenter}`;
   msg += `\nData: ${cap(date)} - ${time}`;
-  msg += `\nPunto vendita: ${DATA.contact.address}`;
-  msg += `\nFinestra servizio: ${deliveryCopy()}`;
-  msg += `\n\nOrdine:\n`;
-  t.items.forEach(i => { msg += `${i.qty}x ${i.name} (${i.opt}) - ${money(discountedPrice(i.originalUnit)*i.qty)}\n`; });
+  msg += `\n\n🏪 Punto Vendita`;
+  msg += `\n${DATA.contact.address}`;
+  msg += `\nFinestra servizio: Ordini/pagamenti entro le 12:00 · Consegna entro le 13:00`;
+  msg += `\n\n🥪 Ordine`;
+  t.items.forEach(i => { msg += `\n- ${i.qty}x ${i.name} (${i.opt}) — ${money(discountedPrice(i.originalUnit)*i.qty)}`; });
   const rate = Math.round(discountRate() * 100);
-  msg += `\nTotale: ${money(t.total)}${rate ? ` (${discountLabel()} applicato)` : ''}`;
-  msg += `\nPagamento: ${DATA.payment.model}`;
-  msg += `\nMetodi: ${DATA.payment.methods.map(method => typeof method === 'string' ? method : method.label).join(', ')}`;
-  msg += `\nNota pagamenti: ${DATA.payment.pickup}`;
-  if(paymentBeneficiary()) msg += `\nIntestatario bonifico: ${paymentBeneficiary()}`;
-  if(paymentIban()) msg += `\nIBAN: ${paymentIban()}`;
-  if(notes) msg += `\nNote/allergie: ${notes}`;
-  msg += `\n\nOrdine effettuato tramite DOSepranza`;
+  msg += `\nTotale: ${money(t.total)}`;
+  if(rate) msg += `\nSconti applicati: ${discountLabel()}`;
+  msg += `\n\n💳 Pagamento`;
+  msg += `\nMetodo selezionato: ${paymentMethod || 'Non specificato'}`;
+  msg += `\nNote pagamento: ${paymentNoteCopy()}`;
+  if(paymentMethod === 'Bonifico bancario'){
+    if(paymentBeneficiary()) msg += `\nIntestatario: ${paymentBeneficiary()}`;
+    if(paymentIban()) msg += `\nIBAN: ${paymentIban()}`;
+  }
+  msg += `\n\n⚠️ Note / Allergie`;
+  msg += `\n${notes || 'Nessuna'}`;
   return msg;
 }
 function cap(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
 function whatsappUrl(){ const params = new URLSearchParams({ phone:DATA.whatsapp, text:buildMessage(), type:'phone_number', app_absent:'0' }); return 'https://api.whatsapp.com/send/?' + params.toString(); }
-function sendWA(){ if(totals().count === 0) return; logOrder(); window.open(whatsappUrl(),'_blank'); byId('confirm').classList.add('show'); byId('confirm').textContent = 'Ordine pronto: WhatsApp è stato aperto con il riepilogo completo, incluso il promemoria di pagamento entro le 12:00.'; }
+function buildOrderPayload(){
+  const t = totals();
+  const summary = buildMessage();
+  const items = t.items.flatMap(item => Array.from({ length:item.qty }, () => ({
+    id: item.id,
+    name: item.name,
+    cat: catLabel(item.cat),
+    details: item.opt,
+    option: item.opt,
+    quantity: 1,
+    originalPrice: item.originalUnit,
+    price: discountedPrice(item.originalUnit)
+  })));
+  return {
+    clientOrderId: window.crypto?.randomUUID?.() || `pg-${Date.now()}`,
+    source: 'dosepranza-2',
+    supplierId: 'pagnottella',
+    supplierName: DATA.copy.brand,
+    company: companyCopy(),
+    deliveryAddress: deliverySiteCopy(),
+    pointOfSale: DATA.contact.address,
+    serviceWindow: 'Ordini/pagamenti entro le 12:00 · Consegna entro le 13:00',
+    items,
+    subtotalOriginal: t.orig,
+    discountRate: discountRate(),
+    discountAmount: t.saving,
+    total: t.total,
+    paymentMethod: selectedPaymentMethod(),
+    paymentStatus: 'pending',
+    orderStatus: 'submitted',
+    orderType: 'order',
+    reconciled: false,
+    allergies: (byId('notes')?.value || '').trim(),
+    restaurateurSummary: summary
+  };
+}
+function setSendBusy(busy){
+  state.sending = busy;
+  const button = byId('sendOrderBtn');
+  const label = byId('sendOrderLabel');
+  if(button) button.disabled = busy;
+  if(label) label.textContent = busy ? 'Salvataggio ordine...' : 'Salva e invia su WhatsApp';
+}
+async function sendWA(){
+  if(totals().count === 0 || state.sending) return;
+  const message = buildMessage();
+  if(state.lastSubmittedMessage === message){
+    byId('confirm').classList.add('show');
+    byId('confirm').textContent = 'Questo ordine è già stato salvato. Modifica il carrello o crea un nuovo ordine per inviarne un altro.';
+    return;
+  }
+  const popup = window.open('about:blank', '_blank');
+  if(popup) popup.opener = null;
+  setSendBusy(true);
+  byId('confirm').classList.remove('show', 'isError');
+  try{
+    const payload = buildOrderPayload();
+    const result = await supplierAccess.createPagnottellaOrder(payload);
+    logOrder(result.id, payload);
+    state.lastSubmittedMessage = message;
+    const target = whatsappUrl();
+    if(popup) popup.location.replace(target);
+    else window.open(target, '_blank', 'noopener');
+    byId('confirm').classList.add('show');
+    byId('confirm').textContent = `Ordine ${result.id} salvato correttamente. WhatsApp è stato aperto con il riepilogo per il ristoratore.`;
+  }catch(error){
+    if(popup) popup.close();
+    byId('confirm').classList.add('show', 'isError');
+    byId('confirm').textContent = `Ordine non inviato: ${error?.message || 'salvataggio Firebase non riuscito'}. Riprova senza ricaricare la pagina.`;
+  }finally{
+    setSendBusy(false);
+  }
+}
 function copyPaymentIban(){
   const iban = paymentIban();
   if(!iban) return;
   navigator.clipboard?.writeText(iban).then(() => toast('IBAN copiato')).catch(() => toast(`IBAN: ${iban}`));
 }
-function logOrder(){ const logs = JSON.parse(localStorage.getItem(ORDER_LOG_KEY)||'[]'); const t = totals(); logs.unshift({ ts:new Date().toISOString(), customer:(byId('customer')?.value||authenticatedCustomerName()||'Cliente').trim(), company:companyCopy(), costCenter:deliverySiteCopy(), count:t.count, total:t.total, message:buildMessage() }); localStorage.setItem(ORDER_LOG_KEY, JSON.stringify(logs.slice(0,25))); updateAdmin(); }
-function newOrder(){ state.cart = {}; byId('notes').value = ''; byId('confirm').classList.remove('show'); renderCart(); closeCart(); }
+function logOrder(orderId, payload){ const logs = JSON.parse(localStorage.getItem(ORDER_LOG_KEY)||'[]'); const t = totals(); logs.unshift({ id:orderId, ts:new Date().toISOString(), supplierId:'pagnottella', customer:(byId('customer')?.value||authenticatedCustomerName()||'Cliente').trim(), company:companyCopy(), costCenter:deliverySiteCopy(), paymentMethod:selectedPaymentMethod(), count:t.count, total:t.total, message:payload?.restaurateurSummary || buildMessage() }); localStorage.setItem(ORDER_LOG_KEY, JSON.stringify(logs.slice(0,25))); updateAdmin(); }
+function newOrder(){ state.cart = {}; state.lastSubmittedMessage=''; byId('notes').value = ''; byId('confirm').classList.remove('show', 'isError'); renderCart(); closeCart(); }
 function openCart(){ byId('cart').classList.add('open'); byId('cartBackdrop').classList.add('show'); }
 function closeCart(){ byId('cart').classList.remove('open'); byId('cartBackdrop').classList.remove('show'); }
 function toast(txt){ const el = byId('toast'); el.textContent = txt; el.classList.add('show'); clearTimeout(window.__toast); window.__toast = setTimeout(() => el.classList.remove('show'), 1600); }

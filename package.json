@@ -6,6 +6,7 @@
   "scripts": {
     "test:uat": "playwright test",
     "test:uat:headed": "playwright test --headed",
+    "sync:pagnottella-images": "node scripts/apply_pagnottella_image_audit.mjs && node scripts/build_pagnottella_inline_menu.mjs",
     "report:pagnottella-images": "node scripts/generate_pagnottella_image_audit.mjs",
     "report:pdf": "node scripts/render_report_pdf.mjs",
     "build:css": "tailwindcss -c tailwind.config.cjs -i tailwind.input.css -o tailwind.output.css --minify"

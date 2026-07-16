@@ -1,4 +1,4 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut, signInAnonymously, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addDoc, serverTimestamp, query, orderBy, getDocs, runTransaction, doc, where, limit, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
@@ -295,7 +295,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         };
 
         const firebaseConfig = { apiKey: "AIzaSyCQJsNbgaR89gF_1vLe6H4DPboOhQvm9nI", authDomain: "app-ordini-pranzo-alimentari.firebaseapp.com", projectId: "app-ordini-pranzo-alimentari", storageBucket: "app-ordini-pranzo-alimentari.appspot.com", messagingSenderId: "553169964686", appId: "1:553169964686:web:7f8ca6f32a301949e4c3df" };
-        const app_fb = initializeApp(firebaseConfig);
+        const app_fb = getApps().find(candidate => candidate.name === '[DEFAULT]') || initializeApp(firebaseConfig);
         const auth_fb = getAuth(app_fb);
         setPersistence(auth_fb, browserLocalPersistence).catch((e) => console.warn('auth persistence setup failed', e));
         if(!window.auth_fb) window.auth_fb = auth_fb;
@@ -1896,7 +1896,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                     .sort((a, b) => toMillis(b.createdAt) - toMillis(a.createdAt));
                 renderMyOrderStatus();
             };
-            const baseQuery = query(ordersCol, where("email", "==", state.user.email));
+            const baseQuery = query(ordersCol, where("uid", "==", auth_fb.currentUser.uid));
             const orderedQuery = query(baseQuery, orderBy("createdAt", "desc"));
             const attachFallbackQuery = () => {
                 state.subs.myOrders = onSnapshot(baseQuery, applyMyOrdersSnapshot, renderOrdersLoadError);
@@ -2237,7 +2237,8 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 let totalG = 0;
                 const rawToday = (orders || [])
                     .map((order, index) => normalizeFixtureOrder(order, `order-${index + 1}`))
-                    .filter(o => o.createdAt && o.createdAt.toDate() >= now);
+                    .filter(o => o.createdAt && o.createdAt.toDate() >= now)
+                    .filter(o => isAdmin() || (o.supplierId || 'russo') !== 'pagnottella');
                 state.ordersRawToday = rawToday;
                 state.ordersToday = rawToday.filter(isValidOrder);
                 const listEl = document.getElementById('all-orders-list');
@@ -2248,6 +2249,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                         totalG += o.total || 0;
                         const paid = o.paymentStatus === "paid";
                         const badge = paid ? `<span class="badge badge-green"><i class="fas fa-check"></i>Pagato</span>` : `<span class="badge badge-amber"><i class="fas fa-clock"></i>Da verificare</span>`;
+                        const supplierLabel = o.supplierId === 'pagnottella' ? 'La Pagnottella Gourmet' : 'Alimentari Russo';
                         const time = formatTime(o.createdAt);
                         const items = (o.items || []).map(i => {
                             const label = i.details && i.details !== "" ? `${i.name} (${i.details})` : i.name;
@@ -2272,6 +2274,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                                         <p class="font-black text-sm text-gray-800">${esc(o.user)}</p>
                                         <div class="card-meta mt-1">
                                             <span class="chip">${time}</span>
+                                            <span class="chip">${esc(supplierLabel)}</span>
                                             ${badge}
                                             <span class="chip">Totale ${formatCurrency(o.total || 0)}</span>
                                         </div>

@@ -18,6 +18,8 @@ cp app.v20260210.js "$DIST_DIR/" 2>/dev/null || true
 cp app.v20260325.js "$DIST_DIR/" 2>/dev/null || cp app.js "$DIST_DIR/index.js"
 cp styles.css "$DIST_DIR/" 2>/dev/null || echo "No CSS file found"
 cp preview-hub.css "$DIST_DIR/" 2>/dev/null || echo "No preview hub CSS found"
+cp supplier-access.js "$DIST_DIR/" 2>/dev/null || echo "No supplier access module found"
+cp hub-auth.js "$DIST_DIR/" 2>/dev/null || echo "No hub auth module found"
 cp tailwind-config.js "$DIST_DIR/" 2>/dev/null || echo "No Tailwind config found"
 cp sw-killer.js "$DIST_DIR/" 2>/dev/null || echo "No service worker helper found"
 cp favicondosepranza.png "$DIST_DIR/" 2>/dev/null || echo "No favicon found"

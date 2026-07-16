@@ -6,25 +6,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "petto di tacchino arrosto, provola affumicata, salsa tonnata, melanzane grigliate*",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_numero_10__asset_home_vitella_panino.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Proteico"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
-        "filename": "panini_numero_10__asset_home_vitella_panino.jpg",
-        "basis": "Default panini di carne per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_vitella_panino",
-        "sourceOriginalFilename": "vitella_panino.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -33,26 +30,23 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "pastrami di manzo, pomodoro, provola affumicata, salsa bbq, insalata",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_bbq__asset_home_vitella_panino.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Proteico",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
-        "filename": "panini_bbq__asset_home_vitella_panino.jpg",
-        "basis": "Default panini di carne per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_vitella_panino",
-        "sourceOriginalFilename": "vitella_panino.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -61,25 +55,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "mortadella, provola affumicata, salsa di noci",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_brontolo__panino_brontolo_probabile.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Frutta secca"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto associata",
-        "mappingType": "riuso_affine_per_ingrediente",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337807126-3RCGVSO1HZIL2Y211EGE/IMG_1441.jpg",
-        "filename": "panini_brontolo__panino_brontolo_probabile.jpg",
-        "basis": "Preview conservativa: immagine mantenuta come riuso affine, non come foto specifica verificata dal sito. Associazione gia presente nella mappatura originale: nome file ufficiale o corrispondenza visiva forte.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Panini",
-        "sourceAsset": "panini_brontolo_img1441",
-        "sourceOriginalFilename": "IMG_1441.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Panino con mortadella e crema/noci; attribuzione probabile a Brontolo, non confermata dal filename.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -88,24 +79,21 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "crudo, zucchine grigliate*, cipolla, provola affumicata, riduzione di balsamico",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_cipollini__asset_home_vitella_panino.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
-        "filename": "panini_cipollini__asset_home_vitella_panino.jpg",
-        "basis": "Default panini di carne per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_vitella_panino",
-        "sourceOriginalFilename": "vitella_panino.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -114,24 +102,21 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "crudo, mozzarella, melanzane grigliate*, pomodori secchi",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_contadino__asset_home_vitella_panino.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
-        "filename": "panini_contadino__asset_home_vitella_panino.jpg",
-        "basis": "Default panini di carne per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_vitella_panino",
-        "sourceOriginalFilename": "vitella_panino.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -140,25 +125,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "petto di tacchino arrosto, zucchine grigliate*, mozzarella",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_delicato__asset_home_vitella_panino.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Proteico"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
-        "filename": "panini_delicato__asset_home_vitella_panino.jpg",
-        "basis": "Default panini di carne per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_vitella_panino",
-        "sourceOriginalFilename": "vitella_panino.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -167,25 +149,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "petto di tacchino arrosto, ricotta, pesto, olive**",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_delizioso__asset_home_vitella_panino.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Proteico"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
-        "filename": "panini_delizioso__asset_home_vitella_panino.jpg",
-        "basis": "Default panini di carne per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_vitella_panino",
-        "sourceOriginalFilename": "vitella_panino.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -194,24 +173,21 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "cotto, gorgonzola, miele, spinaci",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_dolcetto__panino_brontolo_probabile.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto associata",
-        "mappingType": "riuso_affine_per_ingrediente",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337807126-3RCGVSO1HZIL2Y211EGE/IMG_1441.jpg",
-        "filename": "panini_dolcetto__panino_brontolo_probabile.jpg",
-        "basis": "Foto panino mortadella/noci usata per ingredienti grassi/cremosi affini.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Panini",
-        "sourceAsset": "panini_brontolo_img1441",
-        "sourceOriginalFilename": "IMG_1441.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -220,25 +196,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "crudo, stracchino, rucola",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_emiliano__asset_home_vitella_panino.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
-        "filename": "panini_emiliano__asset_home_vitella_panino.jpg",
-        "basis": "Default panini di carne per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_vitella_panino",
-        "sourceOriginalFilename": "vitella_panino.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -247,25 +220,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "pastrami di manzo, melanzane e zucchine grigliate*, salsa tartara",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_fumino__asset_home_vitella_panino.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Proteico"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
-        "filename": "panini_fumino__asset_home_vitella_panino.jpg",
-        "basis": "Default panini di carne per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_vitella_panino",
-        "sourceOriginalFilename": "vitella_panino.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -274,26 +244,23 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "burrata, mortadella, granella di pistacchio",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_goloso__panino_brontolo_probabile.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Frutta secca",
         "Top"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "media",
-        "label": "Foto associata",
-        "mappingType": "riuso_affine_per_ingrediente",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337807126-3RCGVSO1HZIL2Y211EGE/IMG_1441.jpg",
-        "filename": "panini_goloso__panino_brontolo_probabile.jpg",
-        "basis": "Nessuna foto Goloso; usata foto panino mortadella affine.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Panini",
-        "sourceAsset": "panini_brontolo_img1441",
-        "sourceOriginalFilename": "IMG_1441.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -302,24 +269,21 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "speck, ricotta, melanzane grigliate*",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_gustoso__asset_home_vitella_panino.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
-        "filename": "panini_gustoso__asset_home_vitella_panino.jpg",
-        "basis": "Default panini di carne per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_vitella_panino",
-        "sourceOriginalFilename": "vitella_panino.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -328,24 +292,21 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "ciauscolo IGP, stracchino, pomodori secchi",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_marchigiano__asset_home_vitella_panino.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
-        "filename": "panini_marchigiano__asset_home_vitella_panino.jpg",
-        "basis": "Default panini di carne per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_vitella_panino",
-        "sourceOriginalFilename": "vitella_panino.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -354,24 +315,21 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "crudo, crema al tartufo, brie, pomodoro, spinaci",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_montanaro__asset_home_vitella_panino.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
-        "filename": "panini_montanaro__asset_home_vitella_panino.jpg",
-        "basis": "Default panini di carne per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_vitella_panino",
-        "sourceOriginalFilename": "vitella_panino.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -380,25 +338,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "pastrami di manzo, pomodoro, salsa tartara, cetriolini",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_newyorkese__asset_home_vitella_panino.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Proteico"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
-        "filename": "panini_newyorkese__asset_home_vitella_panino.jpg",
-        "basis": "Default panini di carne per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_vitella_panino",
-        "sourceOriginalFilename": "vitella_panino.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -407,25 +362,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "crudo, salsa di noci, funghi champignon crudi",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_norcino__panino_brontolo_probabile.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Frutta secca"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto associata",
-        "mappingType": "riuso_affine_per_ingrediente",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337807126-3RCGVSO1HZIL2Y211EGE/IMG_1441.jpg",
-        "filename": "panini_norcino__panino_brontolo_probabile.jpg",
-        "basis": "Foto panino mortadella/noci usata per ingredienti grassi/cremosi affini.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Panini",
-        "sourceAsset": "panini_brontolo_img1441",
-        "sourceOriginalFilename": "IMG_1441.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -434,24 +386,21 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "crudo, pomodoro, origano",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_oregan__asset_home_vitella_panino.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
-        "filename": "panini_oregan__asset_home_vitella_panino.jpg",
-        "basis": "Default panini di carne per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_vitella_panino",
-        "sourceOriginalFilename": "vitella_panino.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -460,24 +409,21 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "crudo, melanzane grigliate*, provola affumicata",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_paesano__asset_home_vitella_panino.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
-        "filename": "panini_paesano__asset_home_vitella_panino.jpg",
-        "basis": "Default panini di carne per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_vitella_panino",
-        "sourceOriginalFilename": "vitella_panino.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -486,25 +432,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 9,
       "desc": "culatta, pomodoro, riduzione di balsamico, Grana Padano DOP",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_pagnottella__asset_home_vitella_panino.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Top"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
-        "filename": "panini_pagnottella__asset_home_vitella_panino.jpg",
-        "basis": "Default panini di carne per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_vitella_panino",
-        "sourceOriginalFilename": "vitella_panino.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -513,25 +456,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "pastrami di manzo, mozzarella, pomodori secchi",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_quirino__asset_home_vitella_panino.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Proteico"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
-        "filename": "panini_quirino__asset_home_vitella_panino.jpg",
-        "basis": "Default panini di carne per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_vitella_panino",
-        "sourceOriginalFilename": "vitella_panino.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -540,26 +480,23 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "bresaola, rucola, ricotta",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_rucolino__asset_home_vitella_panino.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Proteico",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
-        "filename": "panini_rucolino__asset_home_vitella_panino.jpg",
-        "basis": "Default panini di carne per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_vitella_panino",
-        "sourceOriginalFilename": "vitella_panino.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -576,17 +513,18 @@ window.__PAGNOTTELLA_MENU__ = {
       "imageMeta": {
         "assigned": true,
         "specific": true,
-        "source": "mapping-1to1",
+        "source": "audit-completo",
         "confidence": "alta",
-        "label": "Foto prodotto",
-        "mappingType": "foto_specifica_o_quasi_specifica",
+        "label": "Foto prodotto verificata",
+        "mappingType": "foto_specifica_verificata",
         "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/416fa1ae-6eef-441f-9031-1bb2374d295f/saporito.jpg",
         "filename": "panini_saporito__panino_saporito.jpg",
-        "basis": "Associazione gia presente nella mappatura originale: nome file ufficiale o corrispondenza visiva forte.",
+        "basis": "filename + ingredienti",
         "needsSupplierConfirmation": false,
         "sourcePage": "Home",
         "sourceAsset": "home_saporito",
-        "sourceOriginalFilename": "saporito.jpg"
+        "assetId": "PG-002",
+        "auditPublishable": true
       }
     },
     {
@@ -595,24 +533,21 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "crudo, pomodoro, brie, olio al tartufo, spinaci",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_soprana__asset_home_vitella_panino.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
-        "filename": "panini_soprana__asset_home_vitella_panino.jpg",
-        "basis": "Default panini di carne per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_vitella_panino",
-        "sourceOriginalFilename": "vitella_panino.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -621,24 +556,21 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "speck, pomodoro, provola affumicata, melanzane grigliate*",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_spock__asset_home_vitella_panino.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
-        "filename": "panini_spock__asset_home_vitella_panino.jpg",
-        "basis": "Default panini di carne per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_vitella_panino",
-        "sourceOriginalFilename": "vitella_panino.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -657,17 +589,18 @@ window.__PAGNOTTELLA_MENU__ = {
       "imageMeta": {
         "assigned": true,
         "specific": true,
-        "source": "mapping-1to1",
+        "source": "audit-completo",
         "confidence": "alta",
-        "label": "Foto prodotto",
-        "mappingType": "foto_specifica_o_quasi_specifica",
+        "label": "Foto prodotto verificata",
+        "mappingType": "foto_specifica_verificata",
         "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1708349693859-NY2MW1I5AZGLNHSEAUFQ/tartare.jpg",
         "filename": "panini_tartare__panino_tartare.jpg",
-        "basis": "Associazione gia presente nella mappatura originale: nome file ufficiale o corrispondenza visiva forte.",
+        "basis": "filename + ingredienti",
         "needsSupplierConfirmation": false,
         "sourcePage": "Home",
         "sourceAsset": "home_tartare",
-        "sourceOriginalFilename": "tartare.jpg"
+        "assetId": "PG-008",
+        "auditPublishable": true
       }
     },
     {
@@ -676,25 +609,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "speck, crema di noci, brie, spinaci",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_tirolo__panino_brontolo_probabile.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Frutta secca"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto associata",
-        "mappingType": "riuso_affine_per_ingrediente",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337807126-3RCGVSO1HZIL2Y211EGE/IMG_1441.jpg",
-        "filename": "panini_tirolo__panino_brontolo_probabile.jpg",
-        "basis": "Foto panino mortadella/noci usata per ingredienti grassi/cremosi affini.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Panini",
-        "sourceAsset": "panini_brontolo_img1441",
-        "sourceOriginalFilename": "IMG_1441.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -703,25 +633,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "pastrami di manzo, salsa tonnata, funghi champignon crudi",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_tonnato__asset_home_vitella_panino.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Proteico"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
-        "filename": "panini_tonnato__asset_home_vitella_panino.jpg",
-        "basis": "Default panini di carne per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_vitella_panino",
-        "sourceOriginalFilename": "vitella_panino.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -738,17 +665,18 @@ window.__PAGNOTTELLA_MENU__ = {
       "imageMeta": {
         "assigned": true,
         "specific": true,
-        "source": "mapping-1to1",
+        "source": "audit-completo",
         "confidence": "alta",
-        "label": "Foto prodotto",
-        "mappingType": "foto_specifica_o_quasi_specifica",
+        "label": "Foto prodotto verificata",
+        "mappingType": "foto_specifica_verificata",
         "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1708349844523-PM8UKIU0C2V7OSB5J32P/toscanaccio.jpg",
         "filename": "panini_toscanaccio__panino_toscanaccio.jpg",
-        "basis": "Associazione gia presente nella mappatura originale: nome file ufficiale o corrispondenza visiva forte.",
+        "basis": "filename + ingredienti",
         "needsSupplierConfirmation": false,
         "sourcePage": "Home",
         "sourceAsset": "home_toscanaccio",
-        "sourceOriginalFilename": "toscanaccio.jpg"
+        "assetId": "PG-007",
+        "auditPublishable": true
       }
     },
     {
@@ -757,25 +685,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "finocchiona, pomodoro, olio al tartufo, insalata, provola affumicata",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_toscano__panino_toscanaccio.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto associata",
-        "mappingType": "riuso_affine_per_ingrediente",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1708349844523-PM8UKIU0C2V7OSB5J32P/toscanaccio.jpg",
-        "filename": "panini_toscano__panino_toscanaccio.jpg",
-        "basis": "Preview conservativa: immagine mantenuta come riuso affine, non come foto specifica verificata dal sito. Foto Toscanaccio/finocchiona disponibile e coerente con ingredienti.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_toscanaccio",
-        "sourceOriginalFilename": "toscanaccio.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -784,26 +709,23 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "petto di tacchino arrosto, senape al miele, provola affumicata, insalata",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_transalpino__asset_home_vitella_panino.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Proteico",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
-        "filename": "panini_transalpino__asset_home_vitella_panino.jpg",
-        "basis": "Default panini di carne per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_vitella_panino",
-        "sourceOriginalFilename": "vitella_panino.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -812,24 +734,21 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "speck, brie, funghi champignon crudi",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_trentino__asset_home_vitella_panino.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
-        "filename": "panini_trentino__asset_home_vitella_panino.jpg",
-        "basis": "Default panini di carne per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_vitella_panino",
-        "sourceOriginalFilename": "vitella_panino.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -838,25 +757,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "speck, gorgonzola, miele, noci, radicchio",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_trevigiano__panino_brontolo_probabile.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Frutta secca"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto associata",
-        "mappingType": "riuso_affine_per_ingrediente",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337807126-3RCGVSO1HZIL2Y211EGE/IMG_1441.jpg",
-        "filename": "panini_trevigiano__panino_brontolo_probabile.jpg",
-        "basis": "Foto panino mortadella/noci usata per ingredienti grassi/cremosi affini.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Panini",
-        "sourceAsset": "panini_brontolo_img1441",
-        "sourceOriginalFilename": "IMG_1441.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -865,26 +781,23 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "bresaola, pomodoro, rucola, riduzione di balsamico",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_valtella__asset_home_vitella_panino.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Proteico",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
-        "filename": "panini_valtella__asset_home_vitella_panino.jpg",
-        "basis": "Default panini di carne per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_vitella_panino",
-        "sourceOriginalFilename": "vitella_panino.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -893,24 +806,21 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "cotto, provola affumicata, pomodori secchi, spinaci",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/products/panini_violotto__asset_home_vitella_panino.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913543375-PO0UJS2QUNY02TODG6H2/vitella_panino.jpg",
-        "filename": "panini_violotto__asset_home_vitella_panino.jpg",
-        "basis": "Default panini di carne per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_vitella_panino",
-        "sourceOriginalFilename": "vitella_panino.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -919,26 +829,23 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 10,
       "desc": "carpaccio di pesce spada, pachino, mozzarella, olive**, origano",
       "cat": "panini-pesce",
-      "img": "../assets/pagnottella/images/products/panini_cefalu__panino_baccala.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Proteico",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913550178-57I6DBH7IDA5ZAKY2YKO/baccala_panino.jpg",
-        "filename": "panini_cefalu__panino_baccala.jpg",
-        "basis": "Non esiste una foto specifica panino per questo pesce; usata foto Baccala come default panini di pesce.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_baccala_panino",
-        "sourceOriginalFilename": "baccala_panino.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -947,25 +854,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "salmone, carciofini, provola affumicata",
       "cat": "panini-pesce",
-      "img": "../assets/pagnottella/images/products/panini_fumarello__panino_baccala.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Proteico"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913550178-57I6DBH7IDA5ZAKY2YKO/baccala_panino.jpg",
-        "filename": "panini_fumarello__panino_baccala.jpg",
-        "basis": "Non esiste una foto specifica panino per questo pesce; usata foto Baccala come default panini di pesce.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_baccala_panino",
-        "sourceOriginalFilename": "baccala_panino.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -974,26 +878,23 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 9,
       "desc": "carpaccio di tonno, zucchine grigliate*, capperi, insalata, carpaccio di limone, basilico",
       "cat": "panini-pesce",
-      "img": "../assets/pagnottella/images/products/panini_lampedusa__panino_messicano.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Proteico",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "media",
-        "label": "Foto associata",
-        "mappingType": "riuso_affine_per_ingrediente",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337627814-2Y536XYYBYCYKGYYMP9M/DSCF7425.jpg",
-        "filename": "panini_lampedusa__panino_messicano.jpg",
-        "basis": "Foto Messicano usata per panini con tonno/guacamole o profilo pesce simile.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Panini",
-        "sourceAsset": "panini_messicano_dscf7425",
-        "sourceOriginalFilename": "DSCF7425.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1002,25 +903,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "tonno, pomodoro, cipolla rossa, olive**",
       "cat": "panini-pesce",
-      "img": "../assets/pagnottella/images/products/panini_maestrale__panino_messicano.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Proteico"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "media",
-        "label": "Foto associata",
-        "mappingType": "riuso_affine_per_ingrediente",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337627814-2Y536XYYBYCYKGYYMP9M/DSCF7425.jpg",
-        "filename": "panini_maestrale__panino_messicano.jpg",
-        "basis": "Foto Messicano usata per panini con tonno/guacamole o profilo pesce simile.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Panini",
-        "sourceAsset": "panini_messicano_dscf7425",
-        "sourceOriginalFilename": "DSCF7425.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1029,24 +927,21 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "mozzarella, pomodoro, acciughe, origano",
       "cat": "panini-pesce",
-      "img": "../assets/pagnottella/images/products/panini_marinaro__panino_baccala.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913550178-57I6DBH7IDA5ZAKY2YKO/baccala_panino.jpg",
-        "filename": "panini_marinaro__panino_baccala.jpg",
-        "basis": "Non esiste una foto specifica panino per questo pesce; usata foto Baccala come default panini di pesce.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_baccala_panino",
-        "sourceOriginalFilename": "baccala_panino.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1055,25 +950,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "tonno, pate di olive, pomodoro",
       "cat": "panini-pesce",
-      "img": "../assets/pagnottella/images/products/panini_mediterraneo__panino_messicano.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Proteico"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "media",
-        "label": "Foto associata",
-        "mappingType": "riuso_affine_per_ingrediente",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337627814-2Y536XYYBYCYKGYYMP9M/DSCF7425.jpg",
-        "filename": "panini_mediterraneo__panino_messicano.jpg",
-        "basis": "Foto Messicano usata per panini con tonno/guacamole o profilo pesce simile.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Panini",
-        "sourceAsset": "panini_messicano_dscf7425",
-        "sourceOriginalFilename": "DSCF7425.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1082,26 +974,23 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "tonno, pomodoro, guacamole, jalapenos, insalata",
       "cat": "panini-pesce",
-      "img": "../assets/pagnottella/images/products/panini_messicano__panino_messicano.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Proteico",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto associata",
-        "mappingType": "riuso_affine_per_ingrediente",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337627814-2Y536XYYBYCYKGYYMP9M/DSCF7425.jpg",
-        "filename": "panini_messicano__panino_messicano.jpg",
-        "basis": "Preview conservativa: immagine mantenuta come riuso affine, non come foto specifica verificata dal sito. Associazione gia presente nella mappatura originale: nome file ufficiale o corrispondenza visiva forte.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Panini",
-        "sourceAsset": "panini_messicano_dscf7425",
-        "sourceOriginalFilename": "DSCF7425.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Panino con guacamole, tonno, jalapeno/cetriolini e insalata; attribuzione visiva a Messicano.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1110,25 +999,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "salmone, zucchine grigliate*, mozzarella",
       "cat": "panini-pesce",
-      "img": "../assets/pagnottella/images/products/panini_norvegese__panino_baccala.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Proteico"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913550178-57I6DBH7IDA5ZAKY2YKO/baccala_panino.jpg",
-        "filename": "panini_norvegese__panino_baccala.jpg",
-        "basis": "Non esiste una foto specifica panino per questo pesce; usata foto Baccala come default panini di pesce.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_baccala_panino",
-        "sourceOriginalFilename": "baccala_panino.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1137,26 +1023,23 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 10,
       "desc": "carpaccio di pesce spada, melanzane grigliate*, pomodori secchi, granella di pistacchio",
       "cat": "panini-pesce",
-      "img": "../assets/pagnottella/images/products/panini_pantelleria__panino_baccala.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Proteico",
         "Frutta secca"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913550178-57I6DBH7IDA5ZAKY2YKO/baccala_panino.jpg",
-        "filename": "panini_pantelleria__panino_baccala.jpg",
-        "basis": "Non esiste una foto specifica panino per questo pesce; usata foto Baccala come default panini di pesce.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_baccala_panino",
-        "sourceOriginalFilename": "baccala_panino.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1165,26 +1048,23 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "tonno, carciofini, salsa tartara, insalata",
       "cat": "panini-pesce",
-      "img": "../assets/pagnottella/images/products/panini_parigino__panino_messicano.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Proteico",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "media",
-        "label": "Foto associata",
-        "mappingType": "riuso_affine_per_ingrediente",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337627814-2Y536XYYBYCYKGYYMP9M/DSCF7425.jpg",
-        "filename": "panini_parigino__panino_messicano.jpg",
-        "basis": "Foto Messicano usata per panini con tonno/guacamole o profilo pesce simile.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Panini",
-        "sourceAsset": "panini_messicano_dscf7425",
-        "sourceOriginalFilename": "DSCF7425.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1202,17 +1082,18 @@ window.__PAGNOTTELLA_MENU__ = {
       "imageMeta": {
         "assigned": true,
         "specific": true,
-        "source": "mapping-1to1",
+        "source": "audit-completo",
         "confidence": "alta",
-        "label": "Foto prodotto",
-        "mappingType": "foto_specifica_o_quasi_specifica",
+        "label": "Foto prodotto verificata",
+        "mappingType": "foto_specifica_verificata",
         "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913550178-57I6DBH7IDA5ZAKY2YKO/baccala_panino.jpg",
         "filename": "panini_baccala__panino_baccala.jpg",
-        "basis": "Associazione gia presente nella mappatura originale: nome file ufficiale o corrispondenza visiva forte.",
+        "basis": "filename + ingredienti",
         "needsSupplierConfirmation": false,
         "sourcePage": "Home",
         "sourceAsset": "home_baccala_panino",
-        "sourceOriginalFilename": "baccala_panino.jpg"
+        "assetId": "PG-004",
+        "auditPublishable": true
       }
     },
     {
@@ -1221,25 +1102,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 9,
       "desc": "carpaccio di tonno, guacamole, pomodoro, cavolo rosso",
       "cat": "panini-pesce",
-      "img": "../assets/pagnottella/images/products/panini_san_jose__panino_messicano.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Proteico"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "media",
-        "label": "Foto associata",
-        "mappingType": "riuso_affine_per_ingrediente",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337627814-2Y536XYYBYCYKGYYMP9M/DSCF7425.jpg",
-        "filename": "panini_san_jose__panino_messicano.jpg",
-        "basis": "Foto Messicano usata per panini con tonno/guacamole o profilo pesce simile.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Panini",
-        "sourceAsset": "panini_messicano_dscf7425",
-        "sourceOriginalFilename": "DSCF7425.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1248,26 +1126,23 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 10,
       "desc": "carpaccio di tonno, pate di olive, pomodoro, mozzarella, insalata",
       "cat": "panini-pesce",
-      "img": "../assets/pagnottella/images/products/panini_scirocco__panino_messicano.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Proteico",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "media",
-        "label": "Foto associata",
-        "mappingType": "riuso_affine_per_ingrediente",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337627814-2Y536XYYBYCYKGYYMP9M/DSCF7425.jpg",
-        "filename": "panini_scirocco__panino_messicano.jpg",
-        "basis": "Foto Messicano usata per panini con tonno/guacamole o profilo pesce simile.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Panini",
-        "sourceAsset": "panini_messicano_dscf7425",
-        "sourceOriginalFilename": "DSCF7425.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1276,26 +1151,23 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "salmone, guacamole, rucola, riduzione di balsamico",
       "cat": "panini-pesce",
-      "img": "../assets/pagnottella/images/products/panini_verduzzo__panino_messicano.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Proteico",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "media",
-        "label": "Foto associata",
-        "mappingType": "riuso_affine_per_ingrediente",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337627814-2Y536XYYBYCYKGYYMP9M/DSCF7425.jpg",
-        "filename": "panini_verduzzo__panino_messicano.jpg",
-        "basis": "Foto Messicano usata per panini con tonno/guacamole o profilo pesce simile.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Panini",
-        "sourceAsset": "panini_messicano_dscf7425",
-        "sourceOriginalFilename": "DSCF7425.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1314,17 +1186,18 @@ window.__PAGNOTTELLA_MENU__ = {
       "imageMeta": {
         "assigned": true,
         "specific": true,
-        "source": "mapping-1to1",
+        "source": "audit-completo",
         "confidence": "alta",
-        "label": "Foto prodotto",
-        "mappingType": "foto_specifica_o_quasi_specifica",
+        "label": "Foto prodotto verificata",
+        "mappingType": "foto_specifica_verificata",
         "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337806242-QRTKSCRHFYN3AQS4L821/DSCF8503.jpg",
         "filename": "panini_burrata__panino_burrata.jpg",
-        "basis": "Associazione gia presente nella mappatura originale: nome file ufficiale o corrispondenza visiva forte.",
+        "basis": "ingredienti",
         "needsSupplierConfirmation": false,
         "sourcePage": "Panini",
         "sourceAsset": "panini_burrata_dscf8503",
-        "sourceOriginalFilename": "DSCF8503.jpg"
+        "assetId": "PG-013",
+        "auditPublishable": true
       }
     },
     {
@@ -1333,25 +1206,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "melanzane e zucchine grigliate*, pomodori secchi, ricotta",
       "cat": "panini-veg",
-      "img": "../assets/pagnottella/images/products/panini_campagnolo__panino_burrata.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Vegetariano"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337806242-QRTKSCRHFYN3AQS4L821/DSCF8503.jpg",
-        "filename": "panini_campagnolo__panino_burrata.jpg",
-        "basis": "Default panini vegetariani/verdure per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Panini",
-        "sourceAsset": "panini_burrata_dscf8503",
-        "sourceOriginalFilename": "DSCF8503.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1360,7 +1230,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "mozzarella, pomodoro, basilico",
       "cat": "panini-veg",
-      "img": "../assets/pagnottella/images/products/panini_caprese__panino_burrata.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Vegetariano",
@@ -1368,19 +1238,16 @@ window.__PAGNOTTELLA_MENU__ = {
         "Leggero"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "media",
-        "label": "Foto associata",
-        "mappingType": "riuso_affine_per_ingrediente",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337806242-QRTKSCRHFYN3AQS4L821/DSCF8503.jpg",
-        "filename": "panini_caprese__panino_burrata.jpg",
-        "basis": "Foto Burrata usata per panini vegetariani o mozzarella/pomodoro affini.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Panini",
-        "sourceAsset": "panini_burrata_dscf8503",
-        "sourceOriginalFilename": "DSCF8503.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1389,26 +1256,23 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "melanzane e zucchine grigliate*, senape al miele, insalata",
       "cat": "panini-veg",
-      "img": "../assets/pagnottella/images/products/panini_ortolino__panino_burrata.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Vegetariano",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337806242-QRTKSCRHFYN3AQS4L821/DSCF8503.jpg",
-        "filename": "panini_ortolino__panino_burrata.jpg",
-        "basis": "Default panini vegetariani/verdure per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Panini",
-        "sourceAsset": "panini_burrata_dscf8503",
-        "sourceOriginalFilename": "DSCF8503.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1417,25 +1281,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "friarielli sott'olio, mozzarella, pomodori secchi",
       "cat": "panini-veg",
-      "img": "../assets/pagnottella/images/products/panini_spaccanapoli__panino_burrata.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Vegetariano"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337806242-QRTKSCRHFYN3AQS4L821/DSCF8503.jpg",
-        "filename": "panini_spaccanapoli__panino_burrata.jpg",
-        "basis": "Default panini vegetariani/verdure per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Panini",
-        "sourceAsset": "panini_burrata_dscf8503",
-        "sourceOriginalFilename": "DSCF8503.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1444,25 +1305,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 7,
       "desc": "mozzarella, pomodoro, pesto",
       "cat": "panini-veg",
-      "img": "../assets/pagnottella/images/products/panini_tricolore__panino_burrata.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Vegetariano"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "media",
-        "label": "Foto associata",
-        "mappingType": "riuso_affine_per_ingrediente",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337806242-QRTKSCRHFYN3AQS4L821/DSCF8503.jpg",
-        "filename": "panini_tricolore__panino_burrata.jpg",
-        "basis": "Foto Burrata usata per panini vegetariani o mozzarella/pomodoro affini.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Panini",
-        "sourceAsset": "panini_burrata_dscf8503",
-        "sourceOriginalFilename": "DSCF8503.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1471,26 +1329,23 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 8,
       "desc": "guacamole, carciofini, zucchine grigliate*, provola affumicata, rucola",
       "cat": "panini-veg",
-      "img": "../assets/pagnottella/images/products/panini_veg__panino_messicano.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Panino",
         "Vegetariano",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "media",
-        "label": "Foto associata",
-        "mappingType": "riuso_affine_per_ingrediente",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687337627814-2Y536XYYBYCYKGYYMP9M/DSCF7425.jpg",
-        "filename": "panini_veg__panino_messicano.jpg",
-        "basis": "Foto Messicano usata per panini con tonno/guacamole o profilo pesce simile.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Panini",
-        "sourceAsset": "panini_messicano_dscf7425",
-        "sourceOriginalFilename": "DSCF7425.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1499,25 +1354,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 10,
       "desc": "uovo sodo, tonno, prosciutto cotto, mais, zucchine grigliate*",
       "cat": "insalate-carne",
-      "img": "../assets/pagnottella/images/products/insalate_giardiniera__insalata_trapanese.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Insalata",
         "Proteico"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "media",
-        "label": "Foto associata",
-        "mappingType": "riuso_affine_per_ingrediente",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341597598-9O2HBC5LSQNYBC3SG687/trapanese.jpg",
-        "filename": "insalate_giardiniera__insalata_trapanese.jpg",
-        "basis": "Foto Trapanese usata per insalate tonno/verdure/pesto affini.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Insalate",
-        "sourceAsset": "insalata_trapanese",
-        "sourceOriginalFilename": "trapanese.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1526,26 +1378,23 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 9,
       "desc": "cotto, mais, pachino, provola affumicata",
       "cat": "insalate-carne",
-      "img": "../assets/pagnottella/images/products/insalate_leggera__asset_home_vitella_insalata.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Insalata",
         "Fresco",
         "Leggero"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913819124-6F2GES795B4JPNYTT4UZ/vitella_insalata.jpg",
-        "filename": "insalate_leggera__asset_home_vitella_insalata.jpg",
-        "basis": "Default insalate di carne per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_vitella_insalata",
-        "sourceOriginalFilename": "vitella_insalata.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1554,26 +1403,23 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 10,
       "desc": "pastrami di manzo, melanzane e zucchine grigliate*, rucola",
       "cat": "insalate-carne",
-      "img": "../assets/pagnottella/images/products/insalate_suprema__insalata_reginella.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Insalata",
         "Proteico",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341540039-MUG7YLZM6E4THD2RNKXH/DSCF7331.jpg",
-        "filename": "insalate_suprema__insalata_reginella.jpg",
-        "basis": "Foto Reginella usata come default insalate vegetariane/formaggio/verdure.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Insalate",
-        "sourceAsset": "insalata_reginella_dscf7331",
-        "sourceOriginalFilename": "DSCF7331.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1582,7 +1428,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 11,
       "desc": "tartare di manzo al coltello condita con capperi, senape al miele, tabasco, pepe, sale, olio, cavolo rosso, insalata",
       "cat": "insalate-carne",
-      "img": "../assets/pagnottella/images/products/insalate_tartare__insalata_salentina.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Insalata",
         "Proteico",
@@ -1590,19 +1436,16 @@ window.__PAGNOTTELLA_MENU__ = {
         "Top"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "media",
-        "label": "Foto associata",
-        "mappingType": "riuso_affine_per_ingrediente",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341641448-ERIUQ6ZDTVGB0K9D0OEJ/DSCF3962.jpg",
-        "filename": "insalate_tartare__insalata_salentina.jpg",
-        "basis": "Foto Salentina usata per burrata/acciughe/capperi affini.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Insalate",
-        "sourceAsset": "insalata_salentina_dscf3962",
-        "sourceOriginalFilename": "DSCF3962.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1611,25 +1454,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 10,
       "desc": "speck, provola affumicata, noci, radicchio",
       "cat": "insalate-carne",
-      "img": "../assets/pagnottella/images/products/insalate_trevigiana__asset_insalata_gorgonzola_non_menu.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Insalata",
         "Frutta secca"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto associata",
-        "mappingType": "riuso_affine_per_ingrediente",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341796636-YOBM8D003EPXBSW3IPRM/insalata_gorgonzola_2.jpg",
-        "filename": "insalate_trevigiana__asset_insalata_gorgonzola_non_menu.jpg",
-        "basis": "Asset insalata gorgonzola non presente nel menu ma visivamente affine.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Insalate",
-        "sourceAsset": "insalata_unmatched_gorgonzola",
-        "sourceOriginalFilename": "insalata_gorgonzola_2.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1638,26 +1478,23 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 11,
       "desc": "bresaola, Grana Padano DOP, rucola, funghi champignon crudi, carpaccio di limone",
       "cat": "insalate-carne",
-      "img": "../assets/pagnottella/images/products/insalate_valtellina__asset_home_vitella_insalata.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Insalata",
         "Proteico",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913819124-6F2GES795B4JPNYTT4UZ/vitella_insalata.jpg",
-        "filename": "insalate_valtellina__asset_home_vitella_insalata.jpg",
-        "basis": "Default insalate di carne per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_vitella_insalata",
-        "sourceOriginalFilename": "vitella_insalata.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1666,26 +1503,23 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 11,
       "desc": "pastrami di manzo, cetriolini, salsa tartara, pachino",
       "cat": "insalate-carne",
-      "img": "../assets/pagnottella/images/products/insalate_newyorkese__asset_home_vitella_insalata.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Insalata",
         "Proteico",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913819124-6F2GES795B4JPNYTT4UZ/vitella_insalata.jpg",
-        "filename": "insalate_newyorkese__asset_home_vitella_insalata.jpg",
-        "basis": "Default insalate di carne per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Home",
-        "sourceAsset": "home_vitella_insalata",
-        "sourceOriginalFilename": "vitella_insalata.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1694,25 +1528,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 10,
       "desc": "salmone, edamame*, cavolo rosso, salsa di soia, sesamo",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/products/insalate_asiatica__insalata_trapanese.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Insalata",
         "Proteico"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341597598-9O2HBC5LSQNYBC3SG687/trapanese.jpg",
-        "filename": "insalate_asiatica__insalata_trapanese.jpg",
-        "basis": "Default insalate di pesce per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Insalate",
-        "sourceAsset": "insalata_trapanese",
-        "sourceOriginalFilename": "trapanese.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1730,17 +1561,18 @@ window.__PAGNOTTELLA_MENU__ = {
       "imageMeta": {
         "assigned": true,
         "specific": true,
-        "source": "mapping-1to1",
+        "source": "audit-completo",
         "confidence": "alta",
-        "label": "Foto prodotto",
-        "mappingType": "foto_specifica_o_quasi_specifica",
+        "label": "Foto prodotto verificata",
+        "mappingType": "foto_specifica_verificata",
         "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913547258-U44KCIU4E8WMLA1A6W8Z/baccala_insalata.jpg",
         "filename": "insalate_baccala__insalata_baccala.jpg",
-        "basis": "Associazione gia presente nella mappatura originale: nome file ufficiale o corrispondenza visiva forte.",
+        "basis": "filename + ingredienti",
         "needsSupplierConfirmation": false,
         "sourcePage": "Home",
         "sourceAsset": "home_baccala_insalata",
-        "sourceOriginalFilename": "baccala_insalata.jpg"
+        "assetId": "PG-005",
+        "auditPublishable": true
       }
     },
     {
@@ -1757,17 +1589,18 @@ window.__PAGNOTTELLA_MENU__ = {
       "imageMeta": {
         "assigned": true,
         "specific": true,
-        "source": "mapping-1to1",
+        "source": "audit-completo",
         "confidence": "alta",
-        "label": "Foto prodotto",
-        "mappingType": "foto_specifica_o_quasi_specifica",
+        "label": "Foto prodotto verificata",
+        "mappingType": "foto_specifica_verificata",
         "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341646194-RUG4C2J6ZQBUI485YMKR/DSCF9302.jpg",
         "filename": "insalate_cefalu__insalata_cefalu.jpg",
-        "basis": "Associazione gia presente nella mappatura originale: nome file ufficiale o corrispondenza visiva forte.",
+        "basis": "ingredienti",
         "needsSupplierConfirmation": false,
         "sourcePage": "Insalate",
         "sourceAsset": "insalata_cefalu_dscf9302",
-        "sourceOriginalFilename": "DSCF9302.jpg"
+        "assetId": "PG-019",
+        "auditPublishable": true
       }
     },
     {
@@ -1776,7 +1609,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 10,
       "desc": "salmone, zucchine grigliate*, rucola",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/products/insalate_delicata__insalata_reginella.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Insalata",
         "Proteico",
@@ -1784,19 +1617,16 @@ window.__PAGNOTTELLA_MENU__ = {
         "Leggero"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341540039-MUG7YLZM6E4THD2RNKXH/DSCF7331.jpg",
-        "filename": "insalate_delicata__insalata_reginella.jpg",
-        "basis": "Foto Reginella usata come default insalate vegetariane/formaggio/verdure.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Insalate",
-        "sourceAsset": "insalata_reginella_dscf7331",
-        "sourceOriginalFilename": "DSCF7331.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1805,26 +1635,23 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 10,
       "desc": "gamberetti, mozzarella, pachino, mais",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/products/insalate_estiva__insalata_reginella.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Insalata",
         "Proteico",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341540039-MUG7YLZM6E4THD2RNKXH/DSCF7331.jpg",
-        "filename": "insalate_estiva__insalata_reginella.jpg",
-        "basis": "Foto Reginella usata come default insalate vegetariane/formaggio/verdure.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Insalate",
-        "sourceAsset": "insalata_reginella_dscf7331",
-        "sourceOriginalFilename": "DSCF7331.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1833,26 +1660,23 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 10,
       "desc": "salmone, feta, cetriolo, semi di chia, rucola",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/products/insalate_fresca__insalata_reginella.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Insalata",
         "Proteico",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341540039-MUG7YLZM6E4THD2RNKXH/DSCF7331.jpg",
-        "filename": "insalate_fresca__insalata_reginella.jpg",
-        "basis": "Foto Reginella usata come default insalate vegetariane/formaggio/verdure.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Insalate",
-        "sourceAsset": "insalata_reginella_dscf7331",
-        "sourceOriginalFilename": "DSCF7331.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1861,7 +1685,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 11,
       "desc": "salmone, anacardi, edamame, hummus di ceci, cavolo rosso, sesamo nero",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/products/insalate_hawaii__insalata_trapanese.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Insalata",
         "Proteico",
@@ -1869,19 +1693,16 @@ window.__PAGNOTTELLA_MENU__ = {
         "Top"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341597598-9O2HBC5LSQNYBC3SG687/trapanese.jpg",
-        "filename": "insalate_hawaii__insalata_trapanese.jpg",
-        "basis": "Default insalate di pesce per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Insalate",
-        "sourceAsset": "insalata_trapanese",
-        "sourceOriginalFilename": "trapanese.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1890,25 +1711,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 9,
       "desc": "tonno, feta, olive**, carciofini",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/products/insalate_isolana__insalata_reginella.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Insalata",
         "Proteico"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341540039-MUG7YLZM6E4THD2RNKXH/DSCF7331.jpg",
-        "filename": "insalate_isolana__insalata_reginella.jpg",
-        "basis": "Foto Reginella usata come default insalate vegetariane/formaggio/verdure.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Insalate",
-        "sourceAsset": "insalata_reginella_dscf7331",
-        "sourceOriginalFilename": "DSCF7331.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1917,26 +1735,23 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 11,
       "desc": "carpaccio di tonno, capperi, carpaccio di limone, basilico, insalata, zucchine grigliate*",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/products/insalate_lampedusa__insalata_trapanese.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Insalata",
         "Proteico",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "media",
-        "label": "Foto associata",
-        "mappingType": "riuso_affine_per_ingrediente",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341597598-9O2HBC5LSQNYBC3SG687/trapanese.jpg",
-        "filename": "insalate_lampedusa__insalata_trapanese.jpg",
-        "basis": "Foto Trapanese usata per insalate tonno/verdure/pesto affini.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Insalate",
-        "sourceAsset": "insalata_trapanese",
-        "sourceOriginalFilename": "trapanese.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1945,7 +1760,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 9,
       "desc": "tonno, pachino, basilico",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/products/insalate_mediterranea__insalata_trapanese.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Insalata",
         "Proteico",
@@ -1953,19 +1768,16 @@ window.__PAGNOTTELLA_MENU__ = {
         "Leggero"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341597598-9O2HBC5LSQNYBC3SG687/trapanese.jpg",
-        "filename": "insalate_mediterranea__insalata_trapanese.jpg",
-        "basis": "Default insalate di pesce per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Insalate",
-        "sourceAsset": "insalata_trapanese",
-        "sourceOriginalFilename": "trapanese.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -1974,26 +1786,23 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 11,
       "desc": "gamberetti, cetriolo, uovo, spinaci, edamame*, semi di sesamo, salsa di soia",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/products/insalate_osaka__insalata_trapanese.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Insalata",
         "Proteico",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341597598-9O2HBC5LSQNYBC3SG687/trapanese.jpg",
-        "filename": "insalate_osaka__insalata_trapanese.jpg",
-        "basis": "Default insalate di pesce per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Insalate",
-        "sourceAsset": "insalata_trapanese",
-        "sourceOriginalFilename": "trapanese.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -2002,26 +1811,23 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 11,
       "desc": "carpaccio di pesce spada, melanzane grigliate*, pomodori secchi, granella di pistacchio",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/products/insalate_pantelleria__insalata_cefalu.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Insalata",
         "Proteico",
         "Frutta secca"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto associata",
-        "mappingType": "riuso_affine_per_ingrediente",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341646194-RUG4C2J6ZQBUI485YMKR/DSCF9302.jpg",
-        "filename": "insalate_pantelleria__insalata_cefalu.jpg",
-        "basis": "Preview conservativa: immagine mantenuta come riuso affine, non come foto specifica verificata dal sito. Foto Cefalu/pesce spada usata per prodotti con pesce spada.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Insalate",
-        "sourceAsset": "insalata_cefalu_dscf9302",
-        "sourceOriginalFilename": "DSCF9302.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -2030,24 +1836,25 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 11,
       "desc": "Burrata pugliese, pomodoro, acciughe, capperi, olive**, origano",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/products/insalate_salentina__insalata_salentina.jpg",
+      "img": "../assets/pagnottella/images/products/insalate_burrata__insalata_salentina.jpg",
       "tags": [
         "Insalata"
       ],
       "imageMeta": {
         "assigned": true,
         "specific": true,
-        "source": "mapping-1to1",
+        "source": "audit-completo",
         "confidence": "alta",
-        "label": "Foto prodotto",
-        "mappingType": "foto_specifica_o_quasi_specifica",
+        "label": "Foto prodotto verificata",
+        "mappingType": "foto_specifica_verificata",
         "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341641448-ERIUQ6ZDTVGB0K9D0OEJ/DSCF3962.jpg",
-        "filename": "insalate_salentina__insalata_salentina.jpg",
-        "basis": "Associazione gia presente nella mappatura originale: nome file ufficiale o corrispondenza visiva forte.",
+        "filename": "insalate_burrata__insalata_salentina.jpg",
+        "basis": "ingredienti",
         "needsSupplierConfirmation": false,
         "sourcePage": "Insalate",
         "sourceAsset": "insalata_salentina_dscf3962",
-        "sourceOriginalFilename": "DSCF3962.jpg"
+        "assetId": "PG-018",
+        "auditPublishable": true
       }
     },
     {
@@ -2056,25 +1863,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 11,
       "desc": "carpaccio di tonno, guacamole, pomodoro, cavolo rosso",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/products/insalate_san_jose__insalata_trapanese.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Insalata",
         "Proteico"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341597598-9O2HBC5LSQNYBC3SG687/trapanese.jpg",
-        "filename": "insalate_san_jose__insalata_trapanese.jpg",
-        "basis": "Default insalate di pesce per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Insalate",
-        "sourceAsset": "insalata_trapanese",
-        "sourceOriginalFilename": "trapanese.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -2083,26 +1887,23 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 10,
       "desc": "acciughe, pinoli, uvetta, mozzarella, pachino, origano",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/products/insalate_sicula__insalata_salentina.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Insalata",
         "Fresco",
         "Frutta secca"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "media",
-        "label": "Foto associata",
-        "mappingType": "riuso_affine_per_ingrediente",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341641448-ERIUQ6ZDTVGB0K9D0OEJ/DSCF3962.jpg",
-        "filename": "insalate_sicula__insalata_salentina.jpg",
-        "basis": "Foto Salentina usata per burrata/acciughe/capperi affini.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Insalate",
-        "sourceAsset": "insalata_salentina_dscf3962",
-        "sourceOriginalFilename": "DSCF3962.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -2111,25 +1912,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 9,
       "desc": "tonno, capperi, feta, cipolla, radicchio",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/products/insalate_siracusa__insalata_salentina.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Insalata",
         "Proteico"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "media",
-        "label": "Foto associata",
-        "mappingType": "riuso_affine_per_ingrediente",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341641448-ERIUQ6ZDTVGB0K9D0OEJ/DSCF3962.jpg",
-        "filename": "insalate_siracusa__insalata_salentina.jpg",
-        "basis": "Foto Salentina usata per burrata/acciughe/capperi affini.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Insalate",
-        "sourceAsset": "insalata_salentina_dscf3962",
-        "sourceOriginalFilename": "DSCF3962.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -2138,7 +1936,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 12,
       "desc": "tonno, guacamole, uovo sodo, spinaci, noci, pinoli",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/products/insalate_sportiva__asset_insalata_gorgonzola_non_menu.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Insalata",
         "Proteico",
@@ -2146,19 +1944,16 @@ window.__PAGNOTTELLA_MENU__ = {
         "Top"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto associata",
-        "mappingType": "riuso_affine_per_ingrediente",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341796636-YOBM8D003EPXBSW3IPRM/insalata_gorgonzola_2.jpg",
-        "filename": "insalate_sportiva__asset_insalata_gorgonzola_non_menu.jpg",
-        "basis": "Asset insalata gorgonzola non presente nel menu ma visivamente affine.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Insalate",
-        "sourceAsset": "insalata_unmatched_gorgonzola",
-        "sourceOriginalFilename": "insalata_gorgonzola_2.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -2167,7 +1962,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 10,
       "desc": "tonno, melanzane e zucchine grigliate*, pomodori secchi, pesto, granella di pistacchio",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/products/insalate_trapanese__insalata_trapanese.jpg",
+      "img": "../assets/pagnottella/images/products/insalate_asiatica__insalata_trapanese.jpg",
       "tags": [
         "Insalata",
         "Proteico",
@@ -2176,17 +1971,18 @@ window.__PAGNOTTELLA_MENU__ = {
       "imageMeta": {
         "assigned": true,
         "specific": true,
-        "source": "mapping-1to1",
+        "source": "audit-completo",
         "confidence": "alta",
-        "label": "Foto prodotto",
-        "mappingType": "foto_specifica_o_quasi_specifica",
+        "label": "Foto prodotto verificata",
+        "mappingType": "foto_specifica_verificata",
         "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341597598-9O2HBC5LSQNYBC3SG687/trapanese.jpg",
-        "filename": "insalate_trapanese__insalata_trapanese.jpg",
-        "basis": "Associazione gia presente nella mappatura originale: nome file ufficiale o corrispondenza visiva forte.",
+        "filename": "insalate_asiatica__insalata_trapanese.jpg",
+        "basis": "filename + ingredienti",
         "needsSupplierConfirmation": false,
         "sourcePage": "Insalate",
         "sourceAsset": "insalata_trapanese",
-        "sourceOriginalFilename": "trapanese.jpg"
+        "assetId": "PG-017",
+        "auditPublishable": true
       }
     },
     {
@@ -2195,26 +1991,23 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 10,
       "desc": "salmone, ceci, pachino, cavolo rosso",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/products/insalate_vanitosa__insalata_trapanese.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Insalata",
         "Proteico",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341597598-9O2HBC5LSQNYBC3SG687/trapanese.jpg",
-        "filename": "insalate_vanitosa__insalata_trapanese.jpg",
-        "basis": "Default insalate di pesce per assenza di foto specifica.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Insalate",
-        "sourceAsset": "insalata_trapanese",
-        "sourceOriginalFilename": "trapanese.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -2223,7 +2016,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 11,
       "desc": "burrata pugliese, pomodori secchi, pinoli, rucola",
       "cat": "insalate-veg",
-      "img": "../assets/pagnottella/images/products/insalate_burrata__insalata_salentina.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Insalata",
         "Vegetariano",
@@ -2231,19 +2024,16 @@ window.__PAGNOTTELLA_MENU__ = {
         "Frutta secca"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "media",
-        "label": "Foto associata",
-        "mappingType": "riuso_affine_per_ingrediente",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341641448-ERIUQ6ZDTVGB0K9D0OEJ/DSCF3962.jpg",
-        "filename": "insalate_burrata__insalata_salentina.jpg",
-        "basis": "Foto Salentina usata per burrata/acciughe/capperi affini.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Insalate",
-        "sourceAsset": "insalata_salentina_dscf3962",
-        "sourceOriginalFilename": "DSCF3962.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -2252,7 +2042,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 9,
       "desc": "mozzarella, pachino, basilico, olive**",
       "cat": "insalate-veg",
-      "img": "../assets/pagnottella/images/products/insalate_caprese__insalata_reginella.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Insalata",
         "Vegetariano",
@@ -2260,19 +2050,16 @@ window.__PAGNOTTELLA_MENU__ = {
         "Leggero"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341540039-MUG7YLZM6E4THD2RNKXH/DSCF7331.jpg",
-        "filename": "insalate_caprese__insalata_reginella.jpg",
-        "basis": "Foto Reginella usata come default insalate vegetariane/formaggio/verdure.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Insalate",
-        "sourceAsset": "insalata_reginella_dscf7331",
-        "sourceOriginalFilename": "DSCF7331.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -2281,26 +2068,23 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 9,
       "desc": "feta, pachino, olive**, pesto",
       "cat": "insalate-veg",
-      "img": "../assets/pagnottella/images/products/insalate_greca__insalata_reginella.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Insalata",
         "Vegetariano",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341540039-MUG7YLZM6E4THD2RNKXH/DSCF7331.jpg",
-        "filename": "insalate_greca__insalata_reginella.jpg",
-        "basis": "Foto Reginella usata come default insalate vegetariane/formaggio/verdure.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Insalate",
-        "sourceAsset": "insalata_reginella_dscf7331",
-        "sourceOriginalFilename": "DSCF7331.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -2309,7 +2093,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 10,
       "desc": "melanzane e zucchine grigliate*, ceci, noci, pesto, rucola",
       "cat": "insalate-veg",
-      "img": "../assets/pagnottella/images/products/insalate_ortolana__insalata_reginella.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Insalata",
         "Vegetariano",
@@ -2317,19 +2101,16 @@ window.__PAGNOTTELLA_MENU__ = {
         "Frutta secca"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341540039-MUG7YLZM6E4THD2RNKXH/DSCF7331.jpg",
-        "filename": "insalate_ortolana__insalata_reginella.jpg",
-        "basis": "Foto Reginella usata come default insalate vegetariane/formaggio/verdure.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Insalate",
-        "sourceAsset": "insalata_reginella_dscf7331",
-        "sourceOriginalFilename": "DSCF7331.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -2338,7 +2119,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 12,
       "desc": "mozzarella di Bufala DOP 125gr, pachino gialli e rossi, melanzane e zucchine grigliate, pinoli, basilico",
       "cat": "insalate-veg",
-      "img": "../assets/pagnottella/images/products/insalate_reginella__insalata_reginella.jpg",
+      "img": "../assets/pagnottella/images/products/insalate_caprese__insalata_reginella.jpg",
       "tags": [
         "Insalata",
         "Vegetariano",
@@ -2349,17 +2130,18 @@ window.__PAGNOTTELLA_MENU__ = {
       "imageMeta": {
         "assigned": true,
         "specific": true,
-        "source": "mapping-1to1",
+        "source": "audit-completo",
         "confidence": "alta",
-        "label": "Foto prodotto",
-        "mappingType": "foto_specifica_o_quasi_specifica",
+        "label": "Foto prodotto verificata",
+        "mappingType": "foto_specifica_verificata",
         "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341540039-MUG7YLZM6E4THD2RNKXH/DSCF7331.jpg",
-        "filename": "insalate_reginella__insalata_reginella.jpg",
-        "basis": "Associazione gia presente nella mappatura originale: nome file ufficiale o corrispondenza visiva forte.",
+        "filename": "insalate_caprese__insalata_reginella.jpg",
+        "basis": "ingredienti",
         "needsSupplierConfirmation": false,
         "sourcePage": "Insalate",
         "sourceAsset": "insalata_reginella_dscf7331",
-        "sourceOriginalFilename": "DSCF7331.jpg"
+        "assetId": "PG-015",
+        "auditPublishable": true
       }
     },
     {
@@ -2368,7 +2150,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 9,
       "desc": "melanzane e zucchine grigliate*, pomodori secchi, basilico",
       "cat": "insalate-veg",
-      "img": "../assets/pagnottella/images/products/insalate_vegetariana__insalata_reginella.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Insalata",
         "Vegetariano",
@@ -2376,19 +2158,16 @@ window.__PAGNOTTELLA_MENU__ = {
         "Leggero"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-1to1",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341540039-MUG7YLZM6E4THD2RNKXH/DSCF7331.jpg",
-        "filename": "insalate_vegetariana__insalata_reginella.jpg",
-        "basis": "Foto Reginella usata come default insalate vegetariane/formaggio/verdure.",
-        "needsSupplierConfirmation": true,
-        "sourcePage": "Insalate",
-        "sourceAsset": "insalata_reginella_dscf7331",
-        "sourceOriginalFilename": "DSCF7331.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -2397,7 +2176,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 12,
       "desc": "Pollo CBT, uovo sodo, pachino, salsa tartara, rucola e sesamo nero.",
       "cat": "speciali",
-      "img": "../assets/pagnottella/images/products/insalata_apollo.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Top",
         "Insalata",
@@ -2405,18 +2184,16 @@ window.__PAGNOTTELLA_MENU__ = {
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
-        "specific": true,
-        "source": "associated-home",
-        "confidence": "alta",
-        "label": "Foto prodotto",
-        "mappingType": "foto_specifica_o_quasi_specifica",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1733913541674-LEKZU93QZGKVQJ2LGHN2/apollo_3.jpg",
-        "filename": "insalata_apollo.jpg",
-        "basis": "Asset home Apollo mantenuto come riferimento per lo speciale.",
+        "assigned": false,
+        "specific": false,
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Il catalogo pubblico non espone una fotografia univoca per questo prodotto.",
         "needsSupplierConfirmation": false,
-        "sourcePage": "Home",
-        "sourceAsset": "home_apollo"
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -2425,26 +2202,23 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 12,
       "desc": "Gamberetti, mango, pachino, guacamole, rucola, menta e lime.",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/products/insalate_baccala__insalata_baccala.jpg",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Insalata",
         "Fresco",
         "Top"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-fallback-hardening",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "needsSupplierConfirmation": true,
-        "originalUrl": "",
-        "filename": "insalate_baccala__insalata_baccala.jpg",
-        "mappingType": "fallback_categoria",
-        "basis": "Fallback insalate di pesce basato su immagine Baccala già assegnata.",
-        "sourcePage": "Home",
-        "sourceAsset": "home_baccala_insalata",
-        "sourceOriginalFilename": "baccala_insalata.jpg"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Il catalogo pubblico non espone una fotografia univoca per questo prodotto.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -2453,25 +2227,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 1,
       "desc": "Bottiglia d’acqua naturale o frizzante.",
       "cat": "bevande-dolci",
-      "img": "../assets/pagnottella/images/optimized/DSCF7425.webp",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Bevanda",
         "Leggero"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-fallback-hardening",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "basis": "Fallback categoria bevande/dolci con asset locale riusato in modo coerente.",
-        "needsSupplierConfirmation": true,
-        "originalUrl": "",
-        "filename": "DSCF7425.webp",
-        "sourcePage": "Catalogo locale",
-        "sourceAsset": "bevande_fallback_local",
-        "sourceOriginalFilename": "DSCF7425.webp"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Il catalogo pubblico non espone una fotografia univoca per questo prodotto.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -2480,24 +2251,21 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 2.5,
       "desc": "Selezione di bibite in lattina disponibili al punto vendita.",
       "cat": "bevande-dolci",
-      "img": "../assets/pagnottella/images/optimized/DSCF7425.webp",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Bevanda"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-fallback-hardening",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "basis": "Fallback categoria bevande/dolci con asset locale riusato in modo coerente.",
-        "needsSupplierConfirmation": true,
-        "originalUrl": "",
-        "filename": "DSCF7425.webp",
-        "sourcePage": "Catalogo locale",
-        "sourceAsset": "bevande_fallback_local",
-        "sourceOriginalFilename": "DSCF7425.webp"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Il catalogo pubblico non espone una fotografia univoca per questo prodotto.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -2506,25 +2274,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 2.5,
       "desc": "Macedonia fresca pronta per il pranzo.",
       "cat": "bevande-dolci",
-      "img": "../assets/pagnottella/images/optimized/DSCF7425.webp",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Dessert",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-fallback-hardening",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "basis": "Fallback categoria bevande/dolci con asset locale riusato in modo coerente.",
-        "needsSupplierConfirmation": true,
-        "originalUrl": "",
-        "filename": "DSCF7425.webp",
-        "sourcePage": "Catalogo locale",
-        "sourceAsset": "bevande_fallback_local",
-        "sourceOriginalFilename": "DSCF7425.webp"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Il catalogo pubblico non espone una fotografia univoca per questo prodotto.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -2533,24 +2298,21 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 5,
       "desc": "Selezione di birre artigianali del punto vendita.",
       "cat": "bevande-dolci",
-      "img": "../assets/pagnottella/images/optimized/DSCF7425.webp",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Bevanda"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-fallback-hardening",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "basis": "Fallback categoria bevande/dolci con asset locale riusato in modo coerente.",
-        "needsSupplierConfirmation": true,
-        "originalUrl": "",
-        "filename": "DSCF7425.webp",
-        "sourcePage": "Catalogo locale",
-        "sourceAsset": "bevande_fallback_local",
-        "sourceOriginalFilename": "DSCF7425.webp"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Il catalogo pubblico non espone una fotografia univoca per questo prodotto.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -2559,24 +2321,21 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 4,
       "desc": "Pausa dolce con pane e Nutella.",
       "cat": "bevande-dolci",
-      "img": "../assets/pagnottella/images/optimized/DSCF7425.webp",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Dessert"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-fallback-hardening",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "basis": "Fallback categoria bevande/dolci con asset locale riusato in modo coerente.",
-        "needsSupplierConfirmation": true,
-        "originalUrl": "",
-        "filename": "DSCF7425.webp",
-        "sourcePage": "Catalogo locale",
-        "sourceAsset": "bevande_fallback_local",
-        "sourceOriginalFilename": "DSCF7425.webp"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Il catalogo pubblico non espone una fotografia univoca per questo prodotto.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -2585,25 +2344,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 5,
       "desc": "Carota, arancia, mela",
       "cat": "succhi-freschi",
-      "img": "../assets/pagnottella/images/optimized/DSCF7425.webp",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Bevanda",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-fallback-hardening",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "basis": "Fallback categoria succhi freschi con asset locale riusato in modo coerente.",
-        "needsSupplierConfirmation": true,
-        "originalUrl": "",
-        "filename": "DSCF7425.webp",
-        "sourcePage": "Catalogo locale",
-        "sourceAsset": "succhi_fallback_local",
-        "sourceOriginalFilename": "DSCF7425.webp"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Il catalogo pubblico non espone una fotografia univoca per questo prodotto.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -2612,25 +2368,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 5,
       "desc": "Arancia, carota, limone",
       "cat": "succhi-freschi",
-      "img": "../assets/pagnottella/images/optimized/DSCF7425.webp",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Bevanda",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-fallback-hardening",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "basis": "Fallback categoria succhi freschi con asset locale riusato in modo coerente.",
-        "needsSupplierConfirmation": true,
-        "originalUrl": "",
-        "filename": "DSCF7425.webp",
-        "sourcePage": "Catalogo locale",
-        "sourceAsset": "succhi_fallback_local",
-        "sourceOriginalFilename": "DSCF7425.webp"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Il catalogo pubblico non espone una fotografia univoca per questo prodotto.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -2639,25 +2392,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 5,
       "desc": "Arancia, carota, zenzero",
       "cat": "succhi-freschi",
-      "img": "../assets/pagnottella/images/optimized/DSCF7425.webp",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Bevanda",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-fallback-hardening",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "basis": "Fallback categoria succhi freschi con asset locale riusato in modo coerente.",
-        "needsSupplierConfirmation": true,
-        "originalUrl": "",
-        "filename": "DSCF7425.webp",
-        "sourcePage": "Catalogo locale",
-        "sourceAsset": "succhi_fallback_local",
-        "sourceOriginalFilename": "DSCF7425.webp"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Il catalogo pubblico non espone una fotografia univoca per questo prodotto.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -2666,25 +2416,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 5,
       "desc": "Mela, pera, limone, zenzero",
       "cat": "succhi-freschi",
-      "img": "../assets/pagnottella/images/optimized/DSCF7425.webp",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Bevanda",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-fallback-hardening",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "basis": "Fallback categoria succhi freschi con asset locale riusato in modo coerente.",
-        "needsSupplierConfirmation": true,
-        "originalUrl": "",
-        "filename": "DSCF7425.webp",
-        "sourcePage": "Catalogo locale",
-        "sourceAsset": "succhi_fallback_local",
-        "sourceOriginalFilename": "DSCF7425.webp"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Il catalogo pubblico non espone una fotografia univoca per questo prodotto.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -2693,25 +2440,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 5,
       "desc": "Mela, carota, zenzero",
       "cat": "succhi-freschi",
-      "img": "../assets/pagnottella/images/optimized/DSCF7425.webp",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Bevanda",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-fallback-hardening",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "basis": "Fallback categoria succhi freschi con asset locale riusato in modo coerente.",
-        "needsSupplierConfirmation": true,
-        "originalUrl": "",
-        "filename": "DSCF7425.webp",
-        "sourcePage": "Catalogo locale",
-        "sourceAsset": "succhi_fallback_local",
-        "sourceOriginalFilename": "DSCF7425.webp"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Il catalogo pubblico non espone una fotografia univoca per questo prodotto.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -2720,25 +2464,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 5,
       "desc": "Finocchio, sedano, cetriolo, mela",
       "cat": "succhi-freschi",
-      "img": "../assets/pagnottella/images/optimized/DSCF7425.webp",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Bevanda",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-fallback-hardening",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "basis": "Fallback categoria succhi freschi con asset locale riusato in modo coerente.",
-        "needsSupplierConfirmation": true,
-        "originalUrl": "",
-        "filename": "DSCF7425.webp",
-        "sourcePage": "Catalogo locale",
-        "sourceAsset": "succhi_fallback_local",
-        "sourceOriginalFilename": "DSCF7425.webp"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Il catalogo pubblico non espone una fotografia univoca per questo prodotto.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -2747,25 +2488,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 5,
       "desc": "Ananas, lime, sedano, mela",
       "cat": "succhi-freschi",
-      "img": "../assets/pagnottella/images/optimized/DSCF7425.webp",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Bevanda",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-fallback-hardening",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "basis": "Fallback categoria succhi freschi con asset locale riusato in modo coerente.",
-        "needsSupplierConfirmation": true,
-        "originalUrl": "",
-        "filename": "DSCF7425.webp",
-        "sourcePage": "Catalogo locale",
-        "sourceAsset": "succhi_fallback_local",
-        "sourceOriginalFilename": "DSCF7425.webp"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Il catalogo pubblico non espone una fotografia univoca per questo prodotto.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     },
     {
@@ -2774,25 +2512,22 @@ window.__PAGNOTTELLA_MENU__ = {
       "price": 5,
       "desc": "Arancia",
       "cat": "succhi-freschi",
-      "img": "../assets/pagnottella/images/optimized/DSCF7425.webp",
+      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
         "Bevanda",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": true,
+        "assigned": false,
         "specific": false,
-        "source": "mapping-fallback-hardening",
-        "confidence": "bassa",
-        "label": "Foto categoria",
-        "mappingType": "fallback_categoria",
-        "basis": "Fallback categoria succhi freschi con asset locale riusato in modo coerente.",
-        "needsSupplierConfirmation": true,
-        "originalUrl": "",
-        "filename": "DSCF7425.webp",
-        "sourcePage": "Catalogo locale",
-        "sourceAsset": "succhi_fallback_local",
-        "sourceOriginalFilename": "DSCF7425.webp"
+        "source": "audit-completo",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Il catalogo pubblico non espone una fotografia univoca per questo prodotto.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
       }
     }
   ],
@@ -2800,7 +2535,7 @@ window.__PAGNOTTELLA_MENU__ = {
     {
       "id": "all",
       "label": "Tutto",
-      "hero": "../assets/pagnottella/images/products/insalata_apollo.jpg"
+      "hero": "../assets/pagnottella/images/optimized/logo_pagnottella.webp"
     },
     {
       "id": "panini-carne",
@@ -2820,7 +2555,7 @@ window.__PAGNOTTELLA_MENU__ = {
     {
       "id": "insalate-carne",
       "label": "Insalate carne",
-      "hero": "../assets/pagnottella/images/products/insalate_leggera__asset_home_vitella_insalata.jpg"
+      "hero": "../assets/pagnottella/images/optimized/logo_pagnottella.webp"
     },
     {
       "id": "insalate-pesce",
@@ -2830,22 +2565,22 @@ window.__PAGNOTTELLA_MENU__ = {
     {
       "id": "insalate-veg",
       "label": "Insalate vegetariane",
-      "hero": "../assets/pagnottella/images/products/insalate_reginella__insalata_reginella.jpg"
+      "hero": "../assets/pagnottella/images/products/insalate_caprese__insalata_reginella.jpg"
     },
     {
       "id": "speciali",
       "label": "Speciali del punto vendita",
-      "hero": "../assets/pagnottella/images/products/insalata_apollo.jpg"
+      "hero": "../assets/pagnottella/images/optimized/logo_pagnottella.webp"
     },
     {
       "id": "bevande-dolci",
       "label": "Bevande e dolci",
-      "hero": "../assets/pagnottella/images/optimized/DSCF7425.webp"
+      "hero": "../assets/pagnottella/images/optimized/logo_pagnottella.webp"
     },
     {
       "id": "succhi-freschi",
       "label": "Succhi freschi",
-      "hero": "../assets/pagnottella/images/optimized/DSCF7425.webp"
+      "hero": "../assets/pagnottella/images/optimized/logo_pagnottella.webp"
     }
   ],
   "discount": {
@@ -2928,8 +2663,20 @@ window.__PAGNOTTELLA_MENU__ = {
       "Bonifico bancario",
       "Satispay"
     ],
+    "futureMethods": [
+      {
+        "label": "PayPal",
+        "availableFrom": "settembre 2026",
+        "enabled": false
+      },
+      {
+        "label": "Nexi",
+        "availableFrom": "settembre 2026",
+        "enabled": false
+      }
+    ],
     "model": "Pagamento entro le 12:00",
-    "pickup": "Sono accettati contanti, POS, bonifico bancario e Satispay. PayPal e Nexi saranno attivi da settembre.",
+    "pickup": "Sono accettati contanti, POS, bonifico bancario e Satispay. PayPal e Nexi non sono ancora selezionabili e saranno attivati da settembre.",
     "beneficiary": "3M Società a Responsabilità Limitata",
     "iban": "IT35B0832703249000000002986",
     "qrImage": "../assets/pagnottella/payment/satispay-qr-pagnottella.png"

@@ -127,7 +127,7 @@
         <section class="supportBlocks supportBlocksCompact">
           <article class="supportBlock">
             <h4>Listino ingredienti aggiuntivi</h4>
-            <p>Prezzi extra strutturati in pagina e PDF locale scaricabile.</p>
+            <p>Ingredienti e supplementi disponibili, con prezzo sempre leggibile.</p>
             <div id="extrasGrid" class="extrasGrid"></div>
           </article>
           <article class="supportBlock">
@@ -157,10 +157,15 @@
           </div>
           <div id="checkout" class="form checkoutForm hidden">
             <div class="field prettyField"><label for="customer">Nome e cognome</label><div class="inputShell"><span class="inputIcon">♡</span><input id="customer" placeholder="Inserisci nome e cognome" autocomplete="name"></div></div>
-            <div class="infoCards"><div class="serviceCard deliveryCard"><div class="serviceIcon">↻</div><div><strong>Consegna pausa pranzo</strong><span id="deliveryCardText">Ordini e pagamenti entro le 12:00, consegna entro le 13:00.</span></div></div><div class="serviceCard paymentCard"><div class="serviceIcon">¤</div><div><strong id="paymentCardTitle">Pagamento entro le 12:00</strong><span id="paymentCardText">Sono accettati contanti, POS, bonifico bancario e Satispay. PayPal e Nexi saranno attivi da settembre.</span><div class="paymentMethods" id="paymentMethods"></div><div id="paymentDetails" class="paymentDetails"></div></div></div></div>
+            <div class="infoCards"><div class="serviceCard deliveryCard"><div class="serviceIcon">↻</div><div><strong>Consegna pausa pranzo</strong><span id="deliveryCardText">Ordini e pagamenti entro le 12:00, consegna entro le 13:00.</span></div></div><div class="serviceCard paymentCard"><div class="serviceIcon">¤</div><div><strong id="paymentCardTitle">Pagamento entro le 12:00</strong><span id="paymentCardText">Sono accettati contanti, POS, bonifico bancario e Satispay. PayPal e Nexi non sono ancora selezionabili.</span><div class="paymentMethods" id="paymentMethods"></div><div id="paymentDetails" class="paymentDetails"></div></div></div></div>
+            <fieldset class="paymentChoice" aria-describedby="paymentChoiceHelp">
+              <legend>Metodo di pagamento</legend>
+              <p id="paymentChoiceHelp">Seleziona come pagherai l’ordine. Le istruzioni cambiano automaticamente.</p>
+              <div id="paymentOptions" class="paymentOptions"></div>
+            </fieldset>
             <div class="field prettyField"><label for="notes">Note / allergie</label><div class="inputShell textareaShell"><span class="inputIcon">✎</span><textarea id="notes" placeholder="Es. senza noci, senza glutine, no cipolla..."></textarea></div></div>
             <div class="waBlock"><div class="waTitle">Riepilogo ordine da inviare su WhatsApp</div><div class="waCard"><div class="waMark">☎</div><div id="waPreview" class="waPreview"></div></div></div>
-            <button class="waBtn whatsappMain" onclick="sendWA()"><span class="waBtnIcon">☎</span><span>Invia ordine su WhatsApp</span><span class="waArrow">›</span></button>
+            <button id="sendOrderBtn" class="waBtn whatsappMain" onclick="sendWA()"><span class="waBtnIcon">☎</span><span id="sendOrderLabel">Salva e invia su WhatsApp</span><span class="waArrow">›</span></button>
             <button class="ghost dangerGhost" onclick="newOrder()"><span>⌫</span> Svuota e nuovo ordine</button>
             <div id="confirm" class="confirm"></div>
           </div>
@@ -172,6 +177,7 @@
 <div id="mobileBar" class="mobileBar hidden"><div><strong><span id="mobileCount">0</span> prodotti</strong><br><span id="mobileTotal">€0,00</span></div><button onclick="openCart()">Carrello</button></div>
 <div id="drawer" class="drawer" onclick="if(event.target.id==='drawer')closeDrawer()"><div class="sheet"><div class="sheetImg"><img id="drawerImg" src="" alt=""><button class="close" onclick="closeDrawer()" aria-label="Chiudi">×</button></div><div class="sheetBody"><div id="drawerTags" class="meta"></div><h3 id="drawerName"></h3><p id="drawerDesc"></p><h4 id="optionTitle"></h4><p id="optionHelp" class="optionHelpInline"></p><div id="options" class="optGrid"></div><div class="sheetFoot"><div><span class="old" id="drawerOld">€0,00</span><div id="drawerPrice" class="bigPrice">€0,00</div></div><button class="primary gold" onclick="drawerAdd()">Aggiungi al carrello</button></div></div></div></div>
 <div id="toast" class="toast"></div>
+<script src="../supplier-access.js"></script>
 <script src="../assets/pagnottella/data/menu.inline.js"></script>
 <script src="./pagnottella.js"></script>
 </body>
