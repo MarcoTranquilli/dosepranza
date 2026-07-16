@@ -20,6 +20,11 @@ function setAuthButtonsDisabled(disabled) {
     const element = byId(id);
     if (element) element.disabled = !!disabled;
   });
+  const googleButton = byId('hub-google-button');
+  if (googleButton) {
+    googleButton.classList.toggle('is-busy', !!disabled);
+    googleButton.setAttribute('aria-busy', String(!!disabled));
+  }
 }
 
 function setAuthState(session, message = '') {
@@ -136,6 +141,35 @@ async function signInWithGoogleHub() {
   }
 }
 
+async function signInWithGoogleCredentialHub(response) {
+  setAuthButtonsDisabled(true);
+  setAuthState(null, 'Verifica dell’account Google in corso...');
+  try {
+    const session = await access.signInWithGoogleCredential(response?.credential);
+    await activateSession(session, true);
+  } catch (error) {
+    setAuthState(null, friendlyAuthError(error));
+  } finally {
+    setAuthButtonsDisabled(false);
+  }
+}
+
+async function initializeGoogleButton() {
+  if (access.isTrustedLocalContext()) return;
+  if (typeof access.renderGoogleSignInButton !== 'function' || typeof access.signInWithGoogleCredential !== 'function') return;
+  const host = byId('hub-google-button');
+  const fallback = byId('hub-google-login');
+  if (!host || !fallback) return;
+  try {
+    await access.renderGoogleSignInButton(host, signInWithGoogleCredentialHub);
+    host.hidden = false;
+    fallback.hidden = true;
+  } catch (error) {
+    host.hidden = true;
+    fallback.hidden = false;
+  }
+}
+
 async function activateLocalPreviewAccess() {
   if (!access.isFilePreview()) return;
   window.localStorage.setItem('dose_user', JSON.stringify({
@@ -190,9 +224,14 @@ async function init() {
   setAuthState(null);
   try {
     const session = await access.resolveSession();
-    if (session) await activateSession(session, true);
+    if (session) {
+      await activateSession(session, true);
+      return;
+    }
+    await initializeGoogleButton();
   } catch (error) {
     setAuthState(null, 'Impossibile verificare la sessione Google. Riprova.');
+    await initializeGoogleButton();
   }
 }
 
