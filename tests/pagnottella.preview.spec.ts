@@ -79,13 +79,15 @@ test.describe('Preview multi-fornitore', () => {
     await expect(page.locator('body')).not.toContainText('Materiali commerciali');
     await expect(page.locator('body')).not.toContainText('Dati aziendali (opzionale)');
     await expect(page.locator('#customer')).toHaveValue('Marco Tranquilli');
+    await expect(page.locator('#paymentCardTitle')).toContainText('Pagamento entro le 12:00');
+    await expect(page.locator('#paymentCardText')).toContainText('PayPal e Nexi saranno attivi da settembre');
     await expect(page.locator('#paymentMethods')).toContainText('Satispay');
-    await expect(page.locator('#paymentMethods')).toContainText('Bonifico istantaneo');
-    const paymentLinks = page.locator('#paymentMethods a');
-    if (await paymentLinks.count()) {
-      await expect(paymentLinks.nth(0)).toHaveAttribute('href', /satispay|placeholder/);
-      await expect(paymentLinks.nth(1)).toHaveAttribute('href', /bonifico|placeholder/);
-    }
+    await expect(page.locator('#paymentMethods')).toContainText('Bonifico bancario');
+    await expect(page.locator('#paymentMethods')).toContainText('Contanti');
+    await expect(page.locator('#paymentMethods')).toContainText('POS');
+    await expect(page.locator('#paymentDetails')).toContainText('3M Società a Responsabilità Limitata');
+    await expect(page.locator('#paymentDetails')).toContainText('IT35B0832703249000000002986');
+    await expect(page.locator('#paymentDetails img')).toHaveAttribute('src', /satispay-qr-pagnottella\.png/);
 
     await page.locator('#search').fill('BBQ');
     await expect(page.locator('#grid .card')).toHaveCount(1);
@@ -113,8 +115,10 @@ test.describe('Preview multi-fornitore', () => {
     await page.locator('#notes').fill('No cipolla');
     await expect(page.locator('#waPreview')).toContainText('Azienda: DOS Design S.p.a.');
     await expect(page.locator('#waPreview')).toContainText('Sede di consegna: Via Arno, 52, 00198 Roma RM');
-    await expect(page.locator('#waPreview')).toContainText('Pagamento anticipato entro le 12:00');
-    await expect(page.locator('#waPreview')).toContainText('Satispay, Bonifico istantaneo');
+    await expect(page.locator('#waPreview')).toContainText('Pagamento entro le 12:00');
+    await expect(page.locator('#waPreview')).toContainText('Contanti, POS, Bonifico bancario, Satispay');
+    await expect(page.locator('#waPreview')).toContainText('3M Società a Responsabilità Limitata');
+    await expect(page.locator('#waPreview')).toContainText('IT35B0832703249000000002986');
     await expect(page.locator('#waPreview')).toContainText('No cipolla');
     await expect(page.locator('#confirm')).toBeHidden();
 

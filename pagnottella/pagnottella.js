@@ -42,6 +42,8 @@ const authenticatedCustomerName = () => getStoredDoseUser()?.name?.trim() || '';
 const authenticatedDoseUser = () => getStoredDoseUser() || null;
 const companyCopy = () => DATA?.orderContext?.company || 'DOS Design S.p.a.';
 const deliverySiteCopy = () => DATA?.orderContext?.deliverySite || 'Via Arno, 52, 00198 Roma RM';
+const paymentBeneficiary = () => DATA?.payment?.beneficiary || '';
+const paymentIban = () => DATA?.payment?.iban || '';
 const discountedPrice = v => Math.round(v * (1 - discountRate()) * 100) / 100;
 const isLocalPreview = () => location.protocol === 'file:';
 const setAuthButtonsDisabled = (disabled) => {
@@ -105,6 +107,33 @@ function hydrateStatic(){
     if(typeof method === 'string') return `<span class="methodChip">${esc(method)}</span>`;
     return `<a class="methodChip methodChipLink" href="${esc(method.href)}" target="_blank" rel="noopener">${esc(method.label)}</a>`;
   }).join('');
+  const paymentDetails = byId('paymentDetails');
+  if(paymentDetails){
+    const beneficiary = paymentBeneficiary();
+    const iban = paymentIban();
+    const qrImage = DATA.payment.qrImage || '';
+    paymentDetails.innerHTML = `
+      <div class="paymentDetailRow">
+        <span class="paymentDetailLabel">Intestatario</span>
+        <span class="paymentDetailValue">${esc(beneficiary)}</span>
+      </div>
+      <div class="paymentDetailRow">
+        <span class="paymentDetailLabel">IBAN</span>
+        <span class="paymentDetailValue">${esc(iban)}</span>
+      </div>
+      ${qrImage ? `<div class="paymentQrCard">
+        <img src="${esc(qrImage)}" alt="QR code Satispay La Pagnottella Gourmet" loading="lazy">
+        <div class="paymentQrBody">
+          <strong>QR Satispay</strong>
+          <p>Apri il QR dal checkout oppure copia l'IBAN per il bonifico. PayPal e Nexi saranno disponibili da settembre.</p>
+          <div class="paymentQrActions">
+            <a class="paymentActionBtn" href="${esc(qrImage)}" target="_blank" rel="noopener">Apri QR</a>
+            <button type="button" class="paymentActionBtn" onclick="copyPaymentIban()">Copia IBAN</button>
+          </div>
+        </div>
+      </div>` : ''}
+    `;
+  }
   byId('cartDeliveryText').textContent = deliveryCopy();
   byId('discountLabel').textContent = discountLabel();
   byId('deliveryCardText').textContent = `${deliveryCopy()}.`;
@@ -374,6 +403,8 @@ function buildMessage(){
   msg += `\nPagamento: ${DATA.payment.model}`;
   msg += `\nMetodi: ${DATA.payment.methods.map(method => typeof method === 'string' ? method : method.label).join(', ')}`;
   msg += `\nNota pagamenti: ${DATA.payment.pickup}`;
+  if(paymentBeneficiary()) msg += `\nIntestatario bonifico: ${paymentBeneficiary()}`;
+  if(paymentIban()) msg += `\nIBAN: ${paymentIban()}`;
   if(notes) msg += `\nNote/allergie: ${notes}`;
   msg += `\n\nOrdine effettuato tramite DOSepranza`;
   return msg;
@@ -381,6 +412,11 @@ function buildMessage(){
 function cap(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
 function whatsappUrl(){ const params = new URLSearchParams({ phone:DATA.whatsapp, text:buildMessage(), type:'phone_number', app_absent:'0' }); return 'https://api.whatsapp.com/send/?' + params.toString(); }
 function sendWA(){ if(totals().count === 0) return; logOrder(); window.open(whatsappUrl(),'_blank'); byId('confirm').classList.add('show'); byId('confirm').textContent = 'Ordine pronto: WhatsApp è stato aperto con il riepilogo completo, incluso il promemoria di pagamento entro le 12:00.'; }
+function copyPaymentIban(){
+  const iban = paymentIban();
+  if(!iban) return;
+  navigator.clipboard?.writeText(iban).then(() => toast('IBAN copiato')).catch(() => toast(`IBAN: ${iban}`));
+}
 function logOrder(){ const logs = JSON.parse(localStorage.getItem(ORDER_LOG_KEY)||'[]'); const t = totals(); logs.unshift({ ts:new Date().toISOString(), customer:(byId('customer')?.value||authenticatedCustomerName()||'Cliente').trim(), company:companyCopy(), costCenter:deliverySiteCopy(), count:t.count, total:t.total, message:buildMessage() }); localStorage.setItem(ORDER_LOG_KEY, JSON.stringify(logs.slice(0,25))); updateAdmin(); }
 function newOrder(){ state.cart = {}; byId('notes').value = ''; byId('confirm').classList.remove('show'); renderCart(); closeCart(); }
 function openCart(){ byId('cart').classList.add('open'); byId('cartBackdrop').classList.add('show'); }
@@ -403,7 +439,7 @@ function updateAdmin(){
 function exportCSV(){ const logs = JSON.parse(localStorage.getItem(ORDER_LOG_KEY)||'[]'); const rows = [['timestamp','cliente','azienda','centro_costo','prodotti','totale','messaggio'], ...logs.map(o=>[o.ts,o.customer,o.company||'',o.costCenter||'',o.count,o.total,o.message])]; const csv = rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n'); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download = 'ordini-pagnottella.csv'; a.click(); URL.revokeObjectURL(a.href); }
 function escJs(s){ return String(s).replace(/[\\']/g, m => m === '\\' ? '\\\\' : "\\'"); }
 
-Object.assign(window, { openShop, backLanding, setCat, setFilter, openDetails, pickOption, closeDrawer, quickAdd, drawerAdd, changeQty, sendWA, newOrder, openCart, closeCart, exportCSV });
+Object.assign(window, { openShop, backLanding, setCat, setFilter, openDetails, pickOption, closeDrawer, quickAdd, drawerAdd, changeQty, sendWA, newOrder, openCart, closeCart, exportCSV, copyPaymentIban });
 bootstrap().catch(err => {
   console.error(err);
   document.body.innerHTML = `<div style="max-width:720px;margin:48px auto;padding:24px;border-radius:24px;background:#fff;border:1px solid #eadfce;font-family:Manrope,sans-serif"><h1 style="margin-top:0">Errore caricamento catalogo Pagnottella</h1><p>${esc(err.message || 'Errore sconosciuto')}</p><p>Verifica il file <code>assets/pagnottella/data/menu.json</code> e gli asset locali.</p></div>`;

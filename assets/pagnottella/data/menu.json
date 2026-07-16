@@ -2432,11 +2432,19 @@
         "Top"
       ],
       "imageMeta": {
-        "assigned": false,
+        "assigned": true,
         "specific": false,
-        "source": "fallback",
-        "confidence": "nessuna",
-        "label": "Immagine categoria"
+        "source": "mapping-fallback-hardening",
+        "confidence": "bassa",
+        "label": "Foto categoria",
+        "needsSupplierConfirmation": true,
+        "originalUrl": "",
+        "filename": "insalate_baccala__insalata_baccala.jpg",
+        "mappingType": "fallback_categoria",
+        "basis": "Fallback insalate di pesce basato su immagine Baccala già assegnata.",
+        "sourcePage": "Home",
+        "sourceAsset": "home_baccala_insalata",
+        "sourceOriginalFilename": "baccala_insalata.jpg"
       }
     },
     {
@@ -2451,11 +2459,19 @@
         "Leggero"
       ],
       "imageMeta": {
-        "assigned": false,
+        "assigned": true,
         "specific": false,
-        "source": "fallback",
-        "confidence": "nessuna",
-        "label": "Immagine categoria"
+        "source": "mapping-fallback-hardening",
+        "confidence": "bassa",
+        "label": "Foto categoria",
+        "mappingType": "fallback_categoria",
+        "basis": "Fallback categoria bevande/dolci con asset locale riusato in modo coerente.",
+        "needsSupplierConfirmation": true,
+        "originalUrl": "",
+        "filename": "DSCF7425.webp",
+        "sourcePage": "Catalogo locale",
+        "sourceAsset": "bevande_fallback_local",
+        "sourceOriginalFilename": "DSCF7425.webp"
       }
     },
     {
@@ -2469,11 +2485,19 @@
         "Bevanda"
       ],
       "imageMeta": {
-        "assigned": false,
+        "assigned": true,
         "specific": false,
-        "source": "fallback",
-        "confidence": "nessuna",
-        "label": "Immagine categoria"
+        "source": "mapping-fallback-hardening",
+        "confidence": "bassa",
+        "label": "Foto categoria",
+        "mappingType": "fallback_categoria",
+        "basis": "Fallback categoria bevande/dolci con asset locale riusato in modo coerente.",
+        "needsSupplierConfirmation": true,
+        "originalUrl": "",
+        "filename": "DSCF7425.webp",
+        "sourcePage": "Catalogo locale",
+        "sourceAsset": "bevande_fallback_local",
+        "sourceOriginalFilename": "DSCF7425.webp"
       }
     },
     {
@@ -2488,11 +2512,19 @@
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": false,
+        "assigned": true,
         "specific": false,
-        "source": "fallback",
-        "confidence": "nessuna",
-        "label": "Immagine categoria"
+        "source": "mapping-fallback-hardening",
+        "confidence": "bassa",
+        "label": "Foto categoria",
+        "mappingType": "fallback_categoria",
+        "basis": "Fallback categoria bevande/dolci con asset locale riusato in modo coerente.",
+        "needsSupplierConfirmation": true,
+        "originalUrl": "",
+        "filename": "DSCF7425.webp",
+        "sourcePage": "Catalogo locale",
+        "sourceAsset": "bevande_fallback_local",
+        "sourceOriginalFilename": "DSCF7425.webp"
       }
     },
     {
@@ -2506,11 +2538,19 @@
         "Bevanda"
       ],
       "imageMeta": {
-        "assigned": false,
+        "assigned": true,
         "specific": false,
-        "source": "fallback",
-        "confidence": "nessuna",
-        "label": "Immagine categoria"
+        "source": "mapping-fallback-hardening",
+        "confidence": "bassa",
+        "label": "Foto categoria",
+        "mappingType": "fallback_categoria",
+        "basis": "Fallback categoria bevande/dolci con asset locale riusato in modo coerente.",
+        "needsSupplierConfirmation": true,
+        "originalUrl": "",
+        "filename": "DSCF7425.webp",
+        "sourcePage": "Catalogo locale",
+        "sourceAsset": "bevande_fallback_local",
+        "sourceOriginalFilename": "DSCF7425.webp"
       }
     },
     {
@@ -2524,11 +2564,19 @@
         "Dessert"
       ],
       "imageMeta": {
-        "assigned": false,
+        "assigned": true,
         "specific": false,
-        "source": "fallback",
-        "confidence": "nessuna",
-        "label": "Immagine categoria"
+        "source": "mapping-fallback-hardening",
+        "confidence": "bassa",
+        "label": "Foto categoria",
+        "mappingType": "fallback_categoria",
+        "basis": "Fallback categoria bevande/dolci con asset locale riusato in modo coerente.",
+        "needsSupplierConfirmation": true,
+        "originalUrl": "",
+        "filename": "DSCF7425.webp",
+        "sourcePage": "Catalogo locale",
+        "sourceAsset": "bevande_fallback_local",
+        "sourceOriginalFilename": "DSCF7425.webp"
       }
     },
     {
@@ -2543,11 +2591,19 @@
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": false,
+        "assigned": true,
         "specific": false,
-        "source": "fallback",
-        "confidence": "nessuna",
-        "label": "Immagine categoria"
+        "source": "mapping-fallback-hardening",
+        "confidence": "bassa",
+        "label": "Foto categoria",
+        "mappingType": "fallback_categoria",
+        "basis": "Fallback categoria succhi freschi con asset locale riusato in modo coerente.",
+        "needsSupplierConfirmation": true,
+        "originalUrl": "",
+        "filename": "DSCF7425.webp",
+        "sourcePage": "Catalogo locale",
+        "sourceAsset": "succhi_fallback_local",
+        "sourceOriginalFilename": "DSCF7425.webp"
       }
     },
     {
@@ -2562,11 +2618,19 @@
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": false,
+        "assigned": true,
         "specific": false,
-        "source": "fallback",
-        "confidence": "nessuna",
-        "label": "Immagine categoria"
+        "source": "mapping-fallback-hardening",
+        "confidence": "bassa",
+        "label": "Foto categoria",
+        "mappingType": "fallback_categoria",
+        "basis": "Fallback categoria succhi freschi con asset locale riusato in modo coerente.",
+        "needsSupplierConfirmation": true,
+        "originalUrl": "",
+        "filename": "DSCF7425.webp",
+        "sourcePage": "Catalogo locale",
+        "sourceAsset": "succhi_fallback_local",
+        "sourceOriginalFilename": "DSCF7425.webp"
       }
     },
     {
@@ -2581,11 +2645,19 @@
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": false,
+        "assigned": true,
         "specific": false,
-        "source": "fallback",
-        "confidence": "nessuna",
-        "label": "Immagine categoria"
+        "source": "mapping-fallback-hardening",
+        "confidence": "bassa",
+        "label": "Foto categoria",
+        "mappingType": "fallback_categoria",
+        "basis": "Fallback categoria succhi freschi con asset locale riusato in modo coerente.",
+        "needsSupplierConfirmation": true,
+        "originalUrl": "",
+        "filename": "DSCF7425.webp",
+        "sourcePage": "Catalogo locale",
+        "sourceAsset": "succhi_fallback_local",
+        "sourceOriginalFilename": "DSCF7425.webp"
       }
     },
     {
@@ -2600,11 +2672,19 @@
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": false,
+        "assigned": true,
         "specific": false,
-        "source": "fallback",
-        "confidence": "nessuna",
-        "label": "Immagine categoria"
+        "source": "mapping-fallback-hardening",
+        "confidence": "bassa",
+        "label": "Foto categoria",
+        "mappingType": "fallback_categoria",
+        "basis": "Fallback categoria succhi freschi con asset locale riusato in modo coerente.",
+        "needsSupplierConfirmation": true,
+        "originalUrl": "",
+        "filename": "DSCF7425.webp",
+        "sourcePage": "Catalogo locale",
+        "sourceAsset": "succhi_fallback_local",
+        "sourceOriginalFilename": "DSCF7425.webp"
       }
     },
     {
@@ -2619,11 +2699,19 @@
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": false,
+        "assigned": true,
         "specific": false,
-        "source": "fallback",
-        "confidence": "nessuna",
-        "label": "Immagine categoria"
+        "source": "mapping-fallback-hardening",
+        "confidence": "bassa",
+        "label": "Foto categoria",
+        "mappingType": "fallback_categoria",
+        "basis": "Fallback categoria succhi freschi con asset locale riusato in modo coerente.",
+        "needsSupplierConfirmation": true,
+        "originalUrl": "",
+        "filename": "DSCF7425.webp",
+        "sourcePage": "Catalogo locale",
+        "sourceAsset": "succhi_fallback_local",
+        "sourceOriginalFilename": "DSCF7425.webp"
       }
     },
     {
@@ -2638,11 +2726,19 @@
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": false,
+        "assigned": true,
         "specific": false,
-        "source": "fallback",
-        "confidence": "nessuna",
-        "label": "Immagine categoria"
+        "source": "mapping-fallback-hardening",
+        "confidence": "bassa",
+        "label": "Foto categoria",
+        "mappingType": "fallback_categoria",
+        "basis": "Fallback categoria succhi freschi con asset locale riusato in modo coerente.",
+        "needsSupplierConfirmation": true,
+        "originalUrl": "",
+        "filename": "DSCF7425.webp",
+        "sourcePage": "Catalogo locale",
+        "sourceAsset": "succhi_fallback_local",
+        "sourceOriginalFilename": "DSCF7425.webp"
       }
     },
     {
@@ -2657,11 +2753,19 @@
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": false,
+        "assigned": true,
         "specific": false,
-        "source": "fallback",
-        "confidence": "nessuna",
-        "label": "Immagine categoria"
+        "source": "mapping-fallback-hardening",
+        "confidence": "bassa",
+        "label": "Foto categoria",
+        "mappingType": "fallback_categoria",
+        "basis": "Fallback categoria succhi freschi con asset locale riusato in modo coerente.",
+        "needsSupplierConfirmation": true,
+        "originalUrl": "",
+        "filename": "DSCF7425.webp",
+        "sourcePage": "Catalogo locale",
+        "sourceAsset": "succhi_fallback_local",
+        "sourceOriginalFilename": "DSCF7425.webp"
       }
     },
     {
@@ -2676,11 +2780,19 @@
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": false,
+        "assigned": true,
         "specific": false,
-        "source": "fallback",
-        "confidence": "nessuna",
-        "label": "Immagine categoria"
+        "source": "mapping-fallback-hardening",
+        "confidence": "bassa",
+        "label": "Foto categoria",
+        "mappingType": "fallback_categoria",
+        "basis": "Fallback categoria succhi freschi con asset locale riusato in modo coerente.",
+        "needsSupplierConfirmation": true,
+        "originalUrl": "",
+        "filename": "DSCF7425.webp",
+        "sourcePage": "Catalogo locale",
+        "sourceAsset": "succhi_fallback_local",
+        "sourceOriginalFilename": "DSCF7425.webp"
       }
     }
   ],
@@ -2811,17 +2923,16 @@
   },
   "payment": {
     "methods": [
-      {
-        "label": "Satispay",
-        "href": "https://example.com/payment/satispay-placeholder"
-      },
-      {
-        "label": "Bonifico istantaneo",
-        "href": "https://example.com/payment/bonifico-placeholder"
-      }
+      "Contanti",
+      "POS",
+      "Bonifico bancario",
+      "Satispay"
     ],
-    "model": "Pagamento anticipato entro le 12:00",
-    "pickup": "PayPal in valutazione con Isidoro. I pulsanti sotto puntano a link placeholder."
+    "model": "Pagamento entro le 12:00",
+    "pickup": "Sono accettati contanti, POS, bonifico bancario e Satispay. PayPal e Nexi saranno attivi da settembre.",
+    "beneficiary": "3M Società a Responsabilità Limitata",
+    "iban": "IT35B0832703249000000002986",
+    "qrImage": "../assets/pagnottella/payment/satispay-qr-pagnottella.png"
   },
   "notes": {
     "allergens": "1 glutine, 2 crostacei, 3 uova, 4 pesce, 5 arachidi, 6 soia, 7 latte, 8 frutta a guscio, 9 sedano, 10 senape, 11 sesamo, 12 solfiti, 13 lupini, 14 molluschi.",
