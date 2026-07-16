@@ -1,9 +1,10 @@
 import { test, expect } from '@playwright/test';
-import { seedCoreOrders } from './helpers/e2e-fixtures';
+import { seedMultiSupplierOrders } from './helpers/e2e-fixtures';
+import { legacyRussoAppUrl } from './helpers/routes';
 
 test('UAT Ristoratore: gestione frige + riconciliazione', async ({ page }) => {
-  await seedCoreOrders(page);
-  await page.goto('/');
+  await seedMultiSupplierOrders(page);
+  await page.goto(legacyRussoAppUrl);
 
   await page.click('#btn-frige');
   const price = page.locator('[data-action="frige-update-price"]').first();
@@ -20,4 +21,6 @@ test('UAT Ristoratore: gestione frige + riconciliazione', async ({ page }) => {
   await expect(page.locator('#orders-summary-products')).toContainText('Ovoline di bufala 150g');
   await expect(page.locator('#orders-payments-list')).toContainText('Gabriele Maria Cirulli');
   await expect(page.locator('#orders-payments-list')).toContainText('Lorenzo Zuaro');
+  await expect(page.locator('#all-orders-list')).not.toContainText('La Pagnottella Gourmet');
+  await expect(page.locator('#all-orders-list')).not.toContainText('Saporito');
 });

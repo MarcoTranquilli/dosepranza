@@ -1,7 +1,8 @@
 import { test, expect } from '@playwright/test';
+import { legacyRussoAppUrl } from './helpers/routes';
 
 test('UAT Facility: stock + rifornimenti', async ({ page }) => {
-  await page.goto('/');
+  await page.goto(legacyRussoAppUrl);
 
   await page.click('#btn-frige');
   await page.waitForTimeout(500);

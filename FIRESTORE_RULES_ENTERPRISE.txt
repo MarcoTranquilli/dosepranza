@@ -40,10 +40,18 @@ service cloud.firestore {
     // - staff vede tutti gli ordini
     // - create consentita solo per il proprio uid
     match /orders/{doc} {
-      allow read: if isSignedIn();
+      allow read: if isStaffIdentity() || isOwnerByUid();
       allow create: if isCreateOwnerByUid();
-      allow update: if isSignedIn();
+      allow update: if isStaffIdentity();
       allow delete: if isRole('admin') || isAdminEmail();
+    }
+
+    // Configurazione multi-fornitore:
+    // - tutti gli utenti Google autenticati leggono lo stato pubblicato
+    // - solo l'amministratore modifica la visibilità
+    match /app_config/suppliers {
+      allow read: if isGoogleProvider();
+      allow create, update, delete: if isRole('admin') || isAdminEmail();
     }
 
     // Frige prodotti: gestione staff
@@ -55,19 +63,18 @@ service cloud.firestore {
     // - utente crea e legge i propri acquisti
     // - staff legge/aggiorna tutti
     match /frige_purchases/{doc} {
-      allow read: if isSignedIn();
+      allow read: if isStaffIdentity() || isOwnerByUid();
       allow create: if isCreateOwnerByUid();
-      allow update: if isSignedIn();
+      allow update: if isStaffIdentity();
     }
     match /frige_refills/{doc} {
-      allow read, write: if isSignedIn();
+      allow read, write: if isStaffIdentity();
     }
 
-    // Disponibilità menu: recovery mode
-    // consenti scrittura a sessioni autenticate per riallineare frontend e operatività staff
+    // Disponibilità menu: lettura utenti, gestione staff
     match /menu_products/{doc} {
       allow read: if isSignedIn();
-      allow write: if isSignedIn();
+      allow write: if isStaffIdentity();
     }
 
     // Storico creazioni custom e voti
@@ -86,12 +93,12 @@ service cloud.firestore {
 
     // Audit menu: solo staff
     match /menu_audit/{doc} {
-      allow read, write: if isSignedIn();
+      allow read, write: if isStaffIdentity();
     }
 
     // Audit ordini: solo staff
     match /orders_audit/{doc} {
-      allow read, write: if isSignedIn();
+      allow read, write: if isStaffIdentity();
     }
   }
 }

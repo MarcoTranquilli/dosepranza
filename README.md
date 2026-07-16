@@ -23,8 +23,9 @@ Regola operativa:
 - non si pubblica su Netlify per provare fix frontend che possono essere validati prima su GitHub Pages
 
 Documenti di riferimento:
-- [Core Guardrails](/Users/marcotranquilli/Documents/GitHub/dosepranza/docs/CORE_GUARDRAILS.md)
-- [Secure Implementation Plan](/Users/marcotranquilli/Documents/GitHub/dosepranza/docs/SECURE_IMPLEMENTATION_PLAN.md)
+- [Core Guardrails](docs/CORE_GUARDRAILS.md)
+- [Secure Implementation Plan](docs/SECURE_IMPLEMENTATION_PLAN.md)
+- [Runbook multi-fornitore](docs/MULTI_SUPPLIER_RUNBOOK.md)
 
 ## Rilascio rapido su Netlify
 

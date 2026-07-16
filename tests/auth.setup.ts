@@ -1,4 +1,5 @@
 import { test } from '@playwright/test';
+import { legacyRussoAppUrl } from './helpers/routes';
 
 const roles = {
   user: { name: 'Mario Rossi', email: 'mario.rossi@dos.design' },
@@ -8,7 +9,7 @@ const roles = {
 };
 
 async function loginAndSave(page: any, name: string, email: string, storagePath: string) {
-  await page.goto('/');
+  await page.goto(legacyRussoAppUrl);
   await page.evaluate(() => localStorage.removeItem('dose_user'));
   await page.evaluate((payload) => {
     localStorage.setItem('dose_user', JSON.stringify(payload));
