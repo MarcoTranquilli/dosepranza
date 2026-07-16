@@ -8,6 +8,59 @@ import {
 } from './helpers/routes';
 
 test.describe('Preview multi-fornitore', () => {
+  test('Hub: completa il login Google ufficiale e non espone il bypass locale su HTTP', async ({ page }) => {
+    await page.route('**/supplier-access.js', async route => {
+      await route.fulfill({
+        contentType: 'application/javascript',
+        body: `
+          window.DoseSupplierAccess = Object.freeze({
+            ADMIN_EMAIL: 'marco.tranquilli@dos.design',
+            isFilePreview: () => false,
+            isTrustedLocalContext: () => false,
+            resolveSession: async () => null,
+            renderGoogleSignInButton: async (element, callback) => {
+              const button = document.createElement('button');
+              button.type = 'button';
+              button.textContent = 'Continua con Google';
+              button.dataset.testid = 'google-identity-button';
+              button.addEventListener('click', () => callback({ credential: 'header.payload.signature' }));
+              element.replaceChildren(button);
+            },
+            signInWithGoogleCredential: async credential => {
+              if (credential !== 'header.payload.signature') throw new Error('Credenziale inattesa');
+              return {
+                uid: 'google-admin',
+                name: 'Marco Tranquilli',
+                email: 'marco.tranquilli@dos.design',
+                role: 'admin',
+                isAdmin: true,
+                provider: 'google.com'
+              };
+            },
+            signInWithGoogle: async () => { throw new Error('Fallback non atteso'); },
+            getSupplierSettings: async () => ({
+              russo: { enabledForUsers: true },
+              pagnottella: { enabledForUsers: false }
+            }),
+            setSupplierEnabled: async () => ({
+              russo: { enabledForUsers: true },
+              pagnottella: { enabledForUsers: false }
+            })
+          });
+        `
+      });
+    });
+
+    await page.goto(previewHubUrl);
+
+    await expect(page.getByTestId('google-identity-button')).toBeVisible();
+    await expect(page.locator('#hub-google-login')).toBeHidden();
+    await expect(page.locator('#hub-local-login')).toBeHidden();
+    await page.getByTestId('google-identity-button').click();
+    await expect(page.locator('#hub-auth-status')).toContainText('Marco Tranquilli');
+    await expect(page.locator('#supplier-control-panel')).toBeVisible();
+  });
+
   test('Hub: espone entrambi i fornitori con link separati', async ({ page }) => {
     await page.addInitScript(() => {
       window.localStorage.setItem('dose_e2e', '1');

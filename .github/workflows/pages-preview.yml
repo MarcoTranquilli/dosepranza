@@ -37,7 +37,7 @@ jobs:
           touch dist/.nojekyll
           cat > dist/PREVIEW.md <<'EOF'
           DOSepranza 2.0 GitHub Pages preview.
-          Generated from feature/dosepranza-2-preview-clean.
+          Generated from the workflow-selected branch.
           Netlify was not used for this preview.
           EOF
 

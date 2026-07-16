@@ -89,8 +89,17 @@ body {
   font-weight:700;
   color:#f3e8db;
 }
-.auth-local-btn{ display:none; }
-.is-local-preview .auth-local-btn{ display:inline-flex; }
+.google-signin-button{
+  min-height:44px;
+  min-width:250px;
+  display:flex;
+  align-items:center;
+}
+.google-signin-button[hidden]{ display:none; }
+.google-signin-button.is-busy{
+  opacity:.55;
+  pointer-events:none;
+}
 .brandmark {
   width: 280px;
   max-width: 100%;
@@ -342,6 +351,9 @@ body.is-admin .link-board.supplier-admin-only { display: block !important; }
   text-decoration: none;
   transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
 }
+.btn[hidden] { display: none; }
+body:not(.is-local-preview) .auth-local-btn { display: none; }
+.is-local-preview .auth-local-btn { display: inline-flex; }
 .btn:hover { transform: translateY(-1px); }
 .btn-primary {
   background: var(--text);

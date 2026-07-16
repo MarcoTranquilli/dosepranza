@@ -10,6 +10,8 @@
 
   const ADMIN_EMAIL = 'marco.tranquilli@dos.design';
   const GOOGLE_PROVIDER_ID = 'google.com';
+  const GOOGLE_CLIENT_ID = '553169964686-0d7l4u9sbkm7u8ej9r1fa4uchgi6e767.apps.googleusercontent.com';
+  const GOOGLE_IDENTITY_SCRIPT_ID = 'dose-google-identity-services';
   const SETTINGS_KEY = 'dose_supplier_settings';
   const LOCAL_ORDERS_KEY = 'dose_e2e_pagnottella_orders';
   const DEFAULT_SETTINGS = Object.freeze({
@@ -19,6 +21,7 @@
 
   let firebaseCorePromise = null;
   let firestorePromise = null;
+  let googleIdentityPromise = null;
 
   const normalizeEmail = (value) => String(value || '').trim().toLowerCase();
   function isGoogleProviderId(providerId) {
@@ -147,6 +150,79 @@
     provider.addScope('profile');
     provider.setCustomParameters({ prompt: 'select_account' });
     const result = await authSdk.signInWithPopup(auth, provider);
+    const user = await firebaseUserPayload(result.user);
+    if (!user) throw new Error('L’account deve essere autenticato tramite Google.');
+    return user;
+  }
+
+  function loadGoogleIdentityServices() {
+    if (window.google?.accounts?.id) return Promise.resolve(window.google.accounts.id);
+    if (googleIdentityPromise) return googleIdentityPromise;
+
+    googleIdentityPromise = new Promise((resolve, reject) => {
+      const existing = document.getElementById(GOOGLE_IDENTITY_SCRIPT_ID);
+      const script = existing || document.createElement('script');
+      const timeout = window.setTimeout(() => reject(new Error('Google Identity Services non disponibile.')), 10000);
+      const complete = () => {
+        window.clearTimeout(timeout);
+        if (window.google?.accounts?.id) resolve(window.google.accounts.id);
+        else reject(new Error('Google Identity Services non disponibile.'));
+      };
+      const fail = () => {
+        window.clearTimeout(timeout);
+        reject(new Error('Impossibile caricare Google Identity Services.'));
+      };
+
+      script.addEventListener('load', complete, { once: true });
+      script.addEventListener('error', fail, { once: true });
+      if (!existing) {
+        script.id = GOOGLE_IDENTITY_SCRIPT_ID;
+        script.src = 'https://accounts.google.com/gsi/client?hl=it';
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+      }
+    }).catch((error) => {
+      googleIdentityPromise = null;
+      throw error;
+    });
+
+    return googleIdentityPromise;
+  }
+
+  async function renderGoogleSignInButton(element, callback) {
+    if (!element || typeof callback !== 'function') throw new Error('Configurazione Google Login non valida.');
+    const googleIdentity = await loadGoogleIdentityServices();
+    element.replaceChildren();
+    googleIdentity.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback,
+      auto_select: false,
+      cancel_on_tap_outside: true,
+      context: 'signin',
+      itp_support: true,
+      ux_mode: 'popup',
+      use_fedcm_for_button: true
+    });
+    googleIdentity.renderButton(element, {
+      type: 'standard',
+      theme: 'filled_black',
+      size: 'large',
+      text: 'continue_with',
+      shape: 'pill',
+      logo_alignment: 'left',
+      locale: 'it',
+      width: 250
+    });
+    if (!element.childElementCount) throw new Error('Pulsante Google non disponibile.');
+  }
+
+  async function signInWithGoogleCredential(idToken) {
+    const token = String(idToken || '').trim();
+    if (token.split('.').length !== 3) throw new Error('Credenziale Google non valida.');
+    const { auth, authSdk } = await loadFirebaseCore();
+    const credential = authSdk.GoogleAuthProvider.credential(token);
+    const result = await authSdk.signInWithCredential(auth, credential);
     const user = await firebaseUserPayload(result.user);
     if (!user) throw new Error('L’account deve essere autenticato tramite Google.');
     return user;
@@ -284,6 +360,8 @@
     getStoredUser,
     resolveSession,
     signInWithGoogle,
+    renderGoogleSignInButton,
+    signInWithGoogleCredential,
     getSupplierSettings,
     setSupplierEnabled,
     canAccessSupplier,
