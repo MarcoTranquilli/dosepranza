@@ -1,0 +1,26 @@
+name: GitHub Pages Preview
+
+on:
+  push:
+    branches:
+      - feature/dosepranza-2-preview-clean
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: dosepranza-pages-preview
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build static preview
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+     
