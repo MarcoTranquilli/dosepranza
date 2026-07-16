@@ -466,7 +466,6 @@ function cap(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
 function whatsappUrl(){ const params = new URLSearchParams({ phone:DATA.whatsapp, text:buildMessage(), type:'phone_number', app_absent:'0' }); return 'https://api.whatsapp.com/send/?' + params.toString(); }
 function buildOrderPayload(){
   const t = totals();
-  const summary = buildMessage();
   const items = t.items.flatMap(item => Array.from({ length:item.qty }, () => ({
     id: item.id,
     name: item.name,
@@ -496,8 +495,7 @@ function buildOrderPayload(){
     orderStatus: 'submitted',
     orderType: 'order',
     reconciled: false,
-    allergies: (byId('notes')?.value || '').trim(),
-    restaurateurSummary: summary
+    allergies: (byId('notes')?.value || '').trim()
   };
 }
 function setSendBusy(busy){
@@ -522,7 +520,7 @@ async function sendWA(){
   try{
     const payload = buildOrderPayload();
     const result = await supplierAccess.createPagnottellaOrder(payload);
-    logOrder(result.id);
+    logOrder(result.id, { firebaseSaved: !result.local });
     state.lastSubmittedMessage = message;
     const target = whatsappUrl();
     if(popup) popup.location.replace(target);
@@ -542,14 +540,59 @@ function copyPaymentIban(){
   if(!iban) return;
   navigator.clipboard?.writeText(iban).then(() => toast('IBAN copiato')).catch(() => toast(`IBAN: ${iban}`));
 }
-function logOrder(orderId){ const logs = JSON.parse(localStorage.getItem(ORDER_LOG_KEY)||'[]'); const t = totals(); logs.unshift({ id:orderId, ts:new Date().toISOString(), supplierId:'pagnottella', customer:(byId('customer')?.value||authenticatedCustomerName()||'Cliente').trim(), company:companyCopy(), costCenter:deliverySiteCopy(), paymentMethod:selectedPaymentMethod(), count:t.count, total:t.total, message:`Ordine ${orderId} · ${t.count} prodotti · ${money(t.total)}` }); localStorage.setItem(ORDER_LOG_KEY, JSON.stringify(logs.slice(0,25))); updateAdmin(); }
+function sanitizeOrderLog(entry){
+  return {
+    id: String(entry?.id || ''),
+    ts: String(entry?.ts || ''),
+    supplierId: 'pagnottella',
+    customer: String(entry?.customer || ''),
+    company: String(entry?.company || ''),
+    costCenter: String(entry?.costCenter || ''),
+    paymentMethod: String(entry?.paymentMethod || ''),
+    count: Number(entry?.count || 0),
+    total: Number(entry?.total || 0),
+    hasNotesOrAllergies: Boolean(entry?.hasNotesOrAllergies),
+    savedToFirebase: Boolean(entry?.savedToFirebase)
+  };
+}
+function readSafeOrderLogs(){
+  let raw = [];
+  try{
+    const parsed = JSON.parse(localStorage.getItem(ORDER_LOG_KEY) || '[]');
+    raw = Array.isArray(parsed) ? parsed : [];
+  }catch(error){
+    raw = [];
+  }
+  const safeLogs = raw.map(sanitizeOrderLog).slice(0,25);
+  localStorage.setItem(ORDER_LOG_KEY, JSON.stringify(safeLogs));
+  return safeLogs;
+}
+function logOrder(orderId, payload){
+  const logs = readSafeOrderLogs();
+  const t = totals();
+  logs.unshift(sanitizeOrderLog({
+    id: orderId,
+    ts: new Date().toISOString(),
+    supplierId: 'pagnottella',
+    customer: (byId('customer')?.value || authenticatedCustomerName() || 'Cliente').trim(),
+    company: companyCopy(),
+    costCenter: deliverySiteCopy(),
+    paymentMethod: selectedPaymentMethod(),
+    count: t.count,
+    total: t.total,
+    hasNotesOrAllergies: Boolean((byId('notes')?.value || '').trim()),
+    savedToFirebase: Boolean(payload?.firebaseSaved)
+  }));
+  localStorage.setItem(ORDER_LOG_KEY, JSON.stringify(logs.slice(0,25)));
+  updateAdmin();
+}
 function newOrder(){ state.cart = {}; state.lastSubmittedMessage=''; byId('notes').value = ''; byId('confirm').classList.remove('show', 'isError'); renderCart(); closeCart(); }
 function openCart(){ byId('cart').classList.add('open'); byId('cartBackdrop').classList.add('show'); }
 function closeCart(){ byId('cart').classList.remove('open'); byId('cartBackdrop').classList.remove('show'); }
 function toast(txt){ const el = byId('toast'); el.textContent = txt; el.classList.add('show'); clearTimeout(window.__toast); window.__toast = setTimeout(() => el.classList.remove('show'), 1600); }
 function updateAdmin(){
+  const logs = readSafeOrderLogs();
   if(!byId('mProducts')) return;
-  const logs = JSON.parse(localStorage.getItem(ORDER_LOG_KEY)||'[]');
   const imageMapped = PRODUCTS.filter(p => p.imageMeta?.assigned).length;
   const supplierCheck = PRODUCTS.filter(p => p.imageMeta?.needsSupplierConfirmation).length;
   const specificShots = PRODUCTS.filter(p => p.imageMeta?.mappingType === 'foto_specifica_o_quasi_specifica').length;
@@ -561,7 +604,7 @@ function updateAdmin(){
   byId('mSupplierCheck').textContent = String(supplierCheck);
   byId('mSpecificShots').textContent = String(specificShots);
 }
-function exportCSV(){ const logs = JSON.parse(localStorage.getItem(ORDER_LOG_KEY)||'[]'); const rows = [['timestamp','cliente','azienda','centro_costo','prodotti','totale','messaggio'], ...logs.map(o=>[o.ts,o.customer,o.company||'',o.costCenter||'',o.count,o.total,o.message])]; const csv = rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n'); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download = 'ordini-pagnottella.csv'; a.click(); URL.revokeObjectURL(a.href); }
+function exportCSV(){ const logs = readSafeOrderLogs(); const rows = [['timestamp','cliente','azienda','centro_costo','metodo_pagamento','prodotti','totale','note_o_allergie','salvato_firebase'], ...logs.map(o=>[o.ts,o.customer,o.company||'',o.costCenter||'',o.paymentMethod,o.count,o.total,o.hasNotesOrAllergies,o.savedToFirebase])]; const csv = rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n'); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download = 'ordini-pagnottella.csv'; a.click(); URL.revokeObjectURL(a.href); }
 function escJs(s){ return String(s).replace(/[\\']/g, m => m === '\\' ? '\\\\' : "\\'"); }
 
 Object.assign(window, { openShop, backLanding, setCat, setFilter, openDetails, pickOption, closeDrawer, quickAdd, drawerAdd, changeQty, sendWA, newOrder, openCart, closeCart, exportCSV, copyPaymentIban });
