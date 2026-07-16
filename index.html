@@ -1,29 +1,38 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DOSepranza | Accesso</title>
-  <meta name="description" content="Accesso DOSepranza con Google Login.">
-  <link rel="icon" href="./favicondosepranza.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./preview-hub.css?v=20260716-google-auth">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DOSepranza | Accesso</title>
+<link rel="stylesheet" href="./preview-hub.css?v=20260716-google-auth">
 </head>
 <body class="access-pending auth-locked">
-  <div class="page-shell">
-    <header class="hero">
-      <div class="hero-copy">
-        <p class="eyebrow">DOSepranza</p>
-        <img src="./assets/branding/dosepranza-suite-logo.png" alt="DOSepranza" class="brandmark">
-        <h1>Accedi a DOSepranza.</h1>
-        <p class="lede">Accedi con Google per continuare al servizio pranzo disponibile per il tuo profilo.</p>
-        <div class="auth-card" id="hub-auth-card">
-          <div>
-            <p class="auth-label">Accesso Google</p>
-            <h2 class="auth-title">Entra con il tuo account</h2>
-            <p class="auth-copy">Dopo il riconoscimento apriremo automaticamente il percorso corretto.</p>
-          </div>
-          <div class="auth-actions">
-            <div id="hub-google-button" class="google-signin-button" aria-label="Continua con Google
+<div class="page-shell">
+<header class="hero">
+<div class="hero-copy">
+<p class="eyebrow">DOSepranza</p>
+<img src="./assets/branding/dosepranza-suite-logo.png" alt="DOSepranza" class="brandmark">
+<h1>Accedi a DOSepranza.</h1>
+<p class="lede">Accedi con Google per continuare al servizio pranzo disponibile per il tuo profilo.</p>
+<div class="auth-card" id="hub-auth-card">
+<div><p class="auth-label">Accesso Google</p><h2 class="auth-title">Entra con il tuo account</h2><p class="auth-copy">Dopo il riconoscimento apriremo automaticamente il percorso corretto.</p></div>
+<div class="auth-actions"><div id="hub-google-button" class="google-signin-button" aria-label="Continua con Google" hidden></div><button id="hub-google-login" class="btn btn-primary" type="button">Continua con Google</button><button id="hub-local-login" class="btn btn-secondary auth-local-btn" type="button">Usa accesso locale</button><span id="hub-auth-status" class="auth-status">Nessuna sessione Google attiva.</span></div>
+</div>
+<div class="hero-pills"><span>Accesso sicuro</span><span>Profilo riconosciuto</span><span>Servizio pranzo</span></div>
+</div>
+<aside class="hero-panel"><p class="panel-label">DOSepranza</p><ul><li>usa il tuo account autorizzato</li><li>dopo il login il servizio si apre automaticamente</li><li>i dati restano collegati al tuo profilo</li></ul></aside>
+</header>
+<main>
+<section class="section-head supplier-admin-only"><div><p class="eyebrow">Percorsi disponibili</p><h2>Gestisci e apri i fornitori.</h2></div><p class="section-note">Questa area è riservata all’amministratore.</p></section>
+<section id="supplier-control-panel" class="control-panel supplier-admin-only" aria-labelledby="supplier-control-title"><div><p class="eyebrow">Controllo pubblicazione</p><h2 id="supplier-control-title">Disponibilità La Pagnottella Gourmet</h2><p id="supplier-control-copy">Il fornitore è visibile solo all’amministratore.</p></div><label class="supplier-toggle" for="pagnottella-enabled"><input id="pagnottella-enabled" type="checkbox" role="switch" aria-describedby="supplier-control-copy"><span class="supplier-toggle-track" aria-hidden="true"><span></span></span><span id="pagnottella-toggle-label">Solo amministratore</span></label><p id="supplier-control-status" class="control-status" role="status" aria-live="polite"></p></section>
+<section class="suppliers-grid auth-locked supplier-admin-only" id="suppliers-grid">
+<article class="supplier-card supplier-card--russo"><h3>Alimentari Russo</h3><p>Servizio DOSepranza per gli ordini giornalieri.</p><dl><div><dt>Disponibilità</dt><dd id="russo-visibility-status">Attivo per gli utenti</dd></div><div><dt>Uso</dt><dd>Flusso completo</dd></div><div><dt>Accesso</dt><dd>Login condiviso</dd></div></dl><div class="card-actions"><a class="btn btn-primary protected-link" data-target="russo" href="./russo/">Apri Alimentari Russo</a><a class="btn btn-secondary protected-link" data-target="russo" href="./russo/?swreset=1">Apri con reset cache</a></div></article>
+<article class="supplier-card supplier-card--pagnottella"><h3>La Pagnottella Gourmet</h3><p>Catalogo dedicato con checkout e riepilogo ristoratore.</p><dl><div><dt>Disponibilità</dt><dd id="pagnottella-visibility-status">Solo amministratore</dd></div><div><dt>Uso</dt><dd>Catalogo dedicato</dd></div><div><dt>Accesso</dt><dd>Login condiviso</dd></div></dl><div class="card-actions"><a class="btn btn-primary protected-link" data-target="pagnottella" href="./pagnottella/">Apri Pagnottella Gourmet</a><a class="btn btn-secondary protected-link" data-target="pagnottella" href="./pagnottella/?store=pagnottella">Apri direttamente lo shop</a></div></article>
+</section>
+<section class="link-board supplier-admin-only"><h2>Link rapidi</h2><div class="link-list"><a href="./">Hub</a><a class="protected-link" data-target="russo" href="./russo/">Alimentari Russo</a><a class="protected-link" data-target="pagnottella" href="./pagnottella/">La Pagnottella Gourmet</a></div></section>
+</main>
+</div>
+<script src="./supplier-access.js?v=20260716-google-auth"></script>
+<script type="module" src="./hub-auth.js?v=20260716-google-auth"></script>
+</body>
+</html>
