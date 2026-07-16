@@ -9,6 +9,7 @@
   };
 
   const ADMIN_EMAIL = 'marco.tranquilli@dos.design';
+  const GOOGLE_PROVIDER_ID = 'google.com';
   const SETTINGS_KEY = 'dose_supplier_settings';
   const LOCAL_ORDERS_KEY = 'dose_e2e_pagnottella_orders';
   const DEFAULT_SETTINGS = Object.freeze({
@@ -20,6 +21,18 @@
   let firestorePromise = null;
 
   const normalizeEmail = (value) => String(value || '').trim().toLowerCase();
+  function isGoogleProviderId(providerId) {
+    return providerId === GOOGLE_PROVIDER_ID;
+  }
+  function hasGoogleProvider(providerData) {
+    return (providerData || [])
+      .map(item => item?.providerId)
+      .filter(Boolean)
+      .some(isGoogleProviderId);
+  }
+  function isGoogleSignInProvider(signInProvider) {
+    return signInProvider === GOOGLE_PROVIDER_ID;
+  }
   const isFilePreview = () => window.location.protocol === 'file:';
   const isLoopback = () => ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
   const isE2E = () => {
@@ -54,7 +67,7 @@
       email: normalizeEmail(user.email),
       role: user.isAdmin ? 'admin' : (user.role || 'user'),
       isAdmin: !!user.isAdmin,
-      provider: user.provider || 'google.com'
+      provider: user.provider || GOOGLE_PROVIDER_ID
     };
     window.localStorage.setItem('dose_user', JSON.stringify(safeUser));
     return safeUser;
@@ -97,7 +110,6 @@
 
   async function firebaseUserPayload(firebaseUser) {
     if (!firebaseUser || firebaseUser.isAnonymous || !firebaseUser.email) return null;
-    const hasGoogleProvider = (firebaseUser.providerData || []).some(item => item?.providerId === 'google.com');
     let tokenResult = null;
     try {
       tokenResult = await firebaseUser.getIdTokenResult();
@@ -105,7 +117,7 @@
       tokenResult = null;
     }
     const signInProvider = tokenResult?.signInProvider || tokenResult?.claims?.firebase?.sign_in_provider || '';
-    if (!hasGoogleProvider && signInProvider !== 'google.com') return null;
+    if (!hasGoogleProvider(firebaseUser.providerData) && !isGoogleSignInProvider(signInProvider)) return null;
     const email = normalizeEmail(firebaseUser.email);
     const claimRole = tokenResult?.claims?.role;
     const isAdmin = email === ADMIN_EMAIL || claimRole === 'admin';
@@ -115,7 +127,7 @@
       email,
       role: isAdmin ? 'admin' : (['user', 'ristoratore', 'facility'].includes(claimRole) ? claimRole : 'user'),
       isAdmin,
-      provider: 'google.com'
+      provider: GOOGLE_PROVIDER_ID
     });
   }
 
@@ -196,10 +208,38 @@
     return settings[supplierId]?.enabledForUsers === true;
   }
 
+  function structuredOrderPayload(payload, includeAllergies = true) {
+    const structured = {
+      clientOrderId: payload.clientOrderId,
+      source: payload.source,
+      supplierId: 'pagnottella',
+      supplierName: 'La Pagnottella Gourmet',
+      company: payload.company,
+      deliveryAddress: payload.deliveryAddress,
+      pointOfSale: payload.pointOfSale,
+      serviceWindow: payload.serviceWindow,
+      items: payload.items,
+      subtotalOriginal: payload.subtotalOriginal,
+      discountRate: payload.discountRate,
+      discountAmount: payload.discountAmount,
+      total: payload.total,
+      paymentMethod: payload.paymentMethod,
+      paymentStatus: payload.paymentStatus,
+      orderStatus: payload.orderStatus,
+      orderType: payload.orderType,
+      reconciled: payload.reconciled
+    };
+    if (includeAllergies) structured.allergies = String(payload.allergies || '').trim();
+    return structured;
+  }
+
   function createLocalOrder(payload, session) {
     const id = payload.clientOrderId || window.crypto?.randomUUID?.() || `pg-${Date.now()}`;
+    const structured = structuredOrderPayload(payload, false);
+    const hasNotesOrAllergies = Boolean(String(payload.allergies || '').trim());
     const order = {
-      ...payload,
+      ...structured,
+      hasNotesOrAllergies,
       id,
       uid: session.uid,
       user: session.name,
@@ -225,9 +265,7 @@
     if (isTrustedLocalContext()) return createLocalOrder(payload, session);
     const { db, firestoreSdk } = await loadFirestore();
     const order = {
-      ...payload,
-      supplierId: 'pagnottella',
-      supplierName: 'La Pagnottella Gourmet',
+      ...structuredOrderPayload(payload),
       uid: session.uid,
       user: session.name,
       email: session.email,

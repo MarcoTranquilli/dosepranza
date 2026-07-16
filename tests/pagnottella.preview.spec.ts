@@ -106,8 +106,27 @@ test.describe('Preview multi-fornitore', () => {
         name: 'Marco Tranquilli',
         email: 'marco.tranquilli@dos.design'
       }));
+      window.localStorage.setItem('pg_order_logs', JSON.stringify([{
+        id: 'legacy-sensitive-log',
+        ts: '2026-07-01T10:00:00.000Z',
+        supplierId: 'pagnottella',
+        customer: 'Cliente storico',
+        company: 'DOS Design S.p.a.',
+        costCenter: 'Via Arno, 52, 00198 Roma RM',
+        paymentMethod: 'Bonifico bancario',
+        count: 1,
+        total: 8,
+        message: 'IBAN: IT35B0832703249000000002986',
+        restaurateurSummary: 'Intestatario: 3M Società a Responsabilità Limitata',
+        allergies: 'No noci'
+      }]));
     });
     await page.goto(previewPagnottellaUrl);
+
+    const migratedLegacyLogs = await page.evaluate(() => window.localStorage.getItem('pg_order_logs') || '');
+    expect(migratedLegacyLogs).not.toContain('IT35B0832703249000000002986');
+    expect(migratedLegacyLogs).not.toContain('3M Società a Responsabilità Limitata');
+    expect(migratedLegacyLogs).not.toContain('No noci');
 
     await expect(page.locator('#shop')).toHaveClass(/show/);
     await expect(page.locator('#landing')).toHaveClass(/authResolved/);
@@ -195,7 +214,41 @@ test.describe('Preview multi-fornitore', () => {
       deliveryAddress: 'Via Arno, 52, 00198 Roma RM',
       uid: 'admin-e2e'
     });
-    expect(savedOrders[0].restaurateurSummary).toContain('📦 Riepilogo Ordine – La Pagnottella Gourmet');
+    expect(savedOrders[0]).not.toHaveProperty('restaurateurSummary');
+    expect(savedOrders[0]).not.toHaveProperty('allergies');
+    expect(savedOrders[0].hasNotesOrAllergies).toBe(true);
+
+    const localLogs = await page.evaluate(() => JSON.parse(window.localStorage.getItem('pg_order_logs') || '[]'));
+    expect(localLogs).toHaveLength(2);
+    expect(localLogs[0]).toMatchObject({
+      supplierId: 'pagnottella',
+      paymentMethod: 'Bonifico bancario',
+      count: 1,
+      total: 6.4,
+      hasNotesOrAllergies: true,
+      savedToFirebase: false
+    });
+    for (const log of localLogs) {
+      expect(Object.keys(log).sort()).toEqual([
+        'company',
+        'costCenter',
+        'count',
+        'customer',
+        'hasNotesOrAllergies',
+        'id',
+        'paymentMethod',
+        'savedToFirebase',
+        'supplierId',
+        'total',
+        'ts'
+      ].sort());
+    }
+    const serializedLogs = JSON.stringify(localLogs);
+    expect(serializedLogs).not.toContain('IT35B0832703249000000002986');
+    expect(serializedLogs).not.toContain('3M Società a Responsabilità Limitata');
+    expect(serializedLogs).not.toContain('No cipolla');
+    expect(serializedLogs).not.toContain('No noci');
+    expect(serializedLogs).not.toContain('restaurateurSummary');
   });
 
   test('Pagnottella file://: fallback locale carica senza fetch error', async ({ page }) => {

@@ -34,7 +34,9 @@ Gli ordini sono salvati nella raccolta condivisa `orders` prima dell'apertura di
 - `deliveryAddress`
 - `pointOfSale`
 - `discountRate` e `discountAmount`
-- `restaurateurSummary`
+- `items`, `total`, `allergies` e stati ordine/pagamento in forma strutturata
+
+Il riepilogo WhatsApp, l'IBAN e l'intestatario del bonifico non vengono duplicati nel documento ordine. Il log locale conserva soltanto metadati sintetici e migra automaticamente eventuali record precedenti eliminando riepiloghi e note testuali.
 
 L'amministratore vede gli ordini di entrambi i fornitori. Il ristoratore Russo vede nel frontend operativo solo gli ordini Russo.
 
