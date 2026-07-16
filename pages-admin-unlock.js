@@ -33,6 +33,28 @@
     return session;
   }
 
+  function localPreviewOrder(payload, session) {
+    const id = payload?.clientOrderId || `pg-preview-${Date.now()}`;
+    const order = {
+      ...payload,
+      id,
+      uid: session.uid,
+      user: session.name,
+      email: session.email,
+      createdAt: new Date().toISOString(),
+      preview: true
+    };
+    let orders = [];
+    try {
+      orders = JSON.parse(localStorage.getItem('dose_preview_pagnottella_orders') || '[]');
+    } catch (error) {
+      orders = [];
+    }
+    orders.unshift(order);
+    localStorage.setItem('dose_preview_pagnottella_orders', JSON.stringify(orders.slice(0, 50)));
+    return { id, order, local: true };
+  }
+
   function patchSupplierAccess() {
     if (!isPages() || !requested() || !window.DoseSupplierAccess) return;
     const base = window.DoseSupplierAccess;
@@ -51,7 +73,8 @@
         localStorage.setItem('dose_supplier_settings', JSON.stringify(next));
         return next;
       },
-      canAccessSupplier: async () => true
+      canAccessSupplier: async () => true,
+      createPagnottellaOrder: async (payload) => localPreviewOrder(payload, session)
     });
   }
 
