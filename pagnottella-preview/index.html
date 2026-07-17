@@ -39,6 +39,31 @@
 <script src="../pages-admin-unlock.js?v=preview-3"></script>
 <script src="../assets/pagnottella/data/menu.inline.js?v=preview-2"></script>
 <script src="../pagnottella/pagnottella.js?v=preview-2"></script>
-<script>if(window.DosePagesAdminUnlock) window.DosePagesAdminUnlock();</script>
+<script>
+if(window.DosePagesAdminUnlock) window.DosePagesAdminUnlock();
+window.backLanding = function(){ window.location.href = '../preview/?preview=admin'; };
+(function(){
+  function countOrders(){
+    try { return JSON.parse(localStorage.getItem('dose_preview_pagnottella_orders') || '[]').length; }
+    catch(error){ return 0; }
+  }
+  function renderPreviewStatus(){
+    var host = document.querySelector('.topActions.serviceBar');
+    if(!host) return;
+    var badge = document.getElementById('preview-order-badge');
+    if(!badge){
+      badge = document.createElement('button');
+      badge.id = 'preview-order-badge';
+      badge.type = 'button';
+      badge.className = 'ghost';
+      badge.onclick = function(){ alert('Ordini preview salvati in questo browser: ' + countOrders()); };
+      host.appendChild(badge);
+    }
+    badge.textContent = 'Ordini preview: ' + countOrders();
+  }
+  setTimeout(renderPreviewStatus, 700);
+  window.addEventListener('focus', renderPreviewStatus);
+})();
+</script>
 </body>
 </html>
