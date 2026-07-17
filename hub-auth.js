@@ -10,8 +10,8 @@ function getNextTarget() {
 }
 
 function resolveTargetHref(target) {
-  if (target === 'pagnottella') return './pagnottella/?store=pagnottella';
-  return './russo/';
+  if (target === 'pagnottella') return './pagnottella-preview/?preview=admin&store=pagnottella&v=auth-repair-1';
+  return './russo/index.html?v=auth-repair-1';
 }
 
 function setAuthButtonsDisabled(disabled) {
