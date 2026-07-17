@@ -14,6 +14,22 @@
       window.prompt('Copia il riepilogo:', text);
     }
   }
+  function polishSponsorCopy(){
+    const eyebrow = document.querySelector('.authGateEyebrow');
+    if(eyebrow) eyebrow.textContent = 'Anteprima riservata';
+    const gateTitle = document.querySelector('.authGateCard h3');
+    if(gateTitle) gateTitle.textContent = 'Revisione catalogo La Pagnottella Gourmet.';
+    const gateCopy = byId('authGateCopy');
+    if(gateCopy) gateCopy.textContent = 'Pagina riservata per verificare contenuti, prezzi, immagini e flusso ordine prima della pubblicazione.';
+    const gateStatus = byId('authGateStatus');
+    if(gateStatus) gateStatus.textContent = 'Anteprima pronta.';
+    const subtitle = byId('brand-subtitle');
+    if(subtitle) subtitle.textContent = 'Suite DOSepranza · Anteprima riservata';
+    const intro = document.querySelector('.landingCopy > p');
+    if(intro) intro.textContent = 'Anteprima riservata per consultare menu, carrello e riepilogo WhatsApp.';
+    const badge = byId('preview-order-badge');
+    if(badge){ badge.textContent = 'Anteprima riservata'; badge.onclick = null; }
+  }
   function polishCheckout(){
     const label = byId('sendOrderLabel');
     if(label && label.textContent !== 'Salvataggio ordine...') label.textContent = 'Apri WhatsApp con riepilogo ordine';
@@ -56,10 +72,11 @@
       }
     });
   }
-  function run(){ polishCheckout(); polishPayments(); polishProducts(); }
-  setTimeout(run, 300);
-  setTimeout(run, 900);
-  setTimeout(run, 1600);
+  function run(){ polishSponsorCopy(); polishCheckout(); polishPayments(); polishProducts(); }
+  setTimeout(run, 150);
+  setTimeout(run, 500);
+  setTimeout(run, 1100);
+  setTimeout(run, 1800);
   const grid = byId('grid');
   if(grid) new MutationObserver(run).observe(grid, { childList:true, subtree:true });
   document.addEventListener('change', run, true);
