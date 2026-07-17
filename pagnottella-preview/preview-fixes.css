@@ -3,6 +3,9 @@
 .paymentChoice #paymentChoiceHelp{margin:6px 0 14px;color:#52624f;font-size:13px;line-height:1.45}
 .paymentChoice #paymentChoiceHelp::after{content:' I metodi non ancora attivi restano visibili ma non selezionabili.';color:#7a6a54}
 .paymentChoice .paymentOptions{display:grid;gap:9px}
+.paymentGroupTitle{display:flex;align-items:center;gap:8px;margin:8px 0 2px;color:#20331f;font-size:11px;font-weight:950;letter-spacing:.1em;text-transform:uppercase}
+.paymentGroupTitle::after{content:"";height:1px;flex:1;background:#dfe8d9}
+.paymentGroupTitle.isFuture{color:#8a6a31}.paymentGroupTitle.isFuture::after{background:#ead9ad}
 .paymentChoice .paymentOption{display:grid;grid-template-columns:42px 1fr auto;gap:12px;align-items:center;border:1px solid #dfe8d9;background:#fff;border-radius:17px;padding:12px 13px;box-shadow:0 1px 0 rgba(23,23,23,.03);transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
 .paymentChoice .paymentOption:hover{transform:translateY(-1px);border-color:#c8d9bd;box-shadow:0 8px 18px rgba(23,23,23,.06)}
 .paymentChoice .paymentOption input{position:absolute;opacity:0;pointer-events:none}
@@ -18,4 +21,11 @@
 .paymentChoice .paymentOption.isDisabled .paymentOptionState{font-size:0;background:#fff5dc;color:#9a5b08;border-color:#f2d391;text-transform:none;letter-spacing:0}
 .paymentChoice .paymentOption.isDisabled .paymentOptionState::after{content:'Da settembre';font-size:11px;font-weight:950}
 .paymentChoice .paymentOption.isDisabled:hover{transform:none;box-shadow:0 1px 0 rgba(23,23,23,.03)}
-@media (max-width:560px){.paymentChoice{padding:14px}.paymentChoice .paymentOption{grid-template-columns:38px 1fr;position:relative;padding:12px}.paymentChoice .paymentOptionState{grid-column:2;justify-self:start;margin-top:2px}.paymentChoice .paymentOptionIcon{width:38px;height:38px}}
+.whatsappMain #sendOrderLabel{font-weight:950;letter-spacing:-.01em}.whatsappMain.isSponsorReady{background:linear-gradient(180deg,#2fc96d,#1f9f52)}
+.copySummaryBtn{width:100%;min-height:48px;border-radius:18px;border:1px solid #b8d8c5;background:#f5fff8;color:#147a3d;font-weight:950;box-shadow:0 6px 18px rgba(37,211,102,.10)}
+.copySummaryBtn:hover{background:#edfff3}.copySummaryBtn:disabled{opacity:.55;cursor:not-allowed}
+.card.imageFallback .pic{background:linear-gradient(135deg,#fff7ec,#eef7ea);display:grid;place-items:center;border-bottom:1px solid #efe3d3}
+.card.imageFallback .pic img{opacity:0;filter:blur(2px);transform:none!important}
+.card.imageFallback .pic::before{content:'Foto prodotto in aggiornamento';position:absolute;inset:18px;display:grid;place-items:center;text-align:center;border:1px dashed #d9b88f;border-radius:18px;background:rgba(255,255,255,.72);color:#8a5a2f;font-weight:950;font-size:13px;letter-spacing:-.01em;padding:14px;z-index:2}
+.card.imageFallback .imageNotice{z-index:3;background:#fff7e8;color:#8a5a2f;border:1px solid #ecd0a6;border-radius:999px;padding:6px 9px;font-weight:900;font-size:10px;left:10px;right:auto;bottom:10px}
+@media (max-width:560px){.paymentChoice{padding:14px}.paymentChoice .paymentOption{grid-template-columns:38px 1fr;position:relative;padding:12px}.paymentChoice .paymentOptionState{grid-column:2;justify-self:start;margin-top:2px}.paymentChoice .paymentOptionIcon{width:38px;height:38px}.paymentGroupTitle{font-size:10px}.copySummaryBtn{min-height:46px}}
