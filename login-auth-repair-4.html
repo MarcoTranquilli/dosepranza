@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DOSepranza | Accesso riparato</title>
+<link rel="stylesheet" href="./preview-hub.css?v=auth-repair-4">
+</head>
+<body class="access-pending auth-locked">
+<div class="page-shell"><header class="hero"><div class="hero-copy">
+<p class="eyebrow">DOSepranza</p>
+<h1>Accedi a DOSepranza.</h1>
+<p class="lede">Accesso Google ripristinato.</p>
+<div class="auth-card" id="hub-auth-card"><div><p class="auth-label">Accesso Google</p><h2 class="auth-title">Entra con il tuo account</h2><p class="auth-copy">Dopo il riconoscimento apriremo automaticamente il percorso corretto.</p></div><div class="auth-actions"><button id="hub-google-login" class="btn btn-primary" type="button">Continua con Google</button><span id="hub-auth-status" class="auth-status">Nessuna sessione Google attiva.</span></div></div>
+</div></header><main>
+<section class="section-head supplier-admin-only"><div><p class="eyebrow">Area amministratore</p><h2>Gestisci e apri i fornitori.</h2></div></section>
+<section id="supplier-control-panel" class="control-panel supplier-admin-only"><div><h2 id="supplier-control-title">Disponibilita La Pagnottella Gourmet</h2><p id="supplier-control-copy">Il fornitore e visibile solo all'amministratore.</p></div><label class="supplier-toggle" for="pagnottella-enabled"><input id="pagnottella-enabled" type="checkbox" role="switch"><span id="pagnottella-toggle-label">Solo amministratore</span></label><p id="supplier-control-status" class="control-status"></p></section>
+<section id="suppliers-grid" class="suppliers-grid auth-locked supplier-admin-only"><a class="btn btn-primary protected-link" data-target="russo" href="./russo/index.html?v=auth-repair-4">Apri Alimentari Russo</a><a class="btn btn-primary protected-link" data-target="pagnottella" href="./pagnottella-preview/?preview=admin&store=pagnottella&v=auth-repair-4">Apri Pagnottella</a><dd id="russo-visibility-status">Attivo</dd><dd id="pagnottella-visibility-status">Solo amministratore</dd></section>
+</main></div>
+<script src="./supplier-access.js?v=auth-repair-4"></script>
+<script src="./supplier-access-google-repair.js?v=auth-repair-4"></script>
+<script type="module" src="./hub-auth.js?v=auth-repair-4"></script>
+</body>
+</html>
