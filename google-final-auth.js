@@ -1,12 +1,14 @@
-(() => {
-  const $ = id => document.getElementById(id);
-  const ADMIN = 'marco.tranquilli@dos.design';
-  const status = $('hub-auth-status');
-  const btn = $('hub-google-login');
-  const admin = $('admin-actions');
-  const set = msg => { if (status) status.textContent = msg; };
-  const norm = v => String(v || '').trim().toLowerCase();
-  const first = (...v) => v.find(x => String(x || '').trim());
-  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
-
-  function session(user, result
+(()=>{
+const $=id=>document.getElementById(id),ADMIN='marco.tranquilli@dos.design';
+const st=$('hub-auth-status'),btn=$('hub-google-login'),adm=$('admin-actions');
+const set=m=>{if(st)st.textContent=m},norm=v=>String(v||'').trim().toLowerCase(),first=(...v)=>v.find(x=>String(x||'').trim()),sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function makeSession(user,result){const t=result?._tokenResponse||{},p=(user?.providerData||[])[0]||{},email=norm(first(user?.email,p.email,t.email)),uid=first(user?.uid,t.localId,p.uid);if(!email||!uid)return null;const isAdmin=email===ADMIN,s={uid,name:first(user?.displayName,p.displayName,t.displayName,email.split('@')[0]),email,role:isAdmin?'admin':'user',isAdmin,provider:'google.com'};localStorage.setItem('dose_user',JSON.stringify(s));return s;}
+async function kit(){try{await window.DoseSupplierAccess?.resolveSession?.()}catch(e){}const[appSdk,authSdk]=await Promise.all([import('https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js'),import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js')]);const app=appSdk.getApps().find(a=>a.name==='[DEFAULT]');if(!app)throw new Error('Firebase non inizializzato. Verifica caricamento supplier-access.js.');const auth=authSdk.getAuth(app);try{auth.useDeviceLanguage()}catch(e){}return{auth,authSdk};}
+async function waitUser(auth,authSdk){if(typeof auth.authStateReady==='function')await auth.authStateReady();else await new Promise(r=>{const off=authSdk.onAuthStateChanged(auth,()=>{off();r()},()=>r())});for(let i=0;i<12;i++){if(auth.currentUser)return auth.currentUser;await sleep(150)}return auth.currentUser;}
+async function pickSession(auth,authSdk,result){return makeSession(result?.user,result)||makeSession(await waitUser(auth,authSdk),result)||makeSession(auth.currentUser,result);}
+function diag(auth,result){const u=result?.user||auth.currentUser||{},p=(u.providerData||[])[0]||{},t=result?._tokenResponse||{};return`uid=${!!(u.uid||t.localId)}, email=${!!(u.email||p.email||t.email)}, provider=${p.providerId||t.providerId||'n/d'}, tokenEmail=${!!t.email}, project=${auth.app?.options?.projectId||'n/d'}, host=${location.hostname}`;}
+async function finish(s){set(`Accesso completato: ${s.email}`);if(s.isAdmin){document.body.classList.add('is-admin');if(adm)adm.hidden=false;return}location.replace('./russo/index.html?v=google-final-2');}
+async function start(){btn.disabled=true;set('Accesso Google in corso...');try{const{auth,authSdk}=await kit(),provider=new authSdk.GoogleAuthProvider();provider.addScope('email');provider.addScope('profile');provider.setCustomParameters({prompt:'select_account'});let result=null;try{result=await authSdk.signInWithPopup(auth,provider)}catch(e){if(e.code!=='auth/popup-blocked')throw e;sessionStorage.setItem('dose_google_redirect','1');await authSdk.signInWithRedirect(auth,provider);return}const s=await pickSession(auth,authSdk,result);if(!s)throw new Error('Sessione Firebase incompleta: '+diag(auth,result));await finish(s)}catch(e){set(`Accesso Google non riuscito. Dettaglio tecnico: ${e.code||e.name||'Error'} · ${e.message||e}`)}finally{btn.disabled=false}}
+async function boot(){try{const{auth,authSdk}=await kit(),rr=await authSdk.getRedirectResult(auth).catch(()=>null),s=await pickSession(auth,authSdk,rr);if(s){sessionStorage.removeItem('dose_google_redirect');await finish(s);return}}catch(e){set('Pronto per accesso Google.')}btn?.addEventListener('click',start)}
+boot();
+})();
