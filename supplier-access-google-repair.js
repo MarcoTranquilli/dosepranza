@@ -30,7 +30,16 @@
     const app = appSdk.getApps().find(candidate => candidate.name === '[DEFAULT]');
     if (!app) return null;
     const auth = authSdk.getAuth(app);
-    if (typeof auth.authStateReady === 'function') await auth.authStateReady();
+    if (typeof auth.authStateReady === 'function') {
+      await auth.authStateReady();
+    } else {
+      await new Promise(resolve => {
+        const unsubscribe = authSdk.onAuthStateChanged(auth, () => {
+          unsubscribe();
+          resolve();
+        }, () => resolve());
+      });
+    }
     return storeFirebaseUser(auth.currentUser);
   }
 
@@ -51,7 +60,10 @@
   }
 
   async function resolveSession() {
-    const session = await currentFirebaseSession();
+    let session = await currentFirebaseSession();
+    if (session) return session;
+    try { await originalResolve(); } catch (error) { /* initialize Firebase, then retry */ }
+    session = await currentFirebaseSession();
     if (session) return session;
     return originalResolve();
   }
