@@ -1,11 +1,35 @@
 (() => {
   const ADMIN_EMAIL = 'marco.tranquilli@dos.design';
+  const REVIEW_EMAIL = 'review.pagnottella@dosepranza.local';
   const isPages = () => location.hostname === 'marcotranquilli.github.io';
   const params = new URLSearchParams(location.search);
+  const isPagnottellaReview = () => location.pathname.includes('/pagnottella-preview/') || params.get('review') === 'sponsor';
   const requested = () => params.get('preview') === 'admin' || localStorage.getItem('dose_preview_admin') === '1';
   const byId = (id) => document.getElementById(id);
 
+  function resetPreviewSessionIfRequested() {
+    if (!params.has('swreset')) return false;
+    [
+      'dose_preview_admin',
+      'dose_user',
+      'dose_supplier_settings',
+      'dose_preview_pagnottella_orders',
+      'dose_preview_mode'
+    ].forEach((key) => localStorage.removeItem(key));
+    return true;
+  }
+
   function adminSession() {
+    if (isPagnottellaReview()) {
+      return {
+        uid: 'pagnottella-review-preview',
+        name: 'Anteprima sponsor',
+        email: REVIEW_EMAIL,
+        role: 'review',
+        isAdmin: true,
+        provider: 'github-pages-review-preview'
+      };
+    }
     return {
       uid: 'github-pages-admin-preview',
       name: 'Marco Tranquilli',
@@ -26,6 +50,7 @@
   function storePreviewSession() {
     const session = adminSession();
     localStorage.setItem('dose_preview_admin', '1');
+    localStorage.setItem('dose_preview_mode', isPagnottellaReview() ? 'sponsor-review' : 'admin');
     localStorage.setItem('dose_user', JSON.stringify(session));
     if (!localStorage.getItem('dose_supplier_settings')) {
       localStorage.setItem('dose_supplier_settings', JSON.stringify(previewSettings()));
@@ -104,6 +129,7 @@
     if (panel) setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
   }
 
+  resetPreviewSessionIfRequested();
   patchSupplierAccess();
   if (requested()) storePreviewSession();
 
