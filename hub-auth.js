@@ -108,3 +108,24 @@ async function updatePagnottella(event) {
     toggle.checked = currentSettings?.pagnottella?.enabledForUsers === true;
     if (status) status.textContent = error?.message || 'Impossibile aggiornare la configurazione.';
   } finally { toggle.disabled = false; }
+}
+
+function protectLinks() {
+  document.querySelectorAll('.protected-link').forEach((link) => link.addEventListener('click', (event) => {
+    if (currentSession?.isAdmin) return;
+    event.preventDefault();
+    setAuthState(currentSession, 'Questa scelta è riservata all’amministratore.');
+  }));
+}
+
+async function init() {
+  if (!access) { statusText('Modulo accesso non disponibile. Ricarica la pagina.'); return; }
+  $('hub-google-login')?.addEventListener('click', googleLogin);
+  $('pagnottella-enabled')?.addEventListener('change', updatePagnottella);
+  protectLinks();
+  setAuthState(null);
+  try { const session = await access.resolveSession(); if (session) await activate(session, true); }
+  catch (error) { setAuthState(null, `Impossibile verificare la sessione Google. Dettaglio tecnico: ${details(error)}`); }
+}
+
+init();
