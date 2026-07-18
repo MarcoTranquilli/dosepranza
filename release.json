@@ -1,0 +1,24 @@
+{
+  "application": "DOSepranza",
+  "release": "20260718.1",
+  "channel": "github-pages",
+  "branch": "gh-pages",
+  "publishedAt": "2026-07-18",
+  "authentication": {
+    "provider": "Google",
+    "service": "Firebase Authentication",
+    "persistence": "browserLocalPersistence",
+    "legacyPreviewBypass": false,
+    "emailVerifiedRequired": true,
+    "releaseCacheMigration": true,
+    "providerId": "google.com",
+    "providerVerified": true
+  },
+  "entrypoints": {
+    "login": "./",
+    "russo": "./russo-launch.html",
+    "pagnottella": "./pagnottella/",
+    "reset": "./reset/",
+    "diagnostics": "./diagnostics/"
+  }
+}
