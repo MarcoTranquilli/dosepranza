@@ -1,0 +1,8 @@
+(()=>{
+const V='google-final-3',R=document.getElementById('uat-results'),T=document.getElementById('uat-title'),C=document.getElementById('uat-copy');
+const rows=[];const add=(ok,n,d='')=>rows.push(`<p>${ok?'OK':'KO'} - <b>${n}</b>${d?' - '+d:''}</p>`);
+async function get(u){const r=await fetch(u,{cache:'reload'});if(!r.ok)throw Error(String(r.status));return r.text()}
+async function has(name,u,items){try{const s=await get(u);for(const x of items)if(!s.includes(x))throw Error('manca '+x);add(true,name)}catch(e){add(false,name,e.message)}}
+async function run(){rows.length=0;await has('root','./index.html?v='+V,['login-google-final.html?v='+V]);await has('login','./login-google-final.html?v='+V,['pages-cache-warm.js?v='+V,'supplier-access.js?v='+V,'google-final-auth.js?v='+V]);await has('auth','./google-final-auth.js?v='+V,['signInWithPopup','signInWithRedirect','getRedirectResult','russo/index.html?v='+V]);await has('cache','./pages-cache-warm.js?v='+V,['serviceWorker','caches','supplier-access.js','russo/russo-auth-guard.js']);await has('guard','./russo/russo-auth-guard.js?v='+V,['google.com','github-pages-russo-preview','?next=russo&v='+V]);await has('reset','./reset/index.html?v='+V,['localStorage','sessionStorage','indexedDB','serviceWorker']);R.innerHTML=rows.join('');const pass=rows.filter(x=>x.includes('OK')).length;T.textContent=pass+'/6 test superati';C.textContent=pass===6?'Smoke test automatici superati. Apri il login reale per il test Google.':'Correggere i KO prima del rilascio.'}
+document.getElementById('uat-run')?.addEventListener('click',run);run();
+})();
