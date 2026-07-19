@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="it">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DOSepranza Firestore Diagnostic</title><style>body{font-family:system-ui;margin:24px;background:#f4f1ea;color:#23281f}main{max-width:900px;margin:auto;background:white;border-radius:24px;padding:24px}pre{white-space:pre-wrap;background:#111;color:#eee;border-radius:16px;padding:16px}button,a{font-weight:800;margin-right:8px}</style></head>
+<body><main><h1>Diagnostica Firestore</h1><p>Verifica sessione Google, lettura ordini e scrittura diagnostica.</p><p><button id="run">Esegui test</button><button id="write">Test scrittura diagnostica</button><a href="./alimentari-russo.html?v=diag-1">Apri Russo</a></p><pre id="out">Pronto.</pre></main>
+<script type="module">
+import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+import { initializeFirestore, persistentLocalCache, collection, query, orderBy, limit, getDocs, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+const cfg={apiKey:'AIzaSyCQJsNbgaR89gF_1vLe6H4DPboOhQvm9nI',authDomain:'app-ordini-pranzo-alimentari.firebaseapp.com',projectId:'app-ordini-pranzo-alimentari',storageBucket:'app-ordini-pranzo-alimentari.appspot.com',messagingSenderId:'553169964686',appId:'1:553169964686:web:7f8ca6f32a301949e4c3df'};
+const app=getApps()[0]||initializeApp(cfg),auth=getAuth(app),db=initializeFirestore(app,{experimentalForceLongPolling:true,localCache:persistentLocalCache()});
+const out=document.getElementById('out');
+const log=x=>out.textContent=typeof x==='string'?x:JSON.stringify(x,null,2);
+const waitUser=()=>new Promise(r=>{const off=onAuthStateChanged(auth,u=>{off();r(u)},()=>r(null))});
+async function info(){const u=await waitUser();if(!u)return {signedIn:false};const token=await u.getIdTokenResult(true);return {signedIn:true,uid:u.uid,email:u.email,providers:(u.providerData||[]).map(p=>p.providerId),claims:token.claims,project:app.options.projectId,host:location.hostname}}
+document.getElementById('run').onclick=async()=>{try{const i=await info();const snap=await getDocs(query(collection(db,'orders'),orderBy('createdAt','desc'),limit(3)));log({auth:i,ordersRead:true,count:snap.size,ids:snap.docs.map(d=>d.id)});}catch(e){log({ok:false,code:e.code,name:e.name,message:e.message});}};
+document.getElementById('write').onclick=async()=>{try{const i=await info();if(!i.signedIn)throw Error('Utente non autenticato');const ref=await addDoc(collection(db,'orders'),{uid:i.uid,email:i.email,user:i.email,items:[],total:0,allergies:'diagnostic',posate:'No',paymentStatus:'pending',reconciled:false,orderStatus:'diagnostic',orderType:'diagnostic',supplierId:'diagnostic',createdAt:serverTimestamp()});log({write:true,id:ref.id,auth:i});}catch(e){log({write:false,code:e.code,name:e.name,message:e.message});}};
+</script></body></html>
