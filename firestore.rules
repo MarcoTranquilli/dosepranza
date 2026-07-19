@@ -1,27 +1,58 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function signedIn() {
-      return request.auth != null;
-    }
+    function signedIn() { return request.auth != null; }
+    function email() { return signedIn() && request.auth.token.email != null ? lower(request.auth.token.email) : ''; }
+    function admin() { return email() in ['marco.tranquilli@dos.design']; }
+    function ristoratore() { return email() in ['lorenzo.russo@alimentarirusso','russolorenzo11@gmail.com']; }
+    function facility() { return email() in ['beatrice.binini@dos.design','monica.porta@dos.design']; }
+    function staff() { return admin() || ristoratore() || facility(); }
+    function owner() { return signedIn() && resource.data.uid == request.auth.uid; }
+    function newOwner() { return signedIn() && request.resource.data.uid == request.auth.uid; }
 
-    function email() {
-      return signedIn() && request.auth.token.email != null
-        ? lower(request.auth.token.email)
-        : '';
+    match /orders/{id} {
+      allow create: if signedIn() && newOwner();
+      allow read: if staff() || owner();
+      allow update: if staff() || owner();
+      allow delete: if admin();
     }
-
-    function isAdmin() {
-      return email() in ['marco.tranquilli@dos.design'];
+    match /orders_audit/{id} {
+      allow create, read: if staff();
+      allow update, delete: if admin();
     }
-
-    function isRistoratore() {
-      return email() in ['lorenzo.russo@alimentarirusso', 'russolorenzo11@gmail.com'];
+    match /menu_products/{id} {
+      allow read: if signedIn();
+      allow create, update: if admin() || ristoratore();
+      allow delete: if admin();
     }
-
-    function isFacility() {
-      return email() in ['beatrice.binini@dos.design', 'monica.porta@dos.design'];
+    match /menu_audit/{id} {
+      allow read, create: if admin() || ristoratore();
+      allow update, delete: if admin();
     }
-
-    function isStaff() {
-      return isAdmin() || isRistoratore
+    match /custom_creations/{id} {
+      allow read: if signedIn();
+      allow create: if signedIn();
+      allow update: if signedIn();
+      allow delete: if admin();
+    }
+    match /frige_products/{id} {
+      allow read: if signedIn();
+      allow create, update: if admin() || ristoratore() || facility();
+      allow delete: if admin();
+    }
+    match /frige_purchases/{id} {
+      allow create: if signedIn() && newOwner();
+      allow read: if staff() || owner();
+      allow update: if staff();
+      allow delete: if admin();
+    }
+    match /frige_refills/{id} {
+      allow create: if signedIn();
+      allow read, update: if staff();
+      allow delete: if admin();
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
