@@ -1,0 +1,27 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function email() {
+      return signedIn() && request.auth.token.email != null
+        ? lower(request.auth.token.email)
+        : '';
+    }
+
+    function isAdmin() {
+      return email() in ['marco.tranquilli@dos.design'];
+    }
+
+    function isRistoratore() {
+      return email() in ['lorenzo.russo@alimentarirusso', 'russolorenzo11@gmail.com'];
+    }
+
+    function isFacility() {
+      return email() in ['beatrice.binini@dos.design', 'monica.porta@dos.design'];
+    }
+
+    function isStaff() {
+      return isAdmin() || isRistoratore
