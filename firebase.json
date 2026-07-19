@@ -1,6 +1,6 @@
 {
   "firestore": {
-    "rules": "FIRESTORE_RULES_ENTERPRISE.txt",
+    "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
   }
 }
