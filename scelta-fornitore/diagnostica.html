@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DOSepranza | Diagnostica GitHub Pages</title>
+<meta name="robots" content="noindex,nofollow">
+<style>body{font-family:system-ui;margin:0;background:#f4f1ea;color:#23281f}main{max-width:860px;margin:0 auto;padding:32px 18px}.card{background:#fff;border:1px solid #e2d8c8;border-radius:22px;padding:20px;margin:14px 0}pre{white-space:pre-wrap;background:#111;color:#e8ffe8;padding:16px;border-radius:14px;overflow:auto}button,a{font-weight:900}</style>
+</head>
+<body>
+<main>
+<h1>Diagnostica GitHub Pages</h1>
+<p>Pagina diretta per verificare isolamento, sessione locale e cache DOSepranza senza toccare Netlify.</p>
+<div class="card"><h2>Sessione locale</h2><pre id="out">Caricamento...</pre><button id="reset">Pulisci sessione locale DOSepranza</button></div>
+<div class="card"><h2>Link rapidi</h2><p><a href="./?v=pages-stable-1">Scelta fornitore</a> · <a href="../login-google-final.html?v=pages-stable-1">Login Google</a> · <a href="../alimentari-russo.html?v=pages-stable-1&swreset=1">Russo</a> · <a href="../pagnottella-preview/?preview=admin&store=pagnottella&v=pages-stable-1">Pagnottella</a></p></div>
+</main>
+<script>
+const out=document.getElementById('out');
+function safe(k){try{return JSON.parse(localStorage.getItem(k)||'null')}catch(e){return localStorage.getItem(k)}}
+function render(){const keys=Object.keys(localStorage).filter(k=>k.startsWith('dose_')).sort();out.textContent=JSON.stringify({host:location.hostname,path:location.pathname,doseKeys:keys,session:safe('dose_user'),supplierSettings:safe('dose_supplier_settings')},null,2)}
+document.getElementById('reset').onclick=()=>{for(const s of [localStorage,sessionStorage])for(const k of Object.keys(s))if(k.startsWith('dose_')||k.includes('firebase'))s.removeItem(k);render()};
+render();
+</script>
+</body>
+</html>
