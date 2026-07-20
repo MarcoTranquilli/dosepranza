@@ -26,20 +26,41 @@ cp -R reports "$DIST_DIR/" 2>/dev/null || echo "No reports folder"
 python3 - <<'PY'
 from pathlib import Path
 
-p = Path('dist/index.html')
-html = p.read_text(encoding='utf-8')
+index_path = Path('dist/index.html')
+html = index_path.read_text(encoding='utf-8')
 pre = '<script src="netlify-preauth-reset.js?v=staff-preauth-1"></script>'
 post = '<script src="netlify-staff-auth-guard.js?v=staff-auth-1"></script>'
-app = '<script type="module" src="app.v20260325.js?v=13"></script>'
+app_tag = '<script type="module" src="app.v20260325.js?v=13"></script>'
 if pre not in html:
-    html = html.replace(app, f'    {pre}\n    {app}')
+    html = html.replace(app_tag, f'    {pre}\n    {app_tag}')
 if post not in html:
     html = html.replace('</body>', f'    {post}\n</body>')
-p.write_text(html, encoding='utf-8')
+index_path.write_text(html, encoding='utf-8')
 
 app_path = Path('dist/app.v20260325.js')
 js = app_path.read_text(encoding='utf-8')
-old_fallback = """                // 2) Fallback: mapped staff emails (recovery mode)
-                if(role === 'user' && state.authzSource !== 'claims') {"""
-new_fallback = """                // 2) Fallback: mapped staff emails (recovery mode)
-                if(role === 'user' && state
+old = "if(role === 'user' && state.authzSource !== 'claims') {"
+new = "if(role === 'user' && state.authzSource !== 'claims' && auth_fb.currentUser && !auth_fb.currentUser.isAnonymous && normalizeEmail(auth_fb.currentUser.email) === e) {"
+if old not in js:
+    raise SystemExit('staff fallback patch target not found')
+js = js.replace(old, new, 1)
+needle = "                const name = normalizeName(isAnon ? cached?.name : (u.displayName || u.email?.split('@')[0] || ''));"
+insert = needle + """
+                if(isAnon && isMappedStaffEmail(email)) {
+                    localStorage.removeItem('dose_user');
+                    localStorage.removeItem('menu_admin_open');
+                    state.user = null;
+                    state.role = 'user';
+                    state.authzSource = 'unverified';
+                    document.getElementById('user-modal').classList.remove('hidden');
+                    renderRoleStatus();
+                    renderMenuAdminToggle();
+                    return;
+                }"""
+if needle not in js:
+    raise SystemExit('anonymous staff cache patch target not found')
+js = js.replace(needle, insert, 1)
+app_path.write_text(js, encoding='utf-8')
+PY
+
+echo "--- Build completata con successo nella cartella /$DIST_DIR ---"
