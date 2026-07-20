@@ -25,6 +25,7 @@ cp -R reports "$DIST_DIR/" 2>/dev/null || echo "No reports folder"
 
 python3 - <<'PY'
 from pathlib import Path
+
 p = Path('dist/index.html')
 html = p.read_text(encoding='utf-8')
 pre = '<script src="netlify-preauth-reset.js?v=staff-preauth-1"></script>'
@@ -35,6 +36,10 @@ if pre not in html:
 if post not in html:
     html = html.replace('</body>', f'    {post}\n</body>')
 p.write_text(html, encoding='utf-8')
-PY
 
-echo "--- Build completata con successo nella cartella /$DIST_DIR ---"
+app_path = Path('dist/app.v20260325.js')
+js = app_path.read_text(encoding='utf-8')
+old_fallback = """                // 2) Fallback: mapped staff emails (recovery mode)
+                if(role === 'user' && state.authzSource !== 'claims') {"""
+new_fallback = """                // 2) Fallback: mapped staff emails (recovery mode)
+                if(role === 'user' && state
