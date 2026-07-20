@@ -16,7 +16,7 @@
   if (location.hostname !== 'marcotranquilli.github.io') return;
 
   document.addEventListener('click', async (event) => {
-    const target = event.target && event.target.closest('[data-action="signin-google"],#role-google-login');
+    const target = event.target && event.target.closest('[data-action="signin-google"],#role-google-login,#hub-google-login');
     if (!target || !window.auth_fb) return;
     event.preventDefault();
     event.stopImmediatePropagation();
