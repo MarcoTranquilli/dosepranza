@@ -1,8 +1,14 @@
 (()=>{
 const S=new Set(['marco.tranquilli@dos.design','lorenzo.russo@alimentarirusso','russolorenzo11@gmail.com','beatrice.binini@dos.design','monica.porta@dos.design']);
 const norm=v=>String(v||'').trim().toLowerCase();
+const localE2E=()=>{
+ const host=location.hostname;
+ const local=host==='localhost'||host==='127.0.0.1'||host==='::1';
+ return local&&(new URLSearchParams(location.search).get('e2e')==='1'||localStorage.getItem('dose_e2e')==='1');
+};
 const cached=()=>{try{return JSON.parse(localStorage.getItem('dose_user')||'null')}catch(e){return null}};
 function stale(){
+ if(localE2E())return false;
  const email=norm(cached()?.email);
  if(!S.has(email))return false;
  const u=window.auth_fb?.currentUser;

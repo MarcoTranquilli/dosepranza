@@ -22,6 +22,10 @@ export default defineConfig({
       testMatch: /.*\.setup\.ts/
     },
     {
+      name: 'security',
+      testMatch: /.*security\.auth\.spec\.ts/
+    },
+    {
       name: 'user',
       dependencies: ['setup'],
       use: { storageState: 'tests/.auth/user.json' },

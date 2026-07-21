@@ -6,6 +6,10 @@ test('UAT Utente standard: ordine + frige WIP', async ({ page }) => {
   await seedUserOrders(page);
   await page.goto('/');
 
+  await expect(page.locator('a[href*="pagnottella"], a[href*="fornitor"]')).toHaveCount(0);
+  await expect(page.locator('body')).not.toContainText('Scegli il fornitore');
+  await expect(page.locator('#menu-view').getByText('Pagamento Alimentari Russo')).toBeVisible();
+
   await page.click('#btn-menu');
   await page.click('[data-action="add-std"]');
 
