@@ -338,17 +338,13 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(user === auth_fb.currentUser && state.authSignInProvider === 'google.com') return true;
             return !!user && !user.isAnonymous && getProviderIds(user).some(providerId => providerId === 'google.com');
         };
-        const resolveVerifiedMappedRole = (email, user, googleVerified) => {
-            if(!user || user.isAnonymous || !googleVerified) return '';
+        const resolveVerifiedMappedRole = (email, user) => {
+            if(!user || user.isAnonymous) return '';
             if(normalizeEmail(user.email) !== normalizeEmail(email)) return '';
             return mappedStaffRole(email);
         };
         if(isLocalE2E) {
-            window.__doseTestResolveVerifiedMappedRole = (email, user) => resolveVerifiedMappedRole(
-                email,
-                user,
-                getProviderIds(user).some(providerId => providerId === 'google.com')
-            );
+            window.__doseTestResolveVerifiedMappedRole = (email, user) => resolveVerifiedMappedRole(email, user);
         }
         const requiresGoogleStaffVerification = (email = state.user?.email || '') => (
             isMappedStaffEmail(email) && !hasGoogleSession()
@@ -3588,7 +3584,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 }
 
                 // 2) Fallback: mapped staff emails (recovery mode)
-                const mappedRole = resolveVerifiedMappedRole(e, authenticatedUser, googleSession);
+                const mappedRole = resolveVerifiedMappedRole(e, authenticatedUser);
                 if(role === 'user' && mappedRole) {
                     role = mappedRole;
                     state.authzSource = 'email-map-google';

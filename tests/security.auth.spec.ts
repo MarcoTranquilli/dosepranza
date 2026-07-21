@@ -32,7 +32,7 @@ test('Sicurezza: una cache utente standard resta utilizzabile', async ({ page })
   await expect(page.locator('#menu-admin-toggle')).toBeHidden();
 });
 
-test('Sicurezza: solo Google verificato abilita la mappatura staff', async ({ page }) => {
+test('Sicurezza: solo una identita Firebase verificata abilita la mappatura staff', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('dose_e2e', '1'));
   await page.goto('/');
 
@@ -49,7 +49,7 @@ test('Sicurezza: solo Google verificato abilita la mappatura staff', async ({ pa
         isAnonymous: true,
         providerData: [{ providerId: 'google.com' }]
       }),
-      wrongProvider: resolve('marco.tranquilli@dos.design', {
+      authenticatedProvider: resolve('marco.tranquilli@dos.design', {
         email: 'marco.tranquilli@dos.design',
         isAnonymous: false,
         providerData: [{ providerId: 'password' }]
@@ -65,7 +65,7 @@ test('Sicurezza: solo Google verificato abilita la mappatura staff', async ({ pa
   expect(roles).toEqual({
     verifiedAdmin: 'admin',
     anonymous: '',
-    wrongProvider: '',
+    authenticatedProvider: 'admin',
     wrongEmail: ''
   });
 });
