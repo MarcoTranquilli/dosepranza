@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut, signInAnonymously, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, linkWithPopup, signInWithCredential, signOut, signInAnonymously, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addDoc, serverTimestamp, query, orderBy, getDocs, runTransaction, doc, where, limit, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- DATABASE PRODOTTI COMPLETO ---
@@ -954,7 +954,24 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 provider.addScope('email');
                 provider.addScope('profile');
                 provider.setCustomParameters({ prompt: 'select_account' });
-                const result = await signInWithPopup(auth_fb, provider);
+                const currentUser = auth_fb.currentUser;
+                let result;
+                try {
+                    // Preserve the anonymous UID used for orders while upgrading it
+                    // to a verified Google identity.
+                    result = currentUser?.isAnonymous
+                        ? await linkWithPopup(currentUser, provider)
+                        : await signInWithPopup(auth_fb, provider);
+                } catch(linkError) {
+                    const credential = GoogleAuthProvider.credentialFromError(linkError);
+                    const recoverableCodes = new Set([
+                        'auth/credential-already-in-use',
+                        'auth/email-already-in-use',
+                        'auth/account-exists-with-different-credential'
+                    ]);
+                    if(!credential || !recoverableCodes.has(linkError?.code)) throw linkError;
+                    result = await signInWithCredential(auth_fb, credential);
+                }
                 state.authSignInProvider = 'google.com';
                 await result.user?.getIdToken?.(true);
                 const { email, name } = resolveAuthenticatedIdentity(result.user, result);
@@ -979,7 +996,8 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 }
             } catch(e) {
                 console.warn('Google sign-in failed', e);
-                window.toast("Accesso Google non riuscito");
+                const code = String(e?.code || 'errore-sconosciuto').replace(/^auth\//, '');
+                window.toast(`Accesso Google non riuscito: ${code}`);
             }
         };
 
