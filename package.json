@@ -13,9 +13,9 @@
     "@playwright/test": "^1.50.0"
   },
   "dependencies": {
-    "@netlify/blobs": "^7.0.0",
     "@aws-sdk/client-s3": "^3.637.0",
-    "firebase-admin": "^12.5.0",
+    "@netlify/blobs": "^7.0.0",
+    "firebase-admin": "^13.10.0",
     "form-data": "^4.0.0",
     "node-fetch": "^3.3.2"
   }

@@ -229,7 +229,9 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             try {
                 const params = new URLSearchParams(window.location.search);
                 const flag = localStorage.getItem('dose_e2e');
-                return (params.get('e2e') === '1' || flag === '1');
+                const host = window.location.hostname;
+                const isLocalHost = host === 'localhost' || host === '127.0.0.1' || host === '::1';
+                return isLocalHost && (params.get('e2e') === '1' || flag === '1');
             } catch(e) {
                 return false;
             }
@@ -3574,7 +3576,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 }
 
                 // 2) Fallback: mapped staff emails (recovery mode)
-                if(role === 'user' && state.authzSource !== 'claims') {
+                if(role === 'user' && auth_fb.currentUser && !auth_fb.currentUser.isAnonymous && normalizeEmail(auth_fb.currentUser.email) === e) {
                     if(ROLE_EMAILS.admin.includes(e) || ROLE_NAMES.admin.includes(n)) {
                         role = 'admin';
                         state.authzSource = 'email-map-fallback';
@@ -3688,6 +3690,17 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 const isAnon = !!u.isAnonymous;
                 const email = normalizeEmail(isAnon ? cached?.email : u.email);
                 const name = normalizeName(isAnon ? cached?.name : (u.displayName || u.email?.split('@')[0] || ''));
+                if(!isLocalE2E && isAnon && isMappedStaffEmail(email)) {
+                    localStorage.removeItem('dose_user');
+                    localStorage.removeItem('menu_admin_open');
+                    state.user = null;
+                    state.role = 'user';
+                    state.authzSource = 'unverified';
+                    document.getElementById('user-modal').classList.remove('hidden');
+                    renderRoleStatus();
+                    renderMenuAdminToggle();
+                    return;
+                }
                 if(email) {
                     if(!isAnon) {
                         await adoptAuthenticatedUser(u);
