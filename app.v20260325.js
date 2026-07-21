@@ -287,13 +287,15 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             ristoratore: ['lorenzo.russo@alimentarirusso', 'russolorenzo11@gmail.com'],
             facility: ['beatrice.binini@dos.design', 'monica.porta@dos.design']
         };
-        const ROLE_NAMES = {
-            admin: ['marco tranquilli'],
-            ristoratore: ['lorenzo russo']
+        const mappedStaffRole = (email) => {
+            const e = normalizeEmail(email);
+            if(ROLE_EMAILS.admin.includes(e)) return 'admin';
+            if(ROLE_EMAILS.ristoratore.includes(e)) return 'ristoratore';
+            if(ROLE_EMAILS.facility.includes(e)) return 'facility';
+            return '';
         };
         const isMappedStaffEmail = (email) => {
-            const e = normalizeEmail(email);
-            return ROLE_EMAILS.admin.includes(e) || ROLE_EMAILS.ristoratore.includes(e) || ROLE_EMAILS.facility.includes(e);
+            return Boolean(mappedStaffRole(email));
         };
 
         const firebaseConfig = { apiKey: "AIzaSyCQJsNbgaR89gF_1vLe6H4DPboOhQvm9nI", authDomain: "app-ordini-pranzo-alimentari.firebaseapp.com", projectId: "app-ordini-pranzo-alimentari", storageBucket: "app-ordini-pranzo-alimentari.appspot.com", messagingSenderId: "553169964686", appId: "1:553169964686:web:7f8ca6f32a301949e4c3df" };
@@ -336,7 +338,9 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(state.authSignInProvider === 'google.com') return true;
             return !!auth_fb.currentUser && !auth_fb.currentUser.isAnonymous && getProviderIds().includes('google.com');
         };
-        const requiresGoogleStaffVerification = (email = state.user?.email || '') => false;
+        const requiresGoogleStaffVerification = (email = state.user?.email || '') => (
+            isMappedStaffEmail(email) && !hasGoogleSession()
+        );
         const canWriteMenuAdmin = () => (isAdmin() || isRistoratore()) && (
             isLocalE2E ||
             state.authzSource === 'claims' ||
@@ -3541,15 +3545,12 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
 
         async function setRole(email) {
             const e = normalizeEmail(email);
-            const n = normalizeName(state.user?.name);
             let role = 'user';
             state.authzSource = 'claims';
             state.authSignInProvider = '';
 
             if(isLocalE2E) {
-                if(ROLE_EMAILS.admin.includes(e) || ROLE_NAMES.admin.includes(n)) role = 'admin';
-                else if(ROLE_EMAILS.ristoratore.includes(e)) role = 'ristoratore';
-                else if(ROLE_EMAILS.facility.includes(e)) role = 'facility';
+                role = mappedStaffRole(e) || 'user';
                 state.role = role;
                 state.authzSource = 'e2e';
                 state.authSignInProvider = 'google.com';
@@ -3576,17 +3577,17 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 }
 
                 // 2) Fallback: mapped staff emails (recovery mode)
-                if(role === 'user' && auth_fb.currentUser && !auth_fb.currentUser.isAnonymous && normalizeEmail(auth_fb.currentUser.email) === e) {
-                    if(ROLE_EMAILS.admin.includes(e) || ROLE_NAMES.admin.includes(n)) {
-                        role = 'admin';
-                        state.authzSource = 'email-map-fallback';
-                    } else if(ROLE_EMAILS.ristoratore.includes(e) || ROLE_NAMES.ristoratore.includes(n)) {
-                        role = 'ristoratore';
-                        state.authzSource = 'email-map-fallback';
-                    } else if(ROLE_EMAILS.facility.includes(e)) {
-                        role = 'facility';
-                        state.authzSource = 'email-map-fallback';
-                    }
+                const authenticatedEmail = normalizeEmail(auth_fb.currentUser?.email);
+                const verifiedGoogleIdentity = Boolean(
+                    auth_fb.currentUser &&
+                    !auth_fb.currentUser.isAnonymous &&
+                    authenticatedEmail === e &&
+                    googleSession
+                );
+                const mappedRole = mappedStaffRole(e);
+                if(role === 'user' && verifiedGoogleIdentity && mappedRole) {
+                    role = mappedRole;
+                    state.authzSource = 'email-map-google';
                 }
                 state.role = role;
             }
