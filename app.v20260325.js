@@ -332,12 +332,24 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         const computeProductKey = (item) => `${normalizeCat(item.cat)}::${(item.name || '').toString().trim().toLowerCase()}`;
         const isVisibleMenuCategory = (cat) => !HIDDEN_MENU_CATEGORIES.has((cat || '').toString().trim());
         const getVisibleMenuCategories = () => Object.keys(RAW_MENU).filter(isVisibleMenuCategory);
-        const getProviderIds = () => Array.from(new Set((auth_fb.currentUser?.providerData || []).map(p => p?.providerId).filter(Boolean)));
-        const hasGoogleSession = () => {
+        const getProviderIds = (user = auth_fb.currentUser) => Array.from(new Set((user?.providerData || []).map(p => p?.providerId).filter(Boolean)));
+        const hasGoogleSession = (user = auth_fb.currentUser) => {
             if(isLocalE2E) return true;
-            if(state.authSignInProvider === 'google.com') return true;
-            return !!auth_fb.currentUser && !auth_fb.currentUser.isAnonymous && getProviderIds().includes('google.com');
+            if(user === auth_fb.currentUser && state.authSignInProvider === 'google.com') return true;
+            return !!user && !user.isAnonymous && getProviderIds(user).some(providerId => providerId === 'google.com');
         };
+        const resolveVerifiedMappedRole = (email, user, googleVerified) => {
+            if(!user || user.isAnonymous || !googleVerified) return '';
+            if(normalizeEmail(user.email) !== normalizeEmail(email)) return '';
+            return mappedStaffRole(email);
+        };
+        if(isLocalE2E) {
+            window.__doseTestResolveVerifiedMappedRole = (email, user) => resolveVerifiedMappedRole(
+                email,
+                user,
+                getProviderIds(user).some(providerId => providerId === 'google.com')
+            );
+        }
         const requiresGoogleStaffVerification = (email = state.user?.email || '') => (
             isMappedStaffEmail(email) && !hasGoogleSession()
         );
@@ -797,12 +809,11 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                         : 'Modalità sola lettura: sessione staff non abilitata alla scrittura.';
                 } else {
                     btn.classList.add('hidden');
-                    if(requiresGoogleStaffVerification(email)) {
+                    if(isMappedStaffEmail(email)) {
                         googleBtn.classList.remove('hidden');
-                        hint.textContent = 'Verifica Google richiesta: accedi con Google per attivare i permessi staff.';
-                    } else if(isMappedStaffEmail(email) && !['claims','email-map-google','email-map-fallback'].includes(state.authzSource)) {
-                        googleBtn.classList.add('hidden');
-                        hint.textContent = 'Account staff non ancora riconosciuto correttamente.';
+                        hint.textContent = hasGoogleSession()
+                            ? 'Ruolo staff non sincronizzato: premi Verifica Google per aggiornare la sessione.'
+                            : 'Verifica Google richiesta: accedi con Google per attivare i permessi staff.';
                     } else {
                         googleBtn.classList.add('hidden');
                         hint.textContent = 'Accesso standard: alcune funzioni sono riservate.';
@@ -910,7 +921,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(nameInput) nameInput.value = name;
             if(emailInput) emailInput.value = email;
             document.getElementById('user-modal').classList.add('hidden');
-            await setRole(email);
+            await setRole(email, user);
             syncMyOrders();
             return true;
         };
@@ -960,7 +971,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                     if(nameInput) nameInput.value = name;
                     if(emailInput) emailInput.value = email;
                     document.getElementById('user-modal').classList.add('hidden');
-                    await setRole(email);
+                    await setRole(email, result.user);
                     adopted = true;
                 } else {
                     adopted = await adoptAuthenticatedUser(result.user);
@@ -3543,7 +3554,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         function isRistoratore() { return state.role === 'ristoratore'; }
         function isFacility() { return state.role === 'facility'; }
 
-        async function setRole(email) {
+        async function setRole(email, authenticatedUser = auth_fb.currentUser) {
             const e = normalizeEmail(email);
             let role = 'user';
             state.authzSource = 'claims';
@@ -3555,10 +3566,10 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 state.authzSource = 'e2e';
                 state.authSignInProvider = 'google.com';
             } else {
-                let googleSession = hasGoogleSession();
+                let googleSession = hasGoogleSession(authenticatedUser);
                 // 1) Try custom claims
                 try {
-                    const token = await auth_fb.currentUser?.getIdTokenResult?.();
+                    const token = await authenticatedUser?.getIdTokenResult?.();
                     const signInProvider = token?.signInProvider || token?.claims?.firebase?.sign_in_provider || '';
                     state.authSignInProvider = signInProvider;
                     googleSession = googleSession || signInProvider === 'google.com';
@@ -3571,21 +3582,14 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 } catch(e) {
                     state.authzSource = 'unverified';
                     if(!state.authSignInProvider) {
-                        const providerIds = getProviderIds();
+                        const providerIds = getProviderIds(authenticatedUser);
                         if(providerIds.includes('google.com')) state.authSignInProvider = 'google.com';
                     }
                 }
 
                 // 2) Fallback: mapped staff emails (recovery mode)
-                const authenticatedEmail = normalizeEmail(auth_fb.currentUser?.email);
-                const verifiedGoogleIdentity = Boolean(
-                    auth_fb.currentUser &&
-                    !auth_fb.currentUser.isAnonymous &&
-                    authenticatedEmail === e &&
-                    googleSession
-                );
-                const mappedRole = mappedStaffRole(e);
-                if(role === 'user' && verifiedGoogleIdentity && mappedRole) {
+                const mappedRole = resolveVerifiedMappedRole(e, authenticatedUser, googleSession);
+                if(role === 'user' && mappedRole) {
                     role = mappedRole;
                     state.authzSource = 'email-map-google';
                 }
