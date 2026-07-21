@@ -33,4 +33,9 @@ if rg -n -i 'pagnottella|multi-fornitore|scelta fornitore|supplier-access|hub-au
   exit 1
 fi
 
+if [[ "$ROOT" != "." ]]; then
+  test -s "$ROOT/russo/index.html"
+  rg -q '<base href="\.\./">' "$ROOT/russo/index.html"
+fi
+
 echo "[russo-only] verified: $ROOT"

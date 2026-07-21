@@ -27,6 +27,11 @@ cp favicondosepranza.png "$DIST_DIR/" 2>/dev/null || echo "No favicon found"
 cp -R login "$DIST_DIR/" 2>/dev/null || echo "No login folder"
 cp -R reports "$DIST_DIR/" 2>/dev/null || echo "No reports folder"
 
+# Stable public alias for Alimentari Russo. The base element keeps all assets
+# on the canonical bundle while preserving the shareable /russo/ URL.
+mkdir -p "$DIST_DIR/russo"
+awk '{ print; if ($0 ~ /<head>/) print "    <base href=\"../\">" }' "$DIST_DIR/index.html" > "$DIST_DIR/russo/index.html"
+
 bash scripts/verify_russo_only.sh "$DIST_DIR"
 
 echo "--- Build completata con successo nella cartella /$DIST_DIR ---"

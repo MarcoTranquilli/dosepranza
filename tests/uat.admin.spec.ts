@@ -16,4 +16,5 @@ test('UAT Admin: analytics + export', async ({ page }) => {
   await page.click('[data-action="analytics-export-csv"]');
 
   await page.click('[data-action="analytics-export-pdf"]');
+  await expect(page.locator('body')).toHaveAttribute('data-print-requested', 'true');
 });

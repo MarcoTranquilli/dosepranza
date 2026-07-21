@@ -934,25 +934,28 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
                 await adoptAuthenticatedUser(auth_fb.currentUser);
                 return;
             }
+            const name = normalizeName(document.getElementById('user-name-input').value);
+            const email = normalizeEmail(document.getElementById('user-email-input').value);
+            if(!name || !email) return window.toast("Inserisci nome ed email");
+            if(isMappedStaffEmail(email)) return window.toast("Per gli account staff è richiesto l’accesso Google");
+
+            // Persist identity before anonymous Auth emits its state callback.
+            resetMyOrdersSubscription();
+            state.user = { name, email };
+            localStorage.setItem('dose_user', JSON.stringify(state.user));
             if(!auth_fb.currentUser) {
                 try {
                     await signInAnonymously(auth_fb);
                 } catch(e) {
+                    state.user = null;
+                    localStorage.removeItem('dose_user');
                     window.toast("Abilita accesso anonimo su Firebase");
                     return;
                 }
             }
-            const name = normalizeName(auth_fb.currentUser.displayName || document.getElementById('user-name-input').value);
-            const email = normalizeEmail(auth_fb.currentUser.email || document.getElementById('user-email-input').value);
-            if(name && email) {
-                resetMyOrdersSubscription();
-                state.user = { name, email };
-                localStorage.setItem('dose_user', JSON.stringify(state.user));
-                document.getElementById('user-modal').classList.add('hidden');
-                await setRole(email);
-                syncMyOrders();
-                
-            }
+            document.getElementById('user-modal').classList.add('hidden');
+            await setRole(email);
+            syncMyOrders();
         };
 
         window.signInWithGoogle = async () => {
@@ -3199,6 +3202,11 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
             document.body.classList.add('print-mode');
             const el = document.getElementById('print-generated-at');
             if(el) el.textContent = new Date().toLocaleString('it-IT');
+            if(isLocalE2E) {
+                document.body.dataset.printRequested = 'true';
+                document.body.classList.remove('print-mode');
+                return;
+            }
             window.print();
             setTimeout(() => document.body.classList.remove('print-mode'), 500);
         };

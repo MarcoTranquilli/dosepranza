@@ -32,6 +32,25 @@ test('Sicurezza: una cache utente standard resta utilizzabile', async ({ page })
   await expect(page.locator('#menu-admin-toggle')).toBeHidden();
 });
 
+test('Accesso pubblico Russo: nome ed email non riaprono la modale', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.clear();
+    localStorage.setItem('dose_e2e', '1');
+  });
+
+  await page.goto('/russo/?e2e=1&v=russo-public-3');
+  await expect(page.locator('#user-modal')).toBeVisible();
+  await page.locator('#user-name-input').fill('Mario Rossi');
+  await page.locator('#user-email-input').fill('mario.rossi@dos.design');
+  await page.locator('[data-action="save-user"]').click();
+  await expect(page.locator('#user-modal')).toBeHidden();
+
+  await page.reload();
+  await expect(page.locator('#user-modal')).toBeHidden();
+  await expect(page.locator('#menu-view')).toBeVisible();
+  await expect(page.locator('#menu-admin-toggle')).toBeHidden();
+});
+
 test('Sicurezza: solo una identita Firebase verificata abilita la mappatura staff', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('dose_e2e', '1'));
   await page.goto('/');
