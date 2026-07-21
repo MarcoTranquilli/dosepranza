@@ -28,14 +28,14 @@ if (( ${#runtime_files[@]} == 0 )); then
   exit 1
 fi
 
-if rg -n -i 'pagnottella|multi-fornitore|scelta fornitore|supplier-access|hub-auth' "${runtime_files[@]}"; then
+if grep -Eni 'pagnottella|multi-fornitore|scelta fornitore|supplier-access|hub-auth' "${runtime_files[@]}"; then
   echo "[russo-only] forbidden multi-supplier reference found" >&2
   exit 1
 fi
 
 if [[ "$ROOT" != "." ]]; then
   test -s "$ROOT/russo/index.html"
-  rg -q '<base href="\.\./">' "$ROOT/russo/index.html"
+  grep -Eq '<base href="\.\./">' "$ROOT/russo/index.html"
 fi
 
 echo "[russo-only] verified: $ROOT"
