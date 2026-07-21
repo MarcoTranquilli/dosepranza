@@ -5,6 +5,9 @@ echo "--- Inizio Build DOSepranza ---"
 
 DIST_DIR="dist"
 
+# Compile utility classes instead of loading Tailwind's development CDN.
+npm run build:css
+
 # 1. Crea una cartella pulita per il deploy
 rm -rf "$DIST_DIR"
 mkdir -p "$DIST_DIR"
@@ -15,6 +18,7 @@ cp app.js "$DIST_DIR/" 2>/dev/null || true
 cp app.v20260210.js "$DIST_DIR/" 2>/dev/null || true
 cp app.v20260325.js "$DIST_DIR/" 2>/dev/null || cp app.js "$DIST_DIR/index.js"
 cp styles.css "$DIST_DIR/" 2>/dev/null || echo "No CSS file found"
+cp tailwind.output.css "$DIST_DIR/"
 cp tailwind-config.js "$DIST_DIR/" 2>/dev/null || echo "No Tailwind config found"
 cp sw-killer.js "$DIST_DIR/" 2>/dev/null || echo "No service worker helper found"
 cp netlify-preauth-reset.js "$DIST_DIR/" 2>/dev/null || echo "No preauth reset found"

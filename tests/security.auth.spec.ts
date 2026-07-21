@@ -44,6 +44,11 @@ test('Sicurezza: solo una identita Firebase verificata abilita la mappatura staf
         isAnonymous: false,
         providerData: [{ providerId: 'google.com' }]
       }),
+      legacyGoogleAdmin: resolve('marco.tranquilli@dos.design', {
+        email: null,
+        isAnonymous: false,
+        providerData: [{ providerId: 'google.com', email: 'marco.tranquilli@dos.design' }]
+      }),
       anonymous: resolve('marco.tranquilli@dos.design', {
         email: 'marco.tranquilli@dos.design',
         isAnonymous: true,
@@ -64,8 +69,9 @@ test('Sicurezza: solo una identita Firebase verificata abilita la mappatura staf
 
   expect(roles).toEqual({
     verifiedAdmin: 'admin',
+    legacyGoogleAdmin: 'admin',
     anonymous: '',
-    authenticatedProvider: 'admin',
+    authenticatedProvider: '',
     wrongEmail: ''
   });
 });

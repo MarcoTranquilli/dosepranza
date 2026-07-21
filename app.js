@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, linkWithPopup, signInWithCredential, signOut, signInAnonymously, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addDoc, serverTimestamp, query, orderBy, getDocs, runTransaction, doc, where, limit, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, onSnapshot, addDoc, serverTimestamp, query, orderBy, getDocs, runTransaction, doc, where, limit, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- DATABASE PRODOTTI COMPLETO ---
         const DIETS_CONFIG = { "carne/pesce": "🥩 Carne/Pesce", "vegetariano": "🧀 Vegetariano", "vegano": "🌱 Vegano" };
@@ -303,7 +303,10 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         const auth_fb = getAuth(app_fb);
         setPersistence(auth_fb, browserLocalPersistence).catch((e) => console.warn('auth persistence setup failed', e));
         if(!window.auth_fb) window.auth_fb = auth_fb;
-        const db_fb = initializeFirestore(app_fb, { experimentalForceLongPolling: true, localCache: persistentLocalCache() });
+        const db_fb = initializeFirestore(app_fb, {
+            experimentalForceLongPolling: true,
+            localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+        });
         const ordersCol = collection(db_fb, "orders");
         const ordersAuditCol = collection(db_fb, "orders_audit");
         const frigeProductsCol = collection(db_fb, "frige_products");
@@ -333,6 +336,9 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         const isVisibleMenuCategory = (cat) => !HIDDEN_MENU_CATEGORIES.has((cat || '').toString().trim());
         const getVisibleMenuCategories = () => Object.keys(RAW_MENU).filter(isVisibleMenuCategory);
         const getProviderIds = (user = auth_fb.currentUser) => Array.from(new Set((user?.providerData || []).map(p => p?.providerId).filter(Boolean)));
+        const getGoogleProviderEmail = (user = auth_fb.currentUser) => normalizeEmail(
+            (user?.providerData || []).find(p => p?.providerId === 'google.com')?.email || ''
+        );
         const hasGoogleSession = (user = auth_fb.currentUser) => {
             if(isLocalE2E) return true;
             if(user === auth_fb.currentUser && state.authSignInProvider === 'google.com') return true;
@@ -340,7 +346,8 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         };
         const resolveVerifiedMappedRole = (email, user) => {
             if(!user || user.isAnonymous) return '';
-            if(normalizeEmail(user.email) !== normalizeEmail(email)) return '';
+            const authenticatedEmail = normalizeEmail(user.email) || getGoogleProviderEmail(user);
+            if(!getProviderIds(user).includes('google.com') || authenticatedEmail !== normalizeEmail(email)) return '';
             return mappedStaffRole(email);
         };
         if(isLocalE2E) {
@@ -3583,7 +3590,8 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 let googleSession = hasGoogleSession(authenticatedUser);
                 // 1) Try custom claims
                 try {
-                    const token = await authenticatedUser?.getIdTokenResult?.();
+                    const refreshStaffToken = Boolean(mappedStaffRole(e)) && hasGoogleSession(authenticatedUser);
+                    const token = await authenticatedUser?.getIdTokenResult?.(refreshStaffToken);
                     const signInProvider = token?.signInProvider || token?.claims?.firebase?.sign_in_provider || '';
                     state.authSignInProvider = signInProvider;
                     googleSession = googleSession || signInProvider === 'google.com';
