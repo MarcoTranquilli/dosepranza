@@ -20,7 +20,7 @@ test.describe('Preview multi-fornitore', () => {
     await page.goto(previewHubUrl);
 
     await expect(page.getByRole('heading', { name: /accedi a dosepranza/i })).toBeVisible();
-    await expect(page.locator('#hub-auth-status')).toContainText('Marco Tranquilli');
+    await expect(page.locator('#hub-auth-status')).toContainText('Accesso amministratore completato');
     await expect(page.getByRole('link', { name: /apri alimentari russo/i })).toBeVisible();
     await expect(page.getByRole('link', { name: /apri pagnottella gourmet/i })).toBeVisible();
     await expect(page.locator('#supplier-control-panel')).toBeVisible();

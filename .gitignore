@@ -3,4 +3,5 @@ playwright-report/
 test-results/
 tests/.auth/
 dist/
+dist-approval/
 output/

@@ -25,7 +25,7 @@
     </div><div class="landingVisual"><img class="photo" src="../assets/pagnottella/images/optimized/apollo_3.webp" alt="Selezione Pagnottella Gourmet" loading="eager"><div class="visualLogos"><img class="logoBig suiteMasterLogo" src="../assets/branding/dosepranza-suite-logo.png" alt="DOSepranza"><img class="partnerLogo" src="../assets/pagnottella/images/optimized/logo_pagnottella.webp" alt="La Pagnottella Gourmet"></div></div></div></div>
   </section>
   <main id="shop" class="shop" aria-label="Catalogo La Pagnottella Gourmet">
-    <header class="topbar"><div class="brand brandExtended"><img class="suiteInlineLogo" src="../assets/branding/dosepranza-suite-logo.png" alt="DOSepranza"><img class="brandLogo" src="../assets/pagnottella/images/optimized/logo_pagnottella.webp" alt="Logo La Pagnottella Gourmet"><div><h1>La Pagnottella Gourmet</h1><p id="brand-subtitle">Suite DOSepranza · Anteprima riservata</p></div></div><div class="topActions serviceBar" aria-label="Vantaggi e azioni Pagnottella"><div class="serviceCluster" role="list" aria-label="Vantaggi ordine" id="hero-highlight-list"></div><button class="supplierSwitch" onclick="backLanding()" aria-label="Torna alla selezione del fornitore">Cambia fornitore</button></div></header>
+    <header class="topbar"><div class="brand brandExtended"><img class="suiteInlineLogo" src="../assets/branding/dosepranza-suite-logo.png" alt="DOSepranza"><img class="brandLogo" src="../assets/pagnottella/images/optimized/logo_pagnottella.webp" alt="Logo La Pagnottella Gourmet"><div><h1>La Pagnottella Gourmet</h1><p id="brand-subtitle">Suite DOSepranza · Anteprima riservata</p></div></div><div class="topActions serviceBar" aria-label="Vantaggi e azioni Pagnottella"><div class="serviceCluster" role="list" aria-label="Vantaggi ordine" id="hero-highlight-list"></div><button class="supplierSwitch" onclick="backLanding()" aria-label="Torna alla presentazione">Torna all'inizio</button></div></header>
     <section class="hero"><img id="heroImage" src="../assets/pagnottella/images/optimized/apollo_3.webp" alt="La Pagnottella Gourmet"><div class="heroContent"><img class="heroLogo" src="../assets/pagnottella/images/optimized/logo_pagnottella.webp" alt="La Pagnottella Gourmet"><div class="eyebrow" id="heroKicker">Menu completo</div><h2 id="heroTitle">Panini e insalate gourmet, ordinati in pochi secondi.</h2><p id="heroText">Prezzi originali e scontati sempre visibili.</p><div id="heroStats" class="heroStats"></div></div></section>
     <section class="briefGrid briefGridCompact"><article class="briefCard briefCardAccent"><p class="briefEyebrow">Punto vendita</p><h3 id="contact-address">Via Quintino Sella 53, Roma</h3><p id="contact-hours">Lun-Ven 8:30 - 16:30</p><p class="suiteDeliveryCopy">Ordine destinato a DOS Design S.p.a. · consegna in Via Arno 52, Roma.</p><div class="briefActions"><a id="contact-whatsapp" class="ghost" href="#" target="_blank" rel="noopener">Apri WhatsApp</a><a id="contact-site" class="ghost" href="#" target="_blank" rel="noopener">Sito ufficiale</a></div></article><article class="briefCard"><p class="briefEyebrow">Ingredienti aggiuntivi</p><h3>Listino extra strutturato</h3><div id="extrasPreview" class="extrasPreview"></div></article></section>
     <div class="appgrid"><section class="catalogShell" id="catalogTop"><div class="toolbar"><div class="searchLine"><div class="search"><span class="searchIcon">⌕</span><input id="search" type="search" placeholder="Cerca per nome, ingrediente o tag..." autocomplete="off"></div><button class="primary gold" onclick="openCart()">Vedi carrello</button></div><div class="tabs" id="tabs" aria-label="Categorie"></div><div class="filters" id="filters" aria-label="Filtri rapidi"></div></div><div class="sectionHead"><div><h3 id="sectionTitle">Tutto il menu</h3><p id="sectionSub"></p></div><select id="sort" class="sortSelect" aria-label="Ordina"><option value="recommended">Consigliati</option><option value="top">Top prima</option><option value="price">Prezzo crescente</option><option value="az">Nome A-Z</option></select></div><div id="empty" class="empty">Nessun prodotto trovato. Prova a cancellare la ricerca o cambiare filtro.</div><div id="grid" class="grid"></div><div class="infoGrid"><div class="info"><h4>Opzioni panini</h4><p>Pane bianco incluso. Integrale ai cereali +€0,50 prima dello sconto.</p></div><div class="info"><h4>Basi insalate</h4><p>Insalata, cous cous, farro e riso inclusi. Riso venere +€1,50 prima dello sconto.</p></div><div class="info"><h4>Validità prezzi</h4><p id="price-validity-note">Ricette e prezzi soggetti a conferma del punto vendita.</p></div></div><section class="supportBlocks supportBlocksCompact"><article class="supportBlock"><h4>Listino ingredienti aggiuntivi</h4><p>Ingredienti e supplementi disponibili, con prezzo sempre leggibile.</p><div id="extrasGrid" class="extrasGrid"></div></article><article class="supportBlock"><h4>Note servizio</h4><div id="notesList" class="notesList"></div></article></section></section>
@@ -42,7 +42,19 @@
 <script src="./sponsor-polish.js?v=preview-6"></script>
 <script>
 if(window.DosePagesAdminUnlock) window.DosePagesAdminUnlock();
-window.backLanding = function(){ window.location.href = '../preview/?preview=admin'; };
+const sponsorReviewQuery = '?preview=admin&review=sponsor';
+const openSponsorCatalog = window.openShop;
+window.openShop = function(){
+  openSponsorCatalog(false);
+  history.replaceState(null, '', sponsorReviewQuery);
+};
+window.backLanding = function(){
+  window.closeCart();
+  document.getElementById('shop')?.classList.remove('show');
+  document.getElementById('landing')?.classList.remove('hidden');
+  history.replaceState(null, '', sponsorReviewQuery);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
 </script>
 </body>
 </html>

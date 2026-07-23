@@ -1,0 +1,58 @@
+name: Pagnottella Sponsor Approval
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dosepranza-pages-pagnottella-approval
+  cancel-in-progress: true
+
+jobs:
+  verify-and-publish:
+    name: Verify and publish isolated Pagnottella preview
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout approval branch
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build standalone approval package
+        run: npm run build:approval
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Start approval package
+        run: nohup python3 -m http.server 8082 --bind 127.0.0.1 --directory dist-approval >/tmp/pagnottella-approval.log 2>&1 &
+
+      - name: Run approval UAT
+        run: npm run test:approval
+        env:
+          BASE_URL: http://127.0.0.1:8082
+
+      - name: Publish only the Pagnottella approval directory
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git clone --branch gh-pages --single-branch \
+            "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" pages
+          rm -rf pages/pagnottella-approval
+          mkdir -p pages/pagnottella-approval
+          cp -R dist-approval/. pages/pagnottella-approval/
+          cd pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A pagnottella-approval
+          git commit -m "Publish Pagnottella approval from ${GITHUB_SHA}" || exit 0
+          git push origin gh-pages

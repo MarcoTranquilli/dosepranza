@@ -1,9 +1,14 @@
 (() => {
   const ADMIN_EMAIL = 'marco.tranquilli@dos.design';
   const REVIEW_EMAIL = 'review.pagnottella@dosepranza.local';
-  const isPages = () => location.hostname === 'marcotranquilli.github.io';
   const params = new URLSearchParams(location.search);
   const isPagnottellaReview = () => location.pathname.includes('/pagnottella-preview/') || params.get('review') === 'sponsor';
+  const isPages = () => location.hostname === 'marcotranquilli.github.io'
+    || (
+      ['localhost', '127.0.0.1', '::1'].includes(location.hostname)
+      && isPagnottellaReview()
+      && params.get('review') === 'sponsor'
+    );
   const requested = () => params.get('preview') === 'admin' || localStorage.getItem('dose_preview_admin') === '1';
   const byId = (id) => document.getElementById(id);
 
