@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const reviewPath = '/pagnottella-preview/?preview=admin&review=sponsor';
+const reviewPath = 'pagnottella-preview/?preview=admin&review=sponsor';
 
 test.beforeEach(async ({ page }) => {
   await page.goto(reviewPath);
