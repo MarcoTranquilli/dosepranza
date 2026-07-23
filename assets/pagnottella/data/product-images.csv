@@ -1,0 +1,11 @@
+product_id,product_name,category,original_image_url,source_filename,suggested_filename,local_path,mapping_type,confidence,needs_supplier_confirmation,notes
+apollo,Apollo,Panini,,apollo_3.jpg,apollo.jpg,assets/pagnottella/images/products/apollo.jpg,foto_specifica,media,true,Foto individuata come Apollo nella ricognizione Codex; da confermare con il fornitore
+saporito,Saporito,Panini,,saporito.jpg,saporito.jpg,assets/pagnottella/images/products/saporito.jpg,foto_specifica,alta,false,Nome file coerente con il prodotto Saporito
+panino-baccala,Panino baccala,Panini di Pesce,,baccala_panino.jpg,panino-baccala.jpg,assets/pagnottella/images/products/panino-baccala.jpg,foto_specifica,alta,false,Nome file coerente con il prodotto Panino baccala
+toscanaccio,Toscanaccio,Panini,,toscanoccio.jpg,toscanaccio.jpg,assets/pagnottella/images/products/toscanaccio.jpg,foto_specifica,media,true,Grafia file diversa; confermare con il fornitore
+tartare,Tartare,Panini / Insalate,,tartare.jpg,tartare.jpg,assets/pagnottella/images/products/tartare.jpg,foto_specifica,media,true,Foto specifica tartare; puo riferirsi a panino o insalata
+vitella-panino,Vitella panino,Panini,,vitella_panino.jpg,vitella-panino.jpg,assets/pagnottella/images/products/vitella-panino.jpg,foto_specifica,media,true,Prodotto non allineato al menu testuale attuale
+baccala-insalata,Insalata Baccala,Insalate di Pesce,,baccala_Sala.jpg,insalata-baccala.jpg,assets/pagnottella/images/products/insalata-baccala.jpg,foto_specifica,alta,false,Nome file coerente con insalata/baccala
+vitella-insalata,Vitella insalata,Insalate,,vitella_insalata.jpg,vitella-insalata.jpg,assets/pagnottella/images/products/vitella-insalata.jpg,foto_specifica,media,true,Prodotto non allineato al menu testuale attuale
+panini-fallback,Fallback categoria Panini,Panini,,saporito.jpg,fallback-panini.jpg,assets/pagnottella/images/products/fallback-panini.jpg,fallback_categoria,bassa,true,Da usare solo per prodotti senza immagine specifica
+insalate-fallback,Fallback categoria Insalate,Insalate,,baccala_Sala.jpg,fallback-insalate.jpg,assets/pagnottella/images/products/fallback-insalate.jpg,fallback_categoria,bassa,true,Da usare solo per prodotti senza immagine specifica
