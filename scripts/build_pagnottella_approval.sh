@@ -10,7 +10,9 @@ mkdir -p \
   "${DIST_DIR}/pagnottella-preview" \
   "${DIST_DIR}/pagnottella" \
   "${DIST_DIR}/assets/branding" \
-  "${DIST_DIR}/assets/pagnottella"
+  "${DIST_DIR}/assets/pagnottella/data" \
+  "${DIST_DIR}/assets/pagnottella/images" \
+  "${DIST_DIR}/assets/pagnottella/payment"
 
 cp "${ROOT_DIR}/pagnottella-preview/index.html" "${DIST_DIR}/pagnottella-preview/"
 cp "${ROOT_DIR}/pagnottella-preview/preview-fixes.css" "${DIST_DIR}/pagnottella-preview/"
@@ -21,7 +23,10 @@ cp "${ROOT_DIR}/supplier-access.js" "${DIST_DIR}/"
 cp "${ROOT_DIR}/pages-admin-unlock.js" "${DIST_DIR}/"
 cp "${ROOT_DIR}/favicondosepranza.png" "${DIST_DIR}/"
 cp -R "${ROOT_DIR}/assets/branding/." "${DIST_DIR}/assets/branding/"
-cp -R "${ROOT_DIR}/assets/pagnottella/." "${DIST_DIR}/assets/pagnottella/"
+cp "${ROOT_DIR}/assets/pagnottella/data/menu.json" "${DIST_DIR}/assets/pagnottella/data/"
+cp "${ROOT_DIR}/assets/pagnottella/data/menu.inline.js" "${DIST_DIR}/assets/pagnottella/data/"
+cp -R "${ROOT_DIR}/assets/pagnottella/images/." "${DIST_DIR}/assets/pagnottella/images/"
+cp -R "${ROOT_DIR}/assets/pagnottella/payment/." "${DIST_DIR}/assets/pagnottella/payment/"
 
 cat > "${DIST_DIR}/index.html" <<'EOF'
 <!doctype html>
