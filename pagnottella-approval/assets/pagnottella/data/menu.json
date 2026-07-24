@@ -55,22 +55,25 @@
       "price": 7,
       "desc": "mortadella, provola affumicata, salsa di noci",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/panini_brontolo__panino_brontolo.jpg",
       "tags": [
         "Panino",
         "Frutta secca"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Panino con mortadella e crema/noci; attribuzione probabile a Brontolo, non confermata dal filename.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-email-2026-07-24",
+        "confidence": "alta",
+        "label": "Foto prodotto fornita dal fornitore",
+        "mappingType": "foto_specifica_fornitore",
+        "originalFilename": "brontolo.jpeg",
+        "filename": "panini_brontolo__panino_brontolo.jpg",
+        "basis": "filename fornito dal ristoratore + contenuto coerente con il prodotto",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
+        "auditPublishable": true
       }
     },
     {
@@ -244,23 +247,26 @@
       "price": 8,
       "desc": "burrata, mortadella, granella di pistacchio",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/panini_goloso__panino_goloso.jpg",
       "tags": [
         "Panino",
         "Frutta secca",
         "Top"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-email-2026-07-24",
+        "confidence": "alta",
+        "label": "Foto prodotto fornita dal fornitore",
+        "mappingType": "foto_specifica_fornitore",
+        "originalFilename": "goloso.jpeg",
+        "filename": "panini_goloso__panino_goloso.jpg",
+        "basis": "filename fornito dal ristoratore + contenuto coerente con il prodotto",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
+        "auditPublishable": true
       }
     },
     {
@@ -315,21 +321,24 @@
       "price": 8,
       "desc": "crudo, crema al tartufo, brie, pomodoro, spinaci",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/panini_montanaro__panino_montanaro.jpg",
       "tags": [
         "Panino"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-email-2026-07-24",
+        "confidence": "alta",
+        "label": "Foto prodotto fornita dal fornitore",
+        "mappingType": "foto_specifica_fornitore",
+        "originalFilename": "montanaro.jpeg",
+        "filename": "panini_montanaro__panino_montanaro.jpg",
+        "basis": "filename fornito dal ristoratore + contenuto coerente con il prodotto",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
+        "auditPublishable": true
       }
     },
     {
@@ -338,22 +347,25 @@
       "price": 8,
       "desc": "pastrami di manzo, pomodoro, salsa tartara, cetriolini",
       "cat": "panini-carne",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/panini_newyorkese__panino_newyorkese.jpg",
       "tags": [
         "Panino",
         "Proteico"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-email-2026-07-24",
+        "confidence": "alta",
+        "label": "Foto prodotto fornita dal fornitore",
+        "mappingType": "foto_specifica_fornitore",
+        "originalFilename": "newyorkese_CMYK.jpeg",
+        "filename": "panini_newyorkese__panino_newyorkese.jpg",
+        "basis": "filename fornito dal ristoratore + contenuto coerente con il prodotto",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
+        "auditPublishable": true
       }
     },
     {
@@ -950,22 +962,25 @@
       "price": 7,
       "desc": "tonno, pate di olive, pomodoro",
       "cat": "panini-pesce",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/panini_mediterraneo__panino_mediterraneo.jpg",
       "tags": [
         "Panino",
         "Proteico"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-email-2026-07-24",
+        "confidence": "alta",
+        "label": "Foto prodotto fornita dal fornitore",
+        "mappingType": "foto_specifica_fornitore",
+        "originalFilename": "mediterraneo.jpeg",
+        "filename": "panini_mediterraneo__panino_mediterraneo.jpg",
+        "basis": "filename fornito dal ristoratore + contenuto coerente con il prodotto",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
+        "auditPublishable": true
       }
     },
     {
@@ -974,23 +989,26 @@
       "price": 8,
       "desc": "tonno, pomodoro, guacamole, jalapenos, insalata",
       "cat": "panini-pesce",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/panini_messicano__panino_messicano.jpg",
       "tags": [
         "Panino",
         "Proteico",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Panino con guacamole, tonno, jalapeno/cetriolini e insalata; attribuzione visiva a Messicano.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-email-2026-07-24",
+        "confidence": "alta",
+        "label": "Foto prodotto fornita dal fornitore",
+        "mappingType": "foto_specifica_fornitore",
+        "originalFilename": "messicano_3.jpeg",
+        "filename": "panini_messicano__panino_messicano.jpg",
+        "basis": "filename fornito dal ristoratore + contenuto coerente con il prodotto",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
+        "auditPublishable": true
       }
     },
     {
@@ -1403,23 +1421,26 @@
       "price": 10,
       "desc": "pastrami di manzo, melanzane e zucchine grigliate*, rucola",
       "cat": "insalate-carne",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/insalate_suprema__insalata_suprema.jpg",
       "tags": [
         "Insalata",
         "Proteico",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-email-2026-07-24",
+        "confidence": "alta",
+        "label": "Foto prodotto fornita dal fornitore",
+        "mappingType": "foto_specifica_fornitore",
+        "originalFilename": "suprema_CMYK.jpeg",
+        "filename": "insalate_suprema__insalata_suprema.jpg",
+        "basis": "filename fornito dal ristoratore + contenuto coerente con il prodotto",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
+        "auditPublishable": true
       }
     },
     {
@@ -1685,7 +1706,7 @@
       "price": 11,
       "desc": "salmone, anacardi, edamame, hummus di ceci, cavolo rosso, sesamo nero",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/insalate_hawaii__insalata_hawaii.jpg",
       "tags": [
         "Insalata",
         "Proteico",
@@ -1693,16 +1714,19 @@
         "Top"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-email-2026-07-24",
+        "confidence": "alta",
+        "label": "Foto prodotto fornita dal fornitore",
+        "mappingType": "foto_specifica_fornitore",
+        "originalFilename": "hawaii_4.jpeg",
+        "filename": "insalate_hawaii__insalata_hawaii.jpg",
+        "basis": "filename fornito dal ristoratore + contenuto coerente con il prodotto",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
+        "auditPublishable": true
       }
     },
     {
@@ -1786,23 +1810,26 @@
       "price": 11,
       "desc": "gamberetti, cetriolo, uovo, spinaci, edamame*, semi di sesamo, salsa di soia",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/insalate_osaka__insalata_osaka.jpg",
       "tags": [
         "Insalata",
         "Proteico",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-email-2026-07-24",
+        "confidence": "alta",
+        "label": "Foto prodotto fornita dal fornitore",
+        "mappingType": "foto_specifica_fornitore",
+        "originalFilename": "osaka.jpeg",
+        "filename": "insalate_osaka__insalata_osaka.jpg",
+        "basis": "filename fornito dal ristoratore + contenuto coerente con il prodotto",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
+        "auditPublishable": true
       }
     },
     {
@@ -1836,24 +1863,23 @@
       "price": 11,
       "desc": "Burrata pugliese, pomodoro, acciughe, capperi, olive**, origano",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/products/insalate_burrata__insalata_salentina.jpg",
+      "img": "../assets/pagnottella/images/products/insalate_salentina__insalata_salentina.jpg",
       "tags": [
         "Insalata"
       ],
       "imageMeta": {
         "assigned": true,
         "specific": true,
-        "source": "audit-completo",
+        "source": "fornitore-email-2026-07-24",
         "confidence": "alta",
-        "label": "Foto prodotto verificata",
-        "mappingType": "foto_specifica_verificata",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341641448-ERIUQ6ZDTVGB0K9D0OEJ/DSCF3962.jpg",
-        "filename": "insalate_burrata__insalata_salentina.jpg",
-        "basis": "ingredienti",
+        "label": "Foto prodotto fornita dal fornitore",
+        "mappingType": "foto_specifica_fornitore",
+        "originalFilename": "salentina_3.jpeg",
+        "filename": "insalate_salentina__insalata_salentina.jpg",
+        "basis": "filename fornito dal ristoratore + contenuto coerente con il prodotto",
         "needsSupplierConfirmation": false,
-        "sourcePage": "Insalate",
-        "sourceAsset": "insalata_salentina_dscf3962",
-        "assetId": "PG-018",
+        "requiresSupplierPhoto": false,
+        "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
         "auditPublishable": true
       }
     },
@@ -1912,22 +1938,25 @@
       "price": 9,
       "desc": "tonno, capperi, feta, cipolla, radicchio",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/insalate_siracusa__insalata_siracusa.jpg",
       "tags": [
         "Insalata",
         "Proteico"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-email-2026-07-24",
+        "confidence": "alta",
+        "label": "Foto prodotto fornita dal fornitore",
+        "mappingType": "foto_specifica_fornitore",
+        "originalFilename": "siracusa.jpeg",
+        "filename": "insalate_siracusa__insalata_siracusa.jpg",
+        "basis": "filename fornito dal ristoratore + contenuto coerente con il prodotto",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
+        "auditPublishable": true
       }
     },
     {
@@ -1936,7 +1965,7 @@
       "price": 12,
       "desc": "tonno, guacamole, uovo sodo, spinaci, noci, pinoli",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/insalate_sportiva__insalata_sportiva.jpg",
       "tags": [
         "Insalata",
         "Proteico",
@@ -1944,16 +1973,19 @@
         "Top"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-email-2026-07-24",
+        "confidence": "alta",
+        "label": "Foto prodotto fornita dal fornitore",
+        "mappingType": "foto_specifica_fornitore",
+        "originalFilename": "sportiva.jpeg",
+        "filename": "insalate_sportiva__insalata_sportiva.jpg",
+        "basis": "filename fornito dal ristoratore + contenuto coerente con il prodotto",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
+        "auditPublishable": true
       }
     },
     {
@@ -1962,7 +1994,7 @@
       "price": 10,
       "desc": "tonno, melanzane e zucchine grigliate*, pomodori secchi, pesto, granella di pistacchio",
       "cat": "insalate-pesce",
-      "img": "../assets/pagnottella/images/products/insalate_asiatica__insalata_trapanese.jpg",
+      "img": "../assets/pagnottella/images/products/insalate_trapanese__insalata_trapanese.jpg",
       "tags": [
         "Insalata",
         "Proteico",
@@ -1971,17 +2003,16 @@
       "imageMeta": {
         "assigned": true,
         "specific": true,
-        "source": "audit-completo",
+        "source": "fornitore-email-2026-07-24",
         "confidence": "alta",
-        "label": "Foto prodotto verificata",
-        "mappingType": "foto_specifica_verificata",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341597598-9O2HBC5LSQNYBC3SG687/trapanese.jpg",
-        "filename": "insalate_asiatica__insalata_trapanese.jpg",
-        "basis": "filename + ingredienti",
+        "label": "Foto prodotto fornita dal fornitore",
+        "mappingType": "foto_specifica_fornitore",
+        "originalFilename": "trapanese.jpeg",
+        "filename": "insalate_trapanese__insalata_trapanese.jpg",
+        "basis": "filename fornito dal ristoratore + contenuto coerente con il prodotto",
         "needsSupplierConfirmation": false,
-        "sourcePage": "Insalate",
-        "sourceAsset": "insalata_trapanese",
-        "assetId": "PG-017",
+        "requiresSupplierPhoto": false,
+        "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
         "auditPublishable": true
       }
     },
@@ -2093,7 +2124,7 @@
       "price": 10,
       "desc": "melanzane e zucchine grigliate*, ceci, noci, pesto, rucola",
       "cat": "insalate-veg",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/insalate_ortolana__insalata_ortolana.jpg",
       "tags": [
         "Insalata",
         "Vegetariano",
@@ -2101,16 +2132,19 @@
         "Frutta secca"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-email-2026-07-24",
+        "confidence": "alta",
+        "label": "Foto prodotto fornita dal fornitore",
+        "mappingType": "foto_specifica_fornitore",
+        "originalFilename": "ortolana_CMYK.jpeg",
+        "filename": "insalate_ortolana__insalata_ortolana.jpg",
+        "basis": "filename fornito dal ristoratore + contenuto coerente con il prodotto",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
+        "auditPublishable": true
       }
     },
     {
@@ -2119,7 +2153,7 @@
       "price": 12,
       "desc": "mozzarella di Bufala DOP 125gr, pachino gialli e rossi, melanzane e zucchine grigliate, pinoli, basilico",
       "cat": "insalate-veg",
-      "img": "../assets/pagnottella/images/products/insalate_caprese__insalata_reginella.jpg",
+      "img": "../assets/pagnottella/images/products/insalate_reginella__insalata_reginella.jpg",
       "tags": [
         "Insalata",
         "Vegetariano",
@@ -2130,17 +2164,16 @@
       "imageMeta": {
         "assigned": true,
         "specific": true,
-        "source": "audit-completo",
+        "source": "fornitore-email-2026-07-24",
         "confidence": "alta",
-        "label": "Foto prodotto verificata",
-        "mappingType": "foto_specifica_verificata",
-        "originalUrl": "https://images.squarespace-cdn.com/content/v1/5bc46325d7819e67da2eef74/1687341540039-MUG7YLZM6E4THD2RNKXH/DSCF7331.jpg",
-        "filename": "insalate_caprese__insalata_reginella.jpg",
-        "basis": "ingredienti",
+        "label": "Foto prodotto fornita dal fornitore",
+        "mappingType": "foto_specifica_fornitore",
+        "originalFilename": "reginella_3.jpeg",
+        "filename": "insalate_reginella__insalata_reginella.jpg",
+        "basis": "filename fornito dal ristoratore + contenuto coerente con il prodotto",
         "needsSupplierConfirmation": false,
-        "sourcePage": "Insalate",
-        "sourceAsset": "insalata_reginella_dscf7331",
-        "assetId": "PG-015",
+        "requiresSupplierPhoto": false,
+        "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
         "auditPublishable": true
       }
     },
@@ -2176,7 +2209,7 @@
       "price": 12,
       "desc": "Pollo CBT, uovo sodo, pachino, salsa tartara, rucola e sesamo nero.",
       "cat": "speciali",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/speciali_apollo__apollo.jpg",
       "tags": [
         "Top",
         "Insalata",
@@ -2184,16 +2217,19 @@
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Il catalogo pubblico non espone una fotografia univoca per questo prodotto.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-email-2026-07-24",
+        "confidence": "alta",
+        "label": "Foto prodotto fornita dal fornitore",
+        "mappingType": "foto_specifica_fornitore",
+        "originalFilename": "apollo_2.jpeg",
+        "filename": "speciali_apollo__apollo.jpg",
+        "basis": "filename fornito dal ristoratore + contenuto coerente con il prodotto",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
+        "auditPublishable": true
       }
     },
     {
@@ -2321,21 +2357,24 @@
       "price": 4,
       "desc": "Pausa dolce con pane e Nutella.",
       "cat": "bevande-dolci",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/dolci_pane_nutella__pane_nutella.jpg",
       "tags": [
         "Dessert"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Il catalogo pubblico non espone una fotografia univoca per questo prodotto.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-email-2026-07-24",
+        "confidence": "alta",
+        "label": "Foto prodotto fornita dal fornitore",
+        "mappingType": "foto_specifica_fornitore",
+        "originalFilename": "Nutella.jpeg",
+        "filename": "dolci_pane_nutella__pane_nutella.jpg",
+        "basis": "filename fornito dal ristoratore + contenuto coerente con il prodotto",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
+        "auditPublishable": true
       }
     },
     {
@@ -2586,7 +2625,7 @@
   "discount": {
     "rate": 0.2,
     "label": "Sconto lancio estate",
-    "activeUntil": "2026-08-23",
+    "activeUntil": "2026-08-30",
     "fallbackRate": 0
   },
   "whatsapp": "393921512515",
@@ -2685,7 +2724,7 @@
     "allergens": "1 glutine, 2 crostacei, 3 uova, 4 pesce, 5 arachidi, 6 soia, 7 latte, 8 frutta a guscio, 9 sedano, 10 senape, 11 sesamo, 12 solfiti, 13 lupini, 14 molluschi.",
     "frozen": "* Prodotto surgelato.",
     "olive": "** Le olive potrebbero contenere eccezionalmente noccioli.",
-    "priceValidity": "Ricette e prezzi indicati nel volantino validi fino a verifica con il punto vendita. Promo estate 2026: sconto 20% fino al 23/08/2026."
+    "priceValidity": "Ricette e prezzi indicati nel volantino validi fino a verifica con il punto vendita. Promo estate 2026: sconto 20% fino al 30/08/2026."
   },
   "extras": [
     {
@@ -2781,6 +2820,34 @@
       "price": 1.5
     },
     {
+      "name": "Funghi",
+      "price": 0.5
+    },
+    {
+      "name": "Gamberetti",
+      "price": 1.5
+    },
+    {
+      "name": "Gorgonzola",
+      "price": 1.5
+    },
+    {
+      "name": "Grana Padano",
+      "price": 2
+    },
+    {
+      "name": "Granella di pistacchio",
+      "price": 0.5
+    },
+    {
+      "name": "Guacamole",
+      "price": 2
+    },
+    {
+      "name": "Hummus",
+      "price": 1.5
+    },
+    {
       "name": "Jalapeños",
       "price": 0.5
     },
@@ -2869,6 +2936,38 @@
       "price": 3.5
     },
     {
+      "name": "Salsa al tartufo",
+      "price": 0.5
+    },
+    {
+      "name": "Salsa BBQ",
+      "price": 0.5
+    },
+    {
+      "name": "Salsa di noci",
+      "price": 0.5
+    },
+    {
+      "name": "Salsa di olive",
+      "price": 0.5
+    },
+    {
+      "name": "Salsa di soia",
+      "price": 0.5
+    },
+    {
+      "name": "Salsa tartara",
+      "price": 0.5
+    },
+    {
+      "name": "Salsa tonnata",
+      "price": 0.5
+    },
+    {
+      "name": "Semi di sesamo",
+      "price": 0.5
+    },
+    {
       "name": "Senape al miele",
       "price": 0.5
     },
@@ -2924,11 +3023,29 @@
     },
     {
       "label": "Promo estate",
-      "value": "-20% fino al 23 agosto"
+      "value": "-20% fino al 30 agosto"
     },
     {
       "label": "Consegna",
       "value": "entro le 13:00 del giorno stesso"
+    },
+    {
+      "label": "Chiusura Via Sella",
+      "value": "17-23 agosto"
     }
-  ]
+  ],
+  "serviceUpdates": {
+    "supplierFeedbackDate": "2026-07-24",
+    "closedDates": [
+      {
+        "location": "Via Sella",
+        "from": "2026-08-17",
+        "to": "2026-08-23"
+      }
+    ],
+    "promotionActiveUntil": "2026-08-30",
+    "extraIngredientsReviewRequired": false,
+    "extraIngredientsCount": 72,
+    "extraIngredientsSource": "Listino completo ingredienti aggiuntivi verificato il 24/07/2026"
+  }
 }
