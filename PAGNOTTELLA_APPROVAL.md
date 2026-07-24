@@ -7,8 +7,10 @@ Netlify.
 ## Contenuti verificabili
 
 - catalogo completo Panini e Insalate;
-- immagini e loghi locali;
-- sconto del 20% applicato automaticamente;
+- 17 nuove fotografie specifiche fornite dal ristoratore;
+- listino completo di 72 ingredienti aggiuntivi;
+- sconto del 20% applicato automaticamente fino al 30 agosto 2026;
+- chiusura Via Sella dal 17 al 23 agosto con ordini sospesi;
 - ordine e pagamento entro le 12:00, consegna entro le 13:00;
 - Contanti, POS, Bonifico bancario e Satispay;
 - PayPal e Nexi visibili ma non selezionabili fino a settembre;

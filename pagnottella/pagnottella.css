@@ -82,6 +82,8 @@
 /* Audit-compliant image fallback */
 .card.imageFallback .pic{background:radial-gradient(circle at 25% 20%,rgba(210,160,98,.22),transparent 28%),linear-gradient(145deg,#18130F,#050403)}.card.imageFallback .pic img{object-fit:contain;padding:38px;filter:saturate(.85);opacity:.9}.imageNotice{position:absolute;left:10px;bottom:10px;z-index:2;display:inline-flex;align-items:center;min-height:24px;padding:0 9px;border-radius:999px;background:rgba(255,255,255,.92);color:#4E443A;font-size:9px;font-weight:850;letter-spacing:.02em;box-shadow:0 5px 16px rgba(0,0,0,.14)}
 @media (max-width:560px){.paymentOptions{grid-template-columns:1fr}.paymentOption{min-height:66px}.card.imageFallback .pic img{padding:48px}}
+
+.serviceClosureNotice{margin:2px 0!important;padding:10px 12px;border:1px solid #E9BE72;border-radius:14px;background:#FFF8E8;color:#7C4A08!important;font-weight:800}.serviceClosureNotice.isActive{border-color:#E39B8E;background:#FFF1EF;color:#9F2D24!important}.extrasAllButton{min-height:30px;padding:5px 11px;border:1px solid #D97706;border-radius:999px;background:#FFF7E6;color:#8A4A00;font-size:10px;font-weight:900}.extrasAllButton:hover{background:#FFE9BE}.card .add:disabled{width:auto;min-width:64px;padding:0 10px;border-radius:999px;background:#E6E2DA;color:#6F6B64;cursor:not-allowed;font-size:10px}.serviceClosed .heroStat:first-child{background:#9F2D24!important}.serviceClosed .whatsappMain:disabled{background:#8B8177;opacity:1}
 @media (max-width:640px){
   .brandExtended{align-items:flex-start}
   .brandExtended>div{min-width:0}

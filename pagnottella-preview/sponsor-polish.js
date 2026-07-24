@@ -32,7 +32,7 @@
   }
   function polishCheckout(){
     const label = byId('sendOrderLabel');
-    if(label && label.textContent !== 'Salvataggio ordine...') label.textContent = 'Apri WhatsApp con riepilogo ordine';
+    if(label && !['Salvataggio ordine...', 'Ordini sospesi durante la chiusura'].includes(label.textContent)) label.textContent = 'Apri WhatsApp con riepilogo ordine';
     const send = byId('sendOrderBtn');
     if(send) send.setAttribute('aria-label', 'Apri WhatsApp con riepilogo ordine');
     if(send && !byId('copySummaryBtn')){

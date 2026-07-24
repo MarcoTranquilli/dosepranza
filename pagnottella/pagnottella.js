@@ -7,11 +7,32 @@ const supplierAccess = window.DoseSupplierAccess;
 const byId = id => document.getElementById(id);
 const money = v => '€' + (Math.round(v*100)/100).toFixed(2).replace('.', ',');
 const esc = s => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const currentDate = () => new Date(window.__PAGNOTTELLA_NOW__ || Date.now());
+const localDateKey = date => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+const formatDate = value => value
+  ? new Date(`${value}T12:00:00`).toLocaleDateString('it-IT', { day:'numeric', month:'long', year:'numeric' })
+  : '';
+const serviceClosures = () => DATA?.serviceUpdates?.closedDates || [];
+const activeClosure = () => {
+  const today = localDateKey(currentDate());
+  return serviceClosures().find(item => today >= item.from && today <= item.to) || null;
+};
+const isOrderingClosed = () => Boolean(activeClosure());
+const closureCopy = closure => {
+  if(!closure) return '';
+  const from = formatDate(closure.from).replace(/ 2026$/, '');
+  return `${closure.location || 'Punto vendita'} chiuso dal ${from} al ${formatDate(closure.to)}. Gli ordini sono sospesi in queste date.`;
+};
 const discountRate = () => {
   const cfg = DATA?.discount;
   if(typeof cfg === 'number') return cfg;
   if(!cfg || typeof cfg !== 'object') return 0;
-  const today = new Date();
+  const today = currentDate();
   const limit = cfg.activeUntil ? new Date(`${cfg.activeUntil}T23:59:59`) : null;
   return !limit || today <= limit ? Number(cfg.rate || 0) : Number(cfg.fallbackRate || 0);
 };
@@ -177,11 +198,27 @@ function hydrateStatic(){
   byId('contact-hours').textContent = DATA.contact.hours;
   byId('contact-whatsapp').href = DATA.contact.whatsappUrl;
   byId('contact-site').href = DATA.contact.website;
-  byId('price-validity-note').textContent = 'Ricette e prezzi soggetti a conferma del punto vendita. Lo sconto estivo viene applicato automaticamente fino al 23/08/2026.';
+  byId('price-validity-note').textContent = DATA.notes?.priceValidity
+    || `Ricette e prezzi soggetti a conferma del punto vendita. Lo sconto estivo viene applicato automaticamente fino al ${formatDate(DATA.discount?.activeUntil)}.`;
   byId('heroStats').innerHTML = DATA.highlights.map(h => `<span class="heroStat"><strong>${esc(h.label)}</strong> · ${esc(h.value)}</span>`).join('');
   byId('hero-highlight-list').innerHTML = DATA.highlights.map((h, idx) => `<span class="serviceChip ${idx===0?'serviceChipPrimary':''}" role="listitem">${esc(h.value)}</span>`).join('');
-  byId('extrasPreview').innerHTML = DATA.extras.slice(0, 8).map(x => `<span class="extraChip">${esc(x.name)} <span>${money(x.price)}</span></span>`).join('');
+  const extrasTitle = byId('extras-preview-title');
+  if(extrasTitle) extrasTitle.textContent = `${DATA.extras.length} ingredienti disponibili`;
+  byId('extrasPreview').innerHTML = `${DATA.extras.slice(0, 8).map(x => `<span class="extraChip">${esc(x.name)} <span>${money(x.price)}</span></span>`).join('')}<button type="button" class="extrasAllButton" onclick="scrollToExtras()">Vedi tutti i ${DATA.extras.length} ingredienti</button>`;
   byId('extrasGrid').innerHTML = DATA.extras.map(x => `<span class="extraChip">${esc(x.name)} <span>${money(x.price)}</span></span>`).join('');
+  const contactHours = byId('contact-hours');
+  if(contactHours && serviceClosures().length){
+    let notice = byId('service-closure-notice');
+    if(!notice){
+      notice = document.createElement('p');
+      notice.id = 'service-closure-notice';
+      notice.className = 'serviceClosureNotice';
+      contactHours.insertAdjacentElement('afterend', notice);
+    }
+    notice.textContent = closureCopy(serviceClosures()[0]);
+    notice.classList.toggle('isActive', isOrderingClosed());
+  }
+  document.body.classList.toggle('serviceClosed', isOrderingClosed());
   byId('notesList').innerHTML = [
     { title:'Allergeni', body: DATA.notes.allergens },
     { title:'Prodotti', body: `${DATA.notes.frozen} ${DATA.notes.olive}` },
@@ -370,7 +407,9 @@ function renderCatalog(){
   const cat = CATS.find(c => c.id === state.cat);
   byId('sectionTitle').textContent = state.cat === 'all' ? 'Tutto il menu' : cat.label;
   const rate = Math.round(discountRate() * 100);
-  byId('sectionSub').textContent = `${arr.length} prodotti disponibili · ${rate ? `prezzi già scontati del ${rate}%` : 'prezzi standard attivi'}`;
+  byId('sectionSub').textContent = isOrderingClosed()
+    ? `${arr.length} prodotti consultabili · ordini temporaneamente sospesi`
+    : `${arr.length} prodotti disponibili · ${rate ? `prezzi già scontati del ${rate}%` : 'prezzi standard attivi'}`;
   byId('empty').classList.toggle('show', arr.length === 0);
   byId('grid').innerHTML = arr.map(p => card(p)).join('');
 }
@@ -379,7 +418,8 @@ function card(p){
   badges.push(...(p.tags || []).slice(0,2));
   const hasSpecificImage = p.imageMeta?.specific === true;
   const alt = hasSpecificImage ? p.name : `La Pagnottella Gourmet - foto specifica non disponibile per ${p.name}`;
-  return `<article class="card ${hasSpecificImage ? '' : 'imageFallback'}"><div class="pic"><img src="${p.img}" alt="${esc(alt)}" loading="lazy"><div class="badges">${badges.map(t=>`<span class="badge">${esc(t)}</span>`).join('')}</div>${hasSpecificImage ? '' : '<span class="imageNotice">Foto specifica non disponibile</span>'}</div><div class="body"><div class="nameRow"><h4>${esc(p.name)}</h4><div class="price"><span class="old">${money(p.price)}</span>${money(discountedPrice(p.price))}</div></div><p class="desc">${esc(p.desc)}</p><div class="meta"><span class="tag">${esc(catLabel(p.cat))}</span>${(p.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div><div class="actions"><button class="details" onclick="openDetails('${p.id}')">Dettagli</button><button class="add" aria-label="Aggiungi ${esc(p.name)}" onclick="quickAdd('${p.id}')">+</button></div></div></article>`;
+  const addLabel = isOrderingClosed() ? 'Ordini sospesi' : `Aggiungi ${p.name}`;
+  return `<article class="card ${hasSpecificImage ? '' : 'imageFallback'}"><div class="pic"><img src="${p.img}" alt="${esc(alt)}" loading="lazy"><div class="badges">${badges.map(t=>`<span class="badge">${esc(t)}</span>`).join('')}</div>${hasSpecificImage ? '' : '<span class="imageNotice">Foto specifica non disponibile</span>'}</div><div class="body"><div class="nameRow"><h4>${esc(p.name)}</h4><div class="price"><span class="old">${money(p.price)}</span>${money(discountedPrice(p.price))}</div></div><p class="desc">${esc(p.desc)}</p><div class="meta"><span class="tag">${esc(catLabel(p.cat))}</span>${(p.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div><div class="actions"><button class="details" onclick="openDetails('${p.id}')">Dettagli</button><button class="add" aria-label="${esc(addLabel)}" onclick="quickAdd('${p.id}')" ${isOrderingClosed() ? 'disabled' : ''}>${isOrderingClosed() ? 'Chiuso' : '+'}</button></div></div></article>`;
 }
 function openDetails(id){
   const p = PRODUCTS.find(x => x.id === id);
@@ -400,8 +440,21 @@ function pickOption(i){ state.option = optionList(state.current)[i]; document.qu
 function updateDrawerPrice(){ const p = state.current, o = state.option || defaultOption(p); byId('drawerOld').textContent = money(p.price + o.extra); byId('drawerPrice').textContent = money(discountedPrice(p.price + o.extra)); }
 function closeDrawer(){ byId('drawer').classList.remove('show'); }
 function quickAdd(id){ const p = PRODUCTS.find(x => x.id === id); addToCart(p, defaultOption(p)); }
-function drawerAdd(){ addToCart(state.current, state.option || defaultOption(state.current)); closeDrawer(); }
-function addToCart(p,o){ const originalUnit = Math.round((p.price + o.extra) * 100) / 100; const key = p.id + '|' + o.label; if(!state.cart[key]) state.cart[key] = {...p,opt:o.label,optExtra:o.extra,originalUnit,qty:0}; state.cart[key].qty++; state.lastSubmittedMessage=''; toast(`${p.name} aggiunto al carrello`); renderCart(); }
+function drawerAdd(){ if(addToCart(state.current, state.option || defaultOption(state.current))) closeDrawer(); }
+function addToCart(p,o){
+  if(isOrderingClosed()){
+    toast('Punto vendita chiuso: ordini temporaneamente sospesi');
+    return false;
+  }
+  const originalUnit = Math.round((p.price + o.extra) * 100) / 100;
+  const key = p.id + '|' + o.label;
+  if(!state.cart[key]) state.cart[key] = {...p,opt:o.label,optExtra:o.extra,originalUnit,qty:0};
+  state.cart[key].qty++;
+  state.lastSubmittedMessage='';
+  toast(`${p.name} aggiunto al carrello`);
+  renderCart();
+  return true;
+}
 function changeQty(key,delta){ if(!state.cart[key]) return; state.cart[key].qty += delta; if(state.cart[key].qty <= 0) delete state.cart[key]; state.lastSubmittedMessage=''; renderCart(); }
 function totals(){ const items = Object.values(state.cart); const orig = items.reduce((a,i)=>a+i.originalUnit*i.qty,0); const total = discountedPrice(orig); return {items, count:items.reduce((a,i)=>a+i.qty,0), orig, total, saving:orig-total}; }
 function renderCart(){
@@ -418,8 +471,13 @@ function renderCart(){
   byId('saving').textContent = '-' + money(t.saving);
   byId('finalTotal').textContent = money(t.total);
   byId('waPreview').textContent = buildMessage();
+  const sendButton = byId('sendOrderBtn');
+  if(sendButton) sendButton.disabled = isOrderingClosed();
+  const sendLabel = byId('sendOrderLabel');
+  if(sendLabel && isOrderingClosed()) sendLabel.textContent = 'Ordini sospesi durante la chiusura';
   updateAdmin();
 }
+function scrollToExtras(){ byId('extrasGrid')?.scrollIntoView({ behavior:'smooth', block:'start' }); }
 function escKey(s){ return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
 function selectedPaymentMethod(){
   const value = (document.querySelector('input[name="paymentMethod"]:checked')?.value || '').trim();
@@ -434,7 +492,7 @@ function buildMessage(){
   const costCenter = deliverySiteCopy().trim();
   const notes = (byId('notes')?.value || '').trim();
   const paymentMethod = selectedPaymentMethod();
-  const now = new Date();
+  const now = currentDate();
   const date = now.toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   const time = now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
   let msg = `📦 Riepilogo Ordine – ${DATA.copy.brand}`;
@@ -502,11 +560,16 @@ function setSendBusy(busy){
   state.sending = busy;
   const button = byId('sendOrderBtn');
   const label = byId('sendOrderLabel');
-  if(button) button.disabled = busy;
-  if(label) label.textContent = busy ? 'Salvataggio ordine...' : 'Salva e invia su WhatsApp';
+  if(button) button.disabled = busy || isOrderingClosed();
+  if(label) label.textContent = busy ? 'Salvataggio ordine...' : (isOrderingClosed() ? 'Ordini sospesi durante la chiusura' : 'Salva e invia su WhatsApp');
 }
 async function sendWA(){
   if(totals().count === 0 || state.sending) return;
+  if(isOrderingClosed()){
+    byId('confirm').classList.add('show', 'isError');
+    byId('confirm').textContent = closureCopy(activeClosure());
+    return;
+  }
   const message = buildMessage();
   if(state.lastSubmittedMessage === message){
     byId('confirm').classList.add('show');
@@ -595,7 +658,7 @@ function updateAdmin(){
   if(!byId('mProducts')) return;
   const imageMapped = PRODUCTS.filter(p => p.imageMeta?.assigned).length;
   const supplierCheck = PRODUCTS.filter(p => p.imageMeta?.needsSupplierConfirmation).length;
-  const specificShots = PRODUCTS.filter(p => p.imageMeta?.mappingType === 'foto_specifica_o_quasi_specifica').length;
+  const specificShots = PRODUCTS.filter(p => p.imageMeta?.specific === true).length;
   byId('mProducts').textContent = PRODUCTS.length;
   byId('mCart').textContent = totals().count;
   byId('mOrders').textContent = logs.length;
@@ -607,7 +670,7 @@ function updateAdmin(){
 function exportCSV(){ const logs = readSafeOrderLogs(); const rows = [['timestamp','cliente','azienda','centro_costo','metodo_pagamento','prodotti','totale','note_o_allergie','salvato_firebase'], ...logs.map(o=>[o.ts,o.customer,o.company||'',o.costCenter||'',o.paymentMethod,o.count,o.total,o.hasNotesOrAllergies,o.savedToFirebase])]; const csv = rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n'); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download = 'ordini-pagnottella.csv'; a.click(); URL.revokeObjectURL(a.href); }
 function escJs(s){ return String(s).replace(/[\\']/g, m => m === '\\' ? '\\\\' : "\\'"); }
 
-Object.assign(window, { openShop, backLanding, setCat, setFilter, openDetails, pickOption, closeDrawer, quickAdd, drawerAdd, changeQty, sendWA, newOrder, openCart, closeCart, exportCSV, copyPaymentIban });
+Object.assign(window, { openShop, backLanding, setCat, setFilter, openDetails, pickOption, closeDrawer, quickAdd, drawerAdd, changeQty, sendWA, newOrder, openCart, closeCart, exportCSV, copyPaymentIban, scrollToExtras });
 bootstrap().catch(err => {
   console.error(err);
   document.body.innerHTML = `<div style="max-width:720px;margin:48px auto;padding:24px;border-radius:24px;background:#fff;border:1px solid #eadfce;font-family:Manrope,sans-serif"><h1 style="margin-top:0">Errore caricamento catalogo Pagnottella</h1><p>${esc(err.message || 'Errore sconosciuto')}</p><p>Verifica il file <code>assets/pagnottella/data/menu.json</code> e gli asset locali.</p></div>`;

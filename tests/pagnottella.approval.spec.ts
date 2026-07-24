@@ -13,6 +13,14 @@ test('catalogo completo, immagini e navigazione autonoma', async ({ page }, test
   await expect(page.locator('.brandLogo')).toBeVisible();
   await expect(page.locator('.suiteInlineLogo')).toBeVisible();
   await expect(page.locator('#grid .card')).toHaveCount(102);
+  await expect(page.locator('#extras-preview-title')).toHaveText('72 ingredienti disponibili');
+  await expect(page.locator('#extrasGrid .extraChip')).toHaveCount(72);
+  await expect(page.locator('#extrasGrid')).toContainText('Funghi');
+  await expect(page.locator('#extrasGrid')).toContainText('Salsa al tartufo');
+  await expect(page.locator('#extrasGrid')).toContainText('Semi di sesamo');
+  await expect(page.locator('#price-validity-note')).toContainText('30/08/2026');
+  await expect(page.locator('#service-closure-notice')).toContainText('17 agosto');
+  await expect(page.locator('#service-closure-notice')).toContainText('23 agosto 2026');
   await expect(page.locator('body')).not.toContainText(/cambia fornitore/i);
   await expect(page.locator('body')).not.toContainText(/documenti locali/i);
   await expect(page.locator('body')).not.toContainText(/layout più vicino alla demo/i);
@@ -31,6 +39,49 @@ test('catalogo completo, immagini e navigazione autonoma', async ({ page }, test
   await page.getByRole('button', { name: /apri il catalogo/i }).click();
   await expect(page.locator('#shop')).toHaveClass(/show/);
   await expect(page).toHaveURL(/preview=admin&review=sponsor/);
+});
+
+test('foto ufficiali del fornitore associate ai prodotti corretti', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'Verifica immagini eseguita su desktop');
+  for (const [product, filename] of [
+    ['Brontolo', 'panini_brontolo__panino_brontolo.jpg'],
+    ['Newyorkese', 'panini_newyorkese__panino_newyorkese.jpg'],
+    ['Reginella', 'insalate_reginella__insalata_reginella.jpg'],
+    ['Salentina', 'insalate_salentina__insalata_salentina.jpg']
+  ]) {
+    await page.locator('#search').fill(product);
+    const card = page.locator('#grid .card').filter({ hasText: product }).first();
+    await expect(card).toBeVisible();
+    await expect(card).not.toHaveClass(/imageFallback/);
+    const image = card.locator('img');
+    await expect(image).toHaveAttribute('src', new RegExp(filename.replace('.', '\\.')));
+    await image.scrollIntoViewIfNeeded();
+    await image.evaluate((element: HTMLImageElement) => element.decode());
+    expect(await image.evaluate((element: HTMLImageElement) => element.naturalWidth)).toBeGreaterThan(0);
+  }
+});
+
+test('promo estesa e chiusura applicate come regole operative', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'Verifica temporale eseguita su desktop');
+
+  await page.addInitScript(() => {
+    (window as Window & { __PAGNOTTELLA_NOW__?: string }).__PAGNOTTELLA_NOW__ = '2026-08-24T10:00:00+02:00';
+  });
+  await page.reload();
+  await expect(page.locator('#shop')).toHaveClass(/show/);
+  await page.locator('#search').fill('Saporito');
+  await page.locator('#grid .card .add').click();
+  await expect(page.locator('#discountLabel')).toContainText('20%');
+  await expect(page.locator('#finalTotal')).toContainText('€6,40');
+
+  await page.addInitScript(() => {
+    (window as Window & { __PAGNOTTELLA_NOW__?: string }).__PAGNOTTELLA_NOW__ = '2026-08-20T10:00:00+02:00';
+  });
+  await page.reload();
+  await expect(page.locator('#service-closure-notice')).toHaveClass(/isActive/);
+  await expect(page.locator('#sectionSub')).toContainText('ordini temporaneamente sospesi');
+  await expect(page.locator('#grid .card .add').first()).toBeDisabled();
+  await expect(page.locator('#grid .card .add').first()).toHaveText('Chiuso');
 });
 
 test('carrello, sconto, pagamenti e riepilogo ordine', async ({ page }, testInfo) => {
