@@ -2666,7 +2666,7 @@ window.__PAGNOTTELLA_MENU__ = {
     "brand": "La Pagnottella Gourmet",
     "powered": "DOSepranza",
     "eyebrow": "Punto vendita Quintino Sella",
-    "headline": "Panini e insalate gourmet, con sconto estivo e consegna in pausa pranzo.",
+    "headline": "Panini e insalate gourmet, con sconto estivo e consegna GRATUITA in pausa pranzo.",
     "subheadline": "Catalogo ufficiale basato su sito, volantino del punto vendita e listino ingredienti aggiuntivi."
   },
   "docs": [
