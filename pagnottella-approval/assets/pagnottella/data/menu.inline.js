@@ -22,7 +22,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-bbq-1",
@@ -47,7 +50,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-brontolo-2",
@@ -74,7 +80,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "requiresSupplierPhoto": false,
         "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
         "auditPublishable": true
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-cipollini-3",
@@ -97,7 +106,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-contadino-4",
@@ -120,7 +132,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-delicato-5",
@@ -144,7 +159,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-delizioso-6",
@@ -168,7 +186,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-dolcetto-7",
@@ -191,7 +212,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-emiliano-8",
@@ -215,7 +239,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-fumino-9",
@@ -239,7 +266,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-goloso-10",
@@ -267,7 +297,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "requiresSupplierPhoto": false,
         "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
         "auditPublishable": true
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-gustoso-11",
@@ -290,7 +323,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-marchigiano-12",
@@ -313,7 +349,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-montanaro-13",
@@ -339,7 +378,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "requiresSupplierPhoto": false,
         "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
         "auditPublishable": true
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-newyorkese-14",
@@ -366,7 +408,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "requiresSupplierPhoto": false,
         "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
         "auditPublishable": true
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-norcino-15",
@@ -390,7 +435,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-oregan-16",
@@ -413,7 +461,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-paesano-17",
@@ -436,7 +487,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-pagnottella-18",
@@ -460,7 +514,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-quirino-19",
@@ -484,7 +541,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-rucolino-20",
@@ -509,7 +569,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-saporito-21",
@@ -537,7 +600,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "sourceAsset": "home_saporito",
         "assetId": "PG-002",
         "auditPublishable": true
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-soprana-22",
@@ -560,7 +626,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-spock-23",
@@ -583,7 +652,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-tartare-24",
@@ -613,7 +685,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "sourceAsset": "home_tartare",
         "assetId": "PG-008",
         "auditPublishable": true
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-tirolo-25",
@@ -637,7 +712,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-tonnato-26",
@@ -661,7 +739,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-toscanaccio-27",
@@ -689,7 +770,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "sourceAsset": "home_toscanaccio",
         "assetId": "PG-007",
         "auditPublishable": true
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-toscano-28",
@@ -713,7 +797,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-transalpino-29",
@@ -738,7 +825,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-trentino-30",
@@ -761,7 +851,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-trevigiano-31",
@@ -785,7 +878,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-valtella-32",
@@ -810,7 +906,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-carne-violotto-33",
@@ -833,7 +932,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "panini-pesce-cefalu-0",
@@ -858,7 +960,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "panini-pesce-fumarello-1",
@@ -882,7 +987,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "panini-pesce-lampedusa-2",
@@ -907,7 +1015,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "panini-pesce-maestrale-3",
@@ -931,7 +1042,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "panini-pesce-marinaro-4",
@@ -954,7 +1068,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "panini-pesce-mediterraneo-5",
@@ -981,7 +1098,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "requiresSupplierPhoto": false,
         "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
         "auditPublishable": true
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "panini-pesce-messicano-6",
@@ -1009,7 +1129,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "requiresSupplierPhoto": false,
         "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
         "auditPublishable": true
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "panini-pesce-norvegese-7",
@@ -1033,7 +1156,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "panini-pesce-pantelleria-8",
@@ -1058,7 +1184,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "panini-pesce-parigino-9",
@@ -1083,7 +1212,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "panini-pesce-baccala-10",
@@ -1112,7 +1244,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "sourceAsset": "home_baccala_panino",
         "assetId": "PG-004",
         "auditPublishable": true
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "panini-pesce-san-jose-11",
@@ -1136,7 +1271,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "panini-pesce-scirocco-12",
@@ -1161,7 +1299,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "panini-pesce-verduzzo-13",
@@ -1186,7 +1327,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "panini-veg-burrata-0",
@@ -1216,7 +1360,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "sourceAsset": "panini_burrata_dscf8503",
         "assetId": "PG-013",
         "auditPublishable": true
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "vegetariana",
+      "needsDietReview": false
     },
     {
       "id": "panini-veg-campagnolo-1",
@@ -1240,7 +1387,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "vegetariana",
+      "needsDietReview": false
     },
     {
       "id": "panini-veg-caprese-2",
@@ -1266,7 +1416,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "vegetariana",
+      "needsDietReview": false
     },
     {
       "id": "panini-veg-ortolino-3",
@@ -1291,7 +1444,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "vegetariana",
+      "needsDietReview": true
     },
     {
       "id": "panini-veg-spaccanapoli-4",
@@ -1315,7 +1471,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "vegetariana",
+      "needsDietReview": false
     },
     {
       "id": "panini-veg-tricolore-5",
@@ -1339,7 +1498,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "vegetariana",
+      "needsDietReview": true
     },
     {
       "id": "panini-veg-veg-6",
@@ -1364,7 +1526,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "panini",
+      "dietType": "vegetariana",
+      "needsDietReview": false
     },
     {
       "id": "insalate-carne-giardiniera-0",
@@ -1388,7 +1553,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "insalate-carne-leggera-1",
@@ -1413,7 +1581,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "insalate-carne-suprema-2",
@@ -1441,7 +1612,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "requiresSupplierPhoto": false,
         "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
         "auditPublishable": true
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "insalate-carne-tartare-3",
@@ -1467,7 +1641,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "insalate-carne-trevigiana-4",
@@ -1491,7 +1668,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "insalate-carne-valtellina-5",
@@ -1516,7 +1696,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "insalate-carne-newyorkese-6",
@@ -1541,7 +1724,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "insalate-pesce-asiatica-0",
@@ -1565,7 +1751,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "insalate-pesce-baccala-1",
@@ -1594,7 +1783,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "sourceAsset": "home_baccala_insalata",
         "assetId": "PG-005",
         "auditPublishable": true
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "insalate-pesce-cefalu-2",
@@ -1622,7 +1814,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "sourceAsset": "insalata_cefalu_dscf9302",
         "assetId": "PG-019",
         "auditPublishable": true
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "insalate-pesce-delicata-3",
@@ -1648,7 +1843,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "insalate-pesce-estiva-4",
@@ -1673,7 +1871,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "insalate-pesce-fresca-5",
@@ -1698,7 +1899,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "insalate-pesce-hawaii-6",
@@ -1727,7 +1931,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "requiresSupplierPhoto": false,
         "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
         "auditPublishable": true
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "insalate-pesce-isolana-7",
@@ -1751,7 +1958,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "insalate-pesce-lampedusa-8",
@@ -1776,7 +1986,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "insalate-pesce-mediterranea-9",
@@ -1802,7 +2015,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "insalate-pesce-osaka-10",
@@ -1830,7 +2046,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "requiresSupplierPhoto": false,
         "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
         "auditPublishable": true
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "insalate-pesce-pantelleria-11",
@@ -1855,7 +2074,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "insalate-pesce-salentina-12",
@@ -1881,7 +2103,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "requiresSupplierPhoto": false,
         "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
         "auditPublishable": true
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "insalate-pesce-san-jose-13",
@@ -1905,7 +2130,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "insalate-pesce-sicula-14",
@@ -1930,7 +2158,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "insalate-pesce-siracusa-15",
@@ -1957,7 +2188,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "requiresSupplierPhoto": false,
         "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
         "auditPublishable": true
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "insalate-pesce-sportiva-16",
@@ -1986,7 +2220,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "requiresSupplierPhoto": false,
         "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
         "auditPublishable": true
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "insalate-pesce-trapanese-17",
@@ -2014,7 +2251,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "requiresSupplierPhoto": false,
         "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
         "auditPublishable": true
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "insalate-pesce-vanitosa-18",
@@ -2039,7 +2279,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "insalate-veg-burrata-0",
@@ -2065,7 +2308,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "vegetariana",
+      "needsDietReview": false
     },
     {
       "id": "insalate-veg-caprese-1",
@@ -2091,7 +2337,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "vegetariana",
+      "needsDietReview": false
     },
     {
       "id": "insalate-veg-greca-2",
@@ -2116,7 +2365,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "vegetariana",
+      "needsDietReview": true
     },
     {
       "id": "insalate-veg-ortolana-3",
@@ -2145,7 +2397,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "requiresSupplierPhoto": false,
         "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
         "auditPublishable": true
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "vegetariana",
+      "needsDietReview": true
     },
     {
       "id": "insalate-veg-reginella-4",
@@ -2175,7 +2430,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "requiresSupplierPhoto": false,
         "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
         "auditPublishable": true
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "vegetariana",
+      "needsDietReview": false
     },
     {
       "id": "insalate-veg-vegetariana-5",
@@ -2201,7 +2459,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "vegana",
+      "needsDietReview": false
     },
     {
       "id": "speciali-apollo-0",
@@ -2230,7 +2491,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "requiresSupplierPhoto": false,
         "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
         "auditPublishable": true
-      }
+      },
+      "categoryGroup": "speciali",
+      "dietType": "onnivora",
+      "needsDietReview": false
     },
     {
       "id": "insalate-pesce-tropicana-19",
@@ -2255,7 +2519,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "insalate",
+      "dietType": "pescetariana",
+      "needsDietReview": false
     },
     {
       "id": "bevande-acqua-0",
@@ -2279,7 +2546,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "bevande",
+      "dietType": "tutte",
+      "needsDietReview": false
     },
     {
       "id": "bevande-bibite-1",
@@ -2302,7 +2572,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "bevande",
+      "dietType": "tutte",
+      "needsDietReview": false
     },
     {
       "id": "bevande-macedonia-2",
@@ -2326,7 +2599,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "dolci",
+      "dietType": "vegana",
+      "needsDietReview": false
     },
     {
       "id": "bevande-birre-3",
@@ -2349,7 +2625,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "bevande",
+      "dietType": "tutte",
+      "needsDietReview": false
     },
     {
       "id": "bevande-pane-nutella-4",
@@ -2375,7 +2654,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "requiresSupplierPhoto": false,
         "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
         "auditPublishable": true
-      }
+      },
+      "categoryGroup": "dolci",
+      "dietType": "vegetariana",
+      "needsDietReview": false
     },
     {
       "id": "succo-0",
@@ -2399,7 +2681,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "succhi",
+      "dietType": "tutte",
+      "needsDietReview": false
     },
     {
       "id": "succo-1",
@@ -2423,7 +2708,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "succhi",
+      "dietType": "tutte",
+      "needsDietReview": false
     },
     {
       "id": "succo-2",
@@ -2447,7 +2735,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "succhi",
+      "dietType": "tutte",
+      "needsDietReview": false
     },
     {
       "id": "succo-3",
@@ -2471,7 +2762,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "succhi",
+      "dietType": "tutte",
+      "needsDietReview": false
     },
     {
       "id": "succo-4",
@@ -2495,7 +2789,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "succhi",
+      "dietType": "tutte",
+      "needsDietReview": false
     },
     {
       "id": "succo-5",
@@ -2519,7 +2816,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "succhi",
+      "dietType": "tutte",
+      "needsDietReview": false
     },
     {
       "id": "succo-6",
@@ -2543,7 +2843,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "succhi",
+      "dietType": "tutte",
+      "needsDietReview": false
     },
     {
       "id": "succo-7",
@@ -2567,7 +2870,10 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      }
+      },
+      "categoryGroup": "succhi",
+      "dietType": "tutte",
+      "needsDietReview": false
     }
   ],
   "cats": [
@@ -3045,6 +3351,60 @@ window.__PAGNOTTELLA_MENU__ = {
     "extraIngredientsReviewRequired": false,
     "extraIngredientsCount": 72,
     "extraIngredientsSource": "Listino completo ingredienti aggiuntivi verificato il 24/07/2026"
+  },
+  "filterTaxonomy": {
+    "clusters": [
+      {
+        "id": "all",
+        "label": "Tutto"
+      },
+      {
+        "id": "panini",
+        "label": "Panini"
+      },
+      {
+        "id": "insalate",
+        "label": "Insalate"
+      },
+      {
+        "id": "speciali",
+        "label": "Speciali del punto vendita"
+      },
+      {
+        "id": "bevande",
+        "label": "Bevande"
+      },
+      {
+        "id": "succhi",
+        "label": "Succhi freschi"
+      },
+      {
+        "id": "dolci",
+        "label": "Dolci"
+      }
+    ],
+    "diets": [
+      {
+        "id": "all",
+        "label": "Tutte"
+      },
+      {
+        "id": "onnivora",
+        "label": "Onnivora"
+      },
+      {
+        "id": "vegetariana",
+        "label": "Vegetariana"
+      },
+      {
+        "id": "vegana",
+        "label": "Vegana"
+      },
+      {
+        "id": "pescetariana",
+        "label": "Pescetariana"
+      }
+    ]
   }
 }
 ;
