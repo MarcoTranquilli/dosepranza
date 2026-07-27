@@ -2631,11 +2631,11 @@ window.__PAGNOTTELLA_MENU__ = {
   "whatsapp": "393921512515",
   "bread": [
     {
-      "label": "Bianco",
+      "label": "Pane bianco",
       "extra": 0
     },
     {
-      "label": "Integrale ai cereali",
+      "label": "Pane integrale ai cereali",
       "extra": 0.5
     }
   ],
@@ -2662,7 +2662,7 @@ window.__PAGNOTTELLA_MENU__ = {
     }
   ],
   "copy": {
-    "delivery": "Ordini e pagamenti entro le 12:00, consegna gratuita entro le 13:00",
+    "delivery": "Ordini e pagamenti entro le 11:30, consegna gratuita alle 12:30",
     "brand": "La Pagnottella Gourmet",
     "powered": "DOSepranza",
     "eyebrow": "Punto vendita Quintino Sella",
@@ -2713,7 +2713,7 @@ window.__PAGNOTTELLA_MENU__ = {
       }
     ],
     "model": "Effettua pagamento",
-    "pickup": "Satispay è il metodo principale. In alternativa puoi usare il bonifico bancario entro le 12:00. PayPal e Nexi sono in attivazione.",
+    "pickup": "Satispay è il metodo principale. In alternativa puoi usare il bonifico bancario istantaneo entro le 11:30. PayPal e Nexi sono in attivazione.",
     "beneficiary": "3M Società a Responsabilità Limitata",
     "iban": "IT35B0832703249000000002986",
     "qrImage": "../assets/pagnottella/payment/satispay-qr-pagnottella.png"
@@ -3017,7 +3017,7 @@ window.__PAGNOTTELLA_MENU__ = {
   "highlights": [
     {
       "label": "Cutoff operativo",
-      "value": "ordine e pagamento entro le 12:00"
+      "value": "ordine e pagamento entro le 11:30"
     },
     {
       "label": "Promo estate",
@@ -3025,7 +3025,7 @@ window.__PAGNOTTELLA_MENU__ = {
     },
     {
       "label": "Consegna",
-      "value": "gratuita entro le 13:00 del giorno stesso"
+      "value": "gratuita alle 12:30 del giorno stesso"
     },
     {
       "label": "Chiusura Via Sella",

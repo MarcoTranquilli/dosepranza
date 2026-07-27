@@ -1,19 +1,5 @@
 (() => {
   function byId(id){ return document.getElementById(id); }
-  function previewText(){ return (byId('waPreview')?.textContent || '').trim(); }
-  function setNotice(text){
-    const confirm = byId('confirm');
-    if(confirm){ confirm.classList.add('show'); confirm.classList.remove('isError'); confirm.textContent = text; }
-  }
-  function copySummary(){
-    const text = previewText();
-    if(!text){ setNotice('Aggiungi almeno un prodotto per generare il riepilogo.'); return; }
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(text).then(() => setNotice('Riepilogo copiato negli appunti.')).catch(() => window.prompt('Copia il riepilogo:', text));
-    } else {
-      window.prompt('Copia il riepilogo:', text);
-    }
-  }
   function polishSponsorCopy(){
     const eyebrow = document.querySelector('.authGateEyebrow');
     if(eyebrow) eyebrow.textContent = 'Anteprima riservata';
@@ -35,15 +21,6 @@
     if(label && !['Salvataggio ordine...', 'Ordini sospesi durante la chiusura'].includes(label.textContent)) label.textContent = 'Finalizza l’ordine tramite il suo invio su WhatsApp';
     const send = byId('sendOrderBtn');
     if(send) send.setAttribute('aria-label', 'Finalizza l’ordine tramite il suo invio su WhatsApp');
-    if(send && !byId('copySummaryBtn')){
-      const copy = document.createElement('button');
-      copy.id = 'copySummaryBtn';
-      copy.type = 'button';
-      copy.className = 'copySummaryBtn';
-      copy.textContent = 'Copia riepilogo';
-      copy.addEventListener('click', copySummary);
-      send.insertAdjacentElement('afterend', copy);
-    }
   }
   function paymentHeading(text){
     const el = document.createElement('div');
