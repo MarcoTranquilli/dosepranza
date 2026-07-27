@@ -1,5 +1,6 @@
 (() => {
   const ADMIN_EMAIL = 'marco.tranquilli@dos.design';
+  const SUPPLIER_EMAIL = 'commerciale@lapagnottellagourmet.it';
   const STORAGE_KEY = 'dose_preview_pagnottella_orders';
   const byId = id => document.getElementById(id);
   const money = value => `€${Number(value || 0).toFixed(2).replace('.', ',')}`;
@@ -22,6 +23,13 @@
   function isAdmin() {
     const user = session();
     return user?.email?.toLowerCase() === ADMIN_EMAIL || user?.role === 'admin' || user?.isAdmin === true;
+  }
+  function isSupplier() {
+    const user = session();
+    return user?.email?.toLowerCase() === SUPPLIER_EMAIL && user?.role === 'supplier';
+  }
+  function hasOrderAccess() {
+    return isAdmin() || isSupplier();
   }
   function readOrders() {
     try {
@@ -65,7 +73,11 @@
   }
   function renderIdentity() {
     const user = session() || { email:ADMIN_EMAIL, role:'admin' };
-    if(byId('adminIdentity')) byId('adminIdentity').textContent = `${user.email || ADMIN_EMAIL} · admin`;
+    if(byId('adminIdentity')) byId('adminIdentity').textContent = `${user.email || ADMIN_EMAIL} · ${isAdmin() ? 'admin' : 'fornitore'}`;
+    if(byId('adminShortcut')) byId('adminShortcut').textContent = isAdmin() ? 'Area admin' : 'Area ordini';
+    if(byId('adminAccessCopy')) byId('adminAccessCopy').textContent = isAdmin()
+      ? 'Accesso avanzato attivo: puoi gestire prodotti, ordini e disponibilità.'
+      : 'Accesso fornitore attivo: puoi consultare gli ordini demo della Pagnottella.';
   }
   function renderOrders() {
     const orders = todayOrders();
@@ -85,7 +97,7 @@
         <footer>
           <span>${escapeHtml(order.paymentMethod || 'Metodo non indicato')}</span>
           <strong>${money(order.total)}</strong>
-          ${order.reconciled ? '' : `<button type="button" onclick="reconcilePagnottellaOrder('${escapeHtml(order.id)}')">Segna riconciliato</button>`}
+          ${order.reconciled || !isAdmin() ? '' : `<button type="button" onclick="reconcilePagnottellaOrder('${escapeHtml(order.id)}')">Segna riconciliato</button>`}
         </footer>
       </article>
     `).join('') : '<div class="adminEmpty">Nessun ordine locale registrato oggi.</div>';
@@ -154,15 +166,21 @@
   function renderAll() {
     const panel = byId('adminWorkspace');
     if(!panel) return;
-    panel.classList.toggle('hidden', !isAdmin());
-    byId('adminShortcut')?.classList.toggle('hidden', !isAdmin());
-    if(!isAdmin()) return;
+    panel.classList.toggle('hidden', !hasOrderAccess());
+    byId('adminShortcut')?.classList.toggle('hidden', !hasOrderAccess());
+    if(!hasOrderAccess()) return;
+    document.querySelectorAll('[data-admin-restricted]').forEach(element => element.classList.toggle('hidden', !isAdmin()));
     renderIdentity();
     renderOrders();
-    renderAnalytics();
-    renderMenuGovernance();
+    if(isAdmin()) {
+      renderAnalytics();
+      renderMenuGovernance();
+    } else {
+      showAdminView('orders');
+    }
   }
   function reconcileOrder(orderId) {
+    if(!isAdmin()) return;
     const orders = readOrders();
     const order = orders.find(item => item.id === orderId);
     if(!order) return;

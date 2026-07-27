@@ -77,22 +77,66 @@ test('foto ufficiali del fornitore associate ai prodotti corretti', async ({ pag
 test('filtri avanzati applicabili e resettabili', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'Scenario desktop');
   await expect(page.locator('#grid .card')).toHaveCount(102);
-  await page.locator('.filterTrigger').click();
-  await expect(page.locator('#filterPanel')).toHaveClass(/show/);
-  await page.locator('[data-filter-group="diet"][data-filter-value="Vegetariano"]').click();
-  await page.locator('#filterIngredientSearch').fill('Mozzarella');
-  await expect(page.locator('#filterIngredients')).toContainText('Mozzarella');
-  await page.locator('[data-filter-group="ingredients"][data-filter-value="Mozzarella"]').click();
-  await page.locator('.filterApply').click();
+  await page.locator('[data-cat="panini"]').click();
+  await page.locator('[data-diet="vegetariana"]').click();
   const filteredCount = await page.locator('#grid .card').count();
   expect(filteredCount).toBeGreaterThan(0);
-  expect(filteredCount).toBeLessThan(102);
+  expect(filteredCount).toBeLessThan(55);
   await expect(page.locator('#activeFilterCount')).toHaveText('2');
-  await expect(page.locator('#resultCount')).toHaveText(`Risultati: ${filteredCount} prodotti`);
-  await page.locator('.filterTrigger').click();
-  await page.locator('.filterReset').click();
+  await expect(page.locator('#resultCount')).toHaveText(`${filteredCount} prodotti trovati`);
+  await page.locator('#search').fill('burrata');
+  const searchedCount = await page.locator('#grid .card').count();
+  expect(searchedCount).toBeGreaterThan(0);
+  expect(searchedCount).toBeLessThanOrEqual(filteredCount);
+  await page.locator('.visibleFilterReset').click();
+  await page.locator('#search').fill('');
   await expect(page.locator('#grid .card')).toHaveCount(102);
   await expect(page.locator('#activeFilterCount')).toHaveClass(/hidden/);
+});
+
+test('tassonomia completa e combinazioni cluster-regime coerenti', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'Scenario desktop');
+  const taxonomy = await page.evaluate(() => {
+    const menu = (window as Window & { __PAGNOTTELLA_MENU__?: { products?: Array<Record<string, unknown>> } }).__PAGNOTTELLA_MENU__;
+    const products = menu?.products || [];
+    return {
+      total: products.length,
+      missing: products.filter(product => !product.categoryGroup || !product.dietType).length,
+      reviews: products.filter(product => product.needsDietReview === true).length
+    };
+  });
+  expect(taxonomy).toEqual({ total:102, missing:0, reviews:4 });
+
+  for(const [cluster, diet] of [
+    ['all', 'vegana'],
+    ['panini', 'pescetariana'],
+    ['insalate', 'onnivora'],
+    ['dolci', 'vegetariana']
+  ]) {
+    await page.locator(`[data-cat="${cluster}"]`).click();
+    await page.locator(`[data-diet="${diet}"]`).click();
+    const count = await page.locator('#grid .card').count();
+    expect(count, `${cluster} + ${diet}`).toBeGreaterThan(0);
+    await expect(page.locator('#resultCount')).toHaveText(`${count} prodotti trovati`);
+  }
+});
+
+test('profilo fornitore Pagnottella limitato al catalogo e agli ordini demo', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'Scenario desktop');
+  await page.goto('pagnottella-preview/?preview=supplier&review=sponsor&swreset=1');
+  await expect(page.locator('#shop')).toHaveClass(/show/);
+  await expect(page.locator('#adminWorkspace')).not.toHaveClass(/hidden/);
+  await expect(page.locator('#adminIdentity')).toHaveText('commerciale@lapagnottellagourmet.it · fornitore');
+  await expect(page.locator('#adminAccessCopy')).toContainText('consultare gli ordini demo');
+  await expect(page.locator('[data-admin-view="analytics"]')).toHaveClass(/hidden/);
+  await expect(page.locator('[data-admin-view="menu"]')).toHaveClass(/hidden/);
+  await expect(page.locator('[data-admin-view="export"]')).toHaveClass(/hidden/);
+  await expect(page.locator('[data-admin-panel="orders"]')).toHaveClass(/active/);
+  const access = await page.evaluate(async () => ({
+    pagnottella: await window.DoseSupplierAccess.canAccessSupplier('pagnottella'),
+    russo: await window.DoseSupplierAccess.canAccessSupplier('russo')
+  }));
+  expect(access).toEqual({ pagnottella:true, russo:false });
 });
 
 test('personalizzazioni ed extra creano righe distinte e aggiornano il totale', async ({ page }, testInfo) => {
@@ -201,12 +245,18 @@ test('promo e chiusura restano applicate', async ({ page }, testInfo) => {
 
 test('filtri, personalizzazione e checkout sono raggiungibili su mobile', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile', 'Scenario mobile');
+  await expect(page.locator('#mobileCategoryFilter')).toBeVisible();
+  await expect(page.locator('#mobileDietFilter')).toBeVisible();
+  await page.locator('#mobileCategoryFilter').selectOption('insalate');
+  await page.locator('#mobileDietFilter').selectOption('pescetariana');
+  await expect(page.locator('#activeFilterCount')).toHaveText('2');
   await page.locator('.filterTrigger').click();
   await expect(page.locator('#filterPanel')).toHaveClass(/show/);
   await expect(page.locator('.filterApply')).toBeInViewport();
-  await page.locator('[data-filter-group="type"][data-filter-value="Panino"]').click();
+  await page.locator('[data-filter-group="type"][data-filter-value="Insalata"]').click();
   await page.locator('.filterApply').click();
-  await expect(page.locator('#activeFilterCount')).toHaveText('1');
+  await expect(page.locator('#activeFilterCount')).toHaveText('3');
+  await page.locator('.visibleFilterReset').click();
 
   await addProduct(page, 'Saporito', 1, ['Funghi']);
   await page.locator('#mobileBar button').click();

@@ -1,10 +1,13 @@
 let DATA = null;
 let PRODUCTS = [];
 let CATS = [];
+let FILTER_TAXONOMY = { clusters:[], diets:[] };
 const state = {
   screen:'landing',
   cat:'all',
   pendingCat:'all',
+  diet:'all',
+  pendingDiet:'all',
   query:'',
   sort:'recommended',
   filters:{ diet:[], type:[], ingredients:[], exclusions:[] },
@@ -101,6 +104,7 @@ async function bootstrap(){
   DATA = await loadData();
   PRODUCTS = DATA.products;
   CATS = DATA.cats;
+  FILTER_TAXONOMY = DATA.filterTaxonomy || { clusters:[], diets:[] };
   hydrateStatic();
   bind();
   renderTabs();
@@ -295,7 +299,14 @@ function backLanding(){
   window.location.href = '../';
 }
 function renderTabs(){
-  byId('tabs').innerHTML = CATS.map(c => `<button class="tab" data-cat="${c.id}" onclick="setCat('${c.id}')">${esc(c.label)}</button>`).join('');
+  byId('tabs').innerHTML = `
+    <span class="filterLevelLabel">Categoria</span>
+    <div class="categoryFilterOptions">
+      ${FILTER_TAXONOMY.clusters.map(c => `<button class="tab" data-cat="${c.id}" onclick="setCat('${c.id}')">${esc(c.label)}</button>`).join('')}
+    </div>
+    <select id="mobileCategoryFilter" class="mobileTaxonomySelect" aria-label="Categoria prodotti" onchange="setCat(this.value)">
+      ${FILTER_TAXONOMY.clusters.map(c => `<option value="${c.id}">${esc(c.label)}</option>`).join('')}
+    </select>`;
   updateTabs();
 }
 function ensureAuthenticated(){
@@ -387,15 +398,25 @@ function activateLocalPreviewAccess(){
   syncAuthGate();
   openShop(false);
 }
-function updateTabs(){ document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.cat === state.cat)); }
+function updateTabs(){
+  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.cat === state.cat));
+  if(byId('mobileCategoryFilter')) byId('mobileCategoryFilter').value = state.cat;
+}
 function renderFilters(){
-  const quickFilters = ['Top','Vegetariano','Panino','Insalata'];
   const quick = byId('filters');
-  if(quick) quick.innerHTML = quickFilters.map(f => `<button class="filter" data-filter="${f}" onclick="setFilter('${escJs(f)}')">${esc(f)}</button>`).join('');
+  if(quick) quick.innerHTML = `
+    <span class="filterLevelLabel">Regime</span>
+    <div class="dietFilterOptions">
+      ${FILTER_TAXONOMY.diets.map(diet => `<button class="filter" data-diet="${diet.id}" onclick="setDiet('${diet.id}')">${esc(diet.label)}</button>`).join('')}
+    </div>
+    <select id="mobileDietFilter" class="mobileTaxonomySelect" aria-label="Regime alimentare" onchange="setDiet(this.value)">
+      ${FILTER_TAXONOMY.diets.map(diet => `<option value="${diet.id}">${esc(diet.label)}</option>`).join('')}
+    </select>
+    <button type="button" class="visibleFilterReset" onclick="resetFilters()">Reset</button>`;
   const categories = byId('filterCategories');
-  if(categories) categories.innerHTML = CATS.map(c => `<button type="button" class="filterSheetChip" data-filter-category="${esc(c.id)}" onclick="setPendingCategory('${escJs(c.id)}')">${esc(c.label)}</button>`).join('');
+  if(categories) categories.innerHTML = FILTER_TAXONOMY.clusters.map(c => `<button type="button" class="filterSheetChip" data-filter-category="${esc(c.id)}" onclick="setPendingCategory('${escJs(c.id)}')">${esc(c.label)}</button>`).join('');
   const diet = byId('filterDiet');
-  if(diet) diet.innerHTML = ['Vegetariano','Vegano','Proteico','Leggero'].map(value => filterFacetButton('diet', value)).join('');
+  if(diet) diet.innerHTML = FILTER_TAXONOMY.diets.map(value => `<button type="button" class="filterSheetChip" data-filter-diet="${value.id}" onclick="setPendingDiet('${value.id}')">${esc(value.label)}</button>`).join('');
   const type = byId('filterTypes');
   if(type) type.innerHTML = ['Top','Panino','Insalata','Bevanda','Dessert','Fresco'].map(value => filterFacetButton('type', value)).join('');
   const exclusions = byId('filterExclusions');
@@ -427,14 +448,15 @@ function renderIngredientFilters(){
   updateFilters();
 }
 function countActiveFilters(filters=state.filters){
-  return Object.values(filters).reduce((total, values) => total + values.length, 0) + (state.cat === 'all' ? 0 : 1);
+  return Object.values(filters).reduce((total, values) => total + values.length, 0)
+    + (state.cat === 'all' ? 0 : 1)
+    + (state.diet === 'all' ? 0 : 1);
 }
 function updateFilters(){
-  document.querySelectorAll('.filter').forEach(button => {
-    const value = button.dataset.filter;
-    button.classList.toggle('active', state.filters.type.includes(value) || state.filters.diet.includes(value));
-  });
+  document.querySelectorAll('[data-diet]').forEach(button => button.classList.toggle('active', button.dataset.diet === state.diet));
+  if(byId('mobileDietFilter')) byId('mobileDietFilter').value = state.diet;
   document.querySelectorAll('[data-filter-category]').forEach(button => button.classList.toggle('active', button.dataset.filterCategory === state.pendingCat));
+  document.querySelectorAll('[data-filter-diet]').forEach(button => button.classList.toggle('active', button.dataset.filterDiet === state.pendingDiet));
   document.querySelectorAll('[data-filter-group]').forEach(button => {
     const group = button.dataset.filterGroup;
     button.classList.toggle('active', state.pendingFilters[group]?.includes(button.dataset.filterValue));
@@ -449,6 +471,7 @@ function updateFilters(){
   if(summary){
     const labels = [
       ...(state.cat === 'all' ? [] : [catLabel(state.cat)]),
+      ...(state.diet === 'all' ? [] : [dietLabel(state.diet)]),
       ...Object.values(state.filters).flat()
     ];
     summary.innerHTML = labels.length
@@ -460,23 +483,23 @@ function setCat(cat){
   state.cat = cat;
   state.pendingCat = cat;
   updateTabs();
-  const c = CATS.find(x => x.id === cat);
-  if(c) byId('heroImage').src = c.hero;
-  byId('heroKicker').textContent = cat === 'all' ? 'Menu completo' : c.label;
+  const c = FILTER_TAXONOMY.clusters.find(x => x.id === cat);
+  const legacyHero = CATS.find(x => x.id === 'all')?.hero;
+  if(legacyHero) byId('heroImage').src = legacyHero;
+  byId('heroKicker').textContent = cat === 'all' ? 'Menu completo' : c?.label || 'Menu';
   renderCatalog();
   byId('catalogTop').scrollIntoView({behavior:'smooth', block:'start'});
 }
-function setFilter(filter){
-  const group = ['Vegetariano','Vegano','Proteico','Leggero'].includes(filter) ? 'diet' : 'type';
-  const values = state.filters[group];
-  state.filters[group] = values.includes(filter) ? values.filter(value => value !== filter) : [...values, filter];
-  state.pendingFilters = structuredClone(state.filters);
+function setDiet(diet){
+  state.diet = diet;
+  state.pendingDiet = diet;
   updateFilters();
   renderCatalog();
 }
 function openFilterPanel(){
   state.pendingFilters = structuredClone(state.filters);
   state.pendingCat = state.cat;
+  state.pendingDiet = state.diet;
   updateFilters();
   byId('filterPanel')?.classList.add('show');
   byId('filterBackdrop')?.classList.add('show');
@@ -491,6 +514,10 @@ function setPendingCategory(category){
   state.pendingCat = category;
   updateFilters();
 }
+function setPendingDiet(diet){
+  state.pendingDiet = diet;
+  updateFilters();
+}
 function togglePendingFilter(group, value){
   const values = state.pendingFilters[group] || [];
   state.pendingFilters[group] = values.includes(value) ? values.filter(item => item !== value) : [...values, value];
@@ -498,6 +525,7 @@ function togglePendingFilter(group, value){
 }
 function applyFilters(){
   state.cat = state.pendingCat;
+  state.diet = state.pendingDiet;
   state.filters = structuredClone(state.pendingFilters);
   state.sort = byId('sort')?.value || state.sort;
   updateFilters();
@@ -507,6 +535,8 @@ function applyFilters(){
 function resetFilters(){
   state.cat = 'all';
   state.pendingCat = 'all';
+  state.diet = 'all';
+  state.pendingDiet = 'all';
   state.filters = { diet:[], type:[], ingredients:[], exclusions:[] };
   state.pendingFilters = structuredClone(state.filters);
   state.sort = 'recommended';
@@ -518,6 +548,8 @@ function resetFilters(){
   renderCatalog();
 }
 function catLabel(id){ return (CATS.find(c => c.id === id) || {}).label || id; }
+function clusterLabel(id){ return (FILTER_TAXONOMY.clusters.find(c => c.id === id) || {}).label || id; }
+function dietLabel(id){ return (FILTER_TAXONOMY.diets.find(d => d.id === id) || {}).label || id; }
 function isSalad(p){ return p.cat.startsWith('insalate') || p.tags.includes('Insalata'); }
 function optionList(p){
   if(isSalad(p)) return DATA.bases;
@@ -529,7 +561,7 @@ function filtered(){
   let arr = PRODUCTS.filter(p => {
     const searchable = `${p.name} ${p.desc} ${(p.tags||[]).join(' ')} ${catLabel(p.cat)}`.toLowerCase();
     const tags = p.tags || [];
-    const dietMatch = state.filters.diet.every(value => tags.includes(value));
+    const dietMatch = state.diet === 'all' || p.dietType === state.diet || p.dietType === 'tutte';
     const typeMatch = state.filters.type.every(value => tags.includes(value));
     const ingredientMatch = state.filters.ingredients.every(value => searchable.includes(value.toLowerCase()));
     const exclusionMatch = state.filters.exclusions.every(value => {
@@ -538,7 +570,7 @@ function filtered(){
       if(value === 'Pesce') return !/(acciughe|baccalà|gamberetti|salmone|spada|tonno)/i.test(searchable);
       return true;
     });
-    return (state.cat === 'all' || p.cat === state.cat)
+    return (state.cat === 'all' || p.categoryGroup === state.cat)
       && dietMatch && typeMatch && ingredientMatch && exclusionMatch
       && (!state.query || searchable.includes(state.query));
   });
@@ -549,13 +581,13 @@ function filtered(){
 }
 function renderCatalog(){
   const arr = filtered();
-  const cat = CATS.find(c => c.id === state.cat);
+  const cat = FILTER_TAXONOMY.clusters.find(c => c.id === state.cat);
   byId('sectionTitle').textContent = state.cat === 'all' ? 'Tutto il menu' : cat.label;
   const rate = Math.round(discountRate() * 100);
   byId('sectionSub').textContent = isOrderingClosed()
     ? `${arr.length} prodotti consultabili · ordini temporaneamente sospesi`
     : `${arr.length} prodotti disponibili · ${rate ? `prezzi già scontati del ${rate}%` : 'prezzi standard attivi'}`;
-  if(byId('resultCount')) byId('resultCount').textContent = `Risultati: ${arr.length} prodotti`;
+  if(byId('resultCount')) byId('resultCount').textContent = `${arr.length} prodotti trovati`;
   byId('empty').classList.toggle('show', arr.length === 0);
   byId('grid').innerHTML = arr.map(p => card(p)).join('');
 }
@@ -885,8 +917,8 @@ function exportCSV(){ const logs = readSafeOrderLogs(); const rows = [['timestam
 function escJs(s){ return String(s).replace(/[\\']/g, m => m === '\\' ? '\\\\' : "\\'"); }
 
 Object.assign(window, {
-  openShop, backLanding, setCat, setFilter, openFilterPanel, closeFilterPanel,
-  setPendingCategory, togglePendingFilter, applyFilters, resetFilters, renderIngredientFilters,
+  openShop, backLanding, setCat, setDiet, openFilterPanel, closeFilterPanel,
+  setPendingCategory, setPendingDiet, togglePendingFilter, applyFilters, resetFilters, renderIngredientFilters,
   openDetails, pickOption, toggleDrawerExtra, closeDrawer, quickAdd, drawerAdd, changeQty,
   sendWA, closePaymentConfirmation, confirmPaymentAndSend, newOrder, openCart, closeCart,
   exportCSV, copyPaymentIban, scrollToExtras, toast

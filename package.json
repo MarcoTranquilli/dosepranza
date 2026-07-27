@@ -8,6 +8,7 @@
     "test:uat:headed": "playwright test --headed",
     "test:approval": "playwright test -c playwright.approval.config.ts",
     "build:approval": "bash scripts/build_pagnottella_approval.sh",
+    "enrich:pagnottella-taxonomy": "node scripts/enrich_pagnottella_taxonomy.mjs && node scripts/build_pagnottella_inline_menu.mjs",
     "sync:pagnottella-images": "node scripts/apply_pagnottella_image_audit.mjs && node scripts/build_pagnottella_inline_menu.mjs",
     "report:pagnottella-images": "node scripts/generate_pagnottella_image_audit.mjs",
     "report:pdf": "node scripts/render_report_pdf.mjs",
