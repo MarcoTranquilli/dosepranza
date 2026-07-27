@@ -141,7 +141,7 @@
     const repeatUsers = Object.values(byUser).filter(count => count > 1).length;
     const beforeCutoff = orders.filter(order => {
       const date = new Date(order.createdAt);
-      return date.getHours() < 11 || (date.getHours() === 11 && date.getMinutes() <= 30);
+      return date.getHours() < 12 || (date.getHours() === 12 && date.getMinutes() === 0);
     }).length;
     byId('analyticsUnique').textContent = String(uniqueUsers);
     byId('analyticsRepeat').textContent = uniqueUsers ? `${Math.round(repeatUsers / uniqueUsers * 100)}%` : '0%';

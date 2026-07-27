@@ -5,10 +5,6 @@
     if(eyebrow) eyebrow.textContent = 'Anteprima riservata';
     const gateTitle = document.querySelector('.authGateCard h3');
     if(gateTitle) gateTitle.textContent = 'Revisione catalogo La Pagnottella Gourmet.';
-    const gateCopy = byId('authGateCopy');
-    if(gateCopy) gateCopy.textContent = 'Pagina riservata per verificare contenuti, prezzi, immagini e flusso ordine prima della pubblicazione.';
-    const gateStatus = byId('authGateStatus');
-    if(gateStatus) gateStatus.textContent = 'Anteprima pronta.';
     const subtitle = byId('brand-subtitle');
     if(subtitle) subtitle.textContent = 'Suite DOSepranza · Anteprima riservata';
     const intro = document.querySelector('.landingCopy > p');

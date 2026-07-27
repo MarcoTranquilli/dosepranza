@@ -2,19 +2,16 @@
   const ADMIN_EMAIL = 'marco.tranquilli@dos.design';
   const SUPPLIER_EMAIL = 'commerciale@lapagnottellagourmet.it';
   const params = new URLSearchParams(location.search);
-  const isPagnottellaReview = () => location.pathname.includes('/pagnottella-preview/') || params.get('review') === 'sponsor';
-  const isPages = () => location.hostname === 'marcotranquilli.github.io'
-    || (
-      ['localhost', '127.0.0.1', '::1'].includes(location.hostname)
-      && isPagnottellaReview()
-      && params.get('review') === 'sponsor'
-    );
-  const requestedRole = () => params.get('preview') === 'supplier' ? 'supplier' : 'admin';
-  const requested = () => ['admin', 'supplier'].includes(params.get('preview')) || localStorage.getItem('dose_preview_admin') === '1';
   const byId = (id) => document.getElementById(id);
+  const isFilePreview = () => location.protocol === 'file:';
+  const isPreviewHost = () => isFilePreview()
+    || location.hostname === 'marcotranquilli.github.io'
+    || ['localhost', '127.0.0.1', '::1'].includes(location.hostname);
+  const localPreviewRequested = () => params.get('localPreview') === '1';
+  const requestedRole = () => params.get('preview') === 'supplier' ? 'supplier' : 'admin';
 
   function resetPreviewSessionIfRequested() {
-    if (!params.has('swreset')) return false;
+    if (!params.has('swreset')) return;
     [
       'dose_preview_admin',
       'dose_user',
@@ -22,28 +19,37 @@
       'dose_preview_pagnottella_orders',
       'dose_preview_mode'
     ].forEach((key) => localStorage.removeItem(key));
-    return true;
+  }
+
+  function storedGoogleSession() {
+    try {
+      const session = JSON.parse(localStorage.getItem('dose_user') || 'null');
+      return session?.provider === 'google.com' && session?.email ? session : null;
+    } catch (error) {
+      return null;
+    }
   }
 
   function previewSession() {
     if (requestedRole() === 'supplier') {
       return {
-        uid: 'github-pages-pagnottella-supplier-preview',
+        uid: 'local-pagnottella-supplier-preview',
         name: 'Commerciale Pagnottella Gourmet',
         email: SUPPLIER_EMAIL,
         role: 'supplier',
         isAdmin: false,
         supplierIds: ['pagnottella'],
-        provider: 'github-pages-pagnottella-supplier-preview'
+        provider: 'local-preview'
       };
     }
     return {
-      uid: 'github-pages-admin-preview',
+      uid: 'local-pagnottella-admin-preview',
       name: 'Marco Tranquilli',
       email: ADMIN_EMAIL,
       role: 'admin',
       isAdmin: true,
-      provider: isPagnottellaReview() ? 'github-pages-pagnottella-admin-preview' : 'github-pages-admin-unlock'
+      supplierIds: [],
+      provider: 'local-preview'
     };
   }
 
@@ -55,9 +61,11 @@
   }
 
   function storePreviewSession() {
+    const googleSession = storedGoogleSession();
+    if (googleSession) return googleSession;
     const session = previewSession();
     localStorage.setItem('dose_preview_admin', '1');
-    localStorage.setItem('dose_preview_mode', session.role === 'supplier' ? 'supplier-review' : (isPagnottellaReview() ? 'sponsor-review' : 'admin'));
+    localStorage.setItem('dose_preview_mode', session.role === 'supplier' ? 'supplier-review' : 'admin-review');
     localStorage.setItem('dose_user', JSON.stringify(session));
     if (!localStorage.getItem('dose_supplier_settings')) {
       localStorage.setItem('dose_supplier_settings', JSON.stringify(previewSettings()));
@@ -87,17 +95,21 @@
     return { id, order, local: true };
   }
 
-  function patchSupplierAccess() {
-    if (!isPages() || !requested() || !window.DoseSupplierAccess) return;
+  function patchSupplierAccess(session) {
+    if (!window.DoseSupplierAccess || session.provider === 'google.com') return;
     const base = window.DoseSupplierAccess;
-    const session = storePreviewSession();
     window.DoseSupplierAccess = Object.freeze({
       ...base,
-      isFilePreview: () => true,
-      isE2E: () => true,
+      isFilePreview: () => isFilePreview(),
+      isE2E: () => false,
       isTrustedLocalContext: () => true,
       getStoredUser: () => session,
       resolveSession: async () => session,
+      signOut: async () => {
+        localStorage.removeItem('dose_user');
+        localStorage.removeItem('dose_preview_admin');
+        localStorage.removeItem('dose_preview_mode');
+      },
       getSupplierSettings: async () => JSON.parse(localStorage.getItem('dose_supplier_settings') || JSON.stringify(previewSettings())),
       setSupplierEnabled: async (supplierId, enabled) => {
         const next = JSON.parse(localStorage.getItem('dose_supplier_settings') || JSON.stringify(previewSettings()));
@@ -110,47 +122,19 @@
     });
   }
 
-  function setSupplierDefaults() {
-    const settings = JSON.parse(localStorage.getItem('dose_supplier_settings') || JSON.stringify(previewSettings()));
-    const enabled = settings?.pagnottella?.enabledForUsers === true;
-    const toggle = byId('pagnottella-enabled');
-    if (toggle) toggle.checked = enabled;
-    const label = byId('pagnottella-toggle-label');
-    if (label) label.textContent = enabled ? 'Abilitata agli utenti' : 'Solo amministratore';
-    const copy = byId('supplier-control-copy');
-    if (copy) copy.textContent = 'Preview GitHub Pages attiva: puoi verificare i fornitori senza Google Login.';
-    const status = byId('pagnottella-visibility-status');
-    if (status) status.textContent = enabled ? 'Attiva per gli utenti' : 'Solo amministratore';
-  }
-
-  function unlockAdmin() {
-    if (!isPages()) return;
+  function activateLocalPreview() {
+    if (!isPreviewHost()) return null;
+    const googleSession = storedGoogleSession();
+    if (googleSession) return googleSession;
     const session = storePreviewSession();
-    patchSupplierAccess();
-    document.body.classList.remove('access-pending', 'auth-locked');
-    document.body.classList.add('auth-resolved');
-    document.body.classList.toggle('is-admin', session.isAdmin === true);
-    setSupplierDefaults();
-    const status = byId('hub-auth-status');
-    if (status) status.textContent = session.isAdmin
-      ? 'Accesso amministratore GitHub Pages completato. Puoi gestire i fornitori qui sotto.'
-      : 'Accesso Pagnottella completato. Puoi consultare il catalogo e gli ordini demo.';
-    const panel = byId('supplier-control-panel') || byId('suppliers-grid');
-    if (panel) setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
+    patchSupplierAccess(session);
+    const status = byId('authGateStatus');
+    if (status) status.textContent = `${session.email} · ${session.role}`;
+    return session;
   }
 
   resetPreviewSessionIfRequested();
-  patchSupplierAccess();
-  if (requested()) storePreviewSession();
+  if (localPreviewRequested() && !storedGoogleSession()) activateLocalPreview();
 
-  document.addEventListener('click', (event) => {
-    const target = event.target;
-    if (!target || target.id !== 'hub-local-login') return;
-    if (!isPages()) return;
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    unlockAdmin();
-  }, true);
-
-  window.DosePagesAdminUnlock = unlockAdmin;
+  window.DosePagesAdminUnlock = activateLocalPreview;
 })();

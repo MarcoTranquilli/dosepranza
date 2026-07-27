@@ -20,7 +20,9 @@ const state = {
   lastSubmittedMessage:''
 };
 const authState = { loading:false, user:null, message:'' };
-const supplierAccess = window.DoseSupplierAccess;
+let supplierAccess = window.DoseSupplierAccess;
+const ADMIN_EMAIL = 'marco.tranquilli@dos.design';
+const PAGNOTTELLA_SUPPLIER_EMAIL = 'commerciale@lapagnottellagourmet.it';
 const byId = id => document.getElementById(id);
 const money = v => '€' + (Math.round(v*100)/100).toFixed(2).replace('.', ',');
 const esc = s => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
@@ -59,7 +61,7 @@ const discountLabel = () => {
   return `${DATA.discount.label || 'Sconto attivo'} -${rate}%`;
 };
 const ORDER_LOG_KEY = 'pg_order_logs';
-const deliveryCopy = () => DATA?.copy?.delivery || 'Ordini e pagamenti entro le 11:30, consegna gratuita alle 12:30';
+const deliveryCopy = () => DATA?.copy?.delivery || 'Ordini e pagamenti entro le 12:00, consegna gratuita alle 12:30';
 const paymentStatusCopy = () => `${DATA.payment.model}. ${DATA.payment.pickup}.`;
 const getStoredDoseUser = () => {
   try {
@@ -76,7 +78,7 @@ const paymentBeneficiary = () => DATA?.payment?.beneficiary || '';
 const paymentIban = () => DATA?.payment?.iban || '';
 const paymentNoteCopy = () => 'Satispay è il metodo principale; in alternativa è disponibile il bonifico bancario. PayPal e Nexi saranno attivati da settembre.';
 const finalizeOrderLabel = 'Finalizza l’ordine tramite il suo invio su WhatsApp';
-const orderCutoffCopy = '11:30';
+const orderCutoffCopy = '12:00';
 const deliveryTimeCopy = '12:30';
 const discountedPrice = v => Math.round(v * (1 - discountRate()) * 100) / 100;
 const isLocalPreview = () => location.protocol === 'file:';
@@ -89,18 +91,6 @@ const setAuthButtonsDisabled = (disabled) => {
 
 async function bootstrap(){
   if(!supplierAccess) throw new Error('Modulo di accesso fornitori non disponibile.');
-  if(!isLocalPreview()){
-    const session = await supplierAccess.resolveSession();
-    if(!session){
-      window.location.replace('../?next=pagnottella');
-      return;
-    }
-    if(!session.isAdmin && !(await supplierAccess.canAccessSupplier('pagnottella', session))){
-      window.location.replace('../russo/');
-      return;
-    }
-    authState.user = session;
-  }
   DATA = await loadData();
   PRODUCTS = DATA.products;
   CATS = DATA.cats;
@@ -109,11 +99,11 @@ async function bootstrap(){
   bind();
   renderTabs();
   renderFilters();
-  if(ensureAuthenticated()) openShop(false);
   renderCatalog();
   renderCart();
   syncAuthGate();
   updateAdmin();
+  await initializeEntryFlow();
 }
 
 async function loadData(){
@@ -259,10 +249,6 @@ function hydrateStatic(){
 }
 
 function bind(){
-  const googleBtn = byId('authGateGoogle');
-  if(googleBtn) googleBtn.addEventListener('click', signInWithGoogleGate);
-  const localBtn = byId('authGateLocal');
-  if(localBtn) localBtn.addEventListener('click', activateLocalPreviewAccess);
   byId('search').addEventListener('input', e => { state.query = e.target.value.trim().toLowerCase(); renderCatalog(); });
   byId('sort').addEventListener('change', e => { state.sort = e.target.value; renderCatalog(); });
   byId('filterIngredientSearch')?.addEventListener('input', renderIngredientFilters);
@@ -292,11 +278,83 @@ function openShop(save=true){
   sessionStorage.setItem('dosepranza_store','pagnottella');
   byId('landing').classList.add('hidden');
   byId('shop').classList.add('show');
-  if(save) history.replaceState(null,'','?store=pagnottella');
+  if(save && location.protocol !== 'file:'){
+    const params = new URLSearchParams(location.search);
+    params.set('store', 'pagnottella');
+    history.replaceState(null, '', `?${params.toString()}`);
+  }
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function backLanding(){
-  window.location.href = '../';
+  closeCart();
+  byId('shop').classList.remove('show');
+  byId('landing').classList.remove('hidden');
+  if(location.protocol !== 'file:'){
+    const params = new URLSearchParams(location.search);
+    params.delete('store');
+    history.replaceState(null, '', params.size ? `?${params.toString()}` : location.pathname);
+  }
+  showSupplierSelection();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function roleForEmail(email){
+  const normalized = String(email || '').trim().toLowerCase();
+  if(normalized === ADMIN_EMAIL) return 'admin';
+  if(normalized === PAGNOTTELLA_SUPPLIER_EMAIL) return 'supplier';
+  return 'user';
+}
+async function initializeEntryFlow(){
+  try{
+    authState.user = await supplierAccess.resolveSession();
+  }catch(error){
+    console.warn('Pagnottella session resolution failed', error);
+    const code = error?.code ? ` (${error.code})` : '';
+    authState.message = `Impossibile verificare la sessione Google${code}. Riprova.`;
+  }
+  syncAuthGate();
+  if(authState.user?.name && authState.user?.email){
+    if(new URLSearchParams(location.search).get('store') === 'pagnottella') openShop(false);
+    else showSupplierSelection();
+    return;
+  }
+  showRecognition();
+}
+function showRecognition(){
+  byId('landing')?.classList.remove('hidden');
+  byId('shop')?.classList.remove('show');
+  byId('recognitionStage')?.classList.remove('hidden');
+  byId('supplierStage')?.classList.add('hidden');
+  syncAuthGate(true);
+  setTimeout(() => byId('authGateGoogle')?.focus(), 50);
+}
+function showSupplierSelection(){
+  const user = authenticatedDoseUser();
+  if(!user?.name || !user?.email){
+    showRecognition();
+    return;
+  }
+  byId('landing')?.classList.remove('hidden');
+  byId('shop')?.classList.remove('show');
+  byId('recognitionStage')?.classList.add('hidden');
+  byId('supplierStage')?.classList.remove('hidden');
+  const identity = byId('recognizedUserDisplay');
+  if(identity) identity.textContent = `${user.name} · ${user.email} · ${roleForEmail(user.email)}`;
+  authState.user = user;
+  window.renderPagnottellaAdmin?.();
+}
+async function changeLocalUser(){
+  try{
+    await supplierAccess?.signOut?.();
+  }catch(error){
+    console.warn('Pagnottella sign out failed', error);
+  }
+  localStorage.removeItem('dose_user');
+  localStorage.removeItem('dose_preview_admin');
+  localStorage.removeItem('dose_preview_mode');
+  authState.user = null;
+  authState.message = '';
+  window.renderPagnottellaAdmin?.();
+  showRecognition();
 }
 function renderTabs(){
   byId('tabs').innerHTML = `
@@ -332,14 +390,22 @@ function syncAuthGate(forceLocked=false){
   landing.classList.toggle('authLocked', forceLocked || !resolved);
   if(resolved){
     authState.message = '';
-    status.textContent = `Riconosciuto come ${user.name} · ${user.email}`;
+    status.classList.remove('isError');
+    status.textContent = `${user.email} · ${roleForEmail(user.email)}`;
   }else if(authState.message){
+    status.classList.add('isError');
     status.textContent = authState.message;
   }else if(isLocalPreview()){
-    status.textContent = 'Accesso locale disponibile per la verifica offline del catalogo.';
+    status.classList.add('isError');
+    status.textContent = 'Google Login richiede un indirizzo http o https. Avvia il server locale o usa GitHub Pages.';
   }else{
-    status.textContent = authState.loading ? 'Accesso Google in corso...' : 'Nessuna sessione Google attiva.';
+    status.classList.remove('isError');
+    status.textContent = authState.loading ? 'Accesso Google in corso...' : 'Nessun utente riconosciuto';
   }
+  const environment = byId('authGateEnvironment');
+  if(environment) environment.textContent = isLocalPreview()
+    ? 'Da file:// puoi usare solo “Apri anteprima locale”. Per Google avvia il server HTTP.'
+    : 'L’anteprima locale è separata dal riconoscimento Google e non usa Firebase.';
 }
 async function signInWithGoogleGate(){
   if(isLocalPreview()){
@@ -352,7 +418,7 @@ async function signInWithGoogleGate(){
   syncAuthGate(true);
   try{
     const payload = await supplierAccess.signInWithGoogle();
-    if(payload.email){
+    if(payload?.email){
       authState.user = payload;
       authState.message = '';
       hydrateStatic();
@@ -360,8 +426,11 @@ async function signInWithGoogleGate(){
       syncAuthGate();
       const params = new URLSearchParams(location.search);
       if(params.get('store') === 'pagnottella') openShop(false);
+      else showSupplierSelection();
+    }else if(document.visibilityState === 'hidden'){
+      return;
     }else{
-      authState.message = 'Login Google completato ma email non disponibile.';
+      authState.message = 'Reindirizzamento a Google in corso...';
     }
   }catch(err){
     console.warn('Pagnottella Google gate failed', err);
@@ -382,21 +451,18 @@ async function signInWithGoogleGate(){
   }
 }
 function activateLocalPreviewAccess(){
-  if(!isLocalPreview()) return;
-  const fallbackUser = {
-    uid: 'local-preview-admin',
-    name: 'Marco Tranquilli',
-    email: 'marco.tranquilli@dos.design',
-    role: 'admin',
-    isAdmin: true,
-    provider: 'local-preview'
-  };
-  localStorage.setItem('dose_user', JSON.stringify(fallbackUser));
+  const fallbackUser = window.DosePagesAdminUnlock?.();
+  supplierAccess = window.DoseSupplierAccess;
+  if(!fallbackUser?.email){
+    authState.message = 'Anteprima locale non disponibile in questo ambiente.';
+    syncAuthGate(true);
+    return;
+  }
   authState.user = fallbackUser;
   hydrateStatic();
   renderCart();
   syncAuthGate();
-  openShop(false);
+  showSupplierSelection();
 }
 function updateTabs(){
   document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.cat === state.cat));
@@ -550,16 +616,16 @@ function resetFilters(){
 function catLabel(id){ return (CATS.find(c => c.id === id) || {}).label || id; }
 function clusterLabel(id){ return (FILTER_TAXONOMY.clusters.find(c => c.id === id) || {}).label || id; }
 function dietLabel(id){ return (FILTER_TAXONOMY.diets.find(d => d.id === id) || {}).label || id; }
-function isSalad(p){ return p.cat.startsWith('insalate') || p.tags.includes('Insalata'); }
+function isSalad(p){ return p.categoryGroup === 'insalate'; }
 function optionList(p){
   if(isSalad(p)) return DATA.bases;
-  if(p.cat.startsWith('panini')) return DATA.bread;
+  if(p.categoryGroup === 'panini') return DATA.bread;
   return [{label:'Standard',extra:0}];
 }
 function defaultOption(p){ return optionList(p)[0]; }
 function filtered(){
   let arr = PRODUCTS.filter(p => {
-    const searchable = `${p.name} ${p.desc} ${(p.tags||[]).join(' ')} ${catLabel(p.cat)}`.toLowerCase();
+    const searchable = `${p.name} ${p.desc} ${(p.tags||[]).join(' ')} ${clusterLabel(p.categoryGroup)}`.toLowerCase();
     const tags = p.tags || [];
     const dietMatch = state.diet === 'all' || p.dietType === state.diet || p.dietType === 'tutte';
     const typeMatch = state.filters.type.every(value => tags.includes(value));
@@ -597,7 +663,7 @@ function card(p){
   const hasSpecificImage = p.imageMeta?.specific === true;
   const alt = hasSpecificImage ? p.name : `La Pagnottella Gourmet - foto specifica non disponibile per ${p.name}`;
   const addLabel = isOrderingClosed() ? 'Ordini sospesi' : `Aggiungi ${p.name}`;
-  return `<article class="card ${hasSpecificImage ? '' : 'imageFallback'}"><div class="pic"><img src="${p.img}" alt="${esc(alt)}" loading="lazy"><div class="badges">${badges.map(t=>`<span class="badge">${esc(t)}</span>`).join('')}</div>${hasSpecificImage ? '' : '<span class="imageNotice">Foto specifica non disponibile</span>'}</div><div class="body"><div class="nameRow"><h4>${esc(p.name)}</h4><div class="price"><span class="old">${money(p.price)}</span>${money(discountedPrice(p.price))}</div></div><p class="desc">${esc(p.desc)}</p><div class="meta"><span class="tag">${esc(catLabel(p.cat))}</span>${(p.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div><div class="actions"><button class="details" onclick="openDetails('${p.id}')">Dettagli</button><button class="add" aria-label="${esc(addLabel)}" onclick="quickAdd('${p.id}')" ${isOrderingClosed() ? 'disabled' : ''}>${isOrderingClosed() ? 'Chiuso' : '+'}</button></div></div></article>`;
+  return `<article class="card ${hasSpecificImage ? '' : 'imageFallback'}"><div class="pic"><img src="${p.img}" alt="${esc(alt)}" loading="lazy"><div class="badges">${badges.map(t=>`<span class="badge">${esc(t)}</span>`).join('')}</div>${hasSpecificImage ? '' : '<span class="imageNotice">Foto specifica non disponibile</span>'}</div><div class="body"><div class="nameRow"><h4>${esc(p.name)}</h4><div class="price"><span class="old">${money(p.price)}</span>${money(discountedPrice(p.price))}</div></div><p class="desc">${esc(p.desc)}</p><div class="meta"><span class="tag">${esc(clusterLabel(p.categoryGroup))}</span>${(p.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div><div class="actions"><button class="details" onclick="openDetails('${p.id}')">Dettagli</button><button class="add" aria-label="${esc(addLabel)}" onclick="quickAdd('${p.id}')" ${isOrderingClosed() ? 'disabled' : ''}>${isOrderingClosed() ? 'Chiuso' : '+'}</button></div></div></article>`;
 }
 function openDetails(id){
   const p = PRODUCTS.find(x => x.id === id);
@@ -609,16 +675,18 @@ function openDetails(id){
   byId('drawerName').textContent = p.name;
   byId('drawerDesc').textContent = p.desc;
   byId('drawerTags').innerHTML = (p.tags || []).map(t=>`<span class="tag">${esc(t)}</span>`).join('');
-  byId('optionTitle').textContent = isSalad(p) ? 'Scegli la base dell’insalata' : (p.cat.startsWith('panini') ? 'Scegli il tipo di pane' : 'Configurazione');
-  byId('optionHelp').textContent = isSalad(p) ? 'Il riso venere aggiunge +€1,50 prima dello sconto.' : (p.cat.startsWith('panini') ? 'Il pane integrale ai cereali aggiunge +€0,50 prima dello sconto.' : 'Per questa voce non sono previste varianti di base.');
+  byId('optionTitle').textContent = isSalad(p) ? 'Scegli la base dell’insalata' : (p.categoryGroup === 'panini' ? 'Scegli il tipo di pane' : 'Configurazione');
+  byId('optionHelp').textContent = isSalad(p) ? 'Il riso venere aggiunge +€1,50 prima dello sconto.' : (p.categoryGroup === 'panini' ? 'Il pane integrale ai cereali aggiunge +€0,50 prima dello sconto.' : 'Per questa voce non sono previste varianti di base.');
   byId('options').innerHTML = optionList(p).map((o,i)=>`<button class="opt ${i===0?'on':''}" onclick="pickOption(${i})">${esc(o.label)}${o.extra?` +${money(o.extra)}`:''}</button>`).join('');
   if(byId('extraSearch')) byId('extraSearch').value = '';
+  byId('drawerExtrasSection')?.classList.toggle('hidden', p.supportsExtras !== true);
   renderDrawerExtras();
   updateDrawerPrice();
   byId('drawer').classList.add('show');
 }
 function pickOption(i){ state.option = optionList(state.current)[i]; document.querySelectorAll('.opt').forEach((b,idx)=>b.classList.toggle('on', idx===i)); updateDrawerPrice(); }
 function selectedExtraObjects(){
+  if(state.current?.supportsExtras !== true) return [];
   return (DATA.extras || []).filter(extra => state.selectedExtras.includes(extra.name));
 }
 function selectedExtrasTotal(){
@@ -639,6 +707,7 @@ function renderDrawerExtras(){
   if(count) count.textContent = state.selectedExtras.length ? `${state.selectedExtras.length} selezionati · +${money(selectedExtrasTotal())}` : 'Nessun extra selezionato';
 }
 function toggleDrawerExtra(name){
+  if(state.current?.supportsExtras !== true) return;
   state.selectedExtras = state.selectedExtras.includes(name)
     ? state.selectedExtras.filter(value => value !== name)
     : [...state.selectedExtras, name];
@@ -660,7 +729,7 @@ function addToCart(p,o,extras=[]){
     toast('Punto vendita chiuso: ordini temporaneamente sospesi');
     return false;
   }
-  const normalizedExtras = extras.map(extra => ({ name:extra.name, price:Number(extra.price || 0) })).sort((a,b) => a.name.localeCompare(b.name));
+  const normalizedExtras = (p.supportsExtras === true ? extras : []).map(extra => ({ name:extra.name, price:Number(extra.price || 0) })).sort((a,b) => a.name.localeCompare(b.name));
   const extrasTotal = normalizedExtras.reduce((total, extra) => total + extra.price, 0);
   const originalUnit = Math.round((p.price + o.extra + extrasTotal) * 100) / 100;
   const key = [p.id, o.label, ...normalizedExtras.map(extra => extra.name)].join('|');
@@ -749,7 +818,7 @@ function buildOrderPayload(){
   const items = t.items.flatMap(item => Array.from({ length:item.qty }, () => ({
     id: item.id,
     name: item.name,
-    cat: catLabel(item.cat),
+    cat: clusterLabel(item.categoryGroup),
     details: `${item.opt}${item.extras?.length ? ` · Extra: ${item.extras.map(extra => extra.name).join(', ')}` : ''}`,
     option: item.opt,
     optionExtra: Number(item.optExtra || 0),
@@ -917,7 +986,8 @@ function exportCSV(){ const logs = readSafeOrderLogs(); const rows = [['timestam
 function escJs(s){ return String(s).replace(/[\\']/g, m => m === '\\' ? '\\\\' : "\\'"); }
 
 Object.assign(window, {
-  openShop, backLanding, setCat, setDiet, openFilterPanel, closeFilterPanel,
+  openShop, backLanding, showRecognition, showSupplierSelection, signInWithGoogleGate, activateLocalPreviewAccess, changeLocalUser,
+  setCat, setDiet, openFilterPanel, closeFilterPanel,
   setPendingCategory, setPendingDiet, togglePendingFilter, applyFilters, resetFilters, renderIngredientFilters,
   openDetails, pickOption, toggleDrawerExtra, closeDrawer, quickAdd, drawerAdd, changeQty,
   sendWA, closePaymentConfirmation, confirmPaymentAndSend, newOrder, openCart, closeCart,
