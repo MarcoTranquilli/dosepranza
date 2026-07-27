@@ -1,6 +1,5 @@
 (() => {
   const ADMIN_EMAIL = 'marco.tranquilli@dos.design';
-  const REVIEW_EMAIL = 'review.pagnottella@dosepranza.local';
   const params = new URLSearchParams(location.search);
   const isPagnottellaReview = () => location.pathname.includes('/pagnottella-preview/') || params.get('review') === 'sponsor';
   const isPages = () => location.hostname === 'marcotranquilli.github.io'
@@ -25,23 +24,13 @@
   }
 
   function adminSession() {
-    if (isPagnottellaReview()) {
-      return {
-        uid: 'pagnottella-review-preview',
-        name: 'Anteprima sponsor',
-        email: REVIEW_EMAIL,
-        role: 'review',
-        isAdmin: true,
-        provider: 'github-pages-review-preview'
-      };
-    }
     return {
       uid: 'github-pages-admin-preview',
       name: 'Marco Tranquilli',
       email: ADMIN_EMAIL,
       role: 'admin',
       isAdmin: true,
-      provider: 'github-pages-admin-unlock'
+      provider: isPagnottellaReview() ? 'github-pages-pagnottella-admin-preview' : 'github-pages-admin-unlock'
     };
   }
 

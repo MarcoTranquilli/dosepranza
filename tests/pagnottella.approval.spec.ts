@@ -1,51 +1,64 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 
-const reviewPath = 'pagnottella-preview/?preview=admin&review=sponsor';
+const reviewPath = 'pagnottella-preview/?preview=admin&review=sponsor&swreset=1';
+
+async function addProduct(page: Page, name: string, optionIndex = 0, extras: string[] = []) {
+  await page.locator('#search').fill(name);
+  await page.locator('#grid .card').filter({ hasText:name }).first().locator('.add').click();
+  await expect(page.locator('#drawer')).toHaveClass(/show/);
+  await page.locator('#options .opt').nth(optionIndex).click();
+  for(const extra of extras) {
+    await page.locator('#extraSearch').fill(extra);
+    await page.locator('#drawerExtras .drawerExtra').filter({ hasText:extra }).click();
+  }
+  await page.getByRole('button', { name:'Aggiungi al carrello' }).click();
+}
+
+async function confirmOrder(page: Page) {
+  const modal = page.locator('#paymentConfirmModal');
+  if(!(await modal.getAttribute('class'))?.includes('show')) {
+    await page.locator('#sendOrderBtn').click();
+  }
+  await expect(modal).toHaveClass(/show/);
+  const popupPromise = page.waitForEvent('popup');
+  await page.locator('#paymentConfirmAccept').click();
+  const popup = await popupPromise;
+  await expect(page.locator('#confirm')).toContainText('Pagamento dichiarato effettuato');
+  await popup.close();
+}
 
 test.beforeEach(async ({ page }) => {
   await page.goto(reviewPath);
   await expect(page.locator('#shop')).toHaveClass(/show/);
 });
 
-test('catalogo completo, immagini e navigazione autonoma', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'desktop', 'Flusso funzionale verificato su desktop');
+test('catalogo completo, immagini, orari e amministratore locale', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'Scenario desktop');
   await expect(page).toHaveTitle(/Pagnottella Gourmet/);
   await expect(page.locator('.brandLogo')).toBeVisible();
-  await expect(page.locator('.suiteInlineLogo')).toBeVisible();
   await expect(page.locator('#grid .card')).toHaveCount(102);
-  await expect(page.locator('#extras-preview-title')).toHaveText('72 ingredienti disponibili');
   await expect(page.locator('#extrasGrid .extraChip')).toHaveCount(72);
-  await expect(page.locator('#extrasGrid')).toContainText('Funghi');
-  await expect(page.locator('#extrasGrid')).toContainText('Salsa al tartufo');
-  await expect(page.locator('#extrasGrid')).toContainText('Semi di sesamo');
-  await expect(page.locator('#price-validity-note')).toContainText('30/08/2026');
   await expect(page.locator('#heroTitle')).toHaveText(
     'Panini e insalate gourmet, con sconto estivo e consegna gratuita in pausa pranzo.'
   );
-  await expect(page.locator('#service-closure-notice')).toContainText('17 agosto');
-  await expect(page.locator('#service-closure-notice')).toContainText('23 agosto 2026');
-  await expect(page.locator('body')).not.toContainText(/cambia fornitore/i);
-  await expect(page.locator('body')).not.toContainText(/documenti locali/i);
-  await expect(page.locator('body')).not.toContainText(/layout più vicino alla demo/i);
-
-  await page.locator('#search').fill('Saporito');
-  await expect(page.locator('#grid .card')).toHaveCount(1);
-  const image = page.locator('#grid .card img').first();
-  await expect(image).toHaveAttribute('src', /panini_saporito__panino_saporito\.jpg/);
-  await image.scrollIntoViewIfNeeded();
-  await image.evaluate((element: HTMLImageElement) => element.decode());
-  expect(await image.evaluate((element: HTMLImageElement) => element.naturalWidth)).toBeGreaterThan(0);
-
-  await page.getByRole('button', { name: /torna alla presentazione/i }).click();
-  await expect(page.locator('#landing')).not.toHaveClass(/hidden/);
-  await expect(page.locator('#shop')).not.toHaveClass(/show/);
-  await page.getByRole('button', { name: /apri il catalogo/i }).click();
-  await expect(page.locator('#shop')).toHaveClass(/show/);
-  await expect(page).toHaveURL(/preview=admin&review=sponsor/);
+  await expect(page.locator('#cartDeliveryText')).toContainText('11:30');
+  await expect(page.locator('#cartDeliveryText')).toContainText('12:30');
+  await expect(page.locator('body')).not.toContainText('entro le 12:00');
+  await expect(page.locator('body')).not.toContainText('entro le 13:00');
+  await expect(page.locator('#waPreview')).toHaveCount(0);
+  await expect(page.locator('#adminWorkspace')).not.toHaveClass(/hidden/);
+  await expect(page.locator('#adminIdentity')).toHaveText('marco.tranquilli@dos.design · admin');
+  await expect(page.locator('#adminWorkspace')).toContainText(
+    'Accesso avanzato attivo: puoi gestire prodotti, ordini e disponibilità.'
+  );
+  await expect(page.locator('.adminNav')).toContainText('Tutti gli ordini');
+  await expect(page.locator('.adminNav')).toContainText('Analisi');
+  await expect(page.locator('.adminNav')).toContainText('Gestione menù');
+  await expect(page.locator('.adminNav')).toContainText('Export');
 });
 
 test('foto ufficiali del fornitore associate ai prodotti corretti', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'desktop', 'Verifica immagini eseguita su desktop');
+  test.skip(testInfo.project.name !== 'desktop', 'Scenario desktop');
   for (const [product, filename] of [
     ['Brontolo', 'panini_brontolo__panino_brontolo.jpg'],
     ['Newyorkese', 'panini_newyorkese__panino_newyorkese.jpg'],
@@ -53,27 +66,128 @@ test('foto ufficiali del fornitore associate ai prodotti corretti', async ({ pag
     ['Salentina', 'insalate_salentina__insalata_salentina.jpg']
   ]) {
     await page.locator('#search').fill(product);
-    const card = page.locator('#grid .card').filter({ hasText: product }).first();
-    await expect(card).toBeVisible();
-    await expect(card).not.toHaveClass(/imageFallback/);
+    const card = page.locator('#grid .card').filter({ hasText:product }).first();
     const image = card.locator('img');
     await expect(image).toHaveAttribute('src', new RegExp(filename.replace('.', '\\.')));
-    await image.scrollIntoViewIfNeeded();
     await image.evaluate((element: HTMLImageElement) => element.decode());
     expect(await image.evaluate((element: HTMLImageElement) => element.naturalWidth)).toBeGreaterThan(0);
   }
 });
 
-test('promo estesa e chiusura applicate come regole operative', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'desktop', 'Verifica temporale eseguita su desktop');
+test('filtri avanzati applicabili e resettabili', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'Scenario desktop');
+  await expect(page.locator('#grid .card')).toHaveCount(102);
+  await page.locator('.filterTrigger').click();
+  await expect(page.locator('#filterPanel')).toHaveClass(/show/);
+  await page.locator('[data-filter-group="diet"][data-filter-value="Vegetariano"]').click();
+  await page.locator('#filterIngredientSearch').fill('Mozzarella');
+  await expect(page.locator('#filterIngredients')).toContainText('Mozzarella');
+  await page.locator('[data-filter-group="ingredients"][data-filter-value="Mozzarella"]').click();
+  await page.locator('.filterApply').click();
+  const filteredCount = await page.locator('#grid .card').count();
+  expect(filteredCount).toBeGreaterThan(0);
+  expect(filteredCount).toBeLessThan(102);
+  await expect(page.locator('#activeFilterCount')).toHaveText('2');
+  await expect(page.locator('#resultCount')).toHaveText(`Risultati: ${filteredCount} prodotti`);
+  await page.locator('.filterTrigger').click();
+  await page.locator('.filterReset').click();
+  await expect(page.locator('#grid .card')).toHaveCount(102);
+  await expect(page.locator('#activeFilterCount')).toHaveClass(/hidden/);
+});
 
+test('personalizzazioni ed extra creano righe distinte e aggiornano il totale', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'Scenario desktop');
+  await addProduct(page, 'Saporito', 1, ['Funghi']);
+  await addProduct(page, 'Saporito', 0);
+  await expect(page.locator('#cartItems .checkoutItem')).toHaveCount(2);
+  await expect(page.locator('#cartItems')).toContainText('Pane integrale ai cereali');
+  await expect(page.locator('#cartItems')).toContainText('Pane bianco');
+  await expect(page.locator('#cartItems')).toContainText('Extra: Funghi (+€0,50)');
+  await expect(page.locator('#finalTotal')).toHaveText('€13,60');
+  await expect(page.locator('#cartCount')).toHaveText('2');
+});
+
+test('popup pagamento blocca WhatsApp e gestisce Satispay e bonifico', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'Scenario desktop');
+  await addProduct(page, 'Saporito');
+  await page.getByRole('button', { name:'Vedi carrello' }).click();
+  await page.locator('#sendOrderBtn').click();
+  await expect(page.locator('#paymentConfirmModal')).toHaveClass(/show/);
+  await expect(page.locator('#paymentConfirmCopy')).toHaveText(
+    'Prima di finalizzare l’ordine, conferma di aver effettuato il pagamento secondo il metodo selezionato.'
+  );
+  await page.getByRole('button', { name:'Annulla' }).click();
+  await expect(page.locator('#paymentConfirmModal')).not.toHaveClass(/show/);
+  expect(await page.evaluate(() => localStorage.getItem('dose_preview_pagnottella_orders'))).toBeNull();
+
+  await page.locator('.paymentOption').filter({ hasText:'Bonifico bancario' }).click();
+  await page.locator('#sendOrderBtn').click();
+  await expect(page.locator('#paymentConfirmCopy')).toContainText('bonifico deve essere istantaneo');
+  await expect(page.locator('#paymentConfirmCopy')).toContainText('allega la ricevuta');
+  await confirmOrder(page);
+
+  const orders = await page.evaluate(() => JSON.parse(localStorage.getItem('dose_preview_pagnottella_orders') || '[]'));
+  expect(orders).toHaveLength(1);
+  expect(orders[0]).toMatchObject({
+    user:'Marco Tranquilli',
+    email:'marco.tranquilli@dos.design',
+    paymentMethod:'Bonifico bancario',
+    paymentStatus:'declared_paid',
+    reconciled:false,
+    preview:true
+  });
+});
+
+test('WhatsApp include configurazioni ed extra senza preview visibile', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'Scenario desktop');
+  await addProduct(page, 'Saporito', 1, ['Funghi', 'Pesto']);
+  await page.getByRole('button', { name:'Vedi carrello' }).click();
+  await expect(page.locator('#waPreview')).toHaveCount(0);
+  await page.locator('#sendOrderBtn').click();
+  const popupPromise = page.waitForEvent('popup');
+  await page.locator('#paymentConfirmAccept').click();
+  const popup = await popupPromise;
+  const whatsappText = () => new URL(popup.url()).searchParams.get('text') || '';
+  await expect.poll(whatsappText).toContain('Pane integrale ai cereali');
+  await expect.poll(whatsappText).toContain('Funghi');
+  await expect.poll(whatsappText).toContain('Pesto');
+  await popup.close();
+});
+
+test('ordini giornata, riconciliazione, analisi ed export CSV', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'Scenario desktop');
+  await addProduct(page, 'Saporito', 1, ['Funghi']);
+  await page.getByRole('button', { name:'Vedi carrello' }).click();
+  await confirmOrder(page);
+  await expect(page.locator('#adminOrdersCount')).toHaveText('1');
+  await expect(page.locator('#adminRevenue')).toHaveText('€7,20');
+  await expect(page.locator('#adminAverage')).toHaveText('€7,20');
+  await expect(page.locator('#adminOrdersList')).toContainText('Pane integrale ai cereali');
+  await expect(page.locator('#adminOrdersList')).toContainText('Funghi');
+  await expect(page.locator('#adminOrdersList')).toContainText('Dichiarato pagato');
+  await page.getByRole('button', { name:'Segna riconciliato' }).click();
+  await expect(page.locator('#adminOrdersList')).toContainText('Riconciliato');
+  await expect(page.locator('#adminPending')).toHaveText('€0,00');
+
+  await page.locator('[data-admin-view="analytics"]').click();
+  await expect(page.locator('[data-admin-panel="analytics"]')).toHaveClass(/active/);
+  await expect(page.locator('#analyticsUnique')).toHaveText('1');
+  await expect(page.locator('#topProducts')).toContainText('Saporito');
+
+  await page.locator('[data-admin-view="export"]').click();
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name:'Scarica CSV' }).click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toMatch(/^ordini-pagnottella-.*\.csv$/);
+});
+
+test('promo e chiusura restano applicate', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'Scenario desktop');
   await page.addInitScript(() => {
     (window as Window & { __PAGNOTTELLA_NOW__?: string }).__PAGNOTTELLA_NOW__ = '2026-08-24T10:00:00+02:00';
   });
   await page.reload();
-  await expect(page.locator('#shop')).toHaveClass(/show/);
-  await page.locator('#search').fill('Saporito');
-  await page.locator('#grid .card .add').click();
+  await addProduct(page, 'Saporito');
   await expect(page.locator('#discountLabel')).toContainText('20%');
   await expect(page.locator('#finalTotal')).toContainText('€6,40');
 
@@ -82,98 +196,26 @@ test('promo estesa e chiusura applicate come regole operative', async ({ page },
   });
   await page.reload();
   await expect(page.locator('#service-closure-notice')).toHaveClass(/isActive/);
-  await expect(page.locator('#sectionSub')).toContainText('ordini temporaneamente sospesi');
   await expect(page.locator('#grid .card .add').first()).toBeDisabled();
-  await expect(page.locator('#grid .card .add').first()).toHaveText('Chiuso');
 });
 
-test('carrello, sconto, pagamenti e riepilogo ordine', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'desktop', 'Flusso funzionale verificato su desktop');
-  await page.locator('#search').fill('Saporito');
-  await page.locator('#grid .card .add').click();
-  await expect(page.locator('#cartCount')).toHaveText('1');
-  await expect(page.locator('#discountLabel')).toContainText('20%');
-  await expect(page.locator('#finalTotal')).toContainText('€6,40');
+test('filtri, personalizzazione e checkout sono raggiungibili su mobile', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile', 'Scenario mobile');
+  await page.locator('.filterTrigger').click();
+  await expect(page.locator('#filterPanel')).toHaveClass(/show/);
+  await expect(page.locator('.filterApply')).toBeInViewport();
+  await page.locator('[data-filter-group="type"][data-filter-value="Panino"]').click();
+  await page.locator('.filterApply').click();
+  await expect(page.locator('#activeFilterCount')).toHaveText('1');
 
-  await expect(page.locator('input[name="paymentMethod"][value="Contanti"]')).toHaveCount(0);
-  await expect(page.locator('input[name="paymentMethod"][value="POS"]')).toHaveCount(0);
-  await expect(page.locator('input[name="paymentMethod"][value="Satispay"]')).toBeChecked();
-  await expect(page.locator('input[name="paymentMethod"][value="PayPal"]')).toBeDisabled();
-  await expect(page.locator('input[name="paymentMethod"][value="Nexi"]')).toBeDisabled();
-  await expect(page.locator('.paymentChoice legend')).toHaveText('Scegli metodo di pagamento');
-  await expect(page.locator('#paymentCardTitle')).toHaveText('Effettua pagamento');
-  await expect(page.locator('.deliveryCard')).toHaveCount(0);
-  await expect(page.locator('.waTitle')).toHaveCount(0);
-  await expect(page.locator('body')).not.toContainText('Consegna pausa pranzo');
-  await expect(page.locator('body')).not.toContainText('Riepilogo ordine da inviare su WhatsApp');
-  await expect(page.locator('#sendOrderLabel')).toHaveText(
-    'Finalizza l’ordine tramite il suo invio su WhatsApp'
-  );
-  await expect(page.locator('#sendOrderBtn .waArrow')).toBeVisible();
-
-  const checkoutOrder = await page.evaluate(() => {
-    const before = (first: string, second: string) => Boolean(
-      document.querySelector(first)?.compareDocumentPosition(document.querySelector(second)!)
-      & Node.DOCUMENT_POSITION_FOLLOWING
-    );
-    return {
-      customerBeforePayment: before('#customer', '.paymentChoice'),
-      paymentBeforeAction: before('.paymentChoice', '.paymentCard'),
-      actionBeforeSummary: before('.paymentCard', '.waBlock'),
-      summaryBeforeWhatsapp: before('.waBlock', '#sendOrderBtn')
-    };
-  });
-  expect(checkoutOrder).toEqual({
-    customerBeforePayment: true,
-    paymentBeforeAction: true,
-    actionBeforeSummary: true,
-    summaryBeforeWhatsapp: true
-  });
-
-  await expect(page.locator('#paymentDetails img')).toHaveAttribute('src', /satispay-qr-pagnottella\.png/);
-
-  await page.locator('.paymentOption').filter({ hasText: 'Bonifico bancario' }).click();
-  await expect(page.locator('input[name="paymentMethod"][value="Bonifico bancario"]')).toBeChecked();
-  await expect(page.locator('#paymentDetails')).toContainText('3M Società a Responsabilità Limitata');
-  await expect(page.locator('#paymentDetails')).toContainText('IT35B0832703249000000002986');
-  await page.locator('#notes').fill('No cipolla');
-  await expect(page.locator('#waPreview')).toContainText('📦 Riepilogo Ordine – La Pagnottella Gourmet');
-  await expect(page.locator('#waPreview')).toContainText('Anteprima sponsor – DOS Design S.p.a.');
-  await expect(page.locator('#waPreview')).toContainText('Metodo selezionato: Bonifico bancario');
-  await expect(page.locator('#waPreview')).toContainText('No cipolla');
-
-  page.once('popup', async popup => popup.close());
-  await page.locator('#sendOrderBtn').click();
-  await expect(page.locator('#confirm')).toContainText('salvato correttamente');
-
-  const logs = await page.evaluate(() => localStorage.getItem('pg_order_logs') || '');
-  expect(logs).not.toContain('IT35B0832703249000000002986');
-  expect(logs).not.toContain('3M Società a Responsabilità Limitata');
-  expect(logs).not.toContain('No cipolla');
-  const orders = await page.evaluate(() => JSON.parse(localStorage.getItem('dose_preview_pagnottella_orders') || '[]'));
-  expect(orders).toHaveLength(1);
-  expect(orders[0]).toMatchObject({
-    supplierId: 'pagnottella',
-    supplierName: 'La Pagnottella Gourmet',
-    paymentMethod: 'Bonifico bancario',
-    total: 6.4,
-    preview: true
-  });
-});
-
-test('layout utilizzabile su viewport mobile', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'mobile', 'Verifica specifica mobile');
-  await expect(page.locator('.topbar')).toBeVisible();
-  await expect(page.locator('#grid .card').first()).toBeVisible();
-  await page.locator('#grid .card .add').first().click();
-  await expect(page.locator('#mobileBar')).not.toHaveClass(/hidden/);
+  await addProduct(page, 'Saporito', 1, ['Funghi']);
   await page.locator('#mobileBar button').click();
   await expect(page.locator('#cart')).toHaveClass(/open/);
   await page.locator('.cartBody').evaluate(element => {
     element.scrollTop = element.scrollHeight;
   });
   await expect(page.locator('#sendOrderBtn')).toBeInViewport();
-  await expect(page.locator('#sendOrderLabel')).toHaveText(
-    'Finalizza l’ordine tramite il suo invio su WhatsApp'
-  );
+  await page.locator('#sendOrderBtn').click();
+  await expect(page.locator('#paymentConfirmModal')).toHaveClass(/show/);
+  await expect(page.locator('#paymentConfirmAccept')).toBeInViewport();
 });

@@ -17,6 +17,7 @@ mkdir -p \
 cp "${ROOT_DIR}/pagnottella-preview/index.html" "${DIST_DIR}/pagnottella-preview/"
 cp "${ROOT_DIR}/pagnottella-preview/preview-fixes.css" "${DIST_DIR}/pagnottella-preview/"
 cp "${ROOT_DIR}/pagnottella-preview/sponsor-polish.js" "${DIST_DIR}/pagnottella-preview/"
+cp "${ROOT_DIR}/pagnottella-preview/approval-admin.js" "${DIST_DIR}/pagnottella-preview/"
 cp "${ROOT_DIR}/pagnottella/pagnottella.css" "${DIST_DIR}/pagnottella/"
 cp "${ROOT_DIR}/pagnottella/pagnottella.js" "${DIST_DIR}/pagnottella/"
 cp "${ROOT_DIR}/supplier-access.js" "${DIST_DIR}/"
@@ -50,6 +51,7 @@ touch "${DIST_DIR}/.nojekyll"
 
 test -s "${DIST_DIR}/index.html"
 test -s "${DIST_DIR}/pagnottella-preview/index.html"
+test -s "${DIST_DIR}/pagnottella-preview/approval-admin.js"
 test -s "${DIST_DIR}/assets/pagnottella/data/menu.json"
 test -s "${DIST_DIR}/assets/pagnottella/payment/satispay-qr-pagnottella.png"
 
