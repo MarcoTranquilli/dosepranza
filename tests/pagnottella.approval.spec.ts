@@ -41,7 +41,7 @@ test.beforeEach(async ({ page }) => {
 
 test('riconoscimento locale, ruoli e scelta fornitore', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'Scenario desktop');
-  const localUrl = `file://${process.cwd()}/pagnottella-preview/index.html?review=sponsor&swreset=1`;
+  const localUrl = `file://${process.cwd()}/pagnottella-preview/index.html?preview=admin&review=sponsor&swreset=1`;
   await page.goto(localUrl);
   await expect(page.locator('#recognitionStage')).not.toHaveClass(/hidden/);
   await expect(page.locator('#supplierStage')).toHaveClass(/hidden/);
@@ -51,6 +51,9 @@ test('riconoscimento locale, ruoli e scelta fornitore', async ({ page }, testInf
   await expect(page.locator('#supplierStage')).not.toHaveClass(/hidden/);
   await expect(page.locator('#recognizedUserDisplay')).toHaveText('Marco Tranquilli · marco.tranquilli@dos.design · admin');
   await expect(page.locator('.russoCard')).toHaveAttribute('href', 'https://marcotranquilli.github.io/dosepranza/russo/?v=russo-public-3');
+  await expect(page.locator('.russoCard')).toContainText('con consegna gratuita');
+  await expect(page.locator('.russoCard')).toContainText('entro le 11:30');
+  await expect(page.locator('.pagnottellaCard')).toContainText('Pagamento entro le 12:00');
   await page.locator('.pagnottellaCard').click();
   await expect(page.locator('#shop')).toHaveClass(/show/);
   await page.getByRole('button', { name:'Cambia fornitore' }).click();
@@ -74,9 +77,8 @@ test('catalogo completo, immagini, orari e amministratore locale', async ({ page
   await expect(page.locator('#heroTitle')).toHaveText(
     'Panini e insalate gourmet, con sconto estivo e consegna gratuita in pausa pranzo.'
   );
-  await expect(page.locator('#cartDeliveryText')).toContainText('11:30');
+  await expect(page.locator('#cartDeliveryText')).toContainText('12:00');
   await expect(page.locator('#cartDeliveryText')).toContainText('12:30');
-  await expect(page.locator('body')).not.toContainText('entro le 12:00');
   await expect(page.locator('body')).not.toContainText('entro le 13:00');
   await expect(page.locator('#waPreview')).toHaveCount(0);
   await expect(page.locator('#adminWorkspace')).not.toHaveClass(/hidden/);
@@ -254,6 +256,7 @@ test('WhatsApp include configurazioni ed extra senza preview visibile', async ({
   await expect.poll(whatsappText).toContain('Pane integrale ai cereali');
   await expect.poll(whatsappText).toContain('Funghi');
   await expect.poll(whatsappText).toContain('Pesto');
+  await expect.poll(whatsappText).toContain('entro le 12:00');
   await popup.close();
 });
 
@@ -327,4 +330,5 @@ test('filtri, personalizzazione e checkout sono raggiungibili su mobile', async 
   await page.locator('#sendOrderBtn').click();
   await expect(page.locator('#paymentConfirmModal')).toHaveClass(/show/);
   await expect(page.locator('#paymentConfirmAccept')).toBeInViewport();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });

@@ -3050,7 +3050,7 @@ window.__PAGNOTTELLA_MENU__ = {
     }
   ],
   "copy": {
-    "delivery": "Ordini e pagamenti entro le 11:30, consegna gratuita alle 12:30",
+    "delivery": "Ordini e pagamenti entro le 12:00, consegna gratuita alle 12:30",
     "brand": "La Pagnottella Gourmet",
     "powered": "DOSepranza",
     "eyebrow": "Punto vendita Quintino Sella",
@@ -3101,7 +3101,7 @@ window.__PAGNOTTELLA_MENU__ = {
       }
     ],
     "model": "Effettua pagamento",
-    "pickup": "Satispay è il metodo principale. In alternativa puoi usare il bonifico bancario istantaneo entro le 11:30. PayPal e Nexi sono in attivazione.",
+    "pickup": "Satispay è il metodo principale. In alternativa puoi usare il bonifico bancario istantaneo entro le 12:00. PayPal e Nexi sono in attivazione.",
     "beneficiary": "3M Società a Responsabilità Limitata",
     "iban": "IT35B0832703249000000002986",
     "qrImage": "../assets/pagnottella/payment/satispay-qr-pagnottella.png"
@@ -3405,7 +3405,7 @@ window.__PAGNOTTELLA_MENU__ = {
   "highlights": [
     {
       "label": "Cutoff operativo",
-      "value": "ordine e pagamento entro le 11:30"
+      "value": "ordine e pagamento entro le 12:00"
     },
     {
       "label": "Promo estate",

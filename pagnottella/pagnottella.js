@@ -61,7 +61,7 @@ const discountLabel = () => {
   return `${DATA.discount.label || 'Sconto attivo'} -${rate}%`;
 };
 const ORDER_LOG_KEY = 'pg_order_logs';
-const deliveryCopy = () => DATA?.copy?.delivery || 'Ordini e pagamenti entro le 11:30, consegna gratuita alle 12:30';
+const deliveryCopy = () => DATA?.copy?.delivery || 'Ordini e pagamenti entro le 12:00, consegna gratuita alle 12:30';
 const paymentStatusCopy = () => `${DATA.payment.model}. ${DATA.payment.pickup}.`;
 const getStoredDoseUser = () => {
   try {
@@ -78,7 +78,7 @@ const paymentBeneficiary = () => DATA?.payment?.beneficiary || '';
 const paymentIban = () => DATA?.payment?.iban || '';
 const paymentNoteCopy = () => 'Satispay è il metodo principale; in alternativa è disponibile il bonifico bancario. PayPal e Nexi saranno attivati da settembre.';
 const finalizeOrderLabel = 'Finalizza l’ordine tramite il suo invio su WhatsApp';
-const orderCutoffCopy = '11:30';
+const orderCutoffCopy = '12:00';
 const deliveryTimeCopy = '12:30';
 const discountedPrice = v => Math.round(v * (1 - discountRate()) * 100) / 100;
 const isLocalPreview = () => location.protocol === 'file:';
