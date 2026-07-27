@@ -32,9 +32,9 @@
   }
   function polishCheckout(){
     const label = byId('sendOrderLabel');
-    if(label && !['Salvataggio ordine...', 'Ordini sospesi durante la chiusura'].includes(label.textContent)) label.textContent = 'Apri WhatsApp con riepilogo ordine';
+    if(label && !['Salvataggio ordine...', 'Ordini sospesi durante la chiusura'].includes(label.textContent)) label.textContent = 'Finalizza l’ordine tramite il suo invio su WhatsApp';
     const send = byId('sendOrderBtn');
-    if(send) send.setAttribute('aria-label', 'Apri WhatsApp con riepilogo ordine');
+    if(send) send.setAttribute('aria-label', 'Finalizza l’ordine tramite il suo invio su WhatsApp');
     if(send && !byId('copySummaryBtn')){
       const copy = document.createElement('button');
       copy.id = 'copySummaryBtn';

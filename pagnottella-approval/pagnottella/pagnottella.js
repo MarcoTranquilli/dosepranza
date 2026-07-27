@@ -42,7 +42,7 @@ const discountLabel = () => {
   return `${DATA.discount.label || 'Sconto attivo'} -${rate}%`;
 };
 const ORDER_LOG_KEY = 'pg_order_logs';
-const deliveryCopy = () => DATA?.copy?.delivery || 'Ordini e pagamenti entro le 12:00, consegna entro le 13:00';
+const deliveryCopy = () => DATA?.copy?.delivery || 'Ordini e pagamenti entro le 12:00, consegna gratuita entro le 13:00';
 const paymentStatusCopy = () => `${DATA.payment.model}. ${DATA.payment.pickup}.`;
 const getStoredDoseUser = () => {
   try {
@@ -57,7 +57,8 @@ const companyCopy = () => DATA?.orderContext?.company || 'DOS Design S.p.a.';
 const deliverySiteCopy = () => DATA?.orderContext?.deliverySite || 'Via Arno, 52, 00198 Roma RM';
 const paymentBeneficiary = () => DATA?.payment?.beneficiary || '';
 const paymentIban = () => DATA?.payment?.iban || '';
-const paymentNoteCopy = () => 'Contanti, POS, Bonifico e Satispay disponibili. PayPal e Nexi saranno attivati da settembre.';
+const paymentNoteCopy = () => 'Satispay è il metodo principale; in alternativa è disponibile il bonifico bancario. PayPal e Nexi saranno attivati da settembre.';
+const finalizeOrderLabel = 'Finalizza l’ordine tramite il suo invio su WhatsApp';
 const discountedPrice = v => Math.round(v * (1 - discountRate()) * 100) / 100;
 const isLocalPreview = () => location.protocol === 'file:';
 const setAuthButtonsDisabled = (disabled) => {
@@ -113,10 +114,8 @@ function paymentMethodLabel(method){
 
 function paymentMethodMeta(label){
   const methods = {
-    'Contanti': { icon:'€', description:'Pagamento alla consegna' },
-    'POS': { icon:'▣', description:'Carta alla consegna' },
     'Bonifico bancario': { icon:'↗', description:'Bonifico entro le 12:00' },
-    'Satispay': { icon:'S', description:'QR entro le 12:00' },
+    'Satispay': { icon:'S', description:'Metodo principale · entro le 12:00' },
     'PayPal': { icon:'P', description:'Disponibile da settembre' },
     'Nexi': { icon:'N', description:'Disponibile da settembre' }
   };
@@ -184,16 +183,13 @@ function renderPaymentDetails(){
     </div>`;
     return;
   }
-  const copy = method === 'POS'
-    ? 'Paga con carta al momento della consegna.'
-    : 'Paga in contanti al momento della consegna.';
-  container.innerHTML = `<div class="paymentInstruction compact"><strong>${esc(method)}</strong><p>${esc(copy)}</p></div>`;
+  container.innerHTML = '';
 }
 
 function hydrateStatic(){
   byId('brand-subtitle').textContent = `Suite DOSepranza · ${DATA.copy.eyebrow} · ordine in pochi tap`;
   byId('heroTitle').textContent = DATA.copy.headline;
-  byId('heroText').textContent = `Menu dedicato con prezzi originali e scontati sempre visibili. Ordina e paga entro le 12:00, poi consegna entro le 13:00.`;
+  byId('heroText').textContent = `Menu dedicato con prezzi originali e scontati sempre visibili. Ordina e paga entro le 12:00, poi ricevi la consegna gratuita entro le 13:00.`;
   byId('contact-address').textContent = DATA.contact.address;
   byId('contact-hours').textContent = DATA.contact.hours;
   byId('contact-whatsapp').href = DATA.contact.whatsappUrl;
@@ -228,7 +224,8 @@ function hydrateStatic(){
   renderPaymentDetails();
   byId('cartDeliveryText').textContent = deliveryCopy();
   byId('discountLabel').textContent = discountLabel();
-  byId('deliveryCardText').textContent = `${deliveryCopy()}.`;
+  const deliveryCardText = byId('deliveryCardText');
+  if(deliveryCardText) deliveryCardText.textContent = `${deliveryCopy()}.`;
   byId('paymentCardTitle').textContent = DATA.payment.model;
   byId('paymentCardText').textContent = `${DATA.payment.pickup}.`;
   const customerInput = byId('customer');
@@ -503,7 +500,7 @@ function buildMessage(){
   msg += `\nData: ${cap(date)} - ${time}`;
   msg += `\n\n🏪 Punto Vendita`;
   msg += `\n${DATA.contact.address}`;
-  msg += `\nFinestra servizio: Ordini/pagamenti entro le 12:00 · Consegna entro le 13:00`;
+  msg += `\nFinestra servizio: Ordini/pagamenti entro le 12:00 · Consegna gratuita entro le 13:00`;
   msg += `\n\n🥪 Ordine`;
   t.items.forEach(i => { msg += `\n- ${i.qty}x ${i.name} (${i.opt}) — ${money(discountedPrice(i.originalUnit)*i.qty)}`; });
   const rate = Math.round(discountRate() * 100);
@@ -542,7 +539,7 @@ function buildOrderPayload(){
     company: companyCopy(),
     deliveryAddress: deliverySiteCopy(),
     pointOfSale: DATA.contact.address,
-    serviceWindow: 'Ordini/pagamenti entro le 12:00 · Consegna entro le 13:00',
+    serviceWindow: 'Ordini/pagamenti entro le 12:00 · Consegna gratuita entro le 13:00',
     items,
     subtotalOriginal: t.orig,
     discountRate: discountRate(),
@@ -561,7 +558,7 @@ function setSendBusy(busy){
   const button = byId('sendOrderBtn');
   const label = byId('sendOrderLabel');
   if(button) button.disabled = busy || isOrderingClosed();
-  if(label) label.textContent = busy ? 'Salvataggio ordine...' : (isOrderingClosed() ? 'Ordini sospesi durante la chiusura' : 'Salva e invia su WhatsApp');
+  if(label) label.textContent = busy ? 'Salvataggio ordine...' : (isOrderingClosed() ? 'Ordini sospesi durante la chiusura' : finalizeOrderLabel);
 }
 async function sendWA(){
   if(totals().count === 0 || state.sending) return;
