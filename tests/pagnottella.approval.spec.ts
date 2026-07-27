@@ -44,6 +44,7 @@ test('gate Google non viene bypassato e file preview usa fallback esplicito', as
   await page.goto('/');
   await expect(page.locator('#recognitionStage')).not.toHaveClass(/hidden/);
   await expect(page.locator('#supplierStage')).toHaveClass(/hidden/);
+  await page.waitForTimeout(700);
   await expect(page.locator('#authGateStatus')).toHaveText('Nessun utente riconosciuto');
   await expect(page.locator('#authGateGoogle')).toHaveText('Accedi con Google');
   expect(await page.evaluate(() => localStorage.getItem('dose_user'))).toBeNull();
