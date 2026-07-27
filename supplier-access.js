@@ -9,6 +9,7 @@
   };
 
   const ADMIN_EMAIL = 'marco.tranquilli@dos.design';
+  const PAGNOTTELLA_SUPPLIER_EMAIL = 'commerciale@lapagnottellagourmet.it';
   const GOOGLE_PROVIDER_ID = 'google.com';
   const SETTINGS_KEY = 'dose_supplier_settings';
   const LOCAL_ORDERS_KEY = 'dose_e2e_pagnottella_orders';
@@ -19,6 +20,7 @@
 
   let firebaseCorePromise = null;
   let firestorePromise = null;
+  let redirectResultPromise = null;
 
   const normalizeEmail = (value) => String(value || '').trim().toLowerCase();
   function isGoogleProviderId(providerId) {
@@ -46,13 +48,17 @@
     try {
       const raw = JSON.parse(window.localStorage.getItem('dose_user') || 'null');
       if (!raw?.email || !raw?.name) return null;
+      if (raw.provider !== GOOGLE_PROVIDER_ID && !isTrustedLocalContext()) return null;
       const email = normalizeEmail(raw.email);
+      const isAdmin = email === ADMIN_EMAIL;
+      const role = isAdmin ? 'admin' : (email === PAGNOTTELLA_SUPPLIER_EMAIL ? 'supplier' : 'user');
       return {
         uid: raw.uid || (isTrustedLocalContext() ? 'local-preview-user' : ''),
         name: String(raw.name).trim(),
         email,
-        role: email === ADMIN_EMAIL ? 'admin' : (raw.role || 'user'),
-        isAdmin: email === ADMIN_EMAIL,
+        role,
+        isAdmin,
+        supplierIds: role === 'supplier' ? ['pagnottella'] : [],
         provider: raw.provider || (isTrustedLocalContext() ? 'local-preview' : '')
       };
     } catch (error) {
@@ -61,12 +67,16 @@
   }
 
   function storeUser(user) {
+    const email = normalizeEmail(user.email);
+    const isAdmin = email === ADMIN_EMAIL;
+    const role = isAdmin ? 'admin' : (email === PAGNOTTELLA_SUPPLIER_EMAIL ? 'supplier' : 'user');
     const safeUser = {
       uid: user.uid || '',
       name: String(user.name || '').trim(),
-      email: normalizeEmail(user.email),
-      role: user.isAdmin ? 'admin' : (user.role || 'user'),
-      isAdmin: !!user.isAdmin,
+      email,
+      role,
+      isAdmin,
+      supplierIds: role === 'supplier' ? ['pagnottella'] : [],
       provider: user.provider || GOOGLE_PROVIDER_ID
     };
     window.localStorage.setItem('dose_user', JSON.stringify(safeUser));
@@ -119,21 +129,36 @@
     const signInProvider = tokenResult?.signInProvider || tokenResult?.claims?.firebase?.sign_in_provider || '';
     if (!hasGoogleProvider(firebaseUser.providerData) && !isGoogleSignInProvider(signInProvider)) return null;
     const email = normalizeEmail(firebaseUser.email);
-    const claimRole = tokenResult?.claims?.role;
-    const isAdmin = email === ADMIN_EMAIL || claimRole === 'admin';
+    const isAdmin = email === ADMIN_EMAIL;
+    const role = isAdmin ? 'admin' : (email === PAGNOTTELLA_SUPPLIER_EMAIL ? 'supplier' : 'user');
     return storeUser({
       uid: firebaseUser.uid,
       name: firebaseUser.displayName || email.split('@')[0],
       email,
-      role: isAdmin ? 'admin' : (['user', 'ristoratore', 'facility'].includes(claimRole) ? claimRole : 'user'),
+      role,
       isAdmin,
+      supplierIds: role === 'supplier' ? ['pagnottella'] : [],
       provider: GOOGLE_PROVIDER_ID
     });
+  }
+
+  async function consumeRedirectResult() {
+    if (isFilePreview()) return null;
+    if (!redirectResultPromise) {
+      redirectResultPromise = (async () => {
+        const { auth, authSdk } = await loadFirebaseCore();
+        const result = await authSdk.getRedirectResult(auth);
+        return result?.user ? firebaseUserPayload(result.user) : null;
+      })();
+    }
+    return redirectResultPromise;
   }
 
   async function resolveSession() {
     if (isTrustedLocalContext()) return getStoredUser();
     const { auth } = await loadFirebaseCore();
+    const redirectedUser = await consumeRedirectResult();
+    if (redirectedUser) return redirectedUser;
     const user = await firebaseUserPayload(auth.currentUser);
     if (!user) window.localStorage.removeItem('dose_user');
     return user;
@@ -146,10 +171,29 @@
     provider.addScope('email');
     provider.addScope('profile');
     provider.setCustomParameters({ prompt: 'select_account' });
-    const result = await authSdk.signInWithPopup(auth, provider);
-    const user = await firebaseUserPayload(result.user);
-    if (!user) throw new Error('L’account deve essere autenticato tramite Google.');
-    return user;
+    try {
+      const result = await authSdk.signInWithPopup(auth, provider);
+      const user = await firebaseUserPayload(result.user);
+      if (!user) throw new Error('L’account deve essere autenticato tramite Google.');
+      return user;
+    } catch (error) {
+      const redirectFallbackCodes = [
+        'auth/popup-blocked',
+        'auth/operation-not-supported-in-this-environment',
+        'auth/web-storage-unsupported'
+      ];
+      if (!redirectFallbackCodes.includes(error?.code)) throw error;
+      await authSdk.signInWithRedirect(auth, provider);
+      return null;
+    }
+  }
+
+  async function signOut() {
+    if (!isFilePreview()) {
+      const { auth, authSdk } = await loadFirebaseCore();
+      await authSdk.signOut(auth);
+    }
+    window.localStorage.removeItem('dose_user');
   }
 
   function sanitizeSettings(value) {
@@ -204,6 +248,7 @@
     const currentSession = session || await resolveSession();
     if (!currentSession) return false;
     if (currentSession.isAdmin) return true;
+    if (currentSession.supplierIds?.includes(supplierId)) return true;
     const settings = await getSupplierSettings();
     return settings[supplierId]?.enabledForUsers === true;
   }
@@ -284,6 +329,7 @@
     getStoredUser,
     resolveSession,
     signInWithGoogle,
+    signOut,
     getSupplierSettings,
     setSupplierEnabled,
     canAccessSupplier,

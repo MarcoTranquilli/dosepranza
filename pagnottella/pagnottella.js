@@ -20,7 +20,7 @@ const state = {
   lastSubmittedMessage:''
 };
 const authState = { loading:false, user:null, message:'' };
-const supplierAccess = window.DoseSupplierAccess;
+let supplierAccess = window.DoseSupplierAccess;
 const ADMIN_EMAIL = 'marco.tranquilli@dos.design';
 const PAGNOTTELLA_SUPPLIER_EMAIL = 'commerciale@lapagnottellagourmet.it';
 const byId = id => document.getElementById(id);
@@ -91,18 +91,6 @@ const setAuthButtonsDisabled = (disabled) => {
 
 async function bootstrap(){
   if(!supplierAccess) throw new Error('Modulo di accesso fornitori non disponibile.');
-  if(!isLocalPreview()){
-    const session = await supplierAccess.resolveSession();
-    if(!session){
-      window.location.replace('../?next=pagnottella');
-      return;
-    }
-    if(!session.isAdmin && !(await supplierAccess.canAccessSupplier('pagnottella', session))){
-      window.location.replace('../russo/');
-      return;
-    }
-    authState.user = session;
-  }
   DATA = await loadData();
   PRODUCTS = DATA.products;
   CATS = DATA.cats;
@@ -115,7 +103,7 @@ async function bootstrap(){
   renderCart();
   syncAuthGate();
   updateAdmin();
-  initializeEntryFlow();
+  await initializeEntryFlow();
 }
 
 async function loadData(){
@@ -261,7 +249,6 @@ function hydrateStatic(){
 }
 
 function bind(){
-  byId('recognitionForm')?.addEventListener('submit', submitRecognition);
   byId('search').addEventListener('input', e => { state.query = e.target.value.trim().toLowerCase(); renderCatalog(); });
   byId('sort').addEventListener('change', e => { state.sort = e.target.value; renderCatalog(); });
   byId('filterIngredientSearch')?.addEventListener('input', renderIngredientFilters);
@@ -316,39 +303,32 @@ function roleForEmail(email){
   if(normalized === PAGNOTTELLA_SUPPLIER_EMAIL) return 'supplier';
   return 'user';
 }
-function normalizedIdentity(name, email){
-  const normalizedEmail = String(email || '').trim().toLowerCase();
-  const role = roleForEmail(normalizedEmail);
-  return {
-    uid:`local-${normalizedEmail.replace(/[^a-z0-9]/g, '-')}`,
-    name:String(name || '').trim(),
-    email:normalizedEmail,
-    role,
-    isAdmin:role === 'admin',
-    supplierIds:role === 'supplier' ? ['pagnottella'] : [],
-    provider:'local-recognition'
-  };
-}
-function initializeEntryFlow(){
-  const user = getStoredDoseUser();
-  const name = byId('recognitionName');
-  const email = byId('recognitionEmail');
-  if(user?.name && name) name.value = user.name;
-  if(user?.email && email) email.value = user.email;
-  if(user?.name && user?.email && new URLSearchParams(location.search).get('store') === 'pagnottella') openShop(false);
-  else if(user?.name && user?.email) showSupplierSelection();
-  else showRecognition();
+async function initializeEntryFlow(){
+  try{
+    authState.user = await supplierAccess.resolveSession();
+  }catch(error){
+    console.warn('Pagnottella session resolution failed', error);
+    const code = error?.code ? ` (${error.code})` : '';
+    authState.message = `Impossibile verificare la sessione Google${code}. Riprova.`;
+  }
+  syncAuthGate();
+  if(authState.user?.name && authState.user?.email){
+    if(new URLSearchParams(location.search).get('store') === 'pagnottella') openShop(false);
+    else showSupplierSelection();
+    return;
+  }
+  showRecognition();
 }
 function showRecognition(){
   byId('landing')?.classList.remove('hidden');
   byId('shop')?.classList.remove('show');
   byId('recognitionStage')?.classList.remove('hidden');
   byId('supplierStage')?.classList.add('hidden');
-  byId('recognitionError').textContent = '';
-  setTimeout(() => byId('recognitionName')?.focus(), 50);
+  syncAuthGate(true);
+  setTimeout(() => byId('authGateGoogle')?.focus(), 50);
 }
 function showSupplierSelection(){
-  const user = getStoredDoseUser();
+  const user = authenticatedDoseUser();
   if(!user?.name || !user?.email){
     showRecognition();
     return;
@@ -362,32 +342,17 @@ function showSupplierSelection(){
   authState.user = user;
   window.renderPagnottellaAdmin?.();
 }
-function submitRecognition(event){
-  event?.preventDefault();
-  const name = byId('recognitionName')?.value.trim() || '';
-  const emailInput = byId('recognitionEmail');
-  const email = emailInput?.value.trim().toLowerCase() || '';
-  const error = byId('recognitionError');
-  if(!name || !email || !emailInput?.checkValidity()){
-    if(error) error.textContent = 'Inserisci un nome completo e un indirizzo email valido.';
-    emailInput?.reportValidity();
-    return;
+async function changeLocalUser(){
+  try{
+    await supplierAccess?.signOut?.();
+  }catch(error){
+    console.warn('Pagnottella sign out failed', error);
   }
-  const user = normalizedIdentity(name, email);
-  localStorage.setItem('dose_user', JSON.stringify(user));
-  authState.user = user;
-  hydrateStatic();
-  renderCart();
-  showSupplierSelection();
-}
-function changeLocalUser(){
   localStorage.removeItem('dose_user');
   localStorage.removeItem('dose_preview_admin');
+  localStorage.removeItem('dose_preview_mode');
   authState.user = null;
-  const name = byId('recognitionName');
-  const email = byId('recognitionEmail');
-  if(name) name.value = '';
-  if(email) email.value = '';
+  authState.message = '';
   window.renderPagnottellaAdmin?.();
   showRecognition();
 }
@@ -425,14 +390,22 @@ function syncAuthGate(forceLocked=false){
   landing.classList.toggle('authLocked', forceLocked || !resolved);
   if(resolved){
     authState.message = '';
-    status.textContent = `Riconosciuto come ${user.name} · ${user.email}`;
+    status.classList.remove('isError');
+    status.textContent = `${user.email} · ${roleForEmail(user.email)}`;
   }else if(authState.message){
+    status.classList.add('isError');
     status.textContent = authState.message;
   }else if(isLocalPreview()){
-    status.textContent = 'Accesso locale disponibile per la verifica offline del catalogo.';
+    status.classList.add('isError');
+    status.textContent = 'Google Login richiede un indirizzo http o https. Avvia il server locale o usa GitHub Pages.';
   }else{
-    status.textContent = authState.loading ? 'Accesso Google in corso...' : 'Nessuna sessione Google attiva.';
+    status.classList.remove('isError');
+    status.textContent = authState.loading ? 'Accesso Google in corso...' : 'Nessun utente riconosciuto';
   }
+  const environment = byId('authGateEnvironment');
+  if(environment) environment.textContent = isLocalPreview()
+    ? 'Da file:// puoi usare solo “Apri anteprima locale”. Per Google avvia il server HTTP.'
+    : 'L’anteprima locale è separata dal riconoscimento Google e non usa Firebase.';
 }
 async function signInWithGoogleGate(){
   if(isLocalPreview()){
@@ -445,7 +418,7 @@ async function signInWithGoogleGate(){
   syncAuthGate(true);
   try{
     const payload = await supplierAccess.signInWithGoogle();
-    if(payload.email){
+    if(payload?.email){
       authState.user = payload;
       authState.message = '';
       hydrateStatic();
@@ -453,8 +426,11 @@ async function signInWithGoogleGate(){
       syncAuthGate();
       const params = new URLSearchParams(location.search);
       if(params.get('store') === 'pagnottella') openShop(false);
+      else showSupplierSelection();
+    }else if(document.visibilityState === 'hidden'){
+      return;
     }else{
-      authState.message = 'Login Google completato ma email non disponibile.';
+      authState.message = 'Reindirizzamento a Google in corso...';
     }
   }catch(err){
     console.warn('Pagnottella Google gate failed', err);
@@ -475,21 +451,18 @@ async function signInWithGoogleGate(){
   }
 }
 function activateLocalPreviewAccess(){
-  if(!isLocalPreview()) return;
-  const fallbackUser = {
-    uid: 'local-preview-admin',
-    name: 'Marco Tranquilli',
-    email: 'marco.tranquilli@dos.design',
-    role: 'admin',
-    isAdmin: true,
-    provider: 'local-preview'
-  };
-  localStorage.setItem('dose_user', JSON.stringify(fallbackUser));
+  const fallbackUser = window.DosePagesAdminUnlock?.();
+  supplierAccess = window.DoseSupplierAccess;
+  if(!fallbackUser?.email){
+    authState.message = 'Anteprima locale non disponibile in questo ambiente.';
+    syncAuthGate(true);
+    return;
+  }
   authState.user = fallbackUser;
   hydrateStatic();
   renderCart();
   syncAuthGate();
-  openShop(false);
+  showSupplierSelection();
 }
 function updateTabs(){
   document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.cat === state.cat));
@@ -1013,7 +986,7 @@ function exportCSV(){ const logs = readSafeOrderLogs(); const rows = [['timestam
 function escJs(s){ return String(s).replace(/[\\']/g, m => m === '\\' ? '\\\\' : "\\'"); }
 
 Object.assign(window, {
-  openShop, backLanding, showRecognition, showSupplierSelection, submitRecognition, changeLocalUser,
+  openShop, backLanding, showRecognition, showSupplierSelection, signInWithGoogleGate, activateLocalPreviewAccess, changeLocalUser,
   setCat, setDiet, openFilterPanel, closeFilterPanel,
   setPendingCategory, setPendingDiet, togglePendingFilter, applyFilters, resetFilters, renderIngredientFilters,
   openDetails, pickOption, toggleDrawerExtra, closeDrawer, quickAdd, drawerAdd, changeQty,

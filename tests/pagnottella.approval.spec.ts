@@ -1,6 +1,6 @@
 import { test, expect, Page } from '@playwright/test';
 
-const reviewPath = 'pagnottella-preview/?preview=admin&review=sponsor&swreset=1';
+const reviewPath = 'pagnottella-preview/?preview=admin&review=sponsor&localPreview=1&swreset=1';
 
 async function addProduct(page: Page, name: string, optionIndex = 0, extras: string[] = []) {
   await page.locator('#search').fill(name);
@@ -39,15 +39,21 @@ test.beforeEach(async ({ page }) => {
   await expect(page.locator('#shop')).toHaveClass(/show/);
 });
 
-test('riconoscimento locale, ruoli e scelta fornitore', async ({ page }, testInfo) => {
+test('gate Google non viene bypassato e file preview usa fallback esplicito', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'Scenario desktop');
+  await page.goto('/');
+  await expect(page.locator('#recognitionStage')).not.toHaveClass(/hidden/);
+  await expect(page.locator('#supplierStage')).toHaveClass(/hidden/);
+  await expect(page.locator('#authGateStatus')).toHaveText('Nessun utente riconosciuto');
+  await expect(page.locator('#authGateGoogle')).toHaveText('Accedi con Google');
+  expect(await page.evaluate(() => localStorage.getItem('dose_user'))).toBeNull();
+
   const localUrl = `file://${process.cwd()}/pagnottella-preview/index.html?preview=admin&review=sponsor&swreset=1`;
   await page.goto(localUrl);
   await expect(page.locator('#recognitionStage')).not.toHaveClass(/hidden/);
   await expect(page.locator('#supplierStage')).toHaveClass(/hidden/);
-  await page.locator('#recognitionName').fill('Marco Tranquilli');
-  await page.locator('#recognitionEmail').fill('marco.tranquilli@dos.design');
-  await page.getByRole('button', { name:'Continua' }).click();
+  await expect(page.locator('#authGateStatus')).toContainText('Google Login richiede un indirizzo http o https');
+  await page.getByRole('button', { name:'Apri anteprima locale' }).click();
   await expect(page.locator('#supplierStage')).not.toHaveClass(/hidden/);
   await expect(page.locator('#recognizedUserDisplay')).toHaveText('Marco Tranquilli · marco.tranquilli@dos.design · admin');
   await expect(page.locator('.russoCard')).toHaveAttribute('href', 'https://marcotranquilli.github.io/dosepranza/russo/?v=russo-public-3');
@@ -60,12 +66,20 @@ test('riconoscimento locale, ruoli e scelta fornitore', async ({ page }, testInf
   await page.getByRole('button', { name:'Cambia utente' }).click();
   await expect(page.locator('#recognitionStage')).not.toHaveClass(/hidden/);
 
-  await page.locator('#recognitionName').fill('Commerciale Pagnottella');
-  await page.locator('#recognitionEmail').fill('commerciale@lapagnottellagourmet.it');
-  await page.getByRole('button', { name:'Continua' }).click();
+  await page.goto('pagnottella-preview/?preview=supplier&review=sponsor&localPreview=1&swreset=1');
   await expect(page.locator('#recognizedUserDisplay')).toHaveText(
-    'Commerciale Pagnottella · commerciale@lapagnottellagourmet.it · supplier'
+    'Commerciale Pagnottella Gourmet · commerciale@lapagnottellagourmet.it · supplier'
   );
+});
+
+test('il pulsante Google avvia Firebase Auth su HTTP', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'Scenario desktop');
+  await page.goto('pagnottella-preview/?preview=admin&review=sponsor&swreset=1');
+  const popupPromise = page.waitForEvent('popup');
+  await page.getByRole('button', { name:'Accedi con Google' }).click();
+  const popup = await popupPromise;
+  await expect.poll(() => popup.url()).toMatch(/google\.com|firebaseapp\.com/);
+  await popup.close();
 });
 
 test('catalogo completo, immagini, orari e amministratore locale', async ({ page }, testInfo) => {
@@ -165,7 +179,7 @@ test('tassonomia completa e combinazioni cluster-regime coerenti', async ({ page
 
 test('profilo fornitore Pagnottella limitato al catalogo e agli ordini demo', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'Scenario desktop');
-  await page.goto('pagnottella-preview/?preview=supplier&review=sponsor&swreset=1');
+  await page.goto('pagnottella-preview/?preview=supplier&review=sponsor&localPreview=1&swreset=1');
   await expect(page.locator('#recognizedUserDisplay')).toContainText('commerciale@lapagnottellagourmet.it · supplier');
   await page.locator('.pagnottellaCard').click();
   await expect(page.locator('#shop')).toHaveClass(/show/);

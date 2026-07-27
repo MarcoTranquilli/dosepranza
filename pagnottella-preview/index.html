@@ -17,14 +17,18 @@
     <div class="entryShell">
       <header class="entryBrand"><img src="../assets/branding/dosepranza-suite-logo.png" alt="DOSepranza"><div><span>People about food</span><strong>DOSepranza</strong></div></header>
       <section id="recognitionStage" class="entryStage" aria-labelledby="recognitionTitle">
-        <div class="entryCopy"><span class="entryEyebrow">Riconoscimento utente</span><h1 id="recognitionTitle">Benvenuto su DOSepranza</h1><p>Riconosciti per procedere con l’ordine.</p></div>
-        <form id="recognitionForm" class="recognitionForm">
-          <label for="recognitionName">Nome e Cognome<input id="recognitionName" name="name" autocomplete="name" required placeholder="Es. Marco Tranquilli"></label>
-          <label for="recognitionEmail">Email<input id="recognitionEmail" name="email" type="email" autocomplete="email" required placeholder="nome@azienda.it"></label>
-          <p id="recognitionError" class="recognitionError" role="alert" aria-live="polite"></p>
-          <button class="primary gold" type="submit">Continua</button>
-          <small>I dati vengono utilizzati per associare l’ordine alla persona corretta.</small>
-        </form>
+        <div class="entryCopy"><span class="entryEyebrow">Riconoscimento utente</span><h1 id="recognitionTitle">Benvenuto su DOSepranza</h1><p>Accedi con il tuo account Google per associare correttamente ordini e autorizzazioni.</p></div>
+        <div id="authGate" class="authGateCard">
+          <span class="authGateEyebrow">Accesso protetto</span>
+          <h2>Riconoscimento tramite Google</h2>
+          <p id="authGateCopy">L’account determina automaticamente nome, email e ruolo nella preview.</p>
+          <p id="authGateStatus" class="authGateStatus" role="status" aria-live="polite">Nessun utente riconosciuto</p>
+          <div class="authGateActions">
+            <button id="authGateGoogle" class="primary gold" type="button" onclick="signInWithGoogleGate()">Accedi con Google</button>
+            <button id="authGateLocal" class="ghost" type="button" onclick="activateLocalPreviewAccess()">Apri anteprima locale</button>
+          </div>
+          <small id="authGateEnvironment">L’anteprima locale è separata dal riconoscimento Google e non usa Firebase.</small>
+        </div>
       </section>
       <section id="supplierStage" class="entryStage hidden" aria-labelledby="supplierTitle">
         <div class="supplierStageHead"><div class="entryCopy"><span class="entryEyebrow">Scegli il fornitore</span><h1 id="supplierTitle">Cosa vuoi ordinare oggi?</h1><p id="recognizedUserDisplay"></p></div><button type="button" class="changeUserBtn" onclick="changeLocalUser()">Cambia utente</button></div>
@@ -61,12 +65,11 @@
 <aside id="filterPanel" class="filterPanel" aria-label="Filtri prodotti"><header><div><span>Catalogo</span><h2>Filtra i prodotti</h2></div><button type="button" onclick="closeFilterPanel()" aria-label="Chiudi filtri">×</button></header><div class="filterPanelBody"><section><h3>Categorie</h3><div id="filterCategories" class="filterSheetChips"></div></section><section><h3>Regime alimentare</h3><div id="filterDiet" class="filterSheetChips"></div></section><section><h3>Tipologia prodotto</h3><div id="filterTypes" class="filterSheetChips"></div></section><section><h3>Ingredienti principali</h3><label class="filterSearch"><span>⌕</span><input id="filterIngredientSearch" type="search" placeholder="Cerca ingrediente..."></label><div id="filterIngredients" class="filterSheetChips filterIngredients"></div></section><section><h3>Esclusioni e allergeni</h3><div id="filterExclusions" class="filterSheetChips"></div></section><section><label class="filterSortLabel">Ordinamento<select id="sort" class="sortSelect"><option value="recommended">Consigliati</option><option value="top">Top prima</option><option value="price">Prezzo crescente</option><option value="az">Nome A-Z</option></select></label></section></div><footer><button type="button" class="filterReset" onclick="resetFilters()">Reset filtri</button><button type="button" class="filterApply" onclick="applyFilters()">Applica filtri</button></footer></aside>
 <div id="paymentConfirmModal" class="paymentConfirmModal" role="dialog" aria-modal="true" aria-labelledby="paymentConfirmTitle"><div class="paymentConfirmCard"><div class="paymentConfirmIcon">✓</div><span>Conferma richiesta</span><h2 id="paymentConfirmTitle">Hai completato il pagamento?</h2><p id="paymentConfirmCopy">Prima di finalizzare l’ordine, conferma di aver effettuato il pagamento secondo il metodo selezionato.</p><strong id="paymentConfirmMethod">Metodo selezionato: Satispay</strong><div class="paymentConfirmActions"><button type="button" class="ghost" onclick="closePaymentConfirmation()">Annulla</button><button id="paymentConfirmAccept" type="button" class="primary gold" onclick="confirmPaymentAndSend()">Confermo di aver pagato</button></div></div></div>
 <div id="toast" class="toast"></div>
-<script src="../supplier-access.js?v=preview-2"></script>
-<script src="../pages-admin-unlock.js?v=preview-8"></script>
+<script src="../supplier-access.js?v=preview-3"></script>
+<script src="../pages-admin-unlock.js?v=preview-9"></script>
 <script src="../assets/pagnottella/data/menu.inline.js?v=preview-4"></script>
-<script src="../pagnottella/pagnottella.js?v=preview-4"></script>
+<script src="../pagnottella/pagnottella.js?v=preview-5"></script>
 <script src="./sponsor-polish.js?v=preview-7"></script>
 <script src="./approval-admin.js?v=preview-2"></script>
-<script>if(window.DosePagesAdminUnlock) window.DosePagesAdminUnlock();</script>
 </body>
 </html>
