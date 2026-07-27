@@ -9,9 +9,8 @@ const clusters = [
   { id:'all', label:'Tutto' },
   { id:'panini', label:'Panini' },
   { id:'insalate', label:'Insalate' },
-  { id:'speciali', label:'Speciali del punto vendita' },
+  { id:'speciali', label:'Specialità' },
   { id:'bevande', label:'Bevande' },
-  { id:'succhi', label:'Succhi freschi' },
   { id:'dolci', label:'Dolci' }
 ];
 
@@ -24,10 +23,13 @@ const diets = [
 ];
 
 function categoryGroup(product) {
+  if (['panini', 'insalate', 'speciali', 'bevande', 'dolci'].includes(product.categoryGroup)) {
+    return product.categoryGroup;
+  }
   if (product.cat.startsWith('panini-')) return 'panini';
   if (product.cat.startsWith('insalate-')) return 'insalate';
   if (product.cat === 'speciali') return 'speciali';
-  if (product.cat === 'succhi-freschi') return 'succhi';
+  if (product.cat === 'succhi-freschi') return 'bevande';
   if (product.cat === 'bevande-dolci') {
     return product.tags?.includes('Dessert') ? 'dolci' : 'bevande';
   }
@@ -35,6 +37,9 @@ function categoryGroup(product) {
 }
 
 function dietType(product) {
+  if (['onnivora', 'vegetariana', 'vegana', 'pescetariana', 'tutte'].includes(product.dietType)) {
+    return product.dietType;
+  }
   if (product.cat.endsWith('-carne') || product.cat === 'speciali') return 'onnivora';
   if (product.cat.endsWith('-pesce')) return 'pescetariana';
   if (product.cat === 'succhi-freschi') return 'tutte';
@@ -61,12 +66,27 @@ function needsDietReview(product) {
 }
 
 menu.filterTaxonomy = { clusters, diets };
-menu.products = menu.products.map(product => ({
-  ...product,
-  categoryGroup: categoryGroup(product),
-  dietType: dietType(product),
-  needsDietReview: needsDietReview(product)
-}));
+const heroByGroup = {
+  all: menu.cats.find(category => category.id === 'all')?.hero,
+  panini: menu.cats.find(category => category.id.startsWith('panini-'))?.hero,
+  insalate: menu.cats.find(category => category.id.startsWith('insalate-'))?.hero,
+  speciali: menu.cats.find(category => category.id === 'speciali')?.hero,
+  bevande: menu.cats.find(category => ['bevande-dolci', 'bevande'].includes(category.id))?.hero,
+  dolci: menu.cats.find(category => ['bevande-dolci', 'dolci'].includes(category.id))?.hero
+};
+
+menu.products = menu.products.map(product => {
+  const group = categoryGroup(product);
+  return {
+    ...product,
+    cat: group,
+    categoryGroup: group,
+    dietType: dietType(product),
+    supportsExtras: group === 'panini' || group === 'insalate',
+    needsDietReview: needsDietReview(product)
+  };
+});
+menu.cats = clusters.map(category => ({ ...category, hero:heroByGroup[category.id] || heroByGroup.all }));
 
 writeFileSync(menuPath, `${JSON.stringify(menu, null, 2)}\n`);
 console.log(`Enriched ${menu.products.length} products with categoryGroup and dietType.`);

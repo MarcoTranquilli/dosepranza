@@ -14,6 +14,11 @@ async function addProduct(page: Page, name: string, optionIndex = 0, extras: str
   await page.getByRole('button', { name:'Aggiungi al carrello' }).click();
 }
 
+async function closeProductDrawer(page: Page) {
+  await page.locator('#drawer .close').click();
+  await expect(page.locator('#drawer')).not.toHaveClass(/show/);
+}
+
 async function confirmOrder(page: Page) {
   const modal = page.locator('#paymentConfirmModal');
   if(!(await modal.getAttribute('class'))?.includes('show')) {
@@ -29,7 +34,35 @@ async function confirmOrder(page: Page) {
 
 test.beforeEach(async ({ page }) => {
   await page.goto(reviewPath);
+  await expect(page.locator('#supplierStage')).not.toHaveClass(/hidden/);
+  await page.locator('.pagnottellaCard').click();
   await expect(page.locator('#shop')).toHaveClass(/show/);
+});
+
+test('riconoscimento locale, ruoli e scelta fornitore', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'Scenario desktop');
+  const localUrl = `file://${process.cwd()}/pagnottella-preview/index.html?review=sponsor&swreset=1`;
+  await page.goto(localUrl);
+  await expect(page.locator('#recognitionStage')).not.toHaveClass(/hidden/);
+  await expect(page.locator('#supplierStage')).toHaveClass(/hidden/);
+  await page.locator('#recognitionName').fill('Marco Tranquilli');
+  await page.locator('#recognitionEmail').fill('marco.tranquilli@dos.design');
+  await page.getByRole('button', { name:'Continua' }).click();
+  await expect(page.locator('#supplierStage')).not.toHaveClass(/hidden/);
+  await expect(page.locator('#recognizedUserDisplay')).toHaveText('Marco Tranquilli · marco.tranquilli@dos.design · admin');
+  await expect(page.locator('.russoCard')).toHaveAttribute('href', 'https://marcotranquilli.github.io/dosepranza/russo/?v=russo-public-3');
+  await page.locator('.pagnottellaCard').click();
+  await expect(page.locator('#shop')).toHaveClass(/show/);
+  await page.getByRole('button', { name:'Cambia fornitore' }).click();
+  await page.getByRole('button', { name:'Cambia utente' }).click();
+  await expect(page.locator('#recognitionStage')).not.toHaveClass(/hidden/);
+
+  await page.locator('#recognitionName').fill('Commerciale Pagnottella');
+  await page.locator('#recognitionEmail').fill('commerciale@lapagnottellagourmet.it');
+  await page.getByRole('button', { name:'Continua' }).click();
+  await expect(page.locator('#recognizedUserDisplay')).toHaveText(
+    'Commerciale Pagnottella · commerciale@lapagnottellagourmet.it · supplier'
+  );
 });
 
 test('catalogo completo, immagini, orari e amministratore locale', async ({ page }, testInfo) => {
@@ -55,6 +88,11 @@ test('catalogo completo, immagini, orari e amministratore locale', async ({ page
   await expect(page.locator('.adminNav')).toContainText('Analisi');
   await expect(page.locator('.adminNav')).toContainText('Gestione menù');
   await expect(page.locator('.adminNav')).toContainText('Export');
+  await expect(page.locator('[data-cat="speciali"]')).toHaveText('Specialità');
+  await expect(page.locator('[data-cat="bevande"]')).toHaveText('Bevande');
+  await expect(page.locator('[data-cat="succhi"]')).toHaveCount(0);
+  await expect(page.locator('body')).not.toContainText('Speciali del punto vendita');
+  await expect(page.locator('body')).not.toContainText('Succhi freschi');
 });
 
 test('foto ufficiali del fornitore associate ai prodotti corretti', async ({ page }, testInfo) => {
@@ -102,10 +140,12 @@ test('tassonomia completa e combinazioni cluster-regime coerenti', async ({ page
     return {
       total: products.length,
       missing: products.filter(product => !product.categoryGroup || !product.dietType).length,
-      reviews: products.filter(product => product.needsDietReview === true).length
+      reviews: products.filter(product => product.needsDietReview === true).length,
+      beverages: products.filter(product => product.categoryGroup === 'bevande').length,
+      invalidExtras: products.filter(product => product.supportsExtras !== ['panini', 'insalate'].includes(String(product.categoryGroup))).length
     };
   });
-  expect(taxonomy).toEqual({ total:102, missing:0, reviews:4 });
+  expect(taxonomy).toEqual({ total:102, missing:0, reviews:4, beverages:11, invalidExtras:0 });
 
   for(const [cluster, diet] of [
     ['all', 'vegana'],
@@ -124,6 +164,8 @@ test('tassonomia completa e combinazioni cluster-regime coerenti', async ({ page
 test('profilo fornitore Pagnottella limitato al catalogo e agli ordini demo', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'Scenario desktop');
   await page.goto('pagnottella-preview/?preview=supplier&review=sponsor&swreset=1');
+  await expect(page.locator('#recognizedUserDisplay')).toContainText('commerciale@lapagnottellagourmet.it · supplier');
+  await page.locator('.pagnottellaCard').click();
   await expect(page.locator('#shop')).toHaveClass(/show/);
   await expect(page.locator('#adminWorkspace')).not.toHaveClass(/hidden/);
   await expect(page.locator('#adminIdentity')).toHaveText('commerciale@lapagnottellagourmet.it · fornitore');
@@ -137,6 +179,23 @@ test('profilo fornitore Pagnottella limitato al catalogo e agli ordini demo', as
     russo: await window.DoseSupplierAccess.canAccessSupplier('russo')
   }));
   expect(access).toEqual({ pagnottella:true, russo:false });
+});
+
+test('ingredienti aggiuntivi solo sui prodotti personalizzabili', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'Scenario desktop');
+  for(const product of ['Saporito', 'Reginella']) {
+    await page.locator('#search').fill(product);
+    await page.locator('#grid .card').filter({ hasText:product }).first().locator('.details').click();
+    await expect(page.locator('#drawerExtrasSection')).not.toHaveClass(/hidden/);
+    await closeProductDrawer(page);
+  }
+  for(const product of ['Acqua 0,5 lt', 'Pane e Nutella', 'Apollo']) {
+    await page.locator('#search').fill(product);
+    await page.locator('#grid .card').filter({ hasText:product }).first().locator('.details').click();
+    await expect(page.locator('#drawerExtrasSection')).toHaveClass(/hidden/);
+    await expect(page.locator('#drawerExtrasSection')).not.toBeVisible();
+    await closeProductDrawer(page);
+  }
 });
 
 test('personalizzazioni ed extra creano righe distinte e aggiornano il totale', async ({ page }, testInfo) => {

@@ -141,7 +141,7 @@
 
   resetPreviewSessionIfRequested();
   patchSupplierAccess();
-  if (requested()) storePreviewSession();
+  if (isPages() && requested()) storePreviewSession();
 
   document.addEventListener('click', (event) => {
     const target = event.target;
