@@ -23,6 +23,12 @@
   let redirectResultPromise = null;
 
   const normalizeEmail = (value) => String(value || '').trim().toLowerCase();
+  const roleForEmail = (value) => {
+    const email = normalizeEmail(value);
+    if (email === ADMIN_EMAIL) return 'admin';
+    if (email === PAGNOTTELLA_SUPPLIER_EMAIL) return 'supplier';
+    return 'user';
+  };
   function isGoogleProviderId(providerId) {
     return providerId === GOOGLE_PROVIDER_ID;
   }
@@ -50,8 +56,8 @@
       if (!raw?.email || !raw?.name) return null;
       if (raw.provider !== GOOGLE_PROVIDER_ID && !isTrustedLocalContext()) return null;
       const email = normalizeEmail(raw.email);
-      const isAdmin = email === ADMIN_EMAIL;
-      const role = isAdmin ? 'admin' : (email === PAGNOTTELLA_SUPPLIER_EMAIL ? 'supplier' : 'user');
+      const role = roleForEmail(email);
+      const isAdmin = role === 'admin';
       return {
         uid: raw.uid || (isTrustedLocalContext() ? 'local-preview-user' : ''),
         name: String(raw.name).trim(),
@@ -68,8 +74,8 @@
 
   function storeUser(user) {
     const email = normalizeEmail(user.email);
-    const isAdmin = email === ADMIN_EMAIL;
-    const role = isAdmin ? 'admin' : (email === PAGNOTTELLA_SUPPLIER_EMAIL ? 'supplier' : 'user');
+    const role = roleForEmail(email);
+    const isAdmin = role === 'admin';
     const safeUser = {
       uid: user.uid || '',
       name: String(user.name || '').trim(),
@@ -129,8 +135,8 @@
     const signInProvider = tokenResult?.signInProvider || tokenResult?.claims?.firebase?.sign_in_provider || '';
     if (!hasGoogleProvider(firebaseUser.providerData) && !isGoogleSignInProvider(signInProvider)) return null;
     const email = normalizeEmail(firebaseUser.email);
-    const isAdmin = email === ADMIN_EMAIL;
-    const role = isAdmin ? 'admin' : (email === PAGNOTTELLA_SUPPLIER_EMAIL ? 'supplier' : 'user');
+    const role = roleForEmail(email);
+    const isAdmin = role === 'admin';
     return storeUser({
       uid: firebaseUser.uid,
       name: firebaseUser.displayName || email.split('@')[0],
@@ -322,6 +328,7 @@
 
   window.DoseSupplierAccess = Object.freeze({
     ADMIN_EMAIL,
+    roleForEmail,
     DEFAULT_SETTINGS,
     isFilePreview,
     isE2E,
