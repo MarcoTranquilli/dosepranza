@@ -2662,11 +2662,11 @@
     }
   ],
   "copy": {
-    "delivery": "Ordini e pagamenti entro le 12:00, consegna entro le 13:00",
+    "delivery": "Ordini e pagamenti entro le 12:00, consegna gratuita entro le 13:00",
     "brand": "La Pagnottella Gourmet",
     "powered": "DOSepranza",
     "eyebrow": "Punto vendita Quintino Sella",
-    "headline": "Panini e insalate gourmet, con sconto estivo e consegna GRATUITA in pausa pranzo.",
+    "headline": "Panini e insalate gourmet, con sconto estivo e consegna gratuita in pausa pranzo.",
     "subheadline": "Catalogo ufficiale basato su sito, volantino del punto vendita e listino ingredienti aggiuntivi."
   },
   "docs": [
@@ -2697,10 +2697,8 @@
   },
   "payment": {
     "methods": [
-      "Contanti",
-      "POS",
-      "Bonifico bancario",
-      "Satispay"
+      "Satispay",
+      "Bonifico bancario"
     ],
     "futureMethods": [
       {
@@ -2714,8 +2712,8 @@
         "enabled": false
       }
     ],
-    "model": "Pagamento entro le 12:00",
-    "pickup": "Sono accettati contanti, POS, bonifico bancario e Satispay. PayPal e Nexi non sono ancora selezionabili e saranno attivati da settembre.",
+    "model": "Effettua pagamento",
+    "pickup": "Satispay è il metodo principale. In alternativa puoi usare il bonifico bancario entro le 12:00. PayPal e Nexi sono in attivazione.",
     "beneficiary": "3M Società a Responsabilità Limitata",
     "iban": "IT35B0832703249000000002986",
     "qrImage": "../assets/pagnottella/payment/satispay-qr-pagnottella.png"
@@ -3027,7 +3025,7 @@
     },
     {
       "label": "Consegna",
-      "value": "entro le 13:00 del giorno stesso"
+      "value": "gratuita entro le 13:00 del giorno stesso"
     },
     {
       "label": "Chiusura Via Sella",

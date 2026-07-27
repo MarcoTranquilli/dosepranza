@@ -19,6 +19,9 @@ test('catalogo completo, immagini e navigazione autonoma', async ({ page }, test
   await expect(page.locator('#extrasGrid')).toContainText('Salsa al tartufo');
   await expect(page.locator('#extrasGrid')).toContainText('Semi di sesamo');
   await expect(page.locator('#price-validity-note')).toContainText('30/08/2026');
+  await expect(page.locator('#heroTitle')).toHaveText(
+    'Panini e insalate gourmet, con sconto estivo e consegna gratuita in pausa pranzo.'
+  );
   await expect(page.locator('#service-closure-notice')).toContainText('17 agosto');
   await expect(page.locator('#service-closure-notice')).toContainText('23 agosto 2026');
   await expect(page.locator('body')).not.toContainText(/cambia fornitore/i);
@@ -92,12 +95,41 @@ test('carrello, sconto, pagamenti e riepilogo ordine', async ({ page }, testInfo
   await expect(page.locator('#discountLabel')).toContainText('20%');
   await expect(page.locator('#finalTotal')).toContainText('€6,40');
 
-  await expect(page.locator('input[name="paymentMethod"][value="Contanti"]')).toBeChecked();
+  await expect(page.locator('input[name="paymentMethod"][value="Contanti"]')).toHaveCount(0);
+  await expect(page.locator('input[name="paymentMethod"][value="POS"]')).toHaveCount(0);
+  await expect(page.locator('input[name="paymentMethod"][value="Satispay"]')).toBeChecked();
   await expect(page.locator('input[name="paymentMethod"][value="PayPal"]')).toBeDisabled();
   await expect(page.locator('input[name="paymentMethod"][value="Nexi"]')).toBeDisabled();
+  await expect(page.locator('.paymentChoice legend')).toHaveText('Scegli metodo di pagamento');
+  await expect(page.locator('#paymentCardTitle')).toHaveText('Effettua pagamento');
+  await expect(page.locator('.deliveryCard')).toHaveCount(0);
+  await expect(page.locator('.waTitle')).toHaveCount(0);
+  await expect(page.locator('body')).not.toContainText('Consegna pausa pranzo');
+  await expect(page.locator('body')).not.toContainText('Riepilogo ordine da inviare su WhatsApp');
+  await expect(page.locator('#sendOrderLabel')).toHaveText(
+    'Finalizza l’ordine tramite il suo invio su WhatsApp'
+  );
+  await expect(page.locator('#sendOrderBtn .waArrow')).toBeVisible();
 
-  await page.locator('.paymentOption').filter({ hasText: 'Satispay' }).click();
-  await expect(page.locator('input[name="paymentMethod"][value="Satispay"]')).toBeChecked();
+  const checkoutOrder = await page.evaluate(() => {
+    const before = (first: string, second: string) => Boolean(
+      document.querySelector(first)?.compareDocumentPosition(document.querySelector(second)!)
+      & Node.DOCUMENT_POSITION_FOLLOWING
+    );
+    return {
+      customerBeforePayment: before('#customer', '.paymentChoice'),
+      paymentBeforeAction: before('.paymentChoice', '.paymentCard'),
+      actionBeforeSummary: before('.paymentCard', '.waBlock'),
+      summaryBeforeWhatsapp: before('.waBlock', '#sendOrderBtn')
+    };
+  });
+  expect(checkoutOrder).toEqual({
+    customerBeforePayment: true,
+    paymentBeforeAction: true,
+    actionBeforeSummary: true,
+    summaryBeforeWhatsapp: true
+  });
+
   await expect(page.locator('#paymentDetails img')).toHaveAttribute('src', /satispay-qr-pagnottella\.png/);
 
   await page.locator('.paymentOption').filter({ hasText: 'Bonifico bancario' }).click();
@@ -137,5 +169,11 @@ test('layout utilizzabile su viewport mobile', async ({ page }, testInfo) => {
   await expect(page.locator('#mobileBar')).not.toHaveClass(/hidden/);
   await page.locator('#mobileBar button').click();
   await expect(page.locator('#cart')).toHaveClass(/open/);
-  await expect(page.locator('#sendOrderBtn')).toBeVisible();
+  await page.locator('.cartBody').evaluate(element => {
+    element.scrollTop = element.scrollHeight;
+  });
+  await expect(page.locator('#sendOrderBtn')).toBeInViewport();
+  await expect(page.locator('#sendOrderLabel')).toHaveText(
+    'Finalizza l’ordine tramite il suo invio su WhatsApp'
+  );
 });
