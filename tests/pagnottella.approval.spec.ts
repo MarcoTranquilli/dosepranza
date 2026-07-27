@@ -47,6 +47,11 @@ test('gate Google non viene bypassato e file preview usa fallback esplicito', as
   await expect(page.locator('#authGateStatus')).toHaveText('Nessun utente riconosciuto');
   await expect(page.locator('#authGateGoogle')).toHaveText('Accedi con Google');
   expect(await page.evaluate(() => localStorage.getItem('dose_user'))).toBeNull();
+  expect(await page.evaluate(() => ({
+    admin: window.DoseSupplierAccess.roleForEmail('marco.tranquilli@dos.design'),
+    supplier: window.DoseSupplierAccess.roleForEmail('commerciale@lapagnottellagourmet.it'),
+    user: window.DoseSupplierAccess.roleForEmail('persona@dos.design')
+  }))).toEqual({ admin:'admin', supplier:'supplier', user:'user' });
 
   const localUrl = `file://${process.cwd()}/pagnottella-preview/index.html?preview=admin&review=sponsor&swreset=1`;
   await page.goto(localUrl);
