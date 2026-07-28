@@ -63,6 +63,19 @@ test('gate Google non viene bypassato e file preview usa fallback esplicito', as
     similarSuffix:'user',
     similarDomain:'user'
   });
+  expect(await page.evaluate(() => ({
+    trustedPopup: window.DoseSupplierAccess.isVerifiedGoogleResult([], '', true),
+    strictCurrentUser: window.DoseSupplierAccess.isVerifiedGoogleResult([], '', false),
+    googleProvider: window.DoseSupplierAccess.isVerifiedGoogleResult([{ providerId:'google.com' }], '', false),
+    popupBlocked: window.DoseSupplierAccess.shouldUseRedirectFallback('auth/popup-blocked'),
+    popupClosed: window.DoseSupplierAccess.shouldUseRedirectFallback('auth/popup-closed-by-user')
+  }))).toEqual({
+    trustedPopup:true,
+    strictCurrentUser:false,
+    googleProvider:true,
+    popupBlocked:true,
+    popupClosed:false
+  });
   expect(await page.evaluate(async () => ({
     tester: await window.DoseSupplierAccess.canAccessSupplier('pagnottella', {
       email:'persona@dos.design', role:'tester', isAdmin:false, supplierIds:['pagnottella']
