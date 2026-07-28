@@ -22,7 +22,7 @@
   }
   function isAdmin() {
     const user = session();
-    return user?.email?.toLowerCase() === ADMIN_EMAIL || user?.role === 'admin' || user?.isAdmin === true;
+    return String(user?.email || '').trim().toLowerCase() === ADMIN_EMAIL;
   }
   function isSupplier() {
     const user = session();

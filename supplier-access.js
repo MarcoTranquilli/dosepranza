@@ -27,8 +27,10 @@
     const email = normalizeEmail(value);
     if (email === ADMIN_EMAIL) return 'admin';
     if (email === PAGNOTTELLA_SUPPLIER_EMAIL) return 'supplier';
+    if (email.endsWith('@dos.design')) return 'tester';
     return 'user';
   };
+  const supplierIdsForRole = (role) => ['supplier', 'tester'].includes(role) ? ['pagnottella'] : [];
   function isGoogleProviderId(providerId) {
     return providerId === GOOGLE_PROVIDER_ID;
   }
@@ -64,7 +66,7 @@
         email,
         role,
         isAdmin,
-        supplierIds: role === 'supplier' ? ['pagnottella'] : [],
+        supplierIds: supplierIdsForRole(role),
         provider: raw.provider || (isTrustedLocalContext() ? 'local-preview' : '')
       };
     } catch (error) {
@@ -82,7 +84,7 @@
       email,
       role,
       isAdmin,
-      supplierIds: role === 'supplier' ? ['pagnottella'] : [],
+      supplierIds: supplierIdsForRole(role),
       provider: user.provider || GOOGLE_PROVIDER_ID
     };
     window.localStorage.setItem('dose_user', JSON.stringify(safeUser));
@@ -143,7 +145,7 @@
       email,
       role,
       isAdmin,
-      supplierIds: role === 'supplier' ? ['pagnottella'] : [],
+      supplierIds: supplierIdsForRole(role),
       provider: GOOGLE_PROVIDER_ID
     });
   }
@@ -255,6 +257,10 @@
     if (!currentSession) return false;
     if (currentSession.isAdmin) return true;
     if (currentSession.supplierIds?.includes(supplierId)) return true;
+    if (supplierId === 'pagnottella') {
+      const email = normalizeEmail(currentSession.email);
+      return currentSession.role === 'tester' && email.endsWith('@dos.design');
+    }
     const settings = await getSupplierSettings();
     return settings[supplierId]?.enabledForUsers === true;
   }

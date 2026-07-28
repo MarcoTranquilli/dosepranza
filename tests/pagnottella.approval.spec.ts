@@ -51,8 +51,32 @@ test('gate Google non viene bypassato e file preview usa fallback esplicito', as
   expect(await page.evaluate(() => ({
     admin: window.DoseSupplierAccess.roleForEmail('marco.tranquilli@dos.design'),
     supplier: window.DoseSupplierAccess.roleForEmail('commerciale@lapagnottellagourmet.it'),
-    user: window.DoseSupplierAccess.roleForEmail('persona@dos.design')
-  }))).toEqual({ admin:'admin', supplier:'supplier', user:'user' });
+    tester: window.DoseSupplierAccess.roleForEmail('  PERSONA@DOS.DESIGN  '),
+    external: window.DoseSupplierAccess.roleForEmail('test@gmail.com'),
+    similarSuffix: window.DoseSupplierAccess.roleForEmail('utente@dos.design.fake'),
+    similarDomain: window.DoseSupplierAccess.roleForEmail('utente@mydos.design')
+  }))).toEqual({
+    admin:'admin',
+    supplier:'supplier',
+    tester:'tester',
+    external:'user',
+    similarSuffix:'user',
+    similarDomain:'user'
+  });
+  expect(await page.evaluate(async () => ({
+    tester: await window.DoseSupplierAccess.canAccessSupplier('pagnottella', {
+      email:'persona@dos.design', role:'tester', isAdmin:false, supplierIds:['pagnottella']
+    }),
+    external: await window.DoseSupplierAccess.canAccessSupplier('pagnottella', {
+      email:'test@gmail.com', role:'user', isAdmin:false, supplierIds:[]
+    }),
+    similarSuffix: await window.DoseSupplierAccess.canAccessSupplier('pagnottella', {
+      email:'utente@dos.design.fake', role:'user', isAdmin:false, supplierIds:[]
+    }),
+    similarDomain: await window.DoseSupplierAccess.canAccessSupplier('pagnottella', {
+      email:'utente@mydos.design', role:'user', isAdmin:false, supplierIds:[]
+    })
+  }))).toEqual({ tester:true, external:false, similarSuffix:false, similarDomain:false });
 
   const localUrl = `file://${process.cwd()}/pagnottella-preview/index.html?preview=admin&review=sponsor&swreset=1`;
   await page.goto(localUrl);
@@ -201,6 +225,34 @@ test('profilo fornitore Pagnottella limitato al catalogo e agli ordini demo', as
     russo: await window.DoseSupplierAccess.canAccessSupplier('russo')
   }));
   expect(access).toEqual({ pagnottella:true, russo:false });
+});
+
+test('tester DOS completa un ordine senza accedere alle funzioni admin', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'Scenario desktop');
+  await page.goto('pagnottella-preview/?preview=tester&review=sponsor&localPreview=1&swreset=1');
+  await expect(page.locator('#recognizedUserDisplay')).toContainText('tester.preview@dos.design · tester');
+  await expect(page.locator('.pagnottellaCard')).toBeEnabled();
+  await page.locator('.pagnottellaCard').click();
+  await expect(page.locator('#shop')).toHaveClass(/show/);
+  await expect(page.locator('#adminWorkspace')).toHaveClass(/hidden/);
+  await expect(page.locator('#adminShortcut')).toHaveClass(/hidden/);
+  await addProduct(page, 'Saporito', 1, ['Funghi']);
+  await page.getByRole('button', { name:'Vedi carrello' }).click();
+  await confirmOrder(page);
+  await expect(page.locator('#confirm')).toContainText('Ordine');
+  const orders = await page.evaluate(() => JSON.parse(localStorage.getItem('dose_preview_pagnottella_orders') || '[]'));
+  expect(orders).toHaveLength(1);
+  expect(orders[0]).toMatchObject({ email:'tester.preview@dos.design', preview:true });
+});
+
+test('account e domini esterni non possono aprire Pagnottella', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'Scenario desktop');
+  await page.goto('pagnottella-preview/?preview=external&review=sponsor&localPreview=1&swreset=1');
+  await expect(page.locator('#recognizedUserDisplay')).toContainText('test@gmail.com · user');
+  await expect(page.locator('.pagnottellaCard')).toBeDisabled();
+  await expect(page.locator('#supplierAccessStatus')).toContainText('Account non autorizzato');
+  await expect(page.locator('#shop')).not.toHaveClass(/show/);
+  await expect(page.locator('#adminWorkspace')).toHaveClass(/hidden/);
 });
 
 test('ingredienti aggiuntivi solo sui prodotti personalizzabili', async ({ page }, testInfo) => {
