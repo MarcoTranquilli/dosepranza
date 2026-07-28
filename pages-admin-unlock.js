@@ -5,7 +5,6 @@
   const byId = (id) => document.getElementById(id);
   const isFilePreview = () => location.protocol === 'file:';
   const isPreviewHost = () => isFilePreview()
-    || location.hostname === 'marcotranquilli.github.io'
     || ['localhost', '127.0.0.1', '::1'].includes(location.hostname);
   const localPreviewRequested = () => params.get('localPreview') === '1';
   const requestedRole = () => {
@@ -157,6 +156,13 @@
     const status = byId('authGateStatus');
     if (status) status.textContent = `${session.email} · ${session.role}`;
     return session;
+  }
+
+  const localButton = byId('authGateLocal');
+  if (localButton) {
+    localButton.hidden = !isPreviewHost();
+    localButton.disabled = !isPreviewHost();
+    localButton.setAttribute('aria-hidden', String(!isPreviewHost()));
   }
 
   resetPreviewSessionIfRequested();

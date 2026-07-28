@@ -25,7 +25,7 @@
           <p id="authGateStatus" class="authGateStatus" role="status" aria-live="polite">Nessun utente riconosciuto</p>
           <div class="authGateActions">
             <button id="authGateGoogle" class="primary gold" type="button" onclick="signInWithGoogleGate()">Accedi con Google</button>
-            <button id="authGateLocal" class="ghost" type="button" onclick="activateLocalPreviewAccess()">Apri anteprima locale</button>
+            <button id="authGateLocal" class="ghost" type="button" onclick="activateLocalPreviewAccess()" hidden disabled aria-hidden="true">Apri anteprima locale</button>
           </div>
           <small id="authGateEnvironment">L’anteprima locale è separata dal riconoscimento Google e non usa Firebase.</small>
         </div>
@@ -67,7 +67,7 @@
 <div id="paymentConfirmModal" class="paymentConfirmModal" role="dialog" aria-modal="true" aria-labelledby="paymentConfirmTitle"><div class="paymentConfirmCard"><div class="paymentConfirmIcon">✓</div><span>Conferma richiesta</span><h2 id="paymentConfirmTitle">Hai completato il pagamento?</h2><p id="paymentConfirmCopy">Prima di finalizzare l’ordine, conferma di aver effettuato il pagamento secondo il metodo selezionato.</p><strong id="paymentConfirmMethod">Metodo selezionato: Satispay</strong><div class="paymentConfirmActions"><button type="button" class="ghost" onclick="closePaymentConfirmation()">Annulla</button><button id="paymentConfirmAccept" type="button" class="primary gold" onclick="confirmPaymentAndSend()">Confermo di aver pagato</button></div></div></div>
 <div id="toast" class="toast"></div>
 <script src="../supplier-access.js?v=preview-6"></script>
-<script src="../pages-admin-unlock.js?v=preview-11"></script>
+<script src="../pages-admin-unlock.js?v=preview-12"></script>
 <script src="../assets/pagnottella/data/menu.inline.js?v=preview-4"></script>
 <script src="../pagnottella/pagnottella.js?v=preview-9"></script>
 <script src="./sponsor-polish.js?v=preview-8"></script>
