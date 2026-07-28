@@ -53,6 +53,8 @@ test('gate Google non viene bypassato e file preview usa fallback esplicito', as
     admin: window.DoseSupplierAccess.roleForEmail('marco.tranquilli@dos.design'),
     supplier: window.DoseSupplierAccess.roleForEmail('commerciale@lapagnottellagourmet.it'),
     tester: window.DoseSupplierAccess.roleForEmail('  PERSONA@DOS.DESIGN  '),
+    marta: window.DoseSupplierAccess.roleForEmail('marta.diamantini@dos.design'),
+    luca: window.DoseSupplierAccess.roleForEmail('luca.pacella@dos.design'),
     external: window.DoseSupplierAccess.roleForEmail('test@gmail.com'),
     similarSuffix: window.DoseSupplierAccess.roleForEmail('utente@dos.design.fake'),
     similarDomain: window.DoseSupplierAccess.roleForEmail('utente@mydos.design')
@@ -60,6 +62,8 @@ test('gate Google non viene bypassato e file preview usa fallback esplicito', as
     admin:'admin',
     supplier:'supplier',
     tester:'tester',
+    marta:'tester',
+    luca:'tester',
     external:'user',
     similarSuffix:'user',
     similarDomain:'user'

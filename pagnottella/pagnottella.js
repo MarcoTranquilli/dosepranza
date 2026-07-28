@@ -470,18 +470,10 @@ async function signInWithGoogleGate(){
     }
   }catch(err){
     console.warn('Pagnottella Google gate failed', err);
-    const code = err?.code || '';
-    if(code === 'auth/popup-closed-by-user'){
-      authState.message = 'Accesso annullato: popup Google chiuso prima del completamento.';
-    }else if(code === 'auth/cancelled-popup-request'){
-      authState.message = 'Accesso Google già in corso in un altro popup.';
-    }else if(code === 'auth/unauthorized-domain'){
-      authState.message = `Dominio non autorizzato su Firebase Auth: ${location.hostname}.`;
-    }else if(code === 'auth/google-user-missing'){
-      authState.message = 'Accesso Google non completato. Riprova o usa un browser senza blocco popup.';
-    }else{
-      authState.message = 'Accesso Google non completato. Riprova o usa un browser senza blocco popup.';
-    }
+    const code = String(err?.code || '').trim();
+    authState.message = code
+      ? `Accesso Google non completato (${code}). Riprova o usa Chrome.`
+      : 'Accesso Google non completato. Riprova o segnala il messaggio in Console.';
   }finally{
     authState.loading = false;
     setAuthButtonsDisabled(false);

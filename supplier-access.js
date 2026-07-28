@@ -67,6 +67,7 @@
     ].includes(code);
   }
   const isFilePreview = () => window.location.protocol === 'file:';
+  const isGitHubPages = () => window.location.hostname === 'marcotranquilli.github.io';
   const isLoopback = () => ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
   const isE2E = () => {
     if (!isLoopback()) return false;
@@ -204,6 +205,10 @@
     provider.addScope('email');
     provider.addScope('profile');
     provider.setCustomParameters({ prompt: 'select_account' });
+    if (isGitHubPages()) {
+      await authSdk.signInWithRedirect(auth, provider);
+      return null;
+    }
     try {
       const result = await authSdk.signInWithPopup(auth, provider);
       const user = await firebaseUserPayload(result.user, { trustedGoogleResult: true });
