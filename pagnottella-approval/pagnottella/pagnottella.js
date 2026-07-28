@@ -432,6 +432,14 @@ async function signInWithGoogleGate(){
   try{
     const payload = await supplierAccess.signInWithGoogle();
     if(payload?.email){
+      const isAuthorized = await supplierAccess.canAccessSupplier('pagnottella', payload);
+      if(!isAuthorized){
+        localStorage.removeItem('dose_user');
+        authState.user = null;
+        authState.message = 'Account Google riconosciuto, ma dominio non autorizzato per questa preview.';
+        syncAuthGate(true);
+        return;
+      }
       authState.user = payload;
       authState.message = '';
       hydrateStatic();
@@ -454,8 +462,10 @@ async function signInWithGoogleGate(){
       authState.message = 'Accesso Google già in corso in un altro popup.';
     }else if(code === 'auth/unauthorized-domain'){
       authState.message = `Dominio non autorizzato su Firebase Auth: ${location.hostname}.`;
+    }else if(code === 'auth/google-user-missing'){
+      authState.message = 'Accesso Google non completato. Riprova o usa un browser senza blocco popup.';
     }else{
-      authState.message = `Accesso Google non riuscito${code ? ` (${code})` : ''}. Riprova.`;
+      authState.message = 'Accesso Google non completato. Riprova o usa un browser senza blocco popup.';
     }
   }finally{
     authState.loading = false;

@@ -43,6 +43,18 @@
   function isGoogleSignInProvider(signInProvider) {
     return signInProvider === GOOGLE_PROVIDER_ID;
   }
+  function isVerifiedGoogleResult(providerData, signInProvider, trustedGoogleResult = false) {
+    return trustedGoogleResult === true ||
+      hasGoogleProvider(providerData) ||
+      isGoogleSignInProvider(signInProvider);
+  }
+  function shouldUseRedirectFallback(code) {
+    return [
+      'auth/popup-blocked',
+      'auth/operation-not-supported-in-this-environment',
+      'auth/web-storage-unsupported'
+    ].includes(code);
+  }
   const isFilePreview = () => window.location.protocol === 'file:';
   const isLoopback = () => ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
   const isE2E = () => {
@@ -126,7 +138,7 @@
     return firestorePromise;
   }
 
-  async function firebaseUserPayload(firebaseUser) {
+  async function firebaseUserPayload(firebaseUser, { trustedGoogleResult = false } = {}) {
     if (!firebaseUser || firebaseUser.isAnonymous || !firebaseUser.email) return null;
     let tokenResult = null;
     try {
@@ -135,7 +147,7 @@
       tokenResult = null;
     }
     const signInProvider = tokenResult?.signInProvider || tokenResult?.claims?.firebase?.sign_in_provider || '';
-    if (!hasGoogleProvider(firebaseUser.providerData) && !isGoogleSignInProvider(signInProvider)) return null;
+    if (!isVerifiedGoogleResult(firebaseUser.providerData, signInProvider, trustedGoogleResult)) return null;
     const email = normalizeEmail(firebaseUser.email);
     const role = roleForEmail(email);
     const isAdmin = role === 'admin';
@@ -156,7 +168,7 @@
       redirectResultPromise = (async () => {
         const { auth, authSdk } = await loadFirebaseCore();
         const result = await authSdk.getRedirectResult(auth);
-        return result?.user ? firebaseUserPayload(result.user) : null;
+        return result?.user ? firebaseUserPayload(result.user, { trustedGoogleResult: true }) : null;
       })();
     }
     return redirectResultPromise;
@@ -181,16 +193,15 @@
     provider.setCustomParameters({ prompt: 'select_account' });
     try {
       const result = await authSdk.signInWithPopup(auth, provider);
-      const user = await firebaseUserPayload(result.user);
-      if (!user) throw new Error('L’account deve essere autenticato tramite Google.');
+      const user = await firebaseUserPayload(result.user, { trustedGoogleResult: true });
+      if (!user) {
+        const invalidUserError = new Error('Accesso Google non completato. Riprova o usa un browser senza blocco popup.');
+        invalidUserError.code = 'auth/google-user-missing';
+        throw invalidUserError;
+      }
       return user;
     } catch (error) {
-      const redirectFallbackCodes = [
-        'auth/popup-blocked',
-        'auth/operation-not-supported-in-this-environment',
-        'auth/web-storage-unsupported'
-      ];
-      if (!redirectFallbackCodes.includes(error?.code)) throw error;
+      if (!shouldUseRedirectFallback(error?.code)) throw error;
       await authSdk.signInWithRedirect(auth, provider);
       return null;
     }
@@ -335,6 +346,8 @@
   window.DoseSupplierAccess = Object.freeze({
     ADMIN_EMAIL,
     roleForEmail,
+    isVerifiedGoogleResult,
+    shouldUseRedirectFallback,
     DEFAULT_SETTINGS,
     isFilePreview,
     isE2E,
