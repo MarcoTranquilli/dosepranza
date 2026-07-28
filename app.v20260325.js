@@ -872,6 +872,17 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
 
         const normalizeEmail = (email) => (email || '').trim().toLowerCase();
         const normalizeName = (name) => (name || '').trim().toLowerCase();
+        const persistUserIdentity = (nameValue, emailValue) => {
+            const name = normalizeName(nameValue);
+            const email = normalizeEmail(emailValue);
+            state.user = { name, email };
+            const shared = window.DoseSupplierAccess?.getStoredUser?.();
+            const stored = shared?.email === email && shared?.provider === 'google.com'
+                ? { ...shared, name }
+                : state.user;
+            localStorage.setItem('dose_user', JSON.stringify(stored));
+            return state.user;
+        };
         const resolveAuthenticatedIdentity = (user = auth_fb.currentUser, signInResult = null) => {
             const resultUser = signInResult?.user || user;
             const profile = signInResult?.additionalUserInfo?.profile || {};
@@ -897,8 +908,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             const { email, name } = resolveAuthenticatedIdentity(user);
             if(!email) return false;
             resetMyOrdersSubscription();
-            state.user = { name, email };
-            localStorage.setItem('dose_user', JSON.stringify(state.user));
+            persistUserIdentity(name, email);
             const nameInput = document.getElementById('user-name-input');
             const emailInput = document.getElementById('user-email-input');
             if(nameInput) nameInput.value = name;
@@ -926,8 +936,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             const email = normalizeEmail(auth_fb.currentUser.email || document.getElementById('user-email-input').value);
             if(name && email) {
                 resetMyOrdersSubscription();
-                state.user = { name, email };
-                localStorage.setItem('dose_user', JSON.stringify(state.user));
+                persistUserIdentity(name, email);
                 document.getElementById('user-modal').classList.add('hidden');
                 await setRole(email);
                 syncMyOrders();
@@ -947,8 +956,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 const { email, name } = resolveAuthenticatedIdentity(result.user, result);
                 let adopted = false;
                 if(email) {
-                    state.user = { name, email };
-                    localStorage.setItem('dose_user', JSON.stringify(state.user));
+                    persistUserIdentity(name, email);
                     const nameInput = document.getElementById('user-name-input');
                     const emailInput = document.getElementById('user-email-input');
                     if(nameInput) nameInput.value = name;
@@ -3695,8 +3703,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                     if(!isAnon) {
                         await adoptAuthenticatedUser(u);
                     } else {
-                        state.user = { name, email };
-                        localStorage.setItem('dose_user', JSON.stringify(state.user));
+                        persistUserIdentity(name, email);
                         document.getElementById('user-modal').classList.add('hidden');
                         await setRole(email);
                     }

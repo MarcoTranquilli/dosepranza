@@ -341,17 +341,28 @@ async function showSupplierSelection(){
   const identity = byId('recognizedUserDisplay');
   if(identity) identity.textContent = `${user.name} · ${user.email} · ${roleForEmail(user.email)}`;
   const card = document.querySelector('.pagnottellaCard');
+  const russoCard = document.querySelector('.russoCard');
   const status = byId('supplierAccessStatus');
   if(card) card.disabled = true;
-  if(status) status.textContent = 'Verifica autorizzazione Pagnottella...';
-  const canOpenPagnottella = await supplierAccess.canAccessSupplier('pagnottella', user);
+  if(status) status.textContent = 'Verifica autorizzazioni fornitori...';
+  const [canOpenRusso, canOpenPagnottella] = await Promise.all([
+    supplierAccess.canAccessSupplier('russo', user),
+    supplierAccess.canAccessSupplier('pagnottella', user)
+  ]);
+  if(russoCard){
+    const target = russoCard.dataset.target || russoCard.getAttribute('href') || '';
+    russoCard.dataset.target = target;
+    russoCard.setAttribute('aria-disabled', String(!canOpenRusso));
+    if(canOpenRusso) russoCard.setAttribute('href', target);
+    else russoCard.removeAttribute('href');
+  }
   if(card){
     card.disabled = !canOpenPagnottella;
     card.setAttribute('aria-disabled', String(!canOpenPagnottella));
   }
-  if(status) status.textContent = canOpenPagnottella
+  if(status) status.textContent = canOpenRusso || canOpenPagnottella
     ? ''
-    : 'Account non autorizzato: la preview Pagnottella è riservata ai tester @dos.design e al fornitore.';
+    : 'Account non autorizzato per i fornitori di questa preview.';
   authState.user = user;
   window.renderPagnottellaAdmin?.();
 }
@@ -432,7 +443,11 @@ async function signInWithGoogleGate(){
   try{
     const payload = await supplierAccess.signInWithGoogle();
     if(payload?.email){
-      const isAuthorized = await supplierAccess.canAccessSupplier('pagnottella', payload);
+      const supplierAccesses = await Promise.all([
+        supplierAccess.canAccessSupplier('russo', payload),
+        supplierAccess.canAccessSupplier('pagnottella', payload)
+      ]);
+      const isAuthorized = supplierAccesses.some(Boolean);
       if(!isAuthorized){
         localStorage.removeItem('dose_user');
         authState.user = null;

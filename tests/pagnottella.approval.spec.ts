@@ -99,7 +99,7 @@ test('gate Google non viene bypassato e file preview usa fallback esplicito', as
   await page.getByRole('button', { name:'Apri anteprima locale' }).click();
   await expect(page.locator('#supplierStage')).not.toHaveClass(/hidden/);
   await expect(page.locator('#recognizedUserDisplay')).toHaveText('Marco Tranquilli · marco.tranquilli@dos.design · admin');
-  await expect(page.locator('.russoCard')).toHaveAttribute('href', 'https://marcotranquilli.github.io/dosepranza/russo/?v=russo-public-3');
+  await expect(page.locator('.russoCard')).toHaveAttribute('href', '../russo/?suite=approval&v=suite-1');
   await expect(page.locator('.russoCard')).toContainText('con consegna gratuita');
   await expect(page.locator('.russoCard')).toContainText('entro le 11:30');
   await expect(page.locator('.pagnottellaCard')).toContainText('Pagamento entro le 12:00');
@@ -113,6 +113,80 @@ test('gate Google non viene bypassato e file preview usa fallback esplicito', as
   await expect(page.locator('#recognizedUserDisplay')).toHaveText(
     'Commerciale Pagnottella Gourmet · commerciale@lapagnottellagourmet.it · supplier'
   );
+  await expect(page.locator('.russoCard')).not.toHaveAttribute('href');
+  await expect(page.locator('.russoCard')).toHaveAttribute('aria-disabled', 'true');
+});
+
+test('sessione suite condivisa apre Russo senza seconda autenticazione', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'Scenario desktop');
+  await page.evaluate(() => {
+    localStorage.setItem('dose_e2e', '1');
+    localStorage.setItem('dose_user', JSON.stringify({
+      uid:'admin-suite-e2e',
+      name:'Marco Tranquilli',
+      email:'marco.tranquilli@dos.design',
+      role:'user',
+      isAdmin:false,
+      supplierIds:[],
+      provider:'google.com'
+    }));
+  });
+  await page.goto('russo/?suite=approval&e2e=1');
+  await expect(page.locator('#btn-menu')).toBeVisible();
+  await expect(page.locator('#user-modal')).toHaveClass(/hidden/);
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('dose_user') || 'null'))).toMatchObject({
+    email:'marco.tranquilli@dos.design',
+    role:'admin',
+    isAdmin:true,
+    supplierIds:['russo', 'pagnottella'],
+    provider:'google.com'
+  });
+  await page.evaluate(() => window.signOutUser());
+  await expect(page.locator('#user-modal')).not.toHaveClass(/hidden/);
+  expect(await page.evaluate(() => localStorage.getItem('dose_user'))).toBeNull();
+});
+
+test('ruoli supplier e sessioni stale vengono normalizzati dalla suite', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'Scenario desktop');
+  await page.goto('/');
+  const result = await page.evaluate(async () => {
+    localStorage.setItem('dose_e2e', '1');
+    const access = window.DoseSupplierAccess;
+    const resolve = (email) => {
+      localStorage.setItem('dose_user', JSON.stringify({
+        name:'Utente Test',
+        email,
+        provider:'google.com'
+      }));
+      return access.getStoredUser();
+    };
+    const marco = resolve('  MARCO.TRANQUILLI@DOS.DESIGN ');
+    const tester = resolve(' COLLEGA@DOS.DESIGN ');
+    const pagnottellaSupplier = resolve('commerciale@lapagnottellagourmet.it');
+    const russoSupplier = resolve('russolorenzo11@gmail.com');
+    return {
+      marco,
+      tester,
+      pagnottellaSupplier,
+      russoSupplier,
+      access: {
+        pagnottellaToRusso: await access.canAccessSupplier('russo', pagnottellaSupplier),
+        pagnottellaToPagnottella: await access.canAccessSupplier('pagnottella', pagnottellaSupplier),
+        russoToRusso: await access.canAccessSupplier('russo', russoSupplier),
+        russoToPagnottella: await access.canAccessSupplier('pagnottella', russoSupplier)
+      }
+    };
+  });
+  expect(result.marco).toMatchObject({ role:'admin', isAdmin:true, supplierIds:['russo', 'pagnottella'] });
+  expect(result.tester).toMatchObject({ email:'collega@dos.design', role:'tester', isAdmin:false, supplierIds:['russo', 'pagnottella'] });
+  expect(result.pagnottellaSupplier).toMatchObject({ role:'supplier', supplierIds:['pagnottella'] });
+  expect(result.russoSupplier).toMatchObject({ role:'supplier', supplierIds:['russo'] });
+  expect(result.access).toEqual({
+    pagnottellaToRusso:false,
+    pagnottellaToPagnottella:true,
+    russoToRusso:true,
+    russoToPagnottella:false
+  });
 });
 
 test('il pulsante Google avvia Firebase Auth su HTTP', async ({ page }, testInfo) => {
@@ -256,6 +330,14 @@ test('tester DOS completa un ordine senza accedere alle funzioni admin', async (
   const orders = await page.evaluate(() => JSON.parse(localStorage.getItem('dose_preview_pagnottella_orders') || '[]'));
   expect(orders).toHaveLength(1);
   expect(orders[0]).toMatchObject({ email:'tester.preview@dos.design', preview:true });
+  await page.evaluate(() => {
+    const session = JSON.parse(localStorage.getItem('dose_user') || 'null');
+    localStorage.setItem('dose_e2e', '1');
+    localStorage.setItem('dose_user', JSON.stringify({ ...session, provider:'google.com' }));
+  });
+  await page.goto('russo/?suite=approval&e2e=1');
+  await expect(page.locator('#user-modal')).toHaveClass(/hidden/);
+  await expect(page.locator('#btn-history')).toHaveClass(/hidden/);
 });
 
 test('account e domini esterni non possono aprire Pagnottella', async ({ page }, testInfo) => {
@@ -263,6 +345,8 @@ test('account e domini esterni non possono aprire Pagnottella', async ({ page },
   await page.goto('pagnottella-preview/?preview=external&review=sponsor&localPreview=1&swreset=1');
   await expect(page.locator('#recognizedUserDisplay')).toContainText('test@gmail.com · user');
   await expect(page.locator('.pagnottellaCard')).toBeDisabled();
+  await expect(page.locator('.russoCard')).not.toHaveAttribute('href');
+  await expect(page.locator('.russoCard')).toHaveAttribute('aria-disabled', 'true');
   await expect(page.locator('#supplierAccessStatus')).toContainText('Account non autorizzato');
   await expect(page.locator('#shop')).not.toHaveClass(/show/);
   await expect(page.locator('#adminWorkspace')).toHaveClass(/hidden/);
