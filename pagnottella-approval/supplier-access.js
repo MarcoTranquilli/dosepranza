@@ -10,6 +10,10 @@
 
   const ADMIN_EMAIL = 'marco.tranquilli@dos.design';
   const PAGNOTTELLA_SUPPLIER_EMAIL = 'commerciale@lapagnottellagourmet.it';
+  const RUSSO_SUPPLIER_EMAILS = Object.freeze([
+    'lorenzo.russo@alimentarirusso',
+    'russolorenzo11@gmail.com'
+  ]);
   const GOOGLE_PROVIDER_ID = 'google.com';
   const SETTINGS_KEY = 'dose_supplier_settings';
   const LOCAL_ORDERS_KEY = 'dose_e2e_pagnottella_orders';
@@ -27,10 +31,17 @@
     const email = normalizeEmail(value);
     if (email === ADMIN_EMAIL) return 'admin';
     if (email === PAGNOTTELLA_SUPPLIER_EMAIL) return 'supplier';
+    if (RUSSO_SUPPLIER_EMAILS.includes(email)) return 'supplier';
     if (email.endsWith('@dos.design')) return 'tester';
     return 'user';
   };
-  const supplierIdsForRole = (role) => ['supplier', 'tester'].includes(role) ? ['pagnottella'] : [];
+  const supplierIdsForIdentity = (emailValue, role) => {
+    const email = normalizeEmail(emailValue);
+    if (role === 'admin' || role === 'tester') return ['russo', 'pagnottella'];
+    if (email === PAGNOTTELLA_SUPPLIER_EMAIL) return ['pagnottella'];
+    if (RUSSO_SUPPLIER_EMAILS.includes(email)) return ['russo'];
+    return [];
+  };
   function isGoogleProviderId(providerId) {
     return providerId === GOOGLE_PROVIDER_ID;
   }
@@ -72,15 +83,17 @@
       const email = normalizeEmail(raw.email);
       const role = roleForEmail(email);
       const isAdmin = role === 'admin';
-      return {
+      const normalized = {
         uid: raw.uid || (isTrustedLocalContext() ? 'local-preview-user' : ''),
         name: String(raw.name).trim(),
         email,
         role,
         isAdmin,
-        supplierIds: supplierIdsForRole(role),
+        supplierIds: supplierIdsForIdentity(email, role),
         provider: raw.provider || (isTrustedLocalContext() ? 'local-preview' : '')
       };
+      window.localStorage.setItem('dose_user', JSON.stringify(normalized));
+      return normalized;
     } catch (error) {
       return null;
     }
@@ -96,7 +109,7 @@
       email,
       role,
       isAdmin,
-      supplierIds: supplierIdsForRole(role),
+      supplierIds: supplierIdsForIdentity(email, role),
       provider: user.provider || GOOGLE_PROVIDER_ID
     };
     window.localStorage.setItem('dose_user', JSON.stringify(safeUser));
@@ -157,7 +170,7 @@
       email,
       role,
       isAdmin,
-      supplierIds: supplierIdsForRole(role),
+      supplierIds: supplierIdsForIdentity(email, role),
       provider: GOOGLE_PROVIDER_ID
     });
   }
@@ -268,12 +281,7 @@
     if (!currentSession) return false;
     if (currentSession.isAdmin) return true;
     if (currentSession.supplierIds?.includes(supplierId)) return true;
-    if (supplierId === 'pagnottella') {
-      const email = normalizeEmail(currentSession.email);
-      return currentSession.role === 'tester' && email.endsWith('@dos.design');
-    }
-    const settings = await getSupplierSettings();
-    return settings[supplierId]?.enabledForUsers === true;
+    return false;
   }
 
   function structuredOrderPayload(payload, includeAllergies = true) {

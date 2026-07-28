@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../pagnottella/pagnottella.css?v=preview-1">
-<link rel="stylesheet" href="./preview-fixes.css?v=preview-9">
+<link rel="stylesheet" href="./preview-fixes.css?v=preview-10">
 </head>
 <body>
 <div class="wrap">
@@ -33,7 +33,7 @@
       <section id="supplierStage" class="entryStage hidden" aria-labelledby="supplierTitle">
         <div class="supplierStageHead"><div class="entryCopy"><span class="entryEyebrow">Scegli il fornitore</span><h1 id="supplierTitle">Cosa vuoi ordinare oggi?</h1><p id="recognizedUserDisplay"></p></div><button type="button" class="changeUserBtn" onclick="changeLocalUser()">Cambia utente</button></div>
         <div class="supplierChoiceGrid">
-          <a class="supplierChoiceCard russoCard" href="https://marcotranquilli.github.io/dosepranza/russo/?v=russo-public-3">
+          <a class="supplierChoiceCard russoCard" href="../russo/?suite=approval&amp;v=suite-1">
             <span class="supplierChoiceTag">Alimentari Russo</span><h2>Pranzo dalla bottega</h2><p>Piatti, panini e proposte dell’Alimentari Russo con consegna gratuita.</p><small>Ordine e pagamento entro le 11:30</small><strong>Apri Alimentari Russo <span>↗</span></strong>
           </a>
           <button class="supplierChoiceCard pagnottellaCard" type="button" onclick="openShop()">
@@ -66,10 +66,10 @@
 <aside id="filterPanel" class="filterPanel" aria-label="Filtri prodotti"><header><div><span>Catalogo</span><h2>Filtra i prodotti</h2></div><button type="button" onclick="closeFilterPanel()" aria-label="Chiudi filtri">×</button></header><div class="filterPanelBody"><section><h3>Categorie</h3><div id="filterCategories" class="filterSheetChips"></div></section><section><h3>Regime alimentare</h3><div id="filterDiet" class="filterSheetChips"></div></section><section><h3>Tipologia prodotto</h3><div id="filterTypes" class="filterSheetChips"></div></section><section><h3>Ingredienti principali</h3><label class="filterSearch"><span>⌕</span><input id="filterIngredientSearch" type="search" placeholder="Cerca ingrediente..."></label><div id="filterIngredients" class="filterSheetChips filterIngredients"></div></section><section><h3>Esclusioni e allergeni</h3><div id="filterExclusions" class="filterSheetChips"></div></section><section><label class="filterSortLabel">Ordinamento<select id="sort" class="sortSelect"><option value="recommended">Consigliati</option><option value="top">Top prima</option><option value="price">Prezzo crescente</option><option value="az">Nome A-Z</option></select></label></section></div><footer><button type="button" class="filterReset" onclick="resetFilters()">Reset filtri</button><button type="button" class="filterApply" onclick="applyFilters()">Applica filtri</button></footer></aside>
 <div id="paymentConfirmModal" class="paymentConfirmModal" role="dialog" aria-modal="true" aria-labelledby="paymentConfirmTitle"><div class="paymentConfirmCard"><div class="paymentConfirmIcon">✓</div><span>Conferma richiesta</span><h2 id="paymentConfirmTitle">Hai completato il pagamento?</h2><p id="paymentConfirmCopy">Prima di finalizzare l’ordine, conferma di aver effettuato il pagamento secondo il metodo selezionato.</p><strong id="paymentConfirmMethod">Metodo selezionato: Satispay</strong><div class="paymentConfirmActions"><button type="button" class="ghost" onclick="closePaymentConfirmation()">Annulla</button><button id="paymentConfirmAccept" type="button" class="primary gold" onclick="confirmPaymentAndSend()">Confermo di aver pagato</button></div></div></div>
 <div id="toast" class="toast"></div>
-<script src="../supplier-access.js?v=preview-5"></script>
-<script src="../pages-admin-unlock.js?v=preview-10"></script>
+<script src="../supplier-access.js?v=preview-6"></script>
+<script src="../pages-admin-unlock.js?v=preview-11"></script>
 <script src="../assets/pagnottella/data/menu.inline.js?v=preview-4"></script>
-<script src="../pagnottella/pagnottella.js?v=preview-7"></script>
+<script src="../pagnottella/pagnottella.js?v=preview-9"></script>
 <script src="./sponsor-polish.js?v=preview-8"></script>
 <script src="./approval-admin.js?v=preview-3"></script>
 </body>

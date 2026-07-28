@@ -53,7 +53,7 @@
         email: 'tester.preview@dos.design',
         role: 'tester',
         isAdmin: false,
-        supplierIds: ['pagnottella'],
+        supplierIds: ['russo', 'pagnottella'],
         provider: 'local-preview'
       };
     }
