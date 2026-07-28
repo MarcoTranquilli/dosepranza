@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../pagnottella/pagnottella.css?v=preview-1">
-<link rel="stylesheet" href="./preview-fixes.css?v=preview-8">
+<link rel="stylesheet" href="./preview-fixes.css?v=preview-9">
 </head>
 <body>
 <div class="wrap">
@@ -40,6 +40,7 @@
             <img src="../assets/pagnottella/images/optimized/logo_pagnottella.webp" alt="La Pagnottella Gourmet"><span class="supplierChoiceTag">La Pagnottella Gourmet</span><h2>Panini e insalate gourmet</h2><p>Sconto estivo, consegna gratuita in pausa pranzo e riepilogo WhatsApp.</p><small>Pagamento entro le 12:00</small><strong>Apri La Pagnottella <span>→</span></strong>
           </button>
         </div>
+        <p id="supplierAccessStatus" class="supplierAccessStatus" role="status" aria-live="polite"></p>
       </section>
     </div>
   </section>
@@ -65,11 +66,11 @@
 <aside id="filterPanel" class="filterPanel" aria-label="Filtri prodotti"><header><div><span>Catalogo</span><h2>Filtra i prodotti</h2></div><button type="button" onclick="closeFilterPanel()" aria-label="Chiudi filtri">×</button></header><div class="filterPanelBody"><section><h3>Categorie</h3><div id="filterCategories" class="filterSheetChips"></div></section><section><h3>Regime alimentare</h3><div id="filterDiet" class="filterSheetChips"></div></section><section><h3>Tipologia prodotto</h3><div id="filterTypes" class="filterSheetChips"></div></section><section><h3>Ingredienti principali</h3><label class="filterSearch"><span>⌕</span><input id="filterIngredientSearch" type="search" placeholder="Cerca ingrediente..."></label><div id="filterIngredients" class="filterSheetChips filterIngredients"></div></section><section><h3>Esclusioni e allergeni</h3><div id="filterExclusions" class="filterSheetChips"></div></section><section><label class="filterSortLabel">Ordinamento<select id="sort" class="sortSelect"><option value="recommended">Consigliati</option><option value="top">Top prima</option><option value="price">Prezzo crescente</option><option value="az">Nome A-Z</option></select></label></section></div><footer><button type="button" class="filterReset" onclick="resetFilters()">Reset filtri</button><button type="button" class="filterApply" onclick="applyFilters()">Applica filtri</button></footer></aside>
 <div id="paymentConfirmModal" class="paymentConfirmModal" role="dialog" aria-modal="true" aria-labelledby="paymentConfirmTitle"><div class="paymentConfirmCard"><div class="paymentConfirmIcon">✓</div><span>Conferma richiesta</span><h2 id="paymentConfirmTitle">Hai completato il pagamento?</h2><p id="paymentConfirmCopy">Prima di finalizzare l’ordine, conferma di aver effettuato il pagamento secondo il metodo selezionato.</p><strong id="paymentConfirmMethod">Metodo selezionato: Satispay</strong><div class="paymentConfirmActions"><button type="button" class="ghost" onclick="closePaymentConfirmation()">Annulla</button><button id="paymentConfirmAccept" type="button" class="primary gold" onclick="confirmPaymentAndSend()">Confermo di aver pagato</button></div></div></div>
 <div id="toast" class="toast"></div>
-<script src="../supplier-access.js?v=preview-3"></script>
-<script src="../pages-admin-unlock.js?v=preview-9"></script>
+<script src="../supplier-access.js?v=preview-4"></script>
+<script src="../pages-admin-unlock.js?v=preview-10"></script>
 <script src="../assets/pagnottella/data/menu.inline.js?v=preview-4"></script>
-<script src="../pagnottella/pagnottella.js?v=preview-5"></script>
+<script src="../pagnottella/pagnottella.js?v=preview-6"></script>
 <script src="./sponsor-polish.js?v=preview-8"></script>
-<script src="./approval-admin.js?v=preview-2"></script>
+<script src="./approval-admin.js?v=preview-3"></script>
 </body>
 </html>

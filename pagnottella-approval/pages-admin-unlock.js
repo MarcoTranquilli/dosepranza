@@ -8,7 +8,10 @@
     || location.hostname === 'marcotranquilli.github.io'
     || ['localhost', '127.0.0.1', '::1'].includes(location.hostname);
   const localPreviewRequested = () => params.get('localPreview') === '1';
-  const requestedRole = () => params.get('preview') === 'supplier' ? 'supplier' : 'admin';
+  const requestedRole = () => {
+    const role = params.get('preview');
+    return ['supplier', 'tester', 'external'].includes(role) ? role : 'admin';
+  };
 
   function resetPreviewSessionIfRequested() {
     if (!params.has('swreset')) return;
@@ -31,7 +34,8 @@
   }
 
   function previewSession() {
-    if (requestedRole() === 'supplier') {
+    const role = requestedRole();
+    if (role === 'supplier') {
       return {
         uid: 'local-pagnottella-supplier-preview',
         name: 'Commerciale Pagnottella Gourmet',
@@ -39,6 +43,28 @@
         role: 'supplier',
         isAdmin: false,
         supplierIds: ['pagnottella'],
+        provider: 'local-preview'
+      };
+    }
+    if (role === 'tester') {
+      return {
+        uid: 'local-pagnottella-dos-tester',
+        name: 'Tester DOS',
+        email: 'tester.preview@dos.design',
+        role: 'tester',
+        isAdmin: false,
+        supplierIds: ['pagnottella'],
+        provider: 'local-preview'
+      };
+    }
+    if (role === 'external') {
+      return {
+        uid: 'local-pagnottella-external-user',
+        name: 'Utente Esterno',
+        email: 'test@gmail.com',
+        role: 'user',
+        isAdmin: false,
+        supplierIds: [],
         provider: 'local-preview'
       };
     }

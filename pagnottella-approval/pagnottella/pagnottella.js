@@ -21,8 +21,6 @@ const state = {
 };
 const authState = { loading:false, user:null, message:'' };
 let supplierAccess = window.DoseSupplierAccess;
-const ADMIN_EMAIL = 'marco.tranquilli@dos.design';
-const PAGNOTTELLA_SUPPLIER_EMAIL = 'commerciale@lapagnottellagourmet.it';
 const byId = id => document.getElementById(id);
 const money = v => '€' + (Math.round(v*100)/100).toFixed(2).replace('.', ',');
 const esc = s => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
@@ -272,8 +270,14 @@ function bind(){
   });
 }
 
-function openShop(save=true){
+async function openShop(save=true){
   if(!ensureAuthenticated()) return;
+  const user = authenticatedDoseUser();
+  if(!(await supplierAccess.canAccessSupplier('pagnottella', user))){
+    const status = byId('supplierAccessStatus');
+    if(status) status.textContent = 'Questo account Google non è autorizzato ad accedere alla preview Pagnottella.';
+    return;
+  }
   state.screen='shop';
   sessionStorage.setItem('dosepranza_store','pagnottella');
   byId('landing').classList.add('hidden');
@@ -298,10 +302,7 @@ function backLanding(){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function roleForEmail(email){
-  const normalized = String(email || '').trim().toLowerCase();
-  if(normalized === ADMIN_EMAIL) return 'admin';
-  if(normalized === PAGNOTTELLA_SUPPLIER_EMAIL) return 'supplier';
-  return 'user';
+  return supplierAccess?.roleForEmail?.(email) || 'user';
 }
 async function initializeEntryFlow(){
   try{
@@ -313,8 +314,8 @@ async function initializeEntryFlow(){
   }
   syncAuthGate();
   if(authState.user?.name && authState.user?.email){
-    if(new URLSearchParams(location.search).get('store') === 'pagnottella') openShop(false);
-    else showSupplierSelection();
+    if(new URLSearchParams(location.search).get('store') === 'pagnottella') await openShop(false);
+    else await showSupplierSelection();
     return;
   }
   showRecognition();
@@ -327,7 +328,7 @@ function showRecognition(){
   syncAuthGate(true);
   setTimeout(() => byId('authGateGoogle')?.focus(), 50);
 }
-function showSupplierSelection(){
+async function showSupplierSelection(){
   const user = authenticatedDoseUser();
   if(!user?.name || !user?.email){
     showRecognition();
@@ -339,6 +340,18 @@ function showSupplierSelection(){
   byId('supplierStage')?.classList.remove('hidden');
   const identity = byId('recognizedUserDisplay');
   if(identity) identity.textContent = `${user.name} · ${user.email} · ${roleForEmail(user.email)}`;
+  const card = document.querySelector('.pagnottellaCard');
+  const status = byId('supplierAccessStatus');
+  if(card) card.disabled = true;
+  if(status) status.textContent = 'Verifica autorizzazione Pagnottella...';
+  const canOpenPagnottella = await supplierAccess.canAccessSupplier('pagnottella', user);
+  if(card){
+    card.disabled = !canOpenPagnottella;
+    card.setAttribute('aria-disabled', String(!canOpenPagnottella));
+  }
+  if(status) status.textContent = canOpenPagnottella
+    ? ''
+    : 'Account non autorizzato: la preview Pagnottella è riservata ai tester @dos.design e al fornitore.';
   authState.user = user;
   window.renderPagnottellaAdmin?.();
 }
@@ -425,8 +438,8 @@ async function signInWithGoogleGate(){
       renderCart();
       syncAuthGate();
       const params = new URLSearchParams(location.search);
-      if(params.get('store') === 'pagnottella') openShop(false);
-      else showSupplierSelection();
+      if(params.get('store') === 'pagnottella') await openShop(false);
+      else await showSupplierSelection();
     }else if(document.visibilityState === 'hidden'){
       return;
     }else{
