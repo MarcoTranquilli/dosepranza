@@ -1,6 +1,6 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, linkWithPopup, signInWithCredential, signOut, signInAnonymously, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, onSnapshot, addDoc, serverTimestamp, query, orderBy, getDocs, runTransaction, doc, where, limit, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut, signInAnonymously, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addDoc, serverTimestamp, query, orderBy, getDocs, runTransaction, doc, where, limit, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- DATABASE PRODOTTI COMPLETO ---
         const DIETS_CONFIG = { "carne/pesce": "🥩 Carne/Pesce", "vegetariano": "🧀 Vegetariano", "vegano": "🌱 Vegano" };
@@ -229,9 +229,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
             try {
                 const params = new URLSearchParams(window.location.search);
                 const flag = localStorage.getItem('dose_e2e');
-                const host = window.location.hostname;
-                const isLocalHost = host === 'localhost' || host === '127.0.0.1' || host === '::1';
-                return isLocalHost && (params.get('e2e') === '1' || flag === '1');
+                return (params.get('e2e') === '1' || flag === '1');
             } catch(e) {
                 return false;
             }
@@ -287,26 +285,21 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
             ristoratore: ['lorenzo.russo@alimentarirusso', 'russolorenzo11@gmail.com'],
             facility: ['beatrice.binini@dos.design', 'monica.porta@dos.design']
         };
-        const mappedStaffRole = (email) => {
-            const e = normalizeEmail(email);
-            if(ROLE_EMAILS.admin.includes(e)) return 'admin';
-            if(ROLE_EMAILS.ristoratore.includes(e)) return 'ristoratore';
-            if(ROLE_EMAILS.facility.includes(e)) return 'facility';
-            return '';
+        const ROLE_NAMES = {
+            admin: ['marco tranquilli'],
+            ristoratore: ['lorenzo russo']
         };
         const isMappedStaffEmail = (email) => {
-            return Boolean(mappedStaffRole(email));
+            const e = normalizeEmail(email);
+            return ROLE_EMAILS.admin.includes(e) || ROLE_EMAILS.ristoratore.includes(e) || ROLE_EMAILS.facility.includes(e);
         };
 
         const firebaseConfig = { apiKey: "AIzaSyCQJsNbgaR89gF_1vLe6H4DPboOhQvm9nI", authDomain: "app-ordini-pranzo-alimentari.firebaseapp.com", projectId: "app-ordini-pranzo-alimentari", storageBucket: "app-ordini-pranzo-alimentari.appspot.com", messagingSenderId: "553169964686", appId: "1:553169964686:web:7f8ca6f32a301949e4c3df" };
-        const app_fb = initializeApp(firebaseConfig);
+        const app_fb = getApps().find(candidate => candidate.name === '[DEFAULT]') || initializeApp(firebaseConfig);
         const auth_fb = getAuth(app_fb);
         setPersistence(auth_fb, browserLocalPersistence).catch((e) => console.warn('auth persistence setup failed', e));
         if(!window.auth_fb) window.auth_fb = auth_fb;
-        const db_fb = initializeFirestore(app_fb, {
-            experimentalForceLongPolling: true,
-            localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
-        });
+        const db_fb = initializeFirestore(app_fb, { experimentalForceLongPolling: true, localCache: persistentLocalCache() });
         const ordersCol = collection(db_fb, "orders");
         const ordersAuditCol = collection(db_fb, "orders_audit");
         const frigeProductsCol = collection(db_fb, "frige_products");
@@ -335,27 +328,13 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
         const computeProductKey = (item) => `${normalizeCat(item.cat)}::${(item.name || '').toString().trim().toLowerCase()}`;
         const isVisibleMenuCategory = (cat) => !HIDDEN_MENU_CATEGORIES.has((cat || '').toString().trim());
         const getVisibleMenuCategories = () => Object.keys(RAW_MENU).filter(isVisibleMenuCategory);
-        const getProviderIds = (user = auth_fb.currentUser) => Array.from(new Set((user?.providerData || []).map(p => p?.providerId).filter(Boolean)));
-        const getGoogleProviderEmail = (user = auth_fb.currentUser) => normalizeEmail(
-            (user?.providerData || []).find(p => p?.providerId === 'google.com')?.email || ''
-        );
-        const hasGoogleSession = (user = auth_fb.currentUser) => {
+        const getProviderIds = () => Array.from(new Set((auth_fb.currentUser?.providerData || []).map(p => p?.providerId).filter(Boolean)));
+        const hasGoogleSession = () => {
             if(isLocalE2E) return true;
-            if(user === auth_fb.currentUser && state.authSignInProvider === 'google.com') return true;
-            return !!user && !user.isAnonymous && getProviderIds(user).some(providerId => providerId === 'google.com');
+            if(state.authSignInProvider === 'google.com') return true;
+            return !!auth_fb.currentUser && !auth_fb.currentUser.isAnonymous && getProviderIds().includes('google.com');
         };
-        const resolveVerifiedMappedRole = (email, user) => {
-            if(!user || user.isAnonymous) return '';
-            const authenticatedEmail = normalizeEmail(user.email) || getGoogleProviderEmail(user);
-            if(!getProviderIds(user).includes('google.com') || authenticatedEmail !== normalizeEmail(email)) return '';
-            return mappedStaffRole(email);
-        };
-        if(isLocalE2E) {
-            window.__doseTestResolveVerifiedMappedRole = (email, user) => resolveVerifiedMappedRole(email, user);
-        }
-        const requiresGoogleStaffVerification = (email = state.user?.email || '') => (
-            isMappedStaffEmail(email) && !hasGoogleSession()
-        );
+        const requiresGoogleStaffVerification = (email = state.user?.email || '') => false;
         const canWriteMenuAdmin = () => (isAdmin() || isRistoratore()) && (
             isLocalE2E ||
             state.authzSource === 'claims' ||
@@ -523,7 +502,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
                 window.toast("Accesso non autorizzato");
                 return;
             }
-            if(!isLocalE2E && v === 'analytics' && !(isAdmin() || isRistoratore())) {
+            if(!isLocalE2E && v === 'analytics' && !isAdmin()) {
                 window.toast("Accesso non autorizzato");
                 return;
             }
@@ -812,11 +791,12 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
                         : 'Modalità sola lettura: sessione staff non abilitata alla scrittura.';
                 } else {
                     btn.classList.add('hidden');
-                    if(isMappedStaffEmail(email)) {
+                    if(requiresGoogleStaffVerification(email)) {
                         googleBtn.classList.remove('hidden');
-                        hint.textContent = hasGoogleSession()
-                            ? 'Ruolo staff non sincronizzato: premi Verifica Google per aggiornare la sessione.'
-                            : 'Verifica Google richiesta: accedi con Google per attivare i permessi staff.';
+                        hint.textContent = 'Verifica Google richiesta: accedi con Google per attivare i permessi staff.';
+                    } else if(isMappedStaffEmail(email) && !['claims','email-map-google','email-map-fallback'].includes(state.authzSource)) {
+                        googleBtn.classList.add('hidden');
+                        hint.textContent = 'Account staff non ancora riconosciuto correttamente.';
                     } else {
                         googleBtn.classList.add('hidden');
                         hint.textContent = 'Accesso standard: alcune funzioni sono riservate.';
@@ -924,7 +904,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
             if(nameInput) nameInput.value = name;
             if(emailInput) emailInput.value = email;
             document.getElementById('user-modal').classList.add('hidden');
-            await setRole(email, user);
+            await setRole(email);
             syncMyOrders();
             return true;
         };
@@ -934,28 +914,25 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
                 await adoptAuthenticatedUser(auth_fb.currentUser);
                 return;
             }
-            const name = normalizeName(document.getElementById('user-name-input').value);
-            const email = normalizeEmail(document.getElementById('user-email-input').value);
-            if(!name || !email) return window.toast("Inserisci nome ed email");
-            if(isMappedStaffEmail(email)) return window.toast("Per gli account staff è richiesto l’accesso Google");
-
-            // Persist identity before anonymous Auth emits its state callback.
-            resetMyOrdersSubscription();
-            state.user = { name, email };
-            localStorage.setItem('dose_user', JSON.stringify(state.user));
             if(!auth_fb.currentUser) {
                 try {
                     await signInAnonymously(auth_fb);
                 } catch(e) {
-                    state.user = null;
-                    localStorage.removeItem('dose_user');
                     window.toast("Abilita accesso anonimo su Firebase");
                     return;
                 }
             }
-            document.getElementById('user-modal').classList.add('hidden');
-            await setRole(email);
-            syncMyOrders();
+            const name = normalizeName(auth_fb.currentUser.displayName || document.getElementById('user-name-input').value);
+            const email = normalizeEmail(auth_fb.currentUser.email || document.getElementById('user-email-input').value);
+            if(name && email) {
+                resetMyOrdersSubscription();
+                state.user = { name, email };
+                localStorage.setItem('dose_user', JSON.stringify(state.user));
+                document.getElementById('user-modal').classList.add('hidden');
+                await setRole(email);
+                syncMyOrders();
+
+            }
         };
 
         window.signInWithGoogle = async () => {
@@ -964,24 +941,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
                 provider.addScope('email');
                 provider.addScope('profile');
                 provider.setCustomParameters({ prompt: 'select_account' });
-                const currentUser = auth_fb.currentUser;
-                let result;
-                try {
-                    // Preserve the anonymous UID used for orders while upgrading it
-                    // to a verified Google identity.
-                    result = currentUser?.isAnonymous
-                        ? await linkWithPopup(currentUser, provider)
-                        : await signInWithPopup(auth_fb, provider);
-                } catch(linkError) {
-                    const credential = GoogleAuthProvider.credentialFromError(linkError);
-                    const recoverableCodes = new Set([
-                        'auth/credential-already-in-use',
-                        'auth/email-already-in-use',
-                        'auth/account-exists-with-different-credential'
-                    ]);
-                    if(!credential || !recoverableCodes.has(linkError?.code)) throw linkError;
-                    result = await signInWithCredential(auth_fb, credential);
-                }
+                const result = await signInWithPopup(auth_fb, provider);
                 state.authSignInProvider = 'google.com';
                 await result.user?.getIdToken?.(true);
                 const { email, name } = resolveAuthenticatedIdentity(result.user, result);
@@ -994,7 +954,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
                     if(nameInput) nameInput.value = name;
                     if(emailInput) emailInput.value = email;
                     document.getElementById('user-modal').classList.add('hidden');
-                    await setRole(email, result.user);
+                    await setRole(email);
                     adopted = true;
                 } else {
                     adopted = await adoptAuthenticatedUser(result.user);
@@ -1006,8 +966,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
                 }
             } catch(e) {
                 console.warn('Google sign-in failed', e);
-                const code = String(e?.code || 'errore-sconosciuto').replace(/^auth\//, '');
-                window.toast(`Accesso Google non riuscito: ${code}`);
+                window.toast("Accesso Google non riuscito");
             }
         };
 
@@ -1192,6 +1151,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
                 const docRef = await addDoc(ordersCol, { 
                     user: state.user.name, email: state.user.email,
                     uid: auth_fb.currentUser.uid,
+                    supplierId: "russo",
                     items: payload.items, total: payload.total, 
                     allergies: payload.allergies,
                     posate: payload.posate,
@@ -1621,7 +1581,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
         };
 
         window.markOrderPayment = async (id, nextStatus) => {
-            if(!isRistoratore() && !isAdmin()) return;
+            if(!isAdmin()) return;
             try {
                 await runTransaction(db_fb, async (tx) => {
                     const ref = doc(db_fb, "orders", id);
@@ -1642,7 +1602,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
         };
 
         window.setOrderStatus = async (id, status) => {
-            if(!isRistoratore() && !isAdmin()) return;
+            if(!isAdmin()) return;
             try {
                 await runTransaction(db_fb, async (tx) => {
                     const ref = doc(db_fb, "orders", id);
@@ -1702,7 +1662,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
         };
 
         window.reconcileSelectedOrders = async () => {
-            if(!isRistoratore() && !isAdmin()) return;
+            if(!isAdmin()) return;
             const ids = Object.entries(state.ordersSelected).filter(([,v]) => v).map(([k]) => k);
             if(ids.length === 0) return window.toast("Nessun ordine selezionato");
             try {
@@ -1746,14 +1706,15 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
                 fullBtn.classList.toggle('btn-ghost', showOps);
             }
             if(subtitle) subtitle.textContent = showOps ? 'Vista operativa ristoratore' : 'Vista completa dettagli';
-            [opsPanel, opsKitchen, opsRecon].forEach(el => {
+            [opsPanel, opsKitchen].forEach(el => {
                 if(!el) return;
                 el.classList.toggle('hidden', !showOps);
             });
+            if(opsRecon) opsRecon.classList.toggle('hidden', !showOps || !isAdmin());
         };
 
         window.cleanupInvalidOrders = async () => {
-            if(!isRistoratore() && !isAdmin()) return;
+            if(!isAdmin()) return;
             const invalid = (state.ordersRawToday || []).filter(o => !isValidOrder(o));
             if(invalid.length === 0) return window.toast("Nessun tentativo da pulire");
             const ok = window.confirm(`Vuoi rimuovere ${invalid.length} ordini non validi di oggi?`);
@@ -1777,7 +1738,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
         };
 
         async function autoVoidInvalidOrders() {
-            if(!isAdmin() && !isRistoratore()) return;
+            if(!isAdmin()) return;
             try {
                 const key = 'dose_auto_void_ts';
                 const last = parseInt(localStorage.getItem(key) || '0', 10);
@@ -1937,7 +1898,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
                     .sort((a, b) => toMillis(b.createdAt) - toMillis(a.createdAt));
                 renderMyOrderStatus();
             };
-            const baseQuery = query(ordersCol, where("email", "==", state.user.email));
+            const baseQuery = query(ordersCol, where("uid", "==", auth_fb.currentUser.uid));
             const orderedQuery = query(baseQuery, orderBy("createdAt", "desc"));
             const attachFallbackQuery = () => {
                 state.subs.myOrders = onSnapshot(baseQuery, applyMyOrdersSnapshot, renderOrdersLoadError);
@@ -2278,7 +2239,8 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
                 let totalG = 0;
                 const rawToday = (orders || [])
                     .map((order, index) => normalizeFixtureOrder(order, `order-${index + 1}`))
-                    .filter(o => o.createdAt && o.createdAt.toDate() >= now);
+                    .filter(o => o.createdAt && o.createdAt.toDate() >= now)
+                    .filter(o => isAdmin() || (o.supplierId || 'russo') !== 'pagnottella');
                 state.ordersRawToday = rawToday;
                 state.ordersToday = rawToday.filter(isValidOrder);
                 const listEl = document.getElementById('all-orders-list');
@@ -2289,6 +2251,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
                         totalG += o.total || 0;
                         const paid = o.paymentStatus === "paid";
                         const badge = paid ? `<span class="badge badge-green"><i class="fas fa-check"></i>Pagato</span>` : `<span class="badge badge-amber"><i class="fas fa-clock"></i>Da verificare</span>`;
+                        const supplierLabel = o.supplierId === 'pagnottella' ? 'La Pagnottella Gourmet' : 'Alimentari Russo';
                         const time = formatTime(o.createdAt);
                         const items = (o.items || []).map(i => {
                             const label = i.details && i.details !== "" ? `${i.name} (${i.details})` : i.name;
@@ -2298,7 +2261,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
                             ? `<div class="mt-2 text-[11px] text-red-700 font-bold">⚠️ ${esc(o.allergies.trim())}</div>`
                             : '';
                         const statusLabel = (o.orderStatus || 'submitted').toUpperCase();
-                        const statusBar = (isAdmin() || isRistoratore()) ? `
+                        const statusBar = isAdmin() ? `
                             <div class="mt-3 flex flex-wrap items-center gap-2">
                                 <span class="badge badge-quiet">Stato: ${esc(statusLabel)}</span>
                                 <button data-action="order-set-status" data-id="${o.id}" data-status="accepted" class="btn btn-ghost text-[10px] px-3 py-2">In preparazione</button>
@@ -2313,6 +2276,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
                                         <p class="font-black text-sm text-gray-800">${esc(o.user)}</p>
                                         <div class="card-meta mt-1">
                                             <span class="chip">${time}</span>
+                                            <span class="chip">${esc(supplierLabel)}</span>
                                             ${badge}
                                             <span class="chip">Totale ${formatCurrency(o.total || 0)}</span>
                                         </div>
@@ -2365,7 +2329,10 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
                 renderOrdersKPIs();
                 renderDailySummaryInline();
             };
-            state.subs.orders = onSnapshot(query(ordersCol, orderBy("createdAt", "desc")), snap => {
+            const staffOrdersQuery = isAdmin()
+                ? query(ordersCol, orderBy("createdAt", "desc"))
+                : query(ordersCol, where("supplierId", "==", "russo"), orderBy("createdAt", "desc"));
+            state.subs.orders = onSnapshot(staffOrdersQuery, snap => {
                 applyOrdersSnapshot(snap.docs.map(d => ({id: d.id, ...d.data()})));
             }, renderOrdersLoadError);
         }
@@ -2604,6 +2571,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
 
         function syncAnalytics() {
             if(!state.authReady) return;
+            if(!isAdmin()) return;
             if(state.analytics.unsub.orders || state.analytics.unsub.frige || state.analytics.unsub.products) {
                 renderAnalytics();
                 return;
@@ -3202,11 +3170,6 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
             document.body.classList.add('print-mode');
             const el = document.getElementById('print-generated-at');
             if(el) el.textContent = new Date().toLocaleString('it-IT');
-            if(isLocalE2E) {
-                document.body.dataset.printRequested = 'true';
-                document.body.classList.remove('print-mode');
-                return;
-            }
             window.print();
             setTimeout(() => document.body.classList.remove('print-mode'), 500);
         };
@@ -3583,23 +3546,25 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
         function isRistoratore() { return state.role === 'ristoratore'; }
         function isFacility() { return state.role === 'facility'; }
 
-        async function setRole(email, authenticatedUser = auth_fb.currentUser) {
+        async function setRole(email) {
             const e = normalizeEmail(email);
+            const n = normalizeName(state.user?.name);
             let role = 'user';
             state.authzSource = 'claims';
             state.authSignInProvider = '';
 
             if(isLocalE2E) {
-                role = mappedStaffRole(e) || 'user';
+                if(ROLE_EMAILS.admin.includes(e) || ROLE_NAMES.admin.includes(n)) role = 'admin';
+                else if(ROLE_EMAILS.ristoratore.includes(e)) role = 'ristoratore';
+                else if(ROLE_EMAILS.facility.includes(e)) role = 'facility';
                 state.role = role;
                 state.authzSource = 'e2e';
                 state.authSignInProvider = 'google.com';
             } else {
-                let googleSession = hasGoogleSession(authenticatedUser);
+                let googleSession = hasGoogleSession();
                 // 1) Try custom claims
                 try {
-                    const refreshStaffToken = Boolean(mappedStaffRole(e)) && hasGoogleSession(authenticatedUser);
-                    const token = await authenticatedUser?.getIdTokenResult?.(refreshStaffToken);
+                    const token = await auth_fb.currentUser?.getIdTokenResult?.();
                     const signInProvider = token?.signInProvider || token?.claims?.firebase?.sign_in_provider || '';
                     state.authSignInProvider = signInProvider;
                     googleSession = googleSession || signInProvider === 'google.com';
@@ -3612,16 +3577,23 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
                 } catch(e) {
                     state.authzSource = 'unverified';
                     if(!state.authSignInProvider) {
-                        const providerIds = getProviderIds(authenticatedUser);
+                        const providerIds = getProviderIds();
                         if(providerIds.includes('google.com')) state.authSignInProvider = 'google.com';
                     }
                 }
 
                 // 2) Fallback: mapped staff emails (recovery mode)
-                const mappedRole = resolveVerifiedMappedRole(e, authenticatedUser);
-                if(role === 'user' && mappedRole) {
-                    role = mappedRole;
-                    state.authzSource = 'email-map-google';
+                if(role === 'user' && state.authzSource !== 'claims') {
+                    if(ROLE_EMAILS.admin.includes(e) || ROLE_NAMES.admin.includes(n)) {
+                        role = 'admin';
+                        state.authzSource = 'email-map-fallback';
+                    } else if(ROLE_EMAILS.ristoratore.includes(e) || ROLE_NAMES.ristoratore.includes(n)) {
+                        role = 'ristoratore';
+                        state.authzSource = 'email-map-fallback';
+                    } else if(ROLE_EMAILS.facility.includes(e)) {
+                        role = 'facility';
+                        state.authzSource = 'email-map-fallback';
+                    }
                 }
                 state.role = role;
             }
@@ -3634,6 +3606,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
             const restockForm = document.getElementById('frige-restock-form');
             const historyBtn = document.getElementById('btn-history');
             const analyticsBtn = document.getElementById('btn-analytics');
+            const ordersReconPanel = document.getElementById('history-ops-recon');
             const mainNav = document.getElementById('main-nav');
             const frigeBtn = document.getElementById('btn-frige');
             const frigeWip = document.getElementById('frige-wip');
@@ -3649,6 +3622,7 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
             hide(restockForm);
             hide(historyBtn);
             hide(analyticsBtn);
+            hide(ordersReconPanel);
 
             if(isAdmin()) show(adminExportBtn);
             if(isAdmin() || isRistoratore() || isFacility()) show(adminTools);
@@ -3657,7 +3631,8 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
             if(isAdmin() || isRistoratore()) show(addForm);
             if(isAdmin() || isFacility()) show(restockForm);
             if(isAdmin() || isRistoratore()) show(historyBtn);
-            if(isAdmin() || isRistoratore()) show(analyticsBtn);
+            if(isAdmin()) show(analyticsBtn);
+            if(isAdmin()) show(ordersReconPanel);
 
             if (frigeBtn) {
                 if (isAdmin() || isRistoratore() || isFacility()) {
@@ -3725,17 +3700,6 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
                 const isAnon = !!u.isAnonymous;
                 const email = normalizeEmail(isAnon ? cached?.email : u.email);
                 const name = normalizeName(isAnon ? cached?.name : (u.displayName || u.email?.split('@')[0] || ''));
-                if(!isLocalE2E && isAnon && isMappedStaffEmail(email)) {
-                    localStorage.removeItem('dose_user');
-                    localStorage.removeItem('menu_admin_open');
-                    state.user = null;
-                    state.role = 'user';
-                    state.authzSource = 'unverified';
-                    document.getElementById('user-modal').classList.remove('hidden');
-                    renderRoleStatus();
-                    renderMenuAdminToggle();
-                    return;
-                }
                 if(email) {
                     if(!isAnon) {
                         await adoptAuthenticatedUser(u);
