@@ -42,6 +42,7 @@ test.beforeEach(async ({ page }) => {
 test('gate Google non viene bypassato e file preview usa fallback esplicito', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'Scenario desktop');
   await page.goto('/');
+  await expect(page).not.toHaveURL(/(?:\\?|&)swreset=1(?:&|$)/);
   await expect(page.locator('#recognitionStage')).not.toHaveClass(/hidden/);
   await expect(page.locator('#supplierStage')).toHaveClass(/hidden/);
   await page.waitForTimeout(700);
@@ -53,6 +54,7 @@ test('gate Google non viene bypassato e file preview usa fallback esplicito', as
     admin: window.DoseSupplierAccess.roleForEmail('marco.tranquilli@dos.design'),
     supplier: window.DoseSupplierAccess.roleForEmail('commerciale@lapagnottellagourmet.it'),
     tester: window.DoseSupplierAccess.roleForEmail('  PERSONA@DOS.DESIGN  '),
+    veronica: window.DoseSupplierAccess.roleForEmail('veronica.battaglia@dos.design'),
     marta: window.DoseSupplierAccess.roleForEmail('marta.diamantini@dos.design'),
     luca: window.DoseSupplierAccess.roleForEmail('luca.pacella@dos.design'),
     external: window.DoseSupplierAccess.roleForEmail('test@gmail.com'),
@@ -62,6 +64,7 @@ test('gate Google non viene bypassato e file preview usa fallback esplicito', as
     admin:'admin',
     supplier:'supplier',
     tester:'tester',
+    veronica:'tester',
     marta:'tester',
     luca:'tester',
     external:'user',
