@@ -23,6 +23,15 @@
     ].forEach((key) => localStorage.removeItem(key));
   }
 
+  function consumeSwresetOnce() {
+    if (!params.has('swreset')) return;
+    resetPreviewSessionIfRequested();
+    const cleanParams = new URLSearchParams(location.search);
+    cleanParams.delete('swreset');
+    const query = cleanParams.toString();
+    history.replaceState(null, '', `${location.pathname}${query ? `?${query}` : ''}${location.hash || ''}`);
+  }
+
   function storedGoogleSession() {
     try {
       const session = JSON.parse(localStorage.getItem('dose_user') || 'null');
@@ -165,7 +174,7 @@
     localButton.setAttribute('aria-hidden', String(!isPreviewHost()));
   }
 
-  resetPreviewSessionIfRequested();
+  consumeSwresetOnce();
   if (localPreviewRequested() && !storedGoogleSession()) activateLocalPreview();
 
   window.DosePagesAdminUnlock = activateLocalPreview;

@@ -15,6 +15,7 @@
     'russolorenzo11@gmail.com'
   ]);
   const GOOGLE_PROVIDER_ID = 'google.com';
+  const GOOGLE_REDIRECT_PENDING_KEY = 'dose_google_redirect_pending';
   const SETTINGS_KEY = 'dose_supplier_settings';
   const LOCAL_ORDERS_KEY = 'dose_e2e_pagnottella_orders';
   const DEFAULT_SETTINGS = Object.freeze({
@@ -176,13 +177,63 @@
     });
   }
 
+  function clearSwresetFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    if (!params.has('swreset')) return;
+    params.delete('swreset');
+    const query = params.toString();
+    window.history.replaceState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash || ''}`);
+  }
+
+  function redirectPending() {
+    return window.sessionStorage.getItem(GOOGLE_REDIRECT_PENDING_KEY) === '1';
+  }
+
+  function waitForAuthUser(auth, authSdk, timeoutMs = 3500) {
+    if (auth.currentUser) return Promise.resolve(auth.currentUser);
+    return new Promise(resolve => {
+      let settled = false;
+      let unsubscribe = () => {};
+      const finish = (user = null) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        unsubscribe();
+        resolve(user);
+      };
+      const timer = setTimeout(() => finish(null), timeoutMs);
+      unsubscribe = authSdk.onAuthStateChanged(auth, user => {
+        if (user) finish(user);
+      }, () => finish(null));
+    });
+  }
+
   async function consumeRedirectResult() {
     if (isFilePreview()) return null;
     if (!redirectResultPromise) {
       redirectResultPromise = (async () => {
         const { auth, authSdk } = await loadFirebaseCore();
         const result = await authSdk.getRedirectResult(auth);
-        return result?.user ? firebaseUserPayload(result.user, { trustedGoogleResult: true }) : null;
+        if (result?.user) {
+          console.info('Redirect result user found');
+          const user = await firebaseUserPayload(result.user, { trustedGoogleResult: true });
+          if (user) window.sessionStorage.removeItem(GOOGLE_REDIRECT_PENDING_KEY);
+          return user;
+        }
+        if (!redirectPending()) return null;
+        console.info('Google redirect pending');
+        const currentUser = await waitForAuthUser(auth, authSdk);
+        if (currentUser) {
+          const user = await firebaseUserPayload(currentUser, { trustedGoogleResult: true });
+          if (user) {
+            console.info('Auth currentUser recovered');
+            window.sessionStorage.removeItem(GOOGLE_REDIRECT_PENDING_KEY);
+            return user;
+          }
+        }
+        console.info('No Firebase session after redirect');
+        window.sessionStorage.removeItem(GOOGLE_REDIRECT_PENDING_KEY);
+        return null;
       })();
     }
     return redirectResultPromise;
@@ -193,8 +244,12 @@
     const { auth } = await loadFirebaseCore();
     const redirectedUser = await consumeRedirectResult();
     if (redirectedUser) return redirectedUser;
-    const user = await firebaseUserPayload(auth.currentUser);
-    if (!user) window.localStorage.removeItem('dose_user');
+    const user = await firebaseUserPayload(auth.currentUser, { trustedGoogleResult: redirectPending() });
+    if (user) {
+      window.sessionStorage.removeItem(GOOGLE_REDIRECT_PENDING_KEY);
+      return user;
+    }
+    if (!redirectPending()) window.localStorage.removeItem('dose_user');
     return user;
   }
 
@@ -206,6 +261,9 @@
     provider.addScope('profile');
     provider.setCustomParameters({ prompt: 'select_account' });
     if (isGitHubPages()) {
+      clearSwresetFromUrl();
+      window.sessionStorage.setItem(GOOGLE_REDIRECT_PENDING_KEY, '1');
+      console.info('Google redirect pending');
       await authSdk.signInWithRedirect(auth, provider);
       return null;
     }
