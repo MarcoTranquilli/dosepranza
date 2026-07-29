@@ -215,7 +215,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(host.endsWith('github.io')) return '';
             return '/.netlify/functions/order_confirmation';
         })();
-        const SATISPAY_RUSSO_URL = 'http://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0';
+        const SATISPAY_RUSSO_URL = 'https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0';
         const STAFF_ORDERS_ENDPOINT = (() => {
             try {
                 const override = localStorage.getItem('dose_notify_base_url');

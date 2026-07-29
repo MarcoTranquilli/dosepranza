@@ -1,7 +1,8 @@
 (() => {
   const params = new URLSearchParams(location.search);
   const isSuiteEntry = params.get('suite') === 'production';
-  const redirectToHub = () => window.location.replace('../?next=russo');
+  const SUITE_URL = '/dosepranza/pagnottella-gourmet/?suite=production&v=suite-return-2';
+  const redirectToHub = () => window.location.replace(SUITE_URL);
   const renderSuiteReturn = () => {
     const bar = document.getElementById('suite-return-bar');
     if (bar) bar.classList.toggle('hidden', !isSuiteEntry);
