@@ -62,8 +62,13 @@ test('suite apre Russo senza nuovo login e torna alla scelta fornitore preservan
   await expect(page.locator('#user-modal')).toBeHidden();
   await expect(page.locator('#suite-return-bar')).toBeVisible();
   await expect(page.locator('#role-quick-text')).toContainText(users.tester.email);
+  await page.route('**/dosepranza/pagnottella-gourmet/**', route => route.fulfill({
+    status:200,
+    contentType:'text/html',
+    body:'<!doctype html><title>Suite DOSepranza</title>'
+  }));
   await page.getByRole('link', {name:'Cambia fornitore'}).click();
-  await expect(page).toHaveURL(/\/pagnottella-gourmet\/\?.*suite=production/);
+  await expect(page).toHaveURL(/\/dosepranza\/pagnottella-gourmet\/\?.*suite=production/);
   const storedEmail = await page.evaluate(() => JSON.parse(localStorage.getItem('dose_user') || 'null')?.email);
   expect(storedEmail).toBe(users.tester.email);
 });
@@ -101,9 +106,31 @@ test('sorgente Russo applica supplierId, query segregata e guard fornitore', asy
   expect(app).toContain('requireSuiteGoogleSession()');
   expect(guard).toContain("canAccessSupplier('russo', session)");
   expect(guard).toContain("params.get('suite') === 'production'");
+  expect(guard).toContain("'/dosepranza/pagnottella-gourmet/?suite=production&v=suite-return-2'");
   expect(guard).not.toContain("params.get('preview') === 'admin'");
   expect(access).toContain('suiteFallbackSession');
   expect(access).toContain('recoverGoogleSession');
   expect(suite).toContain('../russo/?suite=production');
-  expect(app).toContain("http://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0");
+  expect(app).toContain("https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0");
+  expect(app).not.toContain("http://web.satispay.com/");
+});
+
+test('QR e azioni Satispay Russo usano esclusivamente il link HTTPS canonico', async ({ page }) => {
+  await openAs(page, users.tester, []);
+  const canonicalUrl = 'https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0';
+  const qr = page.locator('img[alt="QR pagamento Alimentari Russo"]').first();
+  await expect(qr).toBeVisible();
+  await expect(qr).toHaveAttribute('src', `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(canonicalUrl)}`);
+  await expect(page.getByRole('link', {name:'Apri Satispay'}).first()).toHaveAttribute('href', canonicalUrl);
+  await page.evaluate(() => {
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable:true,
+      value:{ writeText:(text:string) => {
+        (window as typeof window & {__copiedSatispay?:string}).__copiedSatispay = text;
+        return Promise.resolve();
+      }}
+    });
+  });
+  await page.locator('[data-action="copy-satispay-link"]').first().click();
+  await expect.poll(() => page.evaluate(() => (window as typeof window & {__copiedSatispay?:string}).__copiedSatispay)).toBe(canonicalUrl);
 });
