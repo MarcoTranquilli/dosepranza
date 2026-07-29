@@ -1,6 +1,6 @@
 import { test, expect, Page } from '@playwright/test';
 
-const reviewPath = 'pagnottella-preview/?preview=admin&review=sponsor&localPreview=1&swreset=1';
+const reviewPath = 'pagnottella-preview/?preview=admin&review=sponsor&localPreview=1&e2e=1&swreset=1';
 
 async function addProduct(page: Page, name: string, optionIndex = 0, extras: string[] = []) {
   await page.locator('#search').fill(name);
@@ -75,17 +75,11 @@ test('gate Google non viene bypassato e file preview usa fallback esplicito', as
     similarDomain:'user'
   });
   expect(await page.evaluate(() => ({
-    trustedPopup: window.DoseSupplierAccess.isVerifiedGoogleResult([], '', true),
-    strictCurrentUser: window.DoseSupplierAccess.isVerifiedGoogleResult([], '', false),
-    googleProvider: window.DoseSupplierAccess.isVerifiedGoogleResult([{ providerId:'google.com' }], '', false),
-    popupBlocked: window.DoseSupplierAccess.shouldUseRedirectFallback('auth/popup-blocked'),
-    popupClosed: window.DoseSupplierAccess.shouldUseRedirectFallback('auth/popup-closed-by-user')
+    strictCurrentUser: window.DoseSupplierAccess.isVerifiedGoogleResult([], ''),
+    googleProvider: window.DoseSupplierAccess.isVerifiedGoogleResult([{ providerId:'google.com' }], '')
   }))).toEqual({
-    trustedPopup:true,
     strictCurrentUser:false,
-    googleProvider:true,
-    popupBlocked:true,
-    popupClosed:false
+    googleProvider:true
   });
   expect(await page.evaluate(async () => ({
     tester: await window.DoseSupplierAccess.canAccessSupplier('pagnottella', {
@@ -109,7 +103,7 @@ test('gate Google non viene bypassato e file preview usa fallback esplicito', as
   await expect(page.locator('#authGateStatus')).toContainText('Google Login richiede un indirizzo http o https');
   await page.getByRole('button', { name:'Apri anteprima locale' }).click();
   await expect(page.locator('#supplierStage')).not.toHaveClass(/hidden/);
-  await expect(page.locator('#recognizedUserDisplay')).toHaveText('Marco Tranquilli · marco.tranquilli@dos.design · admin');
+  await expect(page.locator('#recognizedUserDisplay')).toHaveText('Tester DOS · tester.preview@dos.design · tester');
   await expect(page.locator('.russoCard')).toHaveAttribute('href', '../russo/?suite=approval&v=suite-1');
   await expect(page.locator('.russoCard')).toContainText('con consegna gratuita');
   await expect(page.locator('.russoCard')).toContainText('entro le 11:30');
@@ -120,7 +114,7 @@ test('gate Google non viene bypassato e file preview usa fallback esplicito', as
   await page.getByRole('button', { name:'Cambia utente' }).click();
   await expect(page.locator('#recognitionStage')).not.toHaveClass(/hidden/);
 
-  await page.goto('pagnottella-preview/?preview=supplier&review=sponsor&localPreview=1&swreset=1');
+  await page.goto('pagnottella-preview/?preview=supplier&review=sponsor&localPreview=1&e2e=1&swreset=1');
   await expect(page.locator('#recognizedUserDisplay')).toHaveText(
     'Commerciale Pagnottella Gourmet · commerciale@lapagnottellagourmet.it · supplier'
   );
@@ -353,7 +347,7 @@ test('tester DOS completa un ordine senza accedere alle funzioni admin', async (
 
 test('account e domini esterni non possono aprire Pagnottella', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'Scenario desktop');
-  await page.goto('pagnottella-preview/?preview=external&review=sponsor&localPreview=1&swreset=1');
+  await page.goto('pagnottella-preview/?preview=external&review=sponsor&localPreview=1&e2e=1&swreset=1');
   await expect(page.locator('#recognizedUserDisplay')).toContainText('test@gmail.com · user');
   await expect(page.locator('.pagnottellaCard')).toBeDisabled();
   await expect(page.locator('.russoCard')).not.toHaveAttribute('href');

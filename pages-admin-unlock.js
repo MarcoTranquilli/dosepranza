@@ -6,6 +6,9 @@
   const isFilePreview = () => location.protocol === 'file:';
   const isPreviewHost = () => isFilePreview()
     || ['localhost', '127.0.0.1', '::1'].includes(location.hostname);
+  const isE2E = () => !isFilePreview()
+    && ['localhost', '127.0.0.1', '::1'].includes(location.hostname)
+    && params.get('e2e') === '1';
   const localPreviewRequested = () => params.get('localPreview') === '1';
   const requestedRole = () => {
     const role = params.get('preview');
@@ -13,7 +16,7 @@
   };
 
   function resetPreviewSessionIfRequested() {
-    if (!params.has('swreset')) return;
+    if (!params.has('swreset') && !params.has('authreset')) return;
     [
       'dose_preview_admin',
       'dose_user',
@@ -23,11 +26,13 @@
     ].forEach((key) => localStorage.removeItem(key));
   }
 
-  function consumeSwresetOnce() {
-    if (!params.has('swreset')) return;
+  function consumeAuthResetOnce() {
+    if (!params.has('swreset') && !params.has('authreset')) return;
+    if (params.has('authreset')) sessionStorage.setItem('dose_firebase_auth_reset_pending', '1');
     resetPreviewSessionIfRequested();
     const cleanParams = new URLSearchParams(location.search);
     cleanParams.delete('swreset');
+    cleanParams.delete('authreset');
     const query = cleanParams.toString();
     history.replaceState(null, '', `${location.pathname}${query ? `?${query}` : ''}${location.hash || ''}`);
   }
@@ -43,6 +48,17 @@
 
   function previewSession() {
     const role = requestedRole();
+    if (!isE2E()) {
+      return {
+        uid: 'local-pagnottella-dos-tester',
+        name: 'Tester DOS',
+        email: 'tester.preview@dos.design',
+        role: 'tester',
+        isAdmin: false,
+        supplierIds: ['russo', 'pagnottella'],
+        provider: 'local-preview'
+      };
+    }
     if (role === 'supplier') {
       return {
         uid: 'local-pagnottella-supplier-preview',
@@ -174,7 +190,7 @@
     localButton.setAttribute('aria-hidden', String(!isPreviewHost()));
   }
 
-  consumeSwresetOnce();
+  consumeAuthResetOnce();
   if (localPreviewRequested() && !storedGoogleSession()) activateLocalPreview();
 
   window.DosePagesAdminUnlock = activateLocalPreview;

@@ -463,10 +463,8 @@ async function signInWithGoogleGate(){
       const params = new URLSearchParams(location.search);
       if(params.get('store') === 'pagnottella') await openShop(false);
       else await showSupplierSelection();
-    }else if(document.visibilityState === 'hidden'){
-      return;
     }else{
-      authState.message = 'Reindirizzamento a Google in corso...';
+      authState.message = 'Sessione non pronta, riprova tra un istante.';
     }
   }catch(err){
     console.warn('Pagnottella Google gate failed', err);
