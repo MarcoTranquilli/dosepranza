@@ -5,5 +5,6 @@ test-results/
 tests/.auth/
 dist/
 dist-approval/
+dist-production/
 output/
 tmp/
