@@ -16,8 +16,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css?v=20260210p">
-    <script src="supplier-access.js"></script>
-    <script src="russo/russo-auth-guard.js?v=2"></script>
+    <script src="supplier-access.js?v=3"></script>
+    <script src="russo/russo-auth-guard.js?v=3"></script>
 </head>
 <body class="bg-background text-text-main pb-20 font-sans">
 
@@ -28,6 +28,13 @@
                 Ordine entro le 11:30 | Consegna gratuita ore 12:30.
             </div>
         </header>
+
+        <div id="suite-return-bar" class="hidden mb-4">
+            <a href="../pagnottella-gourmet/?suite=production&v=suite-return-1" class="inline-flex items-center gap-2 bg-white border border-gray-200 text-gray-700 text-[11px] font-black px-4 py-3 rounded-2xl shadow-sm">
+                <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                Cambia fornitore
+            </a>
+        </div>
 
         <nav id="main-nav" class="grid grid-cols-5 gap-1 glass p-2 rounded-2xl shadow-lg sticky top-2 z-50 mb-6">
             <button data-action="navigate" data-view="menu" id="btn-menu" class="nav-btn py-3 rounded-xl font-bold text-[10px] uppercase transition-all active"><i class="fas fa-utensils block text-sm mb-1"></i>Menù</button>
@@ -874,7 +881,7 @@
     </div>
 
     <script type="module" src="sw-killer.js?v=20260210"></script>
-    <script type="module" src="app.v20260325.js?v=14"></script>
+    <script type="module" src="app.v20260325.js?v=15"></script>
 
 </body>
 </html>
