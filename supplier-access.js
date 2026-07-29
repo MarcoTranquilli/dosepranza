@@ -60,6 +60,7 @@
   }
   const isFilePreview = () => window.location.protocol === 'file:';
   const isLoopback = () => ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
+  const isProductionSuiteEntry = () => new URLSearchParams(window.location.search).get('suite') === 'production';
   const isE2E = () => {
     if (!isLoopback()) return false;
     const params = new URLSearchParams(window.location.search);
@@ -220,12 +221,51 @@
     });
   }
 
+  async function recoverGoogleSession(auth, authSdk) {
+    if (auth.currentUser && !auth.currentUser.isAnonymous) return auth.currentUser;
+    return new Promise(resolve => {
+      const timeout = window.setTimeout(() => {
+        unsubscribe();
+        resolve(null);
+      }, 1500);
+      const unsubscribe = authSdk.onAuthStateChanged(auth, user => {
+        if (!user || user.isAnonymous) return;
+        window.clearTimeout(timeout);
+        unsubscribe();
+        resolve(user);
+      }, () => {
+        window.clearTimeout(timeout);
+        unsubscribe();
+        resolve(null);
+      });
+    });
+  }
+
+  function suiteFallbackSession() {
+    if (!isProductionSuiteEntry()) return null;
+    const stored = getStoredUser();
+    if (!stored?.supplierIds?.includes('russo')) return null;
+    return {
+      ...stored,
+      role: stored.role === 'tester' ? 'tester' : 'user',
+      isAdmin: false,
+      firebaseVerified: false
+    };
+  }
+
   async function resolveSession() {
     if (isTrustedLocalContext()) return getStoredUser();
     const { auth, authSdk } = await loadFirebaseCore();
     if (auth.currentUser && !auth.currentUser.isAnonymous) {
       const user = await firebaseUserPayload(auth.currentUser);
       if (user) return user;
+    }
+    if (isProductionSuiteEntry()) {
+      const recovered = await recoverGoogleSession(auth, authSdk);
+      const recoveredUser = await firebaseUserPayload(recovered);
+      if (recoveredUser) return recoveredUser;
+      const fallback = suiteFallbackSession();
+      if (fallback) return fallback;
     }
     await ensureAnonymousSession(auth, authSdk);
     window.localStorage.removeItem('dose_user');

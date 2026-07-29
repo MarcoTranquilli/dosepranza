@@ -285,10 +285,6 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             ristoratore: ['lorenzo.russo@alimentarirusso', 'russolorenzo11@gmail.com'],
             facility: ['beatrice.binini@dos.design', 'monica.porta@dos.design']
         };
-        const ROLE_NAMES = {
-            admin: ['marco tranquilli'],
-            ristoratore: ['lorenzo russo']
-        };
         const isMappedStaffEmail = (email) => {
             const e = normalizeEmail(email);
             return ROLE_EMAILS.admin.includes(e) || ROLE_EMAILS.ristoratore.includes(e) || ROLE_EMAILS.facility.includes(e);
@@ -333,6 +329,19 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(isLocalE2E) return true;
             if(state.authSignInProvider === 'google.com') return true;
             return !!auth_fb.currentUser && !auth_fb.currentUser.isAnonymous && getProviderIds().includes('google.com');
+        };
+        const isProductionSuiteEntry = () => new URLSearchParams(window.location.search).get('suite') === 'production';
+        const getSuiteSession = () => {
+            if(!isProductionSuiteEntry()) return null;
+            const session = window.DoseSupplierAccess?.getStoredUser?.();
+            return session?.provider === 'google.com' && session?.supplierIds?.includes('russo')
+                ? session
+                : null;
+        };
+        const requireSuiteGoogleSession = () => {
+            if(!isProductionSuiteEntry() || hasGoogleSession()) return true;
+            window.toast("Sessione Google in ripristino. Torna alla scelta fornitore e riprova.");
+            return false;
         };
         const requiresGoogleStaffVerification = (email = state.user?.email || '') => false;
         const canWriteMenuAdmin = () => (isAdmin() || isRistoratore()) && (
@@ -920,6 +929,13 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         };
 
         window.saveUserData = async () => {
+            const suiteSession = getSuiteSession();
+            if(suiteSession) {
+                persistUserIdentity(suiteSession.name, suiteSession.email);
+                document.getElementById('user-modal').classList.add('hidden');
+                await setRole(suiteSession.email);
+                return;
+            }
             if(auth_fb.currentUser && !auth_fb.currentUser.isAnonymous && auth_fb.currentUser.email) {
                 await adoptAuthenticatedUser(auth_fb.currentUser);
                 return;
@@ -1010,6 +1026,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
 
         window.sendOrder = async () => {
             if(!state.user) return document.getElementById('user-modal').classList.remove('hidden');
+            if(!requireSuiteGoogleSession()) return;
             if(!ensureOrderWindow()) return;
             if(!state.cart.length) return window.toast("Carrello vuoto");
             const total = state.cart.reduce((s,i)=>s+i.price, 0);
@@ -3556,13 +3573,12 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
 
         async function setRole(email) {
             const e = normalizeEmail(email);
-            const n = normalizeName(state.user?.name);
             let role = 'user';
             state.authzSource = 'claims';
             state.authSignInProvider = '';
 
             if(isLocalE2E) {
-                if(ROLE_EMAILS.admin.includes(e) || ROLE_NAMES.admin.includes(n)) role = 'admin';
+                if(ROLE_EMAILS.admin.includes(e)) role = 'admin';
                 else if(ROLE_EMAILS.ristoratore.includes(e)) role = 'ristoratore';
                 else if(ROLE_EMAILS.facility.includes(e)) role = 'facility';
                 state.role = role;
@@ -3591,11 +3607,11 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 }
 
                 // 2) Fallback: mapped staff emails (recovery mode)
-                if(role === 'user' && state.authzSource !== 'claims') {
-                    if(ROLE_EMAILS.admin.includes(e) || ROLE_NAMES.admin.includes(n)) {
+                if(role === 'user' && state.authzSource !== 'claims' && googleSession) {
+                    if(ROLE_EMAILS.admin.includes(e)) {
                         role = 'admin';
                         state.authzSource = 'email-map-fallback';
-                    } else if(ROLE_EMAILS.ristoratore.includes(e) || ROLE_NAMES.ristoratore.includes(n)) {
+                    } else if(ROLE_EMAILS.ristoratore.includes(e)) {
                         role = 'ristoratore';
                         state.authzSource = 'email-map-fallback';
                     } else if(ROLE_EMAILS.facility.includes(e)) {
@@ -3734,6 +3750,13 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             } else {
                 state.authReady = false;
                 state.authSignInProvider = '';
+                const suiteSession = getSuiteSession();
+                if(suiteSession) {
+                    persistUserIdentity(suiteSession.name, suiteSession.email);
+                    document.getElementById('user-modal').classList.add('hidden');
+                    await setRole(suiteSession.email);
+                    return;
+                }
                 // ensure we have an auth session to satisfy Firestore rules
                 try {
                     await signInAnonymously(auth_fb);
@@ -3838,7 +3861,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         });
 
         const init = () => {
-            if(!auth_fb.currentUser) {
+            if(!auth_fb.currentUser && !isProductionSuiteEntry()) {
                 signInAnonymously(auth_fb).catch(() => {});
             }
             state.menuData = Object.entries(RAW_MENU).flatMap(([cat, items]) => items.map((it, idx) => ({ ...it, cat, id: cat.replace(/\s/g,'')+idx })));
