@@ -931,7 +931,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 document.getElementById('user-modal').classList.add('hidden');
                 await setRole(email);
                 syncMyOrders();
-                
+
             }
         };
 
