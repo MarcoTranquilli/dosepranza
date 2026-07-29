@@ -53,8 +53,8 @@ service cloud.firestore {
         && resource.data.supplierId == 'pagnottella';
     }
     function isRussoOrder() {
-      return resource.data.supplierId == 'russo'
-        || !('supplierId' in resource.data);
+      return 'supplierId' in resource.data
+        && resource.data.supplierId == 'russo';
     }
 
     // Ordini:
@@ -68,15 +68,16 @@ service cloud.firestore {
         || (isRussoSupplier() && isRussoOrder());
       allow create: if isDosUser()
         && isCreateOwnerByUid()
-        && (
-          !('supplierId' in request.resource.data)
-          || request.resource.data.supplierId in ['russo', 'pagnottella']
-        );
+        && request.resource.data.supplierId in ['russo', 'pagnottella'];
       allow update: if isAdminEmail()
         && request.resource.data.uid == resource.data.uid
         && request.resource.data.get('supplierId', null) == resource.data.get('supplierId', null)
         && request.resource.data.diff(resource.data).changedKeys()
-          .hasOnly(['paymentStatus','reconciled','reconciledAt','reconciledBy']);
+          .hasOnly([
+            'paymentStatus','reconciled','reconciledAt','reconciledBy',
+            'orderStatus','statusUpdatedAt','statusUpdatedBy',
+            'voidedAt','voidedBy'
+          ]);
       allow delete: if isRole('admin') || isAdminEmail();
     }
 

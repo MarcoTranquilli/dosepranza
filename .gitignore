@@ -2,6 +2,7 @@ node_modules/
 .DS_Store
 playwright-report/
 test-results/
+firestore-debug.log
 tests/.auth/
 dist/
 dist-approval/

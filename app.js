@@ -502,7 +502,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 window.toast("Accesso non autorizzato");
                 return;
             }
-            if(!isLocalE2E && v === 'analytics' && !(isAdmin() || isRistoratore())) {
+            if(!isLocalE2E && v === 'analytics' && !isAdmin()) {
                 window.toast("Accesso non autorizzato");
                 return;
             }
@@ -1151,6 +1151,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 const docRef = await addDoc(ordersCol, { 
                     user: state.user.name, email: state.user.email,
                     uid: auth_fb.currentUser.uid,
+                    supplierId: "russo",
                     items: payload.items, total: payload.total, 
                     allergies: payload.allergies,
                     posate: payload.posate,
@@ -1580,7 +1581,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         };
 
         window.markOrderPayment = async (id, nextStatus) => {
-            if(!isRistoratore() && !isAdmin()) return;
+            if(!isAdmin()) return;
             try {
                 await runTransaction(db_fb, async (tx) => {
                     const ref = doc(db_fb, "orders", id);
@@ -1601,7 +1602,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         };
 
         window.setOrderStatus = async (id, status) => {
-            if(!isRistoratore() && !isAdmin()) return;
+            if(!isAdmin()) return;
             try {
                 await runTransaction(db_fb, async (tx) => {
                     const ref = doc(db_fb, "orders", id);
@@ -1661,7 +1662,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         };
 
         window.reconcileSelectedOrders = async () => {
-            if(!isRistoratore() && !isAdmin()) return;
+            if(!isAdmin()) return;
             const ids = Object.entries(state.ordersSelected).filter(([,v]) => v).map(([k]) => k);
             if(ids.length === 0) return window.toast("Nessun ordine selezionato");
             try {
@@ -1705,14 +1706,15 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 fullBtn.classList.toggle('btn-ghost', showOps);
             }
             if(subtitle) subtitle.textContent = showOps ? 'Vista operativa ristoratore' : 'Vista completa dettagli';
-            [opsPanel, opsKitchen, opsRecon].forEach(el => {
+            [opsPanel, opsKitchen].forEach(el => {
                 if(!el) return;
                 el.classList.toggle('hidden', !showOps);
             });
+            if(opsRecon) opsRecon.classList.toggle('hidden', !showOps || !isAdmin());
         };
 
         window.cleanupInvalidOrders = async () => {
-            if(!isRistoratore() && !isAdmin()) return;
+            if(!isAdmin()) return;
             const invalid = (state.ordersRawToday || []).filter(o => !isValidOrder(o));
             if(invalid.length === 0) return window.toast("Nessun tentativo da pulire");
             const ok = window.confirm(`Vuoi rimuovere ${invalid.length} ordini non validi di oggi?`);
@@ -1736,7 +1738,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         };
 
         async function autoVoidInvalidOrders() {
-            if(!isAdmin() && !isRistoratore()) return;
+            if(!isAdmin()) return;
             try {
                 const key = 'dose_auto_void_ts';
                 const last = parseInt(localStorage.getItem(key) || '0', 10);
@@ -2259,7 +2261,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                             ? `<div class="mt-2 text-[11px] text-red-700 font-bold">⚠️ ${esc(o.allergies.trim())}</div>`
                             : '';
                         const statusLabel = (o.orderStatus || 'submitted').toUpperCase();
-                        const statusBar = (isAdmin() || isRistoratore()) ? `
+                        const statusBar = isAdmin() ? `
                             <div class="mt-3 flex flex-wrap items-center gap-2">
                                 <span class="badge badge-quiet">Stato: ${esc(statusLabel)}</span>
                                 <button data-action="order-set-status" data-id="${o.id}" data-status="accepted" class="btn btn-ghost text-[10px] px-3 py-2">In preparazione</button>
@@ -2327,7 +2329,10 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 renderOrdersKPIs();
                 renderDailySummaryInline();
             };
-            state.subs.orders = onSnapshot(query(ordersCol, orderBy("createdAt", "desc")), snap => {
+            const staffOrdersQuery = isAdmin()
+                ? query(ordersCol, orderBy("createdAt", "desc"))
+                : query(ordersCol, where("supplierId", "==", "russo"), orderBy("createdAt", "desc"));
+            state.subs.orders = onSnapshot(staffOrdersQuery, snap => {
                 applyOrdersSnapshot(snap.docs.map(d => ({id: d.id, ...d.data()})));
             }, renderOrdersLoadError);
         }
@@ -2566,6 +2571,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
 
         function syncAnalytics() {
             if(!state.authReady) return;
+            if(!isAdmin()) return;
             if(state.analytics.unsub.orders || state.analytics.unsub.frige || state.analytics.unsub.products) {
                 renderAnalytics();
                 return;
@@ -3600,6 +3606,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             const restockForm = document.getElementById('frige-restock-form');
             const historyBtn = document.getElementById('btn-history');
             const analyticsBtn = document.getElementById('btn-analytics');
+            const ordersReconPanel = document.getElementById('history-ops-recon');
             const mainNav = document.getElementById('main-nav');
             const frigeBtn = document.getElementById('btn-frige');
             const frigeWip = document.getElementById('frige-wip');
@@ -3615,6 +3622,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             hide(restockForm);
             hide(historyBtn);
             hide(analyticsBtn);
+            hide(ordersReconPanel);
 
             if(isAdmin()) show(adminExportBtn);
             if(isAdmin() || isRistoratore() || isFacility()) show(adminTools);
@@ -3623,7 +3631,8 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(isAdmin() || isRistoratore()) show(addForm);
             if(isAdmin() || isFacility()) show(restockForm);
             if(isAdmin() || isRistoratore()) show(historyBtn);
-            if(isAdmin() || isRistoratore()) show(analyticsBtn);
+            if(isAdmin()) show(analyticsBtn);
+            if(isAdmin()) show(ordersReconPanel);
 
             if (frigeBtn) {
                 if (isAdmin() || isRistoratore() || isFacility()) {

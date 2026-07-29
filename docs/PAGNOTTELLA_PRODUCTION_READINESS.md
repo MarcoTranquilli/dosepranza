@@ -38,8 +38,42 @@ Before enabling the Pagnottella supplier account in live operations:
 4. Deploy the approved Rules in a controlled maintenance window.
 5. Run a live smoke test with one disposable order per authorized role.
 
-Without this activation, the Pagnottella supplier cannot reliably read live orders. The current Russo client also performs a global staff query and therefore does not yet meet strict query-level supplier segregation.
+Without this activation, the Pagnottella supplier cannot reliably read live orders. The Russo client now writes `supplierId: "russo"` and applies a supplier-scoped Firestore query; legacy orders without `supplierId` must be backfilled before the Rules deployment if they need to remain visible to the supplier.
+
+### Controlled deployment
+
+Dry run:
+
+```bash
+firebase deploy --dry-run \
+  --only firestore:rules,firestore:indexes \
+  --project app-ordini-pranzo-alimentari \
+  --config firebase.pagnottella-deploy.json
+```
+
+Deploy only after explicit approval:
+
+```bash
+firebase deploy \
+  --only firestore:rules,firestore:indexes \
+  --project app-ordini-pranzo-alimentari \
+  --config firebase.pagnottella-deploy.json
+```
+
+Post-deploy smoke checks:
+
+1. Marco loads the global order view and analytics.
+2. The Pagnottella supplier sees only `supplierId == "pagnottella"`.
+3. The Russo supplier sees only `supplierId == "russo"`.
+4. A DOS user creates one disposable order per supplier and reads only their own history.
+5. An external account cannot read or create orders.
+
+Rollback:
+
+1. Use Firestore Rules release history in Firebase Console to restore the immediately preceding ruleset.
+2. Do not delete the composite index during the incident; an unused index does not widen access.
+3. Restore the previous GitHub Pages commit if the client release also needs rollback.
 
 ## Release status
 
-Status is **YELLOW** until the Firebase activation gate and the Russo query segregation are completed. Customer ordering and the standalone production UI are testable; full supplier operations must not be declared production-ready before those two controls are closed.
+Status is **YELLOW** until the Firebase activation gate is completed. Query-level Russo segregation is implemented and covered by automated tests, but the supplier-facing release and Rules remain pending.

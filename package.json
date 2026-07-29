@@ -8,6 +8,8 @@
     "test:uat:headed": "playwright test --headed",
     "test:approval": "playwright test -c playwright.approval.config.ts",
     "test:pagnottella-production": "playwright test -c playwright.production.config.ts",
+    "test:rules:suppliers": "bash scripts/test_supplier_rules.sh",
+    "test:russo-segregation": "playwright test -c playwright.russo-segregation.config.ts",
     "build:approval": "bash scripts/build_pagnottella_approval.sh",
     "build:pagnottella-production": "bash scripts/build_pagnottella_production.sh",
     "enrich:pagnottella-taxonomy": "node scripts/enrich_pagnottella_taxonomy.mjs && node scripts/build_pagnottella_inline_menu.mjs",
@@ -17,11 +19,13 @@
     "build:css": "tailwindcss -c tailwind.config.cjs -i tailwind.input.css -o tailwind.output.css --minify"
   },
   "devDependencies": {
-    "@playwright/test": "^1.50.0"
+    "@firebase/rules-unit-testing": "^5.0.0",
+    "@playwright/test": "^1.50.0",
+    "firebase": "^12.1.0"
   },
   "dependencies": {
-    "@netlify/blobs": "^7.0.0",
     "@aws-sdk/client-s3": "^3.637.0",
+    "@netlify/blobs": "^7.0.0",
     "firebase-admin": "^12.5.0",
     "form-data": "^4.0.0",
     "node-fetch": "^3.3.2"

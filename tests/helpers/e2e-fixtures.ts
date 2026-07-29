@@ -9,6 +9,7 @@ function todayAt(hour: number, minute: number, second = 0) {
 export const coreOrdersFixture = [
   {
     id: 'order-gabriele',
+    supplierId: 'russo',
     user: 'Gabriele Maria Cirulli',
     email: 'gabrielemariacirulli@gmail.com',
     createdAt: todayAt(11, 5, 15),
@@ -26,6 +27,7 @@ export const coreOrdersFixture = [
   },
   {
     id: 'order-lorenzo-zuaro',
+    supplierId: 'russo',
     user: 'Lorenzo Zuaro',
     email: 'lorenzo.zuaro@gmail.com',
     createdAt: todayAt(9, 43, 56),
