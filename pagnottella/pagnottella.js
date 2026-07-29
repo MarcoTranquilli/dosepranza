@@ -429,7 +429,7 @@ function syncAuthGate(forceLocked=false){
   const environment = byId('authGateEnvironment');
   if(environment) environment.textContent = isLocalPreview()
     ? 'Da file:// puoi usare solo “Apri anteprima locale”. Per Google avvia il server HTTP.'
-    : 'L’anteprima locale è separata dal riconoscimento Google e non usa Firebase.';
+    : 'Usa il tuo account Google @dos.design per accedere alla preview.';
 }
 async function signInWithGoogleGate(){
   if(isLocalPreview()){

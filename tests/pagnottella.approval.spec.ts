@@ -49,6 +49,9 @@ test('gate Google non viene bypassato e file preview usa fallback esplicito', as
   await expect(page.locator('#authGateStatus')).toHaveText('Nessun utente riconosciuto');
   await expect(page.locator('#authGateGoogle')).toHaveText('Accedi con Google');
   await expect(page.locator('#authGateLocal')).toBeVisible();
+  await expect(page.locator('#authGateEnvironment')).toHaveText(
+    'Usa il tuo account Google @dos.design per accedere alla preview.'
+  );
   expect(await page.evaluate(() => localStorage.getItem('dose_user'))).toBeNull();
   expect(await page.evaluate(() => ({
     admin: window.DoseSupplierAccess.roleForEmail('marco.tranquilli@dos.design'),
