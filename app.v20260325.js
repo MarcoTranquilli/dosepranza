@@ -180,6 +180,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             cart: [], currentView: 'menu', search: '', cat: 'all', diet: 'all', posate: false,
             custom: { base: null, subtype: null, ings: [], total: 3.5 },
             ordersToday: [], menuData: [], menuExtras: [], customMenuItems: [], menuOverrides: new Map(), disabledProducts: new Set(),
+            orderSubmitting: false,
             frige: { products: [], purchasesToday: [], refillsToday: [], selected: null, filter: 'all', paymentFilter: 'pending' },
             customCreations: [],
             customFilter: 'all',
@@ -1174,10 +1175,13 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         }
 
         async function confirmSendOrder() {
-            if(!state.pendingOrder) return;
+            if(!state.pendingOrder || state.orderSubmitting) return;
             const check = document.getElementById('order-send-check');
             if(check && !check.checked) return window.toast("Conferma l'invio");
             const payload = state.pendingOrder;
+            const submit = document.getElementById('order-send-submit');
+            state.orderSubmitting = true;
+            if(submit) submit.disabled = true;
             try {
                 const docRef = await addDoc(ordersCol, { 
                     user: state.user.name, email: state.user.email,
@@ -1205,7 +1209,12 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                     });
                 state.pendingOrder = null;
                 state.cart = []; document.getElementById('cart-count').textContent='0'; window.navigate('history'); window.toast("Inviato!");
-            } catch(e) { alert("Connessione fallita. Carica online!"); }
+            } catch(e) {
+                window.toast("Ordine non salvato: riprova tra un istante.");
+            } finally {
+                state.orderSubmitting = false;
+                if(submit) submit.disabled = !state.pendingOrder || !(check && check.checked);
+            }
         }
 
         function showOrderConfirm(summary) {
