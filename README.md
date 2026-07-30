@@ -4,9 +4,11 @@
 
 ## Produzione attiva
 
-- URL live: `https://marcotranquilli.github.io/dosepranza/`
-- Deploy: GitHub Pages (branch `main`)
-- Nota: le sezioni Netlify sotto sono legacy e non usate nel flusso corrente.
+- Link ufficiale utenti: `https://app-dosepranza.netlify.app/`
+- Fallback tecnico GitHub Pages: `https://marcotranquilli.github.io/dosepranza/`
+- Reset tecnico, solo se necessario: `https://marcotranquilli.github.io/dosepranza/?swreset=1`
+- La root Netlify reindirizza alla suite multi-fornitore pubblicata su GitHub Pages.
+- I percorsi diretti Russo, Pagnottella e approval restano riservati a test tecnici e regressione.
 
 ## Release Policy
 

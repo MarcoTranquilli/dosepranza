@@ -28,6 +28,12 @@
     Cache-Control = "no-cache, no-store, must-revalidate"
 
 [[redirects]]
+  from = "/"
+  to = "https://marcotranquilli.github.io/dosepranza/"
+  status = 302
+  force = true
+
+[[redirects]]
   from = "/reports"
   to = "/reports/index.html"
   status = 200

@@ -1,5 +1,13 @@
 # DOSepranza 2.0 - Runbook multi-fornitore
 
+## Link ufficiali
+
+- Utenti: `https://app-dosepranza.netlify.app/`
+- Fallback tecnico: `https://marcotranquilli.github.io/dosepranza/`
+- Reset cache, solo se necessario: `https://marcotranquilli.github.io/dosepranza/?swreset=1`
+
+I percorsi diretti dei fornitori e l'approval non devono essere distribuiti come link principali.
+
 ## Comportamento atteso
 
 - L'accesso online usa Firebase Google Auth.

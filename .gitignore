@@ -9,3 +9,6 @@ dist-approval/
 dist-production/
 output/
 tmp/
+
+# Local Netlify folder
+.netlify

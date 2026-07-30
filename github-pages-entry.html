@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>DOSepranza</title>
+  <link rel="icon" href="./favicondosepranza.png">
+</head>
+<body>
+  <p>Accesso a DOSepranza in corso...</p>
+  <script>
+    (async () => {
+      try {
+        if ('serviceWorker' in navigator) {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          if (registrations.length) {
+            await Promise.all(registrations.map((registration) => registration.unregister()));
+            if ('caches' in window) {
+              const keys = await caches.keys();
+              await Promise.all(keys.map((key) => caches.delete(key)));
+            }
+          }
+        }
+      } catch (error) {
+        // Il redirect resta disponibile anche se il browser nega la pulizia cache.
+      }
+
+      const current = new URL(window.location.href);
+      const target = new URL('./pagnottella-gourmet/', current);
+      target.searchParams.set('suite', 'production');
+      target.searchParams.set('v', 'official-entry-1');
+      if (current.searchParams.has('swreset')) target.searchParams.set('swreset', '1');
+      window.location.replace(target.toString());
+    })();
+  </script>
+  <noscript><a href="./pagnottella-gourmet/?suite=production">Apri DOSepranza</a></noscript>
+</body>
+</html>
