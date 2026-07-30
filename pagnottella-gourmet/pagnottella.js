@@ -103,6 +103,34 @@ async function bootstrap(){
   syncAuthGate();
   updateAdmin();
   await initializeEntryFlow();
+  await renderAuthDiagnostics();
+}
+
+async function renderAuthDiagnostics(){
+  if(new URLSearchParams(location.search).get('authdebug') !== '1') return;
+  const diagnostics = await supplierAccess?.getAuthDiagnostics?.();
+  if(!diagnostics) return;
+  let panel = byId('authDebugPanel');
+  if(!panel){
+    panel = document.createElement('pre');
+    panel.id = 'authDebugPanel';
+    panel.className = 'authDebugPanel';
+    byId('authGate')?.append(panel);
+  }
+  panel.textContent = [
+    `origin: ${diagnostics.origin}`,
+    `path: ${diagnostics.path}`,
+    `Firebase initialized: ${diagnostics.firebaseInitialized ? 'sì' : 'no'}`,
+    `currentUser presente: ${diagnostics.currentUserPresent ? 'sì' : 'no'}`,
+    `isAnonymous: ${diagnostics.isAnonymous ? 'sì' : 'no'}`,
+    `email: ${diagnostics.email || '-'}`,
+    `providerIds: ${(diagnostics.providerIds || []).join(', ') || '-'}`,
+    `role: ${diagnostics.role || '-'}`,
+    `supplierIds: ${(diagnostics.supplierIds || []).join(', ') || '-'}`,
+    `redirect pending: ${diagnostics.redirectPending ? 'sì' : 'no'}`,
+    `ultimo errore auth: ${diagnostics.lastAuthErrorCode || '-'}`,
+    `supplier-access: ${diagnostics.version}`
+  ].join('\n');
 }
 
 function normalizeAssetPaths(data){
@@ -457,8 +485,16 @@ async function signInWithGoogleGate(){
   authState.message = '';
   setAuthButtonsDisabled(true);
   syncAuthGate(true);
+  let redirectStarted = false;
   try{
     const payload = await supplierAccess.signInWithGoogle();
+    if(payload === null){
+      redirectStarted = true;
+      authState.message = '';
+      authState.loading = true;
+      syncAuthGate(true);
+      return;
+    }
     if(payload?.email){
       const supplierAccesses = await Promise.all([
         supplierAccess.canAccessSupplier('russo', payload),
@@ -468,7 +504,7 @@ async function signInWithGoogleGate(){
       if(!isAuthorized){
         localStorage.removeItem('dose_user');
         authState.user = null;
-        authState.message = 'Account Google riconosciuto, ma dominio non autorizzato per questo servizio.';
+        authState.message = 'Account non autorizzato. Usa un account @dos.design o un account fornitore abilitato.';
         syncAuthGate(true);
         return;
       }
@@ -482,7 +518,7 @@ async function signInWithGoogleGate(){
       if(params.get('store') === 'pagnottella') await openShop(false);
       else await showSupplierSelection();
     }else{
-      authState.message = 'Sessione non pronta, riprova tra un istante.';
+      authState.message = 'Accesso Google non completato. Riprova da Chrome/Safari selezionando l’account @dos.design.';
     }
   }catch(err){
     console.warn('Pagnottella Google gate failed', err);
@@ -491,9 +527,12 @@ async function signInWithGoogleGate(){
       ? `Accesso Google non completato (${code}). Riprova o usa Chrome.`
       : 'Accesso Google non completato. Riprova o segnala il messaggio in Console.';
   }finally{
-    authState.loading = false;
-    setAuthButtonsDisabled(false);
-    syncAuthGate(!authenticatedDoseUser());
+    if(!redirectStarted){
+      authState.loading = false;
+      setAuthButtonsDisabled(false);
+      syncAuthGate(!authenticatedDoseUser());
+      await renderAuthDiagnostics();
+    }
   }
 }
 function activateLocalPreviewAccess(){
