@@ -44,7 +44,7 @@ test('Marco resta admin entrando in Russo dalla suite', async ({ page }) => {
     localStorage.setItem('dose_e2e_orders_today', '[]');
   }, users.admin);
   await page.goto('/russo/?suite=production&e2e=1');
-  await expect(page.locator('#role-quick-text')).toContainText('admin');
+  await expect(page.locator('#role-quick-text')).toContainText('Amministratore');
   await expect(page.locator('#btn-history')).toBeVisible();
   await expect(page.locator('#btn-analytics')).toBeVisible();
 });
@@ -77,7 +77,7 @@ test('suite apre Russo senza nuovo login e torna alla scelta fornitore preservan
   await expect(page).toHaveURL(/\/russo\/\?.*suite=production/);
   await expect(page.locator('#user-modal')).toBeHidden();
   await expect(page.locator('#suite-return-bar')).toBeVisible();
-  await expect(page.locator('#role-quick-text')).toContainText(users.dos_user.email);
+  await expect(page.locator('#role-quick-text')).toContainText(`${users.dos_user.email} · Utente DOS`);
   await page.route('**/dosepranza/pagnottella-gourmet/**', route => route.fulfill({
     status:200,
     contentType:'text/html',

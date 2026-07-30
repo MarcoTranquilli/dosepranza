@@ -787,7 +787,13 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             })();
             const email = state.user?.email || cached?.email || '-';
             const role = state.user ? state.role : 'non autenticato';
-            txt.textContent = `${email} · ${role}`;
+            const resolvedRole = state.user
+                ? (window.DoseSupplierAccess?.roleForEmail?.(email) || role)
+                : role;
+            const roleCopy = state.user
+                ? (window.DoseSupplierAccess?.roleLabel?.(resolvedRole) || resolvedRole)
+                : 'Non autenticato';
+            txt.textContent = `${email} · ${roleCopy}`;
 
             if(state.user) {
                 quick.classList.remove('hidden');
