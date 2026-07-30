@@ -19,7 +19,7 @@ git fetch origin gh-pages
 git worktree add /tmp/dosepranza-rollback origin/gh-pages
 cd /tmp/dosepranza-rollback
 git switch -c rollback/dosepranza-go-live
-git revert <COMMIT_GH_PAGES_GO_LIVE>
+git revert 8c8ad0c
 git push origin HEAD:gh-pages
 ```
 
