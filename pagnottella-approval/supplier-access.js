@@ -33,16 +33,23 @@
     if (email === ADMIN_EMAIL) return 'admin';
     if (email === PAGNOTTELLA_SUPPLIER_EMAIL) return 'supplier';
     if (RUSSO_SUPPLIER_EMAILS.includes(email)) return 'supplier';
-    if (email.endsWith('@dos.design')) return 'tester';
+    if (email.endsWith('@dos.design')) return 'dos_user';
     return 'user';
   };
   const supplierIdsForIdentity = (emailValue, role) => {
     const email = normalizeEmail(emailValue);
-    if (role === 'admin' || role === 'tester') return ['russo', 'pagnottella'];
+    const resolvedRole = roleForEmail(email);
+    if (resolvedRole === 'admin' || resolvedRole === 'dos_user') return ['russo', 'pagnottella'];
     if (email === PAGNOTTELLA_SUPPLIER_EMAIL) return ['pagnottella'];
     if (RUSSO_SUPPLIER_EMAILS.includes(email)) return ['russo'];
     return [];
   };
+  const roleLabel = (role) => ({
+    admin: 'Amministratore',
+    dos_user: 'Utente DOS',
+    supplier: 'Ristoratore / Fornitore',
+    user: 'Non autorizzato'
+  }[role] || 'Non autorizzato');
   function isGoogleProviderId(providerId) {
     return providerId === GOOGLE_PROVIDER_ID;
   }
@@ -60,6 +67,7 @@
   }
   const isFilePreview = () => window.location.protocol === 'file:';
   const isLoopback = () => ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
+  const isProductionSuiteEntry = () => new URLSearchParams(window.location.search).get('suite') === 'production';
   const isE2E = () => {
     if (!isLoopback()) return false;
     const params = new URLSearchParams(window.location.search);
@@ -220,12 +228,53 @@
     });
   }
 
+  async function recoverGoogleSession(auth, authSdk) {
+    if (auth.currentUser && !auth.currentUser.isAnonymous) return auth.currentUser;
+    return new Promise(resolve => {
+      const timeout = window.setTimeout(() => {
+        unsubscribe();
+        resolve(null);
+      }, 1500);
+      const unsubscribe = authSdk.onAuthStateChanged(auth, user => {
+        if (!user || user.isAnonymous) return;
+        window.clearTimeout(timeout);
+        unsubscribe();
+        resolve(user);
+      }, () => {
+        window.clearTimeout(timeout);
+        unsubscribe();
+        resolve(null);
+      });
+    });
+  }
+
+  function suiteFallbackSession() {
+    if (!isProductionSuiteEntry()) return null;
+    const stored = getStoredUser();
+    if (!stored?.supplierIds?.includes('russo')) return null;
+    const role = roleForEmail(stored.email);
+    return {
+      ...stored,
+      role,
+      isAdmin: role === 'admin',
+      supplierIds: supplierIdsForIdentity(stored.email, role),
+      firebaseVerified: false
+    };
+  }
+
   async function resolveSession() {
     if (isTrustedLocalContext()) return getStoredUser();
     const { auth, authSdk } = await loadFirebaseCore();
     if (auth.currentUser && !auth.currentUser.isAnonymous) {
       const user = await firebaseUserPayload(auth.currentUser);
       if (user) return user;
+    }
+    if (isProductionSuiteEntry()) {
+      const recovered = await recoverGoogleSession(auth, authSdk);
+      const recoveredUser = await firebaseUserPayload(recovered);
+      if (recoveredUser) return recoveredUser;
+      const fallback = suiteFallbackSession();
+      if (fallback) return fallback;
     }
     await ensureAnonymousSession(auth, authSdk);
     window.localStorage.removeItem('dose_user');
@@ -413,6 +462,8 @@
   window.DoseSupplierAccess = Object.freeze({
     ADMIN_EMAIL,
     roleForEmail,
+    roleLabel,
+    supplierIdsForIdentity,
     isVerifiedGoogleResult,
     DEFAULT_SETTINGS,
     isFilePreview,

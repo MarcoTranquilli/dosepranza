@@ -304,6 +304,10 @@ function backLanding(){
 function roleForEmail(email){
   return supplierAccess?.roleForEmail?.(email) || 'user';
 }
+function roleLabelForEmail(email){
+  const role = roleForEmail(email);
+  return supplierAccess?.roleLabel?.(role) || role;
+}
 async function initializeEntryFlow(){
   try{
     authState.user = await supplierAccess.resolveSession();
@@ -339,7 +343,7 @@ async function showSupplierSelection(){
   byId('recognitionStage')?.classList.add('hidden');
   byId('supplierStage')?.classList.remove('hidden');
   const identity = byId('recognizedUserDisplay');
-  if(identity) identity.textContent = `${user.name} · ${user.email} · ${roleForEmail(user.email)}`;
+  if(identity) identity.textContent = `${user.name} · ${user.email} · ${roleLabelForEmail(user.email)}`;
   const card = document.querySelector('.pagnottellaCard');
   const russoCard = document.querySelector('.russoCard');
   const status = byId('supplierAccessStatus');
@@ -415,7 +419,7 @@ function syncAuthGate(forceLocked=false){
   if(resolved){
     authState.message = '';
     status.classList.remove('isError');
-    status.textContent = `${user.email} · ${roleForEmail(user.email)}`;
+    status.textContent = `${user.email} · ${roleLabelForEmail(user.email)}`;
   }else if(authState.message){
     status.classList.add('isError');
     status.textContent = authState.message;
