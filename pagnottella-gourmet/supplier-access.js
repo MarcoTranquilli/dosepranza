@@ -17,7 +17,11 @@
   const GOOGLE_PROVIDER_ID = 'google.com';
   const SETTINGS_KEY = 'dose_supplier_settings';
   const LOCAL_ORDERS_KEY = 'dose_e2e_pagnottella_orders';
-  const REDIRECT_PENDING_KEY = 'dose_google_redirect_pending';
+  const REDIRECT_PENDING_KEY = 'dose_auth_redirect_pending';
+  const AUTH_STARTED_AT_KEY = 'dose_auth_started_at';
+  const AUTH_RETURN_TO_KEY = 'dose_auth_return_to';
+  const AUTH_LAST_ERROR_KEY = 'dose_auth_last_error';
+  const AUTH_VERSION = 'auth-redirect-3';
   const DEFAULT_SETTINGS = Object.freeze({
     russo: Object.freeze({ enabledForUsers: true }),
     pagnottella: Object.freeze({ enabledForUsers: true })
@@ -28,6 +32,7 @@
   let anonymousSignInPromise = null;
   let authObserverStarted = false;
   let redirectResultPromise = null;
+  let redirectResultProcessed = false;
 
   const normalizeEmail = (value) => String(value || '').trim().toLowerCase();
   const roleForEmail = (value) => {
@@ -76,6 +81,35 @@
     return params.get('e2e') === '1' || window.localStorage.getItem('dose_e2e') === '1';
   };
   const isTrustedLocalContext = () => isFilePreview() || isE2E();
+  const isPublicWeb = () => !isFilePreview() && !isLoopback();
+  const redirectPending = () => window.sessionStorage.getItem(REDIRECT_PENDING_KEY) === '1';
+  const recordAuthError = (error) => {
+    const code = String(error?.code || 'auth/unknown').slice(0, 80);
+    window.sessionStorage.setItem(AUTH_LAST_ERROR_KEY, code);
+    return code;
+  };
+  const clearRedirectState = () => {
+    [REDIRECT_PENDING_KEY, AUTH_STARTED_AT_KEY, AUTH_RETURN_TO_KEY].forEach(key => {
+      window.sessionStorage.removeItem(key);
+    });
+  };
+  function cleanAuthResetFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const hadSwreset = params.has('swreset');
+    const hadAuthreset = params.has('authreset');
+    params.delete('swreset');
+    params.delete('authreset');
+    const changed = hadSwreset || hadAuthreset;
+    if (!changed) return;
+    const query = params.toString();
+    window.history.replaceState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`);
+  }
+  function markRedirectPending() {
+    cleanAuthResetFromUrl();
+    window.sessionStorage.setItem(REDIRECT_PENDING_KEY, '1');
+    window.sessionStorage.setItem(AUTH_STARTED_AT_KEY, String(Date.now()));
+    window.sessionStorage.setItem(AUTH_RETURN_TO_KEY, `${window.location.pathname}${window.location.search}${window.location.hash}`);
+  }
 
   function getStoredUser() {
     try {
@@ -216,14 +250,9 @@
     if (authObserverStarted) return;
     authObserverStarted = true;
     authSdk.onAuthStateChanged(auth, user => {
-      if (!user) {
-        ensureAnonymousSession(auth, authSdk).catch(error => {
-          console.warn('Firebase anonymous session unavailable', error?.code || 'auth/anonymous-unavailable');
-        });
-        return;
-      }
-      if (!user.isAnonymous) {
+      if (user && !user.isAnonymous) {
         firebaseUserPayload(user).catch(error => {
+          recordAuthError(error);
           console.warn('Firebase Google session adoption failed', error?.code || 'auth/session-adoption-failed');
         });
       }
@@ -233,24 +262,31 @@
   function consumeRedirectResult(auth, authSdk) {
     if (redirectResultPromise) return redirectResultPromise;
     redirectResultPromise = (async () => {
-      const result = await authSdk.getRedirectResult(auth);
-      if (result?.user) {
-        const user = await firebaseUserPayload(result.user, { result });
-        if (user) window.sessionStorage.removeItem(REDIRECT_PENDING_KEY);
-        return user;
+      try {
+        const result = await authSdk.getRedirectResult(auth);
+        redirectResultProcessed = true;
+        if (result?.user) {
+          const user = await firebaseUserPayload(result.user, { result });
+          if (user) clearRedirectState();
+          return user;
+        }
+        return null;
+      } catch (error) {
+        redirectResultProcessed = true;
+        recordAuthError(error);
+        throw error;
       }
-      return null;
     })();
     return redirectResultPromise;
   }
 
   async function recoverPendingRedirect(auth, authSdk) {
-    if (window.sessionStorage.getItem(REDIRECT_PENDING_KEY) !== '1') return null;
+    if (!redirectPending()) return null;
     const firebaseUser = auth.currentUser || await new Promise(resolve => {
       const timeout = window.setTimeout(() => {
         unsubscribe();
         resolve(null);
-      }, 3000);
+      }, 5000);
       const unsubscribe = authSdk.onAuthStateChanged(auth, user => {
         if (!user || user.isAnonymous) return;
         window.clearTimeout(timeout);
@@ -263,7 +299,12 @@
       });
     });
     const user = await firebaseUserPayload(firebaseUser);
-    window.sessionStorage.removeItem(REDIRECT_PENDING_KEY);
+    if (user) {
+      clearRedirectState();
+    } else {
+      recordAuthError({ code: 'auth/redirect-session-missing' });
+      clearRedirectState();
+    }
     return user;
   }
 
@@ -278,8 +319,15 @@
       const user = await firebaseUserPayload(auth.currentUser);
       if (user) return user;
     }
+    if (redirectPending() || !redirectResultProcessed) return null;
     await ensureAnonymousSession(auth, authSdk);
     window.localStorage.removeItem('dose_user');
+    return null;
+  }
+
+  async function startGoogleRedirect(auth, authSdk, provider) {
+    markRedirectPending();
+    await authSdk.signInWithRedirect(auth, provider);
     return null;
   }
 
@@ -290,23 +338,17 @@
     provider.addScope('email');
     provider.addScope('profile');
     provider.setCustomParameters({ prompt: 'select_account' });
-    if (isGitHubPages()) {
-      const params = new URLSearchParams(window.location.search);
-      if (params.delete('swreset')) {
-        const query = params.toString();
-        window.history.replaceState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`);
-      }
-      window.sessionStorage.setItem(REDIRECT_PENDING_KEY, '1');
-      await authSdk.signInWithRedirect(auth, provider);
-      return null;
-    }
-    const currentUser = auth.currentUser || await ensureAnonymousSession(auth, authSdk);
+    const currentUser = isPublicWeb()
+      ? auth.currentUser
+      : (auth.currentUser || await ensureAnonymousSession(auth, authSdk));
     try {
       let result;
       try {
-        result = currentUser?.isAnonymous
-          ? await authSdk.linkWithPopup(currentUser, provider)
-          : await authSdk.signInWithPopup(auth, provider);
+        result = isPublicWeb()
+          ? await authSdk.signInWithPopup(auth, provider)
+          : (currentUser?.isAnonymous
+            ? await authSdk.linkWithPopup(currentUser, provider)
+            : await authSdk.signInWithPopup(auth, provider));
       } catch (error) {
         const canRecoverCredential = [
           'auth/credential-already-in-use',
@@ -316,7 +358,7 @@
         const credential = canRecoverCredential
           ? authSdk.GoogleAuthProvider.credentialFromError(error)
           : null;
-        if (!credential) throw error;
+        if (!credential) return startGoogleRedirect(auth, authSdk, provider);
         result = await authSdk.signInWithCredential(auth, credential);
       }
       await result.user?.getIdToken?.(true);
@@ -333,6 +375,7 @@
       }
       return user;
     } catch (error) {
+      recordAuthError(error);
       throw error;
     }
   }
@@ -343,6 +386,35 @@
       await authSdk.signOut(auth);
     }
     window.localStorage.removeItem('dose_user');
+    clearRedirectState();
+  }
+
+  async function getAuthDiagnostics() {
+    let auth = null;
+    let firebaseInitialized = false;
+    try {
+      ({ auth } = await loadFirebaseCore());
+      firebaseInitialized = true;
+    } catch (error) {
+      recordAuthError(error);
+    }
+    const firebaseUser = auth?.currentUser || null;
+    const email = normalizeEmail(firebaseUser?.email);
+    const role = email ? roleForEmail(email) : '';
+    return {
+      origin: window.location.origin,
+      path: window.location.pathname,
+      firebaseInitialized,
+      currentUserPresent: !!firebaseUser,
+      isAnonymous: !!firebaseUser?.isAnonymous,
+      email,
+      providerIds: (firebaseUser?.providerData || []).map(item => item?.providerId).filter(Boolean),
+      role,
+      supplierIds: email ? supplierIdsForIdentity(email, role) : [],
+      redirectPending: redirectPending(),
+      lastAuthErrorCode: window.sessionStorage.getItem(AUTH_LAST_ERROR_KEY) || '',
+      version: AUTH_VERSION
+    };
   }
 
   function sanitizeSettings(value) {
@@ -473,6 +545,7 @@
 
   window.DoseSupplierAccess = Object.freeze({
     ADMIN_EMAIL,
+    AUTH_VERSION,
     roleForEmail,
     roleLabel,
     supplierIdsForIdentity,
@@ -486,6 +559,7 @@
     resolveSession,
     signInWithGoogle,
     signOut,
+    getAuthDiagnostics,
     getSupplierSettings,
     setSupplierEnabled,
     canAccessSupplier,

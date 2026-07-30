@@ -8,6 +8,7 @@
     "test:uat:headed": "playwright test --headed",
     "test:approval": "playwright test -c playwright.approval.config.ts",
     "test:pagnottella-production": "playwright test -c playwright.production.config.ts",
+    "test:auth-production": "playwright test -c playwright.auth-production.config.ts",
     "test:rules:suppliers": "bash scripts/test_supplier_rules.sh",
     "test:russo-segregation": "playwright test -c playwright.russo-segregation.config.ts",
     "build:approval": "bash scripts/build_pagnottella_approval.sh",

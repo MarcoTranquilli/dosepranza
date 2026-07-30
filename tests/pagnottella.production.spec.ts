@@ -81,7 +81,7 @@ test('matrice ruoli e accessi è calcolata dall’email', async ({page}) => {
     };
     const emails = [
       'marco.tranquilli@dos.design','veronica.battaglia@dos.design','marta.diamantini@dos.design',
-      'andreavalerio.chentrens@dos.design','luca.pacella@dos.design','nome.cognome@dos.design',
+      'andreavalerio.chentrens@dos.design','marco.sabatini@dos.design','luca.pacella@dos.design','nome.cognome@dos.design',
       'commerciale@lapagnottellagourmet.it',
       'lorenzo.russo@alimentarirusso','russolorenzo11@gmail.com','test@gmail.com',
       'utente@mydos.design','utente@dos.design.fake'
@@ -96,6 +96,7 @@ test('matrice ruoli e accessi è calcolata dall’email', async ({page}) => {
     ['veronica.battaglia@dos.design','dos_user',true,true],
     ['marta.diamantini@dos.design','dos_user',true,true],
     ['andreavalerio.chentrens@dos.design','dos_user',true,true],
+    ['marco.sabatini@dos.design','dos_user',true,true],
     ['luca.pacella@dos.design','dos_user',true,true],
     ['nome.cognome@dos.design','dos_user',true,true],
     ['commerciale@lapagnottellagourmet.it','supplier',false,true],
