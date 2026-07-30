@@ -55,7 +55,7 @@ test('UI production pulita, responsive e catalogo compliant', async ({page}, tes
   expect(await page.locator('body').innerText()).not.toMatch(forbiddenCopy);
   await page.evaluate(() => {
     localStorage.setItem('dose_e2e', '1');
-    localStorage.setItem('dose_user', JSON.stringify({uid:'tester',name:'Tester DOS',email:'tester@dos.design',provider:'google.com'}));
+    localStorage.setItem('dose_user', JSON.stringify({uid:'dos_user',name:'Utente DOS',email:'dos_user@dos.design',provider:'google.com'}));
   });
   await page.reload();
   await page.locator('.pagnottellaCard').click();
@@ -81,7 +81,8 @@ test('matrice ruoli e accessi è calcolata dall’email', async ({page}) => {
     };
     const emails = [
       'marco.tranquilli@dos.design','veronica.battaglia@dos.design','marta.diamantini@dos.design',
-      'luca.pacella@dos.design','nome.cognome@dos.design','commerciale@lapagnottellagourmet.it',
+      'andreavalerio.chentrens@dos.design','luca.pacella@dos.design','nome.cognome@dos.design',
+      'commerciale@lapagnottellagourmet.it',
       'lorenzo.russo@alimentarirusso','russolorenzo11@gmail.com','test@gmail.com',
       'utente@mydos.design','utente@dos.design.fake'
     ];
@@ -92,10 +93,11 @@ test('matrice ruoli e accessi è calcolata dall’email', async ({page}) => {
   });
   expect(result).toEqual([
     ['marco.tranquilli@dos.design','admin',true,true],
-    ['veronica.battaglia@dos.design','tester',true,true],
-    ['marta.diamantini@dos.design','tester',true,true],
-    ['luca.pacella@dos.design','tester',true,true],
-    ['nome.cognome@dos.design','tester',true,true],
+    ['veronica.battaglia@dos.design','dos_user',true,true],
+    ['marta.diamantini@dos.design','dos_user',true,true],
+    ['andreavalerio.chentrens@dos.design','dos_user',true,true],
+    ['luca.pacella@dos.design','dos_user',true,true],
+    ['nome.cognome@dos.design','dos_user',true,true],
     ['commerciale@lapagnottellagourmet.it','supplier',false,true],
     ['lorenzo.russo@alimentarirusso','supplier',true,false],
     ['russolorenzo11@gmail.com','supplier',true,false],
@@ -103,9 +105,13 @@ test('matrice ruoli e accessi è calcolata dall’email', async ({page}) => {
     ['utente@mydos.design','user',false,false],
     ['utente@dos.design.fake','user',false,false]
   ]);
+  expect(await page.evaluate(() => {
+    const access = window.DoseSupplierAccess;
+    return ['admin', 'dos_user', 'supplier', 'user'].map(role => access.roleLabel(role));
+  })).toEqual(['Amministratore', 'Utente DOS', 'Ristoratore / Fornitore', 'Non autorizzato']);
 });
 
-test('tester Google salva ordine Pagnottella con UID Firebase', async ({page}, testInfo) => {
+test('utente DOS Google salva ordine Pagnottella con UID Firebase', async ({page}, testInfo) => {
   await mockFirebase(page);
   await page.goto('.');
   await googleLogin(page);
@@ -133,7 +139,7 @@ test('tester Google salva ordine Pagnottella con UID Firebase', async ({page}, t
     user:JSON.parse(localStorage.getItem('dose_user') || 'null'),
     order:(globalThis as typeof globalThis & {__lastOrder?:Record<string,unknown>}).__lastOrder
   }));
-  expect(saved.user).toMatchObject({email:'veronica.battaglia@dos.design',role:'tester',provider:'google.com'});
+  expect(saved.user).toMatchObject({email:'veronica.battaglia@dos.design',role:'dos_user',provider:'google.com'});
   expect(saved.order).toMatchObject({
     uid:'firebase-veronica-battaglia-dos-design',
     email:'veronica.battaglia@dos.design',

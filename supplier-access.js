@@ -33,16 +33,23 @@
     if (email === ADMIN_EMAIL) return 'admin';
     if (email === PAGNOTTELLA_SUPPLIER_EMAIL) return 'supplier';
     if (RUSSO_SUPPLIER_EMAILS.includes(email)) return 'supplier';
-    if (email.endsWith('@dos.design')) return 'tester';
+    if (email.endsWith('@dos.design')) return 'dos_user';
     return 'user';
   };
   const supplierIdsForIdentity = (emailValue, role) => {
     const email = normalizeEmail(emailValue);
-    if (role === 'admin' || role === 'tester') return ['russo', 'pagnottella'];
+    const resolvedRole = roleForEmail(email);
+    if (resolvedRole === 'admin' || resolvedRole === 'dos_user') return ['russo', 'pagnottella'];
     if (email === PAGNOTTELLA_SUPPLIER_EMAIL) return ['pagnottella'];
     if (RUSSO_SUPPLIER_EMAILS.includes(email)) return ['russo'];
     return [];
   };
+  const roleLabel = (role) => ({
+    admin: 'Amministratore',
+    dos_user: 'Utente DOS',
+    supplier: 'Ristoratore / Fornitore',
+    user: 'Non autorizzato'
+  }[role] || 'Non autorizzato');
   function isGoogleProviderId(providerId) {
     return providerId === GOOGLE_PROVIDER_ID;
   }
@@ -245,10 +252,12 @@
     if (!isProductionSuiteEntry()) return null;
     const stored = getStoredUser();
     if (!stored?.supplierIds?.includes('russo')) return null;
+    const role = roleForEmail(stored.email);
     return {
       ...stored,
-      role: stored.role === 'tester' ? 'tester' : 'user',
-      isAdmin: false,
+      role,
+      isAdmin: role === 'admin',
+      supplierIds: supplierIdsForIdentity(stored.email, role),
       firebaseVerified: false
     };
   }
@@ -453,6 +462,8 @@
   window.DoseSupplierAccess = Object.freeze({
     ADMIN_EMAIL,
     roleForEmail,
+    roleLabel,
+    supplierIdsForIdentity,
     isVerifiedGoogleResult,
     DEFAULT_SETTINGS,
     isFilePreview,

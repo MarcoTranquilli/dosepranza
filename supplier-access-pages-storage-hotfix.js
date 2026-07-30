@@ -14,12 +14,14 @@
         const value = JSON.parse(window.localStorage.getItem(key) || 'null');
         const email = normalizeEmail(value?.email);
         if (!email) continue;
+        const role = base.roleForEmail(email);
         const session = {
           uid: value?.uid || value?.localId || `stored-${Date.now()}`,
           name: value?.displayName || value?.providerData?.[0]?.displayName || email.split('@')[0],
           email,
-          role: email === ADMIN_EMAIL ? 'admin' : 'user',
-          isAdmin: email === ADMIN_EMAIL,
+          role,
+          isAdmin: role === 'admin',
+          supplierIds: base.supplierIdsForIdentity(email, role),
           provider: 'google.com'
         };
         window.localStorage.setItem('dose_user', JSON.stringify(session));

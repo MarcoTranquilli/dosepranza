@@ -24,7 +24,7 @@ const googleClaims = email => ({ email, firebase:{ sign_in_provider:'google.com'
 const env = await initializeTestEnvironment({ projectId, firestore:{ rules } });
 
 const admin = env.authenticatedContext('uid-admin', googleClaims('marco.tranquilli@dos.design')).firestore();
-const tester = env.authenticatedContext('uid-tester', googleClaims('utente@dos.design')).firestore();
+const dos_user = env.authenticatedContext('uid-dos_user', googleClaims('utente@dos.design')).firestore();
 const pagnottella = env.authenticatedContext('uid-pg', googleClaims('commerciale@lapagnottellagourmet.it')).firestore();
 const russo = env.authenticatedContext('uid-russo', googleClaims('russolorenzo11@gmail.com')).firestore();
 const external = env.authenticatedContext('uid-ext', googleClaims('utente@gmail.com')).firestore();
@@ -45,7 +45,7 @@ const order = (supplierId, uid, email) => ({
 try {
   await env.withSecurityRulesDisabled(async context => {
     const db = context.firestore();
-    await setDoc(doc(db, 'orders', 'pg-order'), order('pagnottella', 'uid-tester', 'utente@dos.design'));
+    await setDoc(doc(db, 'orders', 'pg-order'), order('pagnottella', 'uid-dos_user', 'utente@dos.design'));
     await setDoc(doc(db, 'orders', 'russo-order'), order('russo', 'uid-other', 'altro@dos.design'));
     const legacyOrder = order('russo', 'uid-other', 'altro@dos.design');
     delete legacyOrder.supplierId;
@@ -79,14 +79,14 @@ try {
   await assertFails(updateDoc(doc(pagnottella, 'orders', 'pg-order'), { paymentStatus:'paid' }));
   await assertFails(updateDoc(doc(russo, 'orders', 'russo-order'), { orderStatus:'completed' }));
 
-  await assertSucceeds(getDoc(doc(tester, 'orders', 'pg-order')));
-  await assertFails(getDocs(globalQuery(tester)));
-  await assertSucceeds(addDoc(collection(tester, 'orders'), order('russo', 'uid-tester', 'utente@dos.design')));
-  await assertSucceeds(addDoc(collection(tester, 'orders'), order('pagnottella', 'uid-tester', 'utente@dos.design')));
-  await assertFails(addDoc(collection(tester, 'orders'), order('russo', 'uid-other', 'utente@dos.design')));
-  const missingSupplier = order('russo', 'uid-tester', 'utente@dos.design');
+  await assertSucceeds(getDoc(doc(dos_user, 'orders', 'pg-order')));
+  await assertFails(getDocs(globalQuery(dos_user)));
+  await assertSucceeds(addDoc(collection(dos_user, 'orders'), order('russo', 'uid-dos_user', 'utente@dos.design')));
+  await assertSucceeds(addDoc(collection(dos_user, 'orders'), order('pagnottella', 'uid-dos_user', 'utente@dos.design')));
+  await assertFails(addDoc(collection(dos_user, 'orders'), order('russo', 'uid-other', 'utente@dos.design')));
+  const missingSupplier = order('russo', 'uid-dos_user', 'utente@dos.design');
   delete missingSupplier.supplierId;
-  await assertFails(addDoc(collection(tester, 'orders'), missingSupplier));
+  await assertFails(addDoc(collection(dos_user, 'orders'), missingSupplier));
 
   await assertFails(getDoc(doc(external, 'orders', 'pg-order')));
   await assertFails(addDoc(collection(external, 'orders'), order('russo', 'uid-ext', 'utente@gmail.com')));

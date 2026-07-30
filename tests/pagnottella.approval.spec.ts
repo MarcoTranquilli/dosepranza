@@ -56,9 +56,10 @@ test('gate Google non viene bypassato e file preview usa fallback esplicito', as
   expect(await page.evaluate(() => ({
     admin: window.DoseSupplierAccess.roleForEmail('marco.tranquilli@dos.design'),
     supplier: window.DoseSupplierAccess.roleForEmail('commerciale@lapagnottellagourmet.it'),
-    tester: window.DoseSupplierAccess.roleForEmail('  PERSONA@DOS.DESIGN  '),
+    dos_user: window.DoseSupplierAccess.roleForEmail('  PERSONA@DOS.DESIGN  '),
     veronica: window.DoseSupplierAccess.roleForEmail('veronica.battaglia@dos.design'),
     marta: window.DoseSupplierAccess.roleForEmail('marta.diamantini@dos.design'),
+    andreaValerio: window.DoseSupplierAccess.roleForEmail('andreavalerio.chentrens@dos.design'),
     luca: window.DoseSupplierAccess.roleForEmail('luca.pacella@dos.design'),
     external: window.DoseSupplierAccess.roleForEmail('test@gmail.com'),
     similarSuffix: window.DoseSupplierAccess.roleForEmail('utente@dos.design.fake'),
@@ -66,10 +67,11 @@ test('gate Google non viene bypassato e file preview usa fallback esplicito', as
   }))).toEqual({
     admin:'admin',
     supplier:'supplier',
-    tester:'tester',
-    veronica:'tester',
-    marta:'tester',
-    luca:'tester',
+    dos_user:'dos_user',
+    veronica:'dos_user',
+    marta:'dos_user',
+    andreaValerio:'dos_user',
+    luca:'dos_user',
     external:'user',
     similarSuffix:'user',
     similarDomain:'user'
@@ -82,8 +84,8 @@ test('gate Google non viene bypassato e file preview usa fallback esplicito', as
     googleProvider:true
   });
   expect(await page.evaluate(async () => ({
-    tester: await window.DoseSupplierAccess.canAccessSupplier('pagnottella', {
-      email:'persona@dos.design', role:'tester', isAdmin:false, supplierIds:['pagnottella']
+    dos_user: await window.DoseSupplierAccess.canAccessSupplier('pagnottella', {
+      email:'persona@dos.design', role:'dos_user', isAdmin:false, supplierIds:['pagnottella']
     }),
     external: await window.DoseSupplierAccess.canAccessSupplier('pagnottella', {
       email:'test@gmail.com', role:'user', isAdmin:false, supplierIds:[]
@@ -94,7 +96,7 @@ test('gate Google non viene bypassato e file preview usa fallback esplicito', as
     similarDomain: await window.DoseSupplierAccess.canAccessSupplier('pagnottella', {
       email:'utente@mydos.design', role:'user', isAdmin:false, supplierIds:[]
     })
-  }))).toEqual({ tester:true, external:false, similarSuffix:false, similarDomain:false });
+  }))).toEqual({ dos_user:true, external:false, similarSuffix:false, similarDomain:false });
 
   const localUrl = `file://${process.cwd()}/pagnottella-preview/index.html?preview=admin&review=sponsor&swreset=1`;
   await page.goto(localUrl);
@@ -103,7 +105,7 @@ test('gate Google non viene bypassato e file preview usa fallback esplicito', as
   await expect(page.locator('#authGateStatus')).toContainText('Google Login richiede un indirizzo http o https');
   await page.getByRole('button', { name:'Apri anteprima locale' }).click();
   await expect(page.locator('#supplierStage')).not.toHaveClass(/hidden/);
-  await expect(page.locator('#recognizedUserDisplay')).toHaveText('Tester DOS · tester.preview@dos.design · tester');
+  await expect(page.locator('#recognizedUserDisplay')).toHaveText('Utente DOS · utente.preview@dos.design · Utente DOS');
   await expect(page.locator('.russoCard')).toHaveAttribute('href', '../russo/?suite=approval&v=suite-1');
   await expect(page.locator('.russoCard')).toContainText('con consegna gratuita');
   await expect(page.locator('.russoCard')).toContainText('entro le 11:30');
@@ -116,7 +118,7 @@ test('gate Google non viene bypassato e file preview usa fallback esplicito', as
 
   await page.goto('pagnottella-preview/?preview=supplier&review=sponsor&localPreview=1&e2e=1&swreset=1');
   await expect(page.locator('#recognizedUserDisplay')).toHaveText(
-    'Commerciale Pagnottella Gourmet · commerciale@lapagnottellagourmet.it · supplier'
+    'Commerciale Pagnottella Gourmet · commerciale@lapagnottellagourmet.it · Ristoratore / Fornitore'
   );
   await expect(page.locator('.russoCard')).not.toHaveAttribute('href');
   await expect(page.locator('.russoCard')).toHaveAttribute('aria-disabled', 'true');
@@ -166,12 +168,20 @@ test('ruoli supplier e sessioni stale vengono normalizzati dalla suite', async (
       return access.getStoredUser();
     };
     const marco = resolve('  MARCO.TRANQUILLI@DOS.DESIGN ');
-    const tester = resolve(' COLLEGA@DOS.DESIGN ');
+    const dos_user = resolve(' COLLEGA@DOS.DESIGN ');
+    localStorage.setItem('dose_user', JSON.stringify({
+      name:'Sessione precedente',
+      email:'marta.diamantini@dos.design',
+      role:['te', 'ster'].join(''),
+      provider:'google.com'
+    }));
+    const migratedDosUser = access.getStoredUser();
     const pagnottellaSupplier = resolve('commerciale@lapagnottellagourmet.it');
     const russoSupplier = resolve('russolorenzo11@gmail.com');
     return {
       marco,
-      tester,
+      dos_user,
+      migratedDosUser,
       pagnottellaSupplier,
       russoSupplier,
       access: {
@@ -183,7 +193,8 @@ test('ruoli supplier e sessioni stale vengono normalizzati dalla suite', async (
     };
   });
   expect(result.marco).toMatchObject({ role:'admin', isAdmin:true, supplierIds:['russo', 'pagnottella'] });
-  expect(result.tester).toMatchObject({ email:'collega@dos.design', role:'tester', isAdmin:false, supplierIds:['russo', 'pagnottella'] });
+  expect(result.dos_user).toMatchObject({ email:'collega@dos.design', role:'dos_user', isAdmin:false, supplierIds:['russo', 'pagnottella'] });
+  expect(result.migratedDosUser).toMatchObject({ email:'marta.diamantini@dos.design', role:'dos_user', isAdmin:false, supplierIds:['russo', 'pagnottella'] });
   expect(result.pagnottellaSupplier).toMatchObject({ role:'supplier', supplierIds:['pagnottella'] });
   expect(result.russoSupplier).toMatchObject({ role:'supplier', supplierIds:['russo'] });
   expect(result.access).toEqual({
@@ -302,7 +313,7 @@ test('tassonomia completa e combinazioni cluster-regime coerenti', async ({ page
 test('profilo fornitore Pagnottella limitato al catalogo e agli ordini demo', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'Scenario desktop');
   await page.goto('pagnottella-preview/?preview=supplier&review=sponsor&localPreview=1&e2e=1&swreset=1');
-  await expect(page.locator('#recognizedUserDisplay')).toContainText('commerciale@lapagnottellagourmet.it · supplier');
+  await expect(page.locator('#recognizedUserDisplay')).toContainText('commerciale@lapagnottellagourmet.it · Ristoratore / Fornitore');
   await page.locator('.pagnottellaCard').click();
   await expect(page.locator('#shop')).toHaveClass(/show/);
   await expect(page.locator('#adminWorkspace')).not.toHaveClass(/hidden/);
@@ -319,10 +330,10 @@ test('profilo fornitore Pagnottella limitato al catalogo e agli ordini demo', as
   expect(access).toEqual({ pagnottella:true, russo:false });
 });
 
-test('tester DOS completa un ordine senza accedere alle funzioni admin', async ({ page }, testInfo) => {
+test('utente DOS completa un ordine senza accedere alle funzioni admin', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'Scenario desktop');
-  await page.goto('pagnottella-preview/?preview=tester&review=sponsor&localPreview=1&swreset=1');
-  await expect(page.locator('#recognizedUserDisplay')).toContainText('tester.preview@dos.design · tester');
+  await page.goto('pagnottella-preview/?preview=dos_user&review=sponsor&localPreview=1&swreset=1');
+  await expect(page.locator('#recognizedUserDisplay')).toContainText('utente.preview@dos.design · Utente DOS');
   await expect(page.locator('.pagnottellaCard')).toBeEnabled();
   await page.locator('.pagnottellaCard').click();
   await expect(page.locator('#shop')).toHaveClass(/show/);
@@ -334,7 +345,7 @@ test('tester DOS completa un ordine senza accedere alle funzioni admin', async (
   await expect(page.locator('#confirm')).toContainText('Ordine');
   const orders = await page.evaluate(() => JSON.parse(localStorage.getItem('dose_preview_pagnottella_orders') || '[]'));
   expect(orders).toHaveLength(1);
-  expect(orders[0]).toMatchObject({ email:'tester.preview@dos.design', preview:true });
+  expect(orders[0]).toMatchObject({ email:'utente.preview@dos.design', preview:true });
   await page.evaluate(() => {
     const session = JSON.parse(localStorage.getItem('dose_user') || 'null');
     localStorage.setItem('dose_e2e', '1');
@@ -348,7 +359,7 @@ test('tester DOS completa un ordine senza accedere alle funzioni admin', async (
 test('account e domini esterni non possono aprire Pagnottella', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'Scenario desktop');
   await page.goto('pagnottella-preview/?preview=external&review=sponsor&localPreview=1&e2e=1&swreset=1');
-  await expect(page.locator('#recognizedUserDisplay')).toContainText('test@gmail.com · user');
+  await expect(page.locator('#recognizedUserDisplay')).toContainText('test@gmail.com · Non autorizzato');
   await expect(page.locator('.pagnottellaCard')).toBeDisabled();
   await expect(page.locator('.russoCard')).not.toHaveAttribute('href');
   await expect(page.locator('.russoCard')).toHaveAttribute('aria-disabled', 'true');

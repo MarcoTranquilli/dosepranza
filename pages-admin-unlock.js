@@ -12,7 +12,7 @@
   const localPreviewRequested = () => params.get('localPreview') === '1';
   const requestedRole = () => {
     const role = params.get('preview');
-    return ['supplier', 'tester', 'external'].includes(role) ? role : 'admin';
+    return ['supplier', 'dos_user', 'external'].includes(role) ? role : 'admin';
   };
 
   function resetPreviewSessionIfRequested() {
@@ -50,10 +50,10 @@
     const role = requestedRole();
     if (!isE2E()) {
       return {
-        uid: 'local-pagnottella-dos-tester',
-        name: 'Tester DOS',
-        email: 'tester.preview@dos.design',
-        role: 'tester',
+        uid: 'local-pagnottella-dos-user',
+        name: 'Utente DOS',
+        email: 'utente.preview@dos.design',
+        role: 'dos_user',
         isAdmin: false,
         supplierIds: ['russo', 'pagnottella'],
         provider: 'local-preview'
@@ -70,12 +70,12 @@
         provider: 'local-preview'
       };
     }
-    if (role === 'tester') {
+    if (role === 'dos_user') {
       return {
-        uid: 'local-pagnottella-dos-tester',
-        name: 'Tester DOS',
-        email: 'tester.preview@dos.design',
-        role: 'tester',
+        uid: 'local-pagnottella-dos-user',
+        name: 'Utente DOS',
+        email: 'utente.preview@dos.design',
+        role: 'dos_user',
         isAdmin: false,
         supplierIds: ['russo', 'pagnottella'],
         provider: 'local-preview'
@@ -179,7 +179,7 @@
     const session = storePreviewSession();
     patchSupplierAccess(session);
     const status = byId('authGateStatus');
-    if (status) status.textContent = `${session.email} · ${session.role}`;
+    if (status) status.textContent = `${session.email} · ${window.DoseSupplierAccess?.roleLabel?.(session.role) || session.role}`;
     return session;
   }
 

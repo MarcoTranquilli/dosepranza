@@ -27,12 +27,14 @@
       const user = auth.currentUser;
       if (!user || user.isAnonymous || !user.email) return null;
       const email = normalizeEmail(user.email);
+      const role = base.roleForEmail(email);
       const session = {
         uid: user.uid,
         name: user.displayName || email.split('@')[0],
         email,
-        role: email === base.ADMIN_EMAIL ? 'admin' : 'user',
-        isAdmin: email === base.ADMIN_EMAIL,
+        role,
+        isAdmin: role === 'admin',
+        supplierIds: base.supplierIdsForIdentity(email, role),
         provider: 'google.com'
       };
       window.localStorage.setItem('dose_user', JSON.stringify(session));

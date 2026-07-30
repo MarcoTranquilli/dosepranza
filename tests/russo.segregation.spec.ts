@@ -5,7 +5,7 @@ import { coreOrdersFixture, pagnottellaOrderFixture } from './helpers/e2e-fixtur
 const users = {
   admin:{ uid:'admin-e2e', name:'Marco Tranquilli', email:'marco.tranquilli@dos.design' },
   supplier:{ uid:'russo-e2e', name:'Lorenzo Russo', email:'russolorenzo11@gmail.com' },
-  tester:{ uid:'tester-e2e', name:'Utente DOS', email:'utente@dos.design' }
+  dos_user:{ uid:'dos_user-e2e', name:'Utente DOS', email:'utente@dos.design' }
 };
 
 async function openAs(page:Page, user:typeof users.admin, orders = [...coreOrdersFixture, pagnottellaOrderFixture]) {
@@ -37,15 +37,31 @@ test('Marco vede entrambi i fornitori e mantiene analytics', async ({ page }) =>
   await expect(page.locator('#btn-analytics')).toBeVisible();
 });
 
-test('tester ordina senza accesso a storico, analytics o export admin', async ({ page }) => {
-  await openAs(page, users.tester, []);
+test('Marco resta admin entrando in Russo dalla suite', async ({ page }) => {
+  await page.addInitScript(user => {
+    localStorage.setItem('dose_e2e', '1');
+    localStorage.setItem('dose_user', JSON.stringify({...user, role:'user', provider:'google.com'}));
+    localStorage.setItem('dose_e2e_orders_today', '[]');
+  }, users.admin);
+  await page.goto('/russo/?suite=production&e2e=1');
+  await expect(page.locator('#role-quick-text')).toContainText('admin');
+  await expect(page.locator('#btn-history')).toBeVisible();
+  await expect(page.locator('#btn-analytics')).toBeVisible();
+});
+
+test('utente DOS ordina senza accesso a storico, analytics o export admin', async ({ page }) => {
+  await openAs(page, users.dos_user, []);
   await expect(page.locator('#btn-history')).toBeHidden();
   await expect(page.locator('#btn-analytics')).toBeHidden();
   await expect(page.locator('#admin-export-btn')).toBeHidden();
   await page.locator('#btn-menu').click();
-  const productId = await page.locator('[data-action="add-std"]').first().getAttribute('data-id');
+  const addButton = page.locator('[data-action="add-std"]:not([disabled])').first();
+  await expect(addButton).toBeVisible();
+  const productId = await addButton.getAttribute('data-id');
   await page.evaluate(id => (window as typeof window & {addStdToCart:(value:string|null)=>void}).addStdToCart(id), productId);
+  await expect(page.locator('#cart-count')).toHaveText('1');
   await page.locator('#btn-cart').click();
+  await expect(page.locator('#cart-options')).toBeVisible();
   await page.locator('[data-action="send-order"]').click();
   await expect(page.locator('#toast-message')).toHaveText('Inviato!');
   await expect(page.locator('#cart-count')).toHaveText('0');
@@ -56,12 +72,12 @@ test('suite apre Russo senza nuovo login e torna alla scelta fornitore preservan
     localStorage.setItem('dose_e2e', '1');
     localStorage.setItem('dose_user', JSON.stringify({...user, provider:'google.com'}));
     localStorage.setItem('dose_e2e_orders_today', '[]');
-  }, users.tester);
+  }, users.dos_user);
   await page.goto('/russo/?suite=production&e2e=1');
   await expect(page).toHaveURL(/\/russo\/\?.*suite=production/);
   await expect(page.locator('#user-modal')).toBeHidden();
   await expect(page.locator('#suite-return-bar')).toBeVisible();
-  await expect(page.locator('#role-quick-text')).toContainText(users.tester.email);
+  await expect(page.locator('#role-quick-text')).toContainText(users.dos_user.email);
   await page.route('**/dosepranza/pagnottella-gourmet/**', route => route.fulfill({
     status:200,
     contentType:'text/html',
@@ -70,7 +86,7 @@ test('suite apre Russo senza nuovo login e torna alla scelta fornitore preservan
   await page.getByRole('link', {name:'Cambia fornitore'}).click();
   await expect(page).toHaveURL(/\/dosepranza\/pagnottella-gourmet\/\?.*suite=production/);
   const storedEmail = await page.evaluate(() => JSON.parse(localStorage.getItem('dose_user') || 'null')?.email);
-  expect(storedEmail).toBe(users.tester.email);
+  expect(storedEmail).toBe(users.dos_user.email);
 });
 
 test('Russo diretto non mostra il ritorno suite e ignora escalation role da localStorage', async ({ page }) => {
@@ -116,7 +132,7 @@ test('sorgente Russo applica supplierId, query segregata e guard fornitore', asy
 });
 
 test('QR e azioni Satispay Russo usano esclusivamente il link HTTPS canonico', async ({ page }) => {
-  await openAs(page, users.tester, []);
+  await openAs(page, users.dos_user, []);
   const canonicalUrl = 'https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0';
   const qr = page.locator('img[alt="QR pagamento Alimentari Russo"]').first();
   await expect(qr).toBeVisible();
