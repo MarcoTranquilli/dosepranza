@@ -301,7 +301,7 @@ test('tassonomia completa e combinazioni cluster-regime coerenti', async ({ page
 
 test('profilo fornitore Pagnottella limitato al catalogo e agli ordini demo', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'Scenario desktop');
-  await page.goto('pagnottella-preview/?preview=supplier&review=sponsor&localPreview=1&swreset=1');
+  await page.goto('pagnottella-preview/?preview=supplier&review=sponsor&localPreview=1&e2e=1&swreset=1');
   await expect(page.locator('#recognizedUserDisplay')).toContainText('commerciale@lapagnottellagourmet.it · supplier');
   await page.locator('.pagnottellaCard').click();
   await expect(page.locator('#shop')).toHaveClass(/show/);
