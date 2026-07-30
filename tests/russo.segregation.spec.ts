@@ -14,7 +14,7 @@ async function openAs(page:Page, user:typeof users.admin, orders = [...coreOrder
     localStorage.setItem('dose_user', JSON.stringify(user));
     localStorage.setItem('dose_e2e_orders_today', JSON.stringify(orders));
   }, { user, orders });
-  await page.goto('/russo/?e2e=1');
+  await page.goto('/russo/?e2e=1', {waitUntil:'domcontentloaded'});
 }
 
 test('supplier Russo vede esclusivamente ordini Russo e nessun controllo admin', async ({ page }) => {
@@ -43,7 +43,7 @@ test('Marco resta admin entrando in Russo dalla suite', async ({ page }) => {
     localStorage.setItem('dose_user', JSON.stringify({...user, role:'user', provider:'google.com'}));
     localStorage.setItem('dose_e2e_orders_today', '[]');
   }, users.admin);
-  await page.goto('/russo/?suite=production&e2e=1');
+  await page.goto('/russo/?suite=production&e2e=1', {waitUntil:'domcontentloaded'});
   await expect(page.locator('#role-quick-text')).toContainText('Amministratore');
   await expect(page.locator('#btn-history')).toBeVisible();
   await expect(page.locator('#btn-analytics')).toBeVisible();
@@ -73,7 +73,7 @@ test('suite apre Russo senza nuovo login e torna alla scelta fornitore preservan
     localStorage.setItem('dose_user', JSON.stringify({...user, provider:'google.com'}));
     localStorage.setItem('dose_e2e_orders_today', '[]');
   }, users.dos_user);
-  await page.goto('/russo/?suite=production&e2e=1');
+  await page.goto('/russo/?suite=production&e2e=1', {waitUntil:'domcontentloaded'});
   await expect(page).toHaveURL(/\/russo\/\?.*suite=production/);
   await expect(page.locator('#user-modal')).toBeHidden();
   await expect(page.locator('#suite-return-bar')).toBeVisible();
@@ -102,7 +102,7 @@ test('Russo diretto non mostra il ritorno suite e ignora escalation role da loca
     }));
     localStorage.setItem('dose_e2e_orders_today', '[]');
   });
-  await page.goto('/russo/?e2e=1');
+  await page.goto('/russo/?e2e=1', {waitUntil:'domcontentloaded'});
   await expect(page.locator('#suite-return-bar')).toBeHidden();
   await expect(page.locator('#btn-history')).toBeHidden();
   await expect(page.locator('#btn-analytics')).toBeHidden();
@@ -120,6 +120,9 @@ test('sorgente Russo applica supplierId, query segregata e guard fornitore', asy
   expect(app).toContain("state.authzSource !== 'claims' && googleSession");
   expect(app).not.toContain("ROLE_EMAILS.admin.includes(e) || ROLE_NAMES.admin.includes(n)");
   expect(app).toContain('requireSuiteGoogleSession()');
+  expect(app).toContain('if(!state.pendingOrder || state.orderSubmitting) return;');
+  expect(app).toContain('state.orderSubmitting = true;');
+  expect(app).toContain('Ordine non salvato: riprova tra un istante.');
   expect(guard).toContain("canAccessSupplier('russo', session)");
   expect(guard).toContain("params.get('suite') === 'production'");
   expect(guard).toContain("'/dosepranza/pagnottella-gourmet/?suite=production&v=suite-return-2'");

@@ -1,84 +1,89 @@
-# DOSepranza 2.0 - Runbook multi-fornitore
+# DOSepranza 2.0 - Runbook go-live multi-fornitore
 
-## Link ufficiali
+Release freeze: 30 luglio 2026.
 
-- Utenti: `https://app-dosepranza.netlify.app/`
-- Fallback tecnico: `https://marcotranquilli.github.io/dosepranza/`
-- Reset cache, solo se necessario: `https://marcotranquilli.github.io/dosepranza/?swreset=1`
+## Link operativi
 
-I percorsi diretti dei fornitori e l'approval non devono essere distribuiti come link principali.
+- Link ufficiale utenti: `https://app-dosepranza.netlify.app/`
+- Fallback GitHub Pages: `https://marcotranquilli.github.io/dosepranza/`
+- Reset cache: `https://marcotranquilli.github.io/dosepranza/?swreset=1`
+- Diagnostica sicura: `https://marcotranquilli.github.io/dosepranza/pagnottella-gourmet/?suite=production&authdebug=1`
+- Russo tecnico: `https://marcotranquilli.github.io/dosepranza/russo/?suite=production`
+- Approval Pagnottella, solo supporto/stakeholder: `https://marcotranquilli.github.io/dosepranza/pagnottella-approval/pagnottella-preview/?review=sponsor`
 
-## Comportamento atteso
+Distribuire agli utenti esclusivamente il link ufficiale Netlify.
 
-- L'accesso online usa Firebase Google Auth.
-- `marco.tranquilli@dos.design` e' l'amministratore della suite.
-- L'amministratore vede sempre Alimentari Russo e La Pagnottella Gourmet.
-- Gli utenti standard non vedono la scelta: dall'hub vengono indirizzati ad Alimentari Russo.
-- La Pagnottella puo' essere resa raggiungibile agli utenti tramite link diretto usando il controllo nell'hub amministratore.
-- Se La Pagnottella non e' pubblicata, un accesso diretto di un utente standard viene riportato su Alimentari Russo.
+## Accessi attesi
 
-## Configurazione Firestore
+| Profilo | Accesso |
+| --- | --- |
+| Marco Tranquilli | Amministratore; entrambi i fornitori e viste globali |
+| Account che termina esattamente con `@dos.design` | Utente DOS; Russo e Pagnottella, senza amministrazione o viste globali |
+| Commerciale Pagnottella | Solo Pagnottella e relativi ordini |
+| Account Russo autorizzati | Solo Russo e relativi ordini |
+| Altri account | Non autorizzati |
 
-Documento: `app_config/suppliers`
+Il ruolo viene sempre ricalcolato dall'email Google verificata. Il ruolo presente in `localStorage` non concede privilegi.
 
-```json
-{
-  "russo": { "enabledForUsers": true },
-  "pagnottella": { "enabledForUsers": false }
-}
-```
+## Supporto rapido
 
-Il frontend usa valori conservativi se il documento non esiste o non e' leggibile: Russo attivo, Pagnottella riservata all'admin. Le regole Firestore consentono la scrittura del documento solo all'admin.
+Chiedere all'utente soltanto:
 
-## Ordini Pagnottella
+1. email usata;
+2. browser e dispositivo;
+3. screenshot del messaggio;
+4. se la scelta account Google si apre;
+5. screenshot della pagina `authdebug=1`.
 
-Gli ordini sono salvati nella raccolta condivisa `orders` prima dell'apertura di WhatsApp. I campi distintivi sono:
+Non chiedere token, UID, contenuto completo di `localStorage` o dati ordine.
 
-- `supplierId: "pagnottella"`
-- `supplierName: "La Pagnottella Gourmet"`
-- `source: "dosepranza-2"`
-- `paymentMethod`
-- `company`
-- `deliveryAddress`
-- `pointOfSale`
-- `discountRate` e `discountAmount`
-- `items`, `total`, `allergies` e stati ordine/pagamento in forma strutturata
+### Cache vecchia
 
-Il riepilogo WhatsApp, l'IBAN e l'intestatario del bonifico non vengono duplicati nel documento ordine. Il log locale conserva soltanto metadati sintetici e migra automaticamente eventuali record precedenti eliminando riepiloghi e note testuali.
+1. Chiudere le schede DOSepranza aperte.
+2. Aprire il link Reset cache.
+3. Attendere l'apertura della suite e aggiornare una sola volta.
+4. Se il problema resta, usare una finestra anonima.
 
-L'amministratore vede gli ordini di entrambi i fornitori. Il ristoratore Russo vede nel frontend operativo solo gli ordini Russo.
+### Popup Google bloccato
 
-## Pagamenti
+1. Consentire temporaneamente i popup per `marcotranquilli.github.io`.
+2. Premere nuovamente `Accedi con Google`.
+3. Se il popup non completa l'accesso, il sistema avvia il fallback redirect.
 
-Metodi selezionabili: Contanti, POS, Bonifico bancario e Satispay.
+### Account errato o non autorizzato
 
-PayPal e Nexi restano presenti come opzioni disabilitate. Per attivarli da settembre occorre prima aggiungere gli estremi operativi e impostare `enabled: true` in `payment.futureMethods` dentro `assets/pagnottella/data/menu.json`.
+1. Uscire con `Cambia utente`.
+2. Selezionare l'account aziendale `@dos.design`.
+3. Verificare che il dominio termini esattamente con `@dos.design`.
 
-## Immagini prodotto
+### Secondo login entrando in Russo
 
-La sorgente autorevole e' `assets/pagnottella/data/source-audit-completo/`.
+Tornare alla suite e riaprire Russo. La sessione Google deve essere condivisa. Se il problema persiste, usare Reset cache e acquisire `authdebug`.
 
-```bash
-npm run sync:pagnottella-images
-npm run report:pagnottella-images
-```
+### QR Russo non visibile
 
-La regola e' conservativa: solo gli asset marcati `pubblicabile = si` sono mostrati come foto prodotto. Gli altri prodotti usano il logo Pagnottella come fallback neutro.
+Aggiornare la pagina Russo dopo Reset cache. Il link alternativo è il pulsante `Apri Satispay`; non comunicare URL diversi da quello presente nell'app.
 
-## Rilascio coordinato
+### Ordine non salvato
 
-```bash
-bash scripts/netlify_preflight.sh
-BASE_URL='http://127.0.0.1:8081/?e2e=1' npx playwright test
-bash scripts/netlify_publish_pdf.sh
-firebase deploy --only firestore:rules --project app-ordini-pranzo-alimentari
-```
+1. Non procedere al pagamento una seconda volta senza verifica.
+2. Conservare il carrello e riprovare una volta.
+3. Acquisire screenshot, ora, email e fornitore.
+4. Il supporto verifica l'ordine senza richiedere dati di pagamento.
 
-Il frontend che interroga i propri ordini per `uid` e le nuove regole Firestore devono essere rilasciati nella stessa finestra. Dopo il rilascio verificare:
+## Controlli operativi giornalieri
 
-1. login Google admin;
-2. controllo visibilita Pagnottella;
-3. redirect utente standard verso Russo;
-4. ordine Pagnottella salvato in `orders`;
-5. ordine visibile all'admin con badge fornitore;
-6. riepilogo Russo privo di ordini Pagnottella.
+- Login con account autorizzato.
+- Entrambe le card visibili agli utenti DOS.
+- QR Satispay Russo visibile.
+- Catalogo e carrello Pagnottella disponibili.
+- Riepilogo ordini visibile al relativo fornitore.
+- Nessun errore bloccante in console.
+
+## Dati e backfill
+
+Gli ordini nuovi includono `supplierId`. Il backfill degli ordini Russo storici senza `supplierId` non è stato eseguito e resta un'attività separata, non necessaria al go-live.
+
+## Contatto
+
+Supporto interno: Marco Tranquilli, canale Slack aziendale.

@@ -14,8 +14,9 @@ Proteggere i flussi core di DOSepranza da regressioni durante futuri sviluppi.
 5. Gestione menu admin.
 6. Flussi `Fridge` per staff.
 7. Instradamento multi-fornitore:
-   - scelta fornitore visibile solo all'admin
-   - utenti standard indirizzati ad Alimentari Russo
+   - scelta fornitore visibile ad admin e utenti DOS
+   - supplier limitato al proprio fornitore
+   - utenti esterni esclusi
    - admin sempre autorizzato su tutti i fornitori
 8. Salvataggio ordine Pagnottella su Firestore prima dell'apertura di WhatsApp.
 
