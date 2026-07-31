@@ -17,6 +17,12 @@
   const GOOGLE_PROVIDER_ID = 'google.com';
   const SETTINGS_KEY = 'dose_supplier_settings';
   const LOCAL_ORDERS_KEY = 'dose_e2e_pagnottella_orders';
+  const REDIRECT_PENDING_KEY = 'dose_auth_redirect_pending';
+  const AUTH_STARTED_AT_KEY = 'dose_auth_started_at';
+  const AUTH_RETURN_TO_KEY = 'dose_auth_return_to';
+  const AUTH_LAST_ERROR_KEY = 'dose_auth_last_error';
+  const AUTH_LAST_ERROR_MESSAGE_KEY = 'dose_auth_last_error_message';
+  const AUTH_VERSION = 'auth-recovery-4';
   const DEFAULT_SETTINGS = Object.freeze({
     russo: Object.freeze({ enabledForUsers: true }),
     pagnottella: Object.freeze({ enabledForUsers: false })
@@ -26,6 +32,8 @@
   let firestorePromise = null;
   let anonymousSignInPromise = null;
   let authObserverStarted = false;
+  let redirectResultPromise = null;
+  let redirectResultProcessed = false;
 
   const normalizeEmail = (value) => String(value || '').trim().toLowerCase();
   const roleForEmail = (value) => {
@@ -74,6 +82,46 @@
     return params.get('e2e') === '1' || window.localStorage.getItem('dose_e2e') === '1';
   };
   const isTrustedLocalContext = () => isFilePreview() || isE2E();
+  const isPublicWeb = () => !isFilePreview() && !isLoopback();
+  const redirectPending = () => window.sessionStorage.getItem(REDIRECT_PENDING_KEY) === '1';
+  const safeAuthErrorMessage = (code) => ({
+    'auth/internal-error': 'Errore interno Firebase durante il riconoscimento Google.',
+    'auth/popup-blocked': 'Il browser ha bloccato la finestra di accesso Google.',
+    'auth/popup-closed-by-user': 'La finestra di accesso Google è stata chiusa.',
+    'auth/redirect-session-missing': 'Il rientro da Google non contiene una sessione utilizzabile.'
+  }[code] || 'Accesso Google non completato.');
+  const recordAuthError = (error) => {
+    const code = String(error?.code || 'auth/unknown').slice(0, 80);
+    window.sessionStorage.setItem(AUTH_LAST_ERROR_KEY, code);
+    window.sessionStorage.setItem(AUTH_LAST_ERROR_MESSAGE_KEY, safeAuthErrorMessage(code));
+    return code;
+  };
+  const clearAuthError = () => {
+    window.sessionStorage.removeItem(AUTH_LAST_ERROR_KEY);
+    window.sessionStorage.removeItem(AUTH_LAST_ERROR_MESSAGE_KEY);
+  };
+  const clearRedirectState = () => {
+    [REDIRECT_PENDING_KEY, AUTH_STARTED_AT_KEY, AUTH_RETURN_TO_KEY].forEach(key => {
+      window.sessionStorage.removeItem(key);
+    });
+  };
+  function cleanAuthResetFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const hadSwreset = params.has('swreset');
+    const hadAuthreset = params.has('authreset');
+    params.delete('swreset');
+    params.delete('authreset');
+    const changed = hadSwreset || hadAuthreset;
+    if (!changed) return;
+    const query = params.toString();
+    window.history.replaceState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`);
+  }
+  function markRedirectPending() {
+    cleanAuthResetFromUrl();
+    window.sessionStorage.setItem(REDIRECT_PENDING_KEY, '1');
+    window.sessionStorage.setItem(AUTH_STARTED_AT_KEY, String(Date.now()));
+    window.sessionStorage.setItem(AUTH_RETURN_TO_KEY, `${window.location.pathname}${window.location.search}${window.location.hash}`);
+  }
 
   function getStoredUser() {
     try {
@@ -214,18 +262,43 @@
     if (authObserverStarted) return;
     authObserverStarted = true;
     authSdk.onAuthStateChanged(auth, user => {
-      if (!user) {
-        ensureAnonymousSession(auth, authSdk).catch(error => {
-          console.warn('Firebase anonymous session unavailable', error?.code || 'auth/anonymous-unavailable');
-        });
-        return;
-      }
-      if (!user.isAnonymous) {
+      if (user && !user.isAnonymous) {
         firebaseUserPayload(user).catch(error => {
+          recordAuthError(error);
           console.warn('Firebase Google session adoption failed', error?.code || 'auth/session-adoption-failed');
         });
       }
     });
+  }
+
+  function consumeRedirectResult(auth, authSdk) {
+    if (redirectResultPromise) return redirectResultPromise;
+    redirectResultPromise = (async () => {
+      try {
+        const result = await authSdk.getRedirectResult(auth);
+        redirectResultProcessed = true;
+        if (result?.user) {
+          const user = await firebaseUserPayload(result.user, { result });
+          if (user) clearRedirectState();
+          return user;
+        }
+        return null;
+      } catch (error) {
+        redirectResultProcessed = true;
+        const code = recordAuthError(error);
+        if (code === 'auth/internal-error') {
+          const recovered = await recoverGoogleSession(auth, authSdk);
+          const user = await firebaseUserPayload(recovered);
+          if (user) {
+            clearRedirectState();
+            return user;
+          }
+          clearRedirectState();
+        }
+        throw error;
+      }
+    })();
+    return redirectResultPromise;
   }
 
   async function recoverGoogleSession(auth, authSdk) {
@@ -248,6 +321,34 @@
     });
   }
 
+  async function recoverPendingRedirect(auth, authSdk) {
+    if (!redirectPending()) return null;
+    const firebaseUser = auth.currentUser || await new Promise(resolve => {
+      const timeout = window.setTimeout(() => {
+        unsubscribe();
+        resolve(null);
+      }, 5000);
+      const unsubscribe = authSdk.onAuthStateChanged(auth, user => {
+        if (!user || user.isAnonymous) return;
+        window.clearTimeout(timeout);
+        unsubscribe();
+        resolve(user);
+      }, () => {
+        window.clearTimeout(timeout);
+        unsubscribe();
+        resolve(null);
+      });
+    });
+    const user = await firebaseUserPayload(firebaseUser);
+    if (user) {
+      clearRedirectState();
+    } else {
+      recordAuthError({ code: 'auth/redirect-session-missing' });
+      clearRedirectState();
+    }
+    return user;
+  }
+
   function suiteFallbackSession() {
     if (!isProductionSuiteEntry()) return null;
     const stored = getStoredUser();
@@ -265,6 +366,10 @@
   async function resolveSession() {
     if (isTrustedLocalContext()) return getStoredUser();
     const { auth, authSdk } = await loadFirebaseCore();
+    const redirectUser = await consumeRedirectResult(auth, authSdk);
+    if (redirectUser) return redirectUser;
+    const pendingUser = await recoverPendingRedirect(auth, authSdk);
+    if (pendingUser) return pendingUser;
     if (auth.currentUser && !auth.currentUser.isAnonymous) {
       const user = await firebaseUserPayload(auth.currentUser);
       if (user) return user;
@@ -276,26 +381,46 @@
       const fallback = suiteFallbackSession();
       if (fallback) return fallback;
     }
+    if (redirectPending() || !redirectResultProcessed) return null;
     await ensureAnonymousSession(auth, authSdk);
     window.localStorage.removeItem('dose_user');
+    return null;
+  }
+
+  async function startGoogleRedirect(auth, authSdk, provider) {
+    markRedirectPending();
+    await authSdk.signInWithRedirect(auth, provider);
     return null;
   }
 
   async function signInWithGoogle() {
     if (isFilePreview()) throw new Error('Google Login richiede un indirizzo http o https.');
     const { auth, authSdk } = await loadFirebaseCore();
+    clearAuthError();
     const provider = new authSdk.GoogleAuthProvider();
     provider.addScope('email');
     provider.addScope('profile');
     provider.setCustomParameters({ prompt: 'select_account' });
-    const currentUser = auth.currentUser || await ensureAnonymousSession(auth, authSdk);
+    const currentUser = isPublicWeb()
+      ? auth.currentUser
+      : (auth.currentUser || await ensureAnonymousSession(auth, authSdk));
     try {
       let result;
       try {
-        result = currentUser?.isAnonymous
-          ? await authSdk.linkWithPopup(currentUser, provider)
-          : await authSdk.signInWithPopup(auth, provider);
+        result = isPublicWeb()
+          ? await authSdk.signInWithPopup(auth, provider)
+          : (currentUser?.isAnonymous
+            ? await authSdk.linkWithPopup(currentUser, provider)
+            : await authSdk.signInWithPopup(auth, provider));
       } catch (error) {
+        recordAuthError(error);
+        if (error?.code === 'auth/internal-error' && auth.currentUser && !auth.currentUser.isAnonymous) {
+          const recoveredUser = await firebaseUserPayload(auth.currentUser);
+          if (recoveredUser) {
+            clearRedirectState();
+            return recoveredUser;
+          }
+        }
         const canRecoverCredential = [
           'auth/credential-already-in-use',
           'auth/email-already-in-use',
@@ -304,7 +429,7 @@
         const credential = canRecoverCredential
           ? authSdk.GoogleAuthProvider.credentialFromError(error)
           : null;
-        if (!credential) throw error;
+        if (!credential) return startGoogleRedirect(auth, authSdk, provider);
         result = await authSdk.signInWithCredential(auth, credential);
       }
       await result.user?.getIdToken?.(true);
@@ -321,6 +446,7 @@
       }
       return user;
     } catch (error) {
+      recordAuthError(error);
       throw error;
     }
   }
@@ -331,6 +457,36 @@
       await authSdk.signOut(auth);
     }
     window.localStorage.removeItem('dose_user');
+    clearRedirectState();
+  }
+
+  async function getAuthDiagnostics() {
+    let auth = null;
+    let firebaseInitialized = false;
+    try {
+      ({ auth } = await loadFirebaseCore());
+      firebaseInitialized = true;
+    } catch (error) {
+      recordAuthError(error);
+    }
+    const firebaseUser = auth?.currentUser || null;
+    const email = normalizeEmail(firebaseUser?.email);
+    const role = email ? roleForEmail(email) : '';
+    return {
+      origin: window.location.origin,
+      path: window.location.pathname,
+      firebaseInitialized,
+      currentUserPresent: !!firebaseUser,
+      isAnonymous: !!firebaseUser?.isAnonymous,
+      email,
+      providerIds: (firebaseUser?.providerData || []).map(item => item?.providerId).filter(Boolean),
+      role,
+      supplierIds: email ? supplierIdsForIdentity(email, role) : [],
+      redirectPending: redirectPending(),
+      lastAuthErrorCode: window.sessionStorage.getItem(AUTH_LAST_ERROR_KEY) || '',
+      lastAuthErrorMessage: window.sessionStorage.getItem(AUTH_LAST_ERROR_MESSAGE_KEY) || '',
+      version: AUTH_VERSION
+    };
   }
 
   function sanitizeSettings(value) {
@@ -461,6 +617,7 @@
 
   window.DoseSupplierAccess = Object.freeze({
     ADMIN_EMAIL,
+    AUTH_VERSION,
     roleForEmail,
     roleLabel,
     supplierIdsForIdentity,
@@ -473,6 +630,7 @@
     resolveSession,
     signInWithGoogle,
     signOut,
+    getAuthDiagnostics,
     getSupplierSettings,
     setSupplierEnabled,
     canAccessSupplier,
