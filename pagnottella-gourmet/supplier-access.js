@@ -21,7 +21,8 @@
   const AUTH_STARTED_AT_KEY = 'dose_auth_started_at';
   const AUTH_RETURN_TO_KEY = 'dose_auth_return_to';
   const AUTH_LAST_ERROR_KEY = 'dose_auth_last_error';
-  const AUTH_VERSION = 'auth-redirect-3';
+  const AUTH_LAST_ERROR_MESSAGE_KEY = 'dose_auth_last_error_message';
+  const AUTH_VERSION = 'auth-recovery-4';
   const DEFAULT_SETTINGS = Object.freeze({
     russo: Object.freeze({ enabledForUsers: true }),
     pagnottella: Object.freeze({ enabledForUsers: true })
@@ -83,10 +84,21 @@
   const isTrustedLocalContext = () => isFilePreview() || isE2E();
   const isPublicWeb = () => !isFilePreview() && !isLoopback();
   const redirectPending = () => window.sessionStorage.getItem(REDIRECT_PENDING_KEY) === '1';
+  const safeAuthErrorMessage = (code) => ({
+    'auth/internal-error': 'Errore interno Firebase durante il riconoscimento Google.',
+    'auth/popup-blocked': 'Il browser ha bloccato la finestra di accesso Google.',
+    'auth/popup-closed-by-user': 'La finestra di accesso Google è stata chiusa.',
+    'auth/redirect-session-missing': 'Il rientro da Google non contiene una sessione utilizzabile.'
+  }[code] || 'Accesso Google non completato.');
   const recordAuthError = (error) => {
     const code = String(error?.code || 'auth/unknown').slice(0, 80);
     window.sessionStorage.setItem(AUTH_LAST_ERROR_KEY, code);
+    window.sessionStorage.setItem(AUTH_LAST_ERROR_MESSAGE_KEY, safeAuthErrorMessage(code));
     return code;
+  };
+  const clearAuthError = () => {
+    window.sessionStorage.removeItem(AUTH_LAST_ERROR_KEY);
+    window.sessionStorage.removeItem(AUTH_LAST_ERROR_MESSAGE_KEY);
   };
   const clearRedirectState = () => {
     [REDIRECT_PENDING_KEY, AUTH_STARTED_AT_KEY, AUTH_RETURN_TO_KEY].forEach(key => {
@@ -259,6 +271,26 @@
     });
   }
 
+  async function recoverGoogleSession(auth, authSdk) {
+    if (auth.currentUser && !auth.currentUser.isAnonymous) return auth.currentUser;
+    return new Promise(resolve => {
+      const timeout = window.setTimeout(() => {
+        unsubscribe();
+        resolve(null);
+      }, 1500);
+      const unsubscribe = authSdk.onAuthStateChanged(auth, user => {
+        if (!user || user.isAnonymous) return;
+        window.clearTimeout(timeout);
+        unsubscribe();
+        resolve(user);
+      }, () => {
+        window.clearTimeout(timeout);
+        unsubscribe();
+        resolve(null);
+      });
+    });
+  }
+
   function consumeRedirectResult(auth, authSdk) {
     if (redirectResultPromise) return redirectResultPromise;
     redirectResultPromise = (async () => {
@@ -273,7 +305,16 @@
         return null;
       } catch (error) {
         redirectResultProcessed = true;
-        recordAuthError(error);
+        const code = recordAuthError(error);
+        if (code === 'auth/internal-error') {
+          const recovered = await recoverGoogleSession(auth, authSdk);
+          const user = await firebaseUserPayload(recovered);
+          if (user) {
+            clearRedirectState();
+            return user;
+          }
+          clearRedirectState();
+        }
         throw error;
       }
     })();
@@ -334,6 +375,7 @@
   async function signInWithGoogle() {
     if (isFilePreview()) throw new Error('Google Login richiede un indirizzo http o https.');
     const { auth, authSdk } = await loadFirebaseCore();
+    clearAuthError();
     const provider = new authSdk.GoogleAuthProvider();
     provider.addScope('email');
     provider.addScope('profile');
@@ -350,6 +392,14 @@
             ? await authSdk.linkWithPopup(currentUser, provider)
             : await authSdk.signInWithPopup(auth, provider));
       } catch (error) {
+        recordAuthError(error);
+        if (error?.code === 'auth/internal-error' && auth.currentUser && !auth.currentUser.isAnonymous) {
+          const recoveredUser = await firebaseUserPayload(auth.currentUser);
+          if (recoveredUser) {
+            clearRedirectState();
+            return recoveredUser;
+          }
+        }
         const canRecoverCredential = [
           'auth/credential-already-in-use',
           'auth/email-already-in-use',
@@ -413,6 +463,7 @@
       supplierIds: email ? supplierIdsForIdentity(email, role) : [],
       redirectPending: redirectPending(),
       lastAuthErrorCode: window.sessionStorage.getItem(AUTH_LAST_ERROR_KEY) || '',
+      lastAuthErrorMessage: window.sessionStorage.getItem(AUTH_LAST_ERROR_MESSAGE_KEY) || '',
       version: AUTH_VERSION
     };
   }

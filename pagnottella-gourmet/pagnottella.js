@@ -129,6 +129,7 @@ async function renderAuthDiagnostics(){
     `supplierIds: ${(diagnostics.supplierIds || []).join(', ') || '-'}`,
     `redirect pending: ${diagnostics.redirectPending ? 'sì' : 'no'}`,
     `ultimo errore auth: ${diagnostics.lastAuthErrorCode || '-'}`,
+    `dettaglio errore: ${diagnostics.lastAuthErrorMessage || '-'}`,
     `supplier-access: ${diagnostics.version}`
   ].join('\n');
 }
@@ -349,13 +350,20 @@ function roleLabelForEmail(email){
   const role = roleForEmail(email);
   return supplierAccess?.roleLabel?.(role) || role;
 }
+function googleRecoveryMessage(code){
+  const embeddedBrowser = /Teams|Slack|Instagram|FBAN|FBAV/i.test(navigator.userAgent);
+  if(embeddedBrowser) return 'Apri DOSepranza da Chrome o Safari. Il browser integrato potrebbe non completare l’accesso Google.';
+  if(code === 'auth/internal-error') return 'Accesso Google non completato. Apri il link da Chrome o Safari e riprova. Se il problema persiste usa il link di reset cache.';
+  return code
+    ? `Accesso Google non completato (${code}). Riprova da Chrome o Safari.`
+    : 'Accesso Google non completato. Riprova o segnala il messaggio in Console.';
+}
 async function initializeEntryFlow(){
   try{
     authState.user = await supplierAccess.resolveSession();
   }catch(error){
     console.warn('Pagnottella session resolution failed', error);
-    const code = error?.code ? ` (${error.code})` : '';
-    authState.message = `Impossibile verificare la sessione Google${code}. Riprova.`;
+    authState.message = googleRecoveryMessage(String(error?.code || '').trim());
   }
   syncAuthGate();
   if(authState.user?.name && authState.user?.email){
@@ -523,9 +531,7 @@ async function signInWithGoogleGate(){
   }catch(err){
     console.warn('Pagnottella Google gate failed', err);
     const code = String(err?.code || '').trim();
-    authState.message = code
-      ? `Accesso Google non completato (${code}). Riprova o usa Chrome.`
-      : 'Accesso Google non completato. Riprova o segnala il messaggio in Console.';
+    authState.message = googleRecoveryMessage(code);
   }finally{
     if(!redirectStarted){
       authState.loading = false;
