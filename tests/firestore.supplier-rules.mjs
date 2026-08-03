@@ -85,6 +85,7 @@ try {
   await assertFails(updateDoc(doc(russo, 'orders', 'russo-order'), { orderStatus:'completed' }));
 
   await assertSucceeds(getDoc(doc(dos_user, 'orders', 'pg-order')));
+  await assertFails(getDoc(doc(dos_user, 'orders', 'russo-order')));
   await assertFails(getDocs(globalQuery(dos_user)));
   await assertSucceeds(addDoc(collection(dos_user, 'orders'), order('russo', 'uid-dos_user', 'utente@dos.design')));
   await assertSucceeds(addDoc(collection(dos_user, 'orders'), order('pagnottella', 'uid-dos_user', 'utente@dos.design')));
@@ -92,6 +93,7 @@ try {
   const missingSupplier = order('russo', 'uid-dos_user', 'utente@dos.design');
   delete missingSupplier.supplierId;
   await assertFails(addDoc(collection(dos_user, 'orders'), missingSupplier));
+  await assertFails(addDoc(collection(dos_user, 'orders'), order('unknown', 'uid-dos_user', 'utente@dos.design')));
 
   await assertFails(getDoc(doc(external, 'orders', 'pg-order')));
   await assertFails(addDoc(collection(external, 'orders'), order('russo', 'uid-ext', 'utente@gmail.com')));

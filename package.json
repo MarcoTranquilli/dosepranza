@@ -10,6 +10,8 @@
     "test:pagnottella-production": "playwright test -c playwright.production.config.ts",
     "test:auth-production": "playwright test -c playwright.auth-production.config.ts",
     "test:rules:suppliers": "bash scripts/test_supplier_rules.sh",
+    "test:backfill-policy": "node tests/russo-backfill-policy.test.mjs",
+    "backfill:russo:dry-run": "node scripts/backfill_russo_supplier_id.mjs --dry-run",
     "test:russo-segregation": "playwright test -c playwright.russo-segregation.config.ts",
     "build:approval": "bash scripts/build_pagnottella_approval.sh",
     "build:pagnottella-production": "bash scripts/build_pagnottella_production.sh",

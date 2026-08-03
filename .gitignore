@@ -1,4 +1,5 @@
 node_modules/
+backfill-manifests/
 .DS_Store
 playwright-report/
 test-results/
