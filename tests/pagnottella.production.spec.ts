@@ -48,10 +48,11 @@ async function googleLogin(page: Page) {
 }
 
 test('UI production pulita, responsive e catalogo compliant', async ({page}, testInfo) => {
-  await page.goto('.');
+  await page.goto('./?e2e=1');
   await expect(page).toHaveTitle('DOSepranza · La Pagnottella Gourmet');
   await expect(page.locator('#authGateLocal')).toHaveCount(0);
   await expect(page.locator('#authGateEnvironment')).toHaveText('Accesso riservato tramite account Google autorizzato.');
+  await expect(page.locator('meta[http-equiv="Content-Security-Policy"]')).toHaveAttribute('content', /script-src[^;]*https:\/\/apis\.google\.com/);
   expect(await page.locator('body').innerText()).not.toMatch(forbiddenCopy);
   await page.evaluate(() => {
     localStorage.setItem('dose_e2e', '1');
