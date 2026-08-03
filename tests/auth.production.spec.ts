@@ -9,6 +9,7 @@ type Scenario =
   | 'redirect-result'
   | 'redirect-internal-current-user'
   | 'redirect-internal-empty'
+  | 'anonymous-current-user'
   | 'current-user';
 
 async function installAuthHarness(page: Page, scenario: Scenario, email: string) {
@@ -34,8 +35,8 @@ const scenario=${JSON.stringify(scenario)};
 let listeners=[];
 const google={uid:'google-user',isAnonymous:false,email:${JSON.stringify(email)},displayName:'Utente DOS',providerData:[{providerId:'google.com',email:${JSON.stringify(email)}}],getIdToken:async()=>'',getIdTokenResult:async()=>({signInProvider:'google.com'})};
 const anon={uid:'anonymous',isAnonymous:true,email:null,providerData:[]};
-const auth={currentUser:['current-user','redirect-internal-current-user'].includes(scenario)?google:null,authStateReady:async()=>{}};
-globalThis.__authCalls={anonymous:0,popup:0,redirect:0,redirectResult:0};
+const auth={currentUser:['current-user','redirect-internal-current-user'].includes(scenario)?google:(scenario==='anonymous-current-user'?anon:null),authStateReady:async()=>{}};
+globalThis.__authCalls={anonymous:0,popup:0,redirect:0,redirectResult:0,signOut:0};
 const emit=()=>listeners.forEach(fn=>fn(auth.currentUser));
 export const browserLocalPersistence={};export const getAuth=()=>auth;export const setPersistence=async()=>{};
 export const onAuthStateChanged=(a,fn)=>{listeners.push(fn);queueMicrotask(()=>fn(a.currentUser));return()=>{listeners=listeners.filter(item=>item!==fn)}};
@@ -45,7 +46,7 @@ export const signInWithPopup=async()=>{globalThis.__authCalls.popup++;if(['popup
 export const linkWithPopup=signInWithPopup;export const signInWithCredential=signInWithPopup;
 export const signInWithRedirect=async()=>{globalThis.__authCalls.redirect++};
 export const getRedirectResult=async()=>{globalThis.__authCalls.redirectResult++;if(['redirect-internal-current-user','redirect-internal-empty'].includes(scenario)){const e=new Error('redirect failed');e.code='auth/internal-error';throw e}if(scenario==='redirect-result'){auth.currentUser=google;emit();return{user:google,_tokenResponse:{email:google.email,fullName:google.displayName}}}return null};
-export const signOut=async()=>{auth.currentUser=null;emit()};
+export const signOut=async()=>{globalThis.__authCalls.signOut++;auth.currentUser=null;emit()};
 `
   }));
   await page.goto('https://marcotranquilli.github.io/auth-harness');
@@ -83,6 +84,26 @@ test('popup pubblico salva la sessione Google senza linking anonimo', async ({ p
   expect(result.session).toMatchObject({email:'marco.sabatini@dos.design', role:'dos_user'});
   expect(result.stored).toMatchObject({email:'marco.sabatini@dos.design', role:'dos_user'});
   expect(result.calls).toMatchObject({popup:1, redirect:0, anonymous:0});
+});
+
+test('sessione anonima preesistente viene rimossa prima del popup Google', async ({ page }) => {
+  await installAuthHarness(page, 'anonymous-current-user', 'marta.diamantini@dos.design');
+  const result = await page.evaluate(async () => ({
+    session: await window.DoseSupplierAccess.signInWithGoogle(),
+    calls: (globalThis as typeof globalThis & {__authCalls: Record<string, number>}).__authCalls
+  }));
+  expect(result.session).toMatchObject({email:'marta.diamantini@dos.design', role:'dos_user'});
+  expect(result.calls).toMatchObject({signOut:1, popup:1, redirect:0, anonymous:0});
+});
+
+test('Isidoro è riconosciuto come fornitore esclusivo Pagnottella', async ({ page }) => {
+  await installAuthHarness(page, 'popup-success', 'isidorovagnozzi@gmail.com');
+  const session = await page.evaluate(() => window.DoseSupplierAccess.signInWithGoogle());
+  expect(session).toMatchObject({
+    email:'isidorovagnozzi@gmail.com',
+    role:'supplier',
+    supplierIds:['pagnottella']
+  });
 });
 
 test('popup pubblico fallito avvia redirect e conserva lo stato pending', async ({ page }) => {

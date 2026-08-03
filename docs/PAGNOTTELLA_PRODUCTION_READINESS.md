@@ -17,7 +17,7 @@ The build localizes all assets and generates a production menu where age-restric
 
 - `marco.tranquilli@dos.design`: administrator, global order view.
 - Dominio esatto `@dos.design`: utente interno DOS autenticato (`dos_user`).
-- `commerciale@lapagnottellagourmet.it`: Pagnottella supplier, Pagnottella orders only.
+- `commerciale@lapagnottellagourmet.it` e `isidorovagnozzi@gmail.com`: Pagnottella supplier, Pagnottella orders only.
 - Russo supplier accounts remain assigned to Russo.
 - Every new order stores `supplierId: "pagnottella"` and the Firebase authenticated UID.
 - The Pagnottella supplier query includes `where("supplierId", "==", "pagnottella")`.

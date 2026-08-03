@@ -83,6 +83,7 @@ test('matrice ruoli e accessi è calcolata dall’email', async ({page}) => {
       'marco.tranquilli@dos.design','veronica.battaglia@dos.design','marta.diamantini@dos.design',
       'andreavalerio.chentrens@dos.design','marco.sabatini@dos.design','luca.pacella@dos.design','nome.cognome@dos.design',
       'commerciale@lapagnottellagourmet.it',
+      'isidorovagnozzi@gmail.com',
       'lorenzo.russo@alimentarirusso','russolorenzo11@gmail.com','test@gmail.com',
       'utente@mydos.design','utente@dos.design.fake'
     ];
@@ -100,6 +101,7 @@ test('matrice ruoli e accessi è calcolata dall’email', async ({page}) => {
     ['luca.pacella@dos.design','dos_user',true,true],
     ['nome.cognome@dos.design','dos_user',true,true],
     ['commerciale@lapagnottellagourmet.it','supplier',false,true],
+    ['isidorovagnozzi@gmail.com','supplier',false,true],
     ['lorenzo.russo@alimentarirusso','supplier',true,false],
     ['russolorenzo11@gmail.com','supplier',true,false],
     ['test@gmail.com','user',false,false],
@@ -151,7 +153,7 @@ test('utente DOS Google salva ordine Pagnottella con UID Firebase', async ({page
 });
 
 test('supplier Pagnottella esegue solo query Pagnottella e non vede funzioni globali', async ({page}) => {
-  await mockFirebase(page, 'commerciale@lapagnottellagourmet.it');
+  await mockFirebase(page, 'isidorovagnozzi@gmail.com');
   await page.goto('.');
   await googleLogin(page);
   await page.locator('.pagnottellaCard').click();

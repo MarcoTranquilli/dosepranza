@@ -28,7 +28,10 @@ service cloud.firestore {
     }
     function isPagnottellaSupplier() {
       return isGoogleProvider()
-        && request.auth.token.email == 'commerciale@lapagnottellagourmet.it';
+        && request.auth.token.email in [
+          'commerciale@lapagnottellagourmet.it',
+          'isidorovagnozzi@gmail.com'
+        ];
     }
     function isRussoSupplier() {
       return isGoogleProvider() && request.auth.token.email in [

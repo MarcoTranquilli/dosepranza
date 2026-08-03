@@ -26,6 +26,7 @@ const env = await initializeTestEnvironment({ projectId, firestore:{ rules } });
 const admin = env.authenticatedContext('uid-admin', googleClaims('marco.tranquilli@dos.design')).firestore();
 const dos_user = env.authenticatedContext('uid-dos_user', googleClaims('utente@dos.design')).firestore();
 const pagnottella = env.authenticatedContext('uid-pg', googleClaims('commerciale@lapagnottellagourmet.it')).firestore();
+const isidoro = env.authenticatedContext('uid-isidoro', googleClaims('isidorovagnozzi@gmail.com')).firestore();
 const russo = env.authenticatedContext('uid-russo', googleClaims('russolorenzo11@gmail.com')).firestore();
 const external = env.authenticatedContext('uid-ext', googleClaims('utente@gmail.com')).firestore();
 
@@ -60,6 +61,10 @@ try {
   if (pgResult.size !== 1 || pgResult.docs[0].id !== 'pg-order') throw new Error('Pagnottella query not segregated');
   await assertFails(getDocs(globalQuery(pagnottella)));
   await assertFails(getDoc(doc(pagnottella, 'orders', 'russo-order')));
+  const isidoroResult = await assertSucceeds(getDocs(pgQuery(isidoro)));
+  if (isidoroResult.size !== 1 || isidoroResult.docs[0].id !== 'pg-order') throw new Error('Isidoro query not segregated');
+  await assertFails(getDocs(globalQuery(isidoro)));
+  await assertFails(getDoc(doc(isidoro, 'orders', 'russo-order')));
 
   const russoResult = await assertSucceeds(getDocs(russoQuery(russo)));
   if (russoResult.size !== 1 || russoResult.docs[0].id !== 'russo-order') throw new Error('Russo query not segregated');

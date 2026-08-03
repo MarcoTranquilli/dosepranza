@@ -56,6 +56,7 @@ test('gate Google non viene bypassato e file preview usa fallback esplicito', as
   expect(await page.evaluate(() => ({
     admin: window.DoseSupplierAccess.roleForEmail('marco.tranquilli@dos.design'),
     supplier: window.DoseSupplierAccess.roleForEmail('commerciale@lapagnottellagourmet.it'),
+    isidoro: window.DoseSupplierAccess.roleForEmail('isidorovagnozzi@gmail.com'),
     dos_user: window.DoseSupplierAccess.roleForEmail('  PERSONA@DOS.DESIGN  '),
     veronica: window.DoseSupplierAccess.roleForEmail('veronica.battaglia@dos.design'),
     marta: window.DoseSupplierAccess.roleForEmail('marta.diamantini@dos.design'),
@@ -67,6 +68,7 @@ test('gate Google non viene bypassato e file preview usa fallback esplicito', as
   }))).toEqual({
     admin:'admin',
     supplier:'supplier',
+    isidoro:'supplier',
     dos_user:'dos_user',
     veronica:'dos_user',
     marta:'dos_user',
@@ -177,12 +179,14 @@ test('ruoli supplier e sessioni stale vengono normalizzati dalla suite', async (
     }));
     const migratedDosUser = access.getStoredUser();
     const pagnottellaSupplier = resolve('commerciale@lapagnottellagourmet.it');
+    const isidoroSupplier = resolve('isidorovagnozzi@gmail.com');
     const russoSupplier = resolve('russolorenzo11@gmail.com');
     return {
       marco,
       dos_user,
       migratedDosUser,
       pagnottellaSupplier,
+      isidoroSupplier,
       russoSupplier,
       access: {
         pagnottellaToRusso: await access.canAccessSupplier('russo', pagnottellaSupplier),
@@ -196,6 +200,7 @@ test('ruoli supplier e sessioni stale vengono normalizzati dalla suite', async (
   expect(result.dos_user).toMatchObject({ email:'collega@dos.design', role:'dos_user', isAdmin:false, supplierIds:['russo', 'pagnottella'] });
   expect(result.migratedDosUser).toMatchObject({ email:'marta.diamantini@dos.design', role:'dos_user', isAdmin:false, supplierIds:['russo', 'pagnottella'] });
   expect(result.pagnottellaSupplier).toMatchObject({ role:'supplier', supplierIds:['pagnottella'] });
+  expect(result.isidoroSupplier).toMatchObject({ role:'supplier', supplierIds:['pagnottella'] });
   expect(result.russoSupplier).toMatchObject({ role:'supplier', supplierIds:['russo'] });
   expect(result.access).toEqual({
     pagnottellaToRusso:false,
