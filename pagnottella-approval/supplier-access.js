@@ -9,7 +9,10 @@
   };
 
   const ADMIN_EMAIL = 'marco.tranquilli@dos.design';
-  const PAGNOTTELLA_SUPPLIER_EMAIL = 'commerciale@lapagnottellagourmet.it';
+  const PAGNOTTELLA_SUPPLIER_EMAILS = Object.freeze([
+    'commerciale@lapagnottellagourmet.it',
+    'isidorovagnozzi@gmail.com'
+  ]);
   const RUSSO_SUPPLIER_EMAILS = Object.freeze([
     'lorenzo.russo@alimentarirusso',
     'russolorenzo11@gmail.com'
@@ -22,7 +25,7 @@
   const AUTH_RETURN_TO_KEY = 'dose_auth_return_to';
   const AUTH_LAST_ERROR_KEY = 'dose_auth_last_error';
   const AUTH_LAST_ERROR_MESSAGE_KEY = 'dose_auth_last_error_message';
-  const AUTH_VERSION = 'auth-recovery-4';
+  const AUTH_VERSION = 'auth-clean-session-5';
   const DEFAULT_SETTINGS = Object.freeze({
     russo: Object.freeze({ enabledForUsers: true }),
     pagnottella: Object.freeze({ enabledForUsers: false })
@@ -30,7 +33,6 @@
 
   let firebaseCorePromise = null;
   let firestorePromise = null;
-  let anonymousSignInPromise = null;
   let authObserverStarted = false;
   let redirectResultPromise = null;
   let redirectResultProcessed = false;
@@ -39,7 +41,7 @@
   const roleForEmail = (value) => {
     const email = normalizeEmail(value);
     if (email === ADMIN_EMAIL) return 'admin';
-    if (email === PAGNOTTELLA_SUPPLIER_EMAIL) return 'supplier';
+    if (PAGNOTTELLA_SUPPLIER_EMAILS.includes(email)) return 'supplier';
     if (RUSSO_SUPPLIER_EMAILS.includes(email)) return 'supplier';
     if (email.endsWith('@dos.design')) return 'dos_user';
     return 'user';
@@ -48,7 +50,7 @@
     const email = normalizeEmail(emailValue);
     const resolvedRole = roleForEmail(email);
     if (resolvedRole === 'admin' || resolvedRole === 'dos_user') return ['russo', 'pagnottella'];
-    if (email === PAGNOTTELLA_SUPPLIER_EMAIL) return ['pagnottella'];
+    if (PAGNOTTELLA_SUPPLIER_EMAILS.includes(email)) return ['pagnottella'];
     if (RUSSO_SUPPLIER_EMAILS.includes(email)) return ['russo'];
     return [];
   };
@@ -82,7 +84,6 @@
     return params.get('e2e') === '1' || window.localStorage.getItem('dose_e2e') === '1';
   };
   const isTrustedLocalContext = () => isFilePreview() || isE2E();
-  const isPublicWeb = () => !isFilePreview() && !isLoopback();
   const redirectPending = () => window.sessionStorage.getItem(REDIRECT_PENDING_KEY) === '1';
   const safeAuthErrorMessage = (code) => ({
     'auth/internal-error': 'Errore interno Firebase durante il riconoscimento Google.',
@@ -246,18 +247,6 @@
     });
   }
 
-  function ensureAnonymousSession(auth, authSdk) {
-    if (auth.currentUser) return Promise.resolve(auth.currentUser);
-    if (!anonymousSignInPromise) {
-      anonymousSignInPromise = authSdk.signInAnonymously(auth)
-        .then(result => result.user)
-        .finally(() => {
-          anonymousSignInPromise = null;
-        });
-    }
-    return anonymousSignInPromise;
-  }
-
   function startAuthObserver(auth, authSdk) {
     if (authObserverStarted) return;
     authObserverStarted = true;
@@ -382,7 +371,6 @@
       if (fallback) return fallback;
     }
     if (redirectPending() || !redirectResultProcessed) return null;
-    await ensureAnonymousSession(auth, authSdk);
     window.localStorage.removeItem('dose_user');
     return null;
   }
@@ -397,21 +385,17 @@
     if (isFilePreview()) throw new Error('Google Login richiede un indirizzo http o https.');
     const { auth, authSdk } = await loadFirebaseCore();
     clearAuthError();
+    if (auth.currentUser?.isAnonymous) {
+      await authSdk.signOut(auth);
+    }
     const provider = new authSdk.GoogleAuthProvider();
     provider.addScope('email');
     provider.addScope('profile');
     provider.setCustomParameters({ prompt: 'select_account' });
-    const currentUser = isPublicWeb()
-      ? auth.currentUser
-      : (auth.currentUser || await ensureAnonymousSession(auth, authSdk));
     try {
       let result;
       try {
-        result = isPublicWeb()
-          ? await authSdk.signInWithPopup(auth, provider)
-          : (currentUser?.isAnonymous
-            ? await authSdk.linkWithPopup(currentUser, provider)
-            : await authSdk.signInWithPopup(auth, provider));
+        result = await authSdk.signInWithPopup(auth, provider);
       } catch (error) {
         recordAuthError(error);
         if (error?.code === 'auth/internal-error' && auth.currentUser && !auth.currentUser.isAnonymous) {

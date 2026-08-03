@@ -1,6 +1,9 @@
 (() => {
   const ADMIN_EMAIL = 'marco.tranquilli@dos.design';
-  const SUPPLIER_EMAIL = 'commerciale@lapagnottellagourmet.it';
+  const SUPPLIER_EMAILS = Object.freeze([
+    'commerciale@lapagnottellagourmet.it',
+    'isidorovagnozzi@gmail.com'
+  ]);
   const byId = id => document.getElementById(id);
   const money = value => `€${Number(value || 0).toFixed(2).replace('.', ',')}`;
   const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({
@@ -20,7 +23,7 @@
     return normalizedEmail() === ADMIN_EMAIL;
   }
   function isSupplier() {
-    return normalizedEmail() === SUPPLIER_EMAIL && session()?.role === 'supplier';
+    return SUPPLIER_EMAILS.includes(normalizedEmail()) && session()?.role === 'supplier';
   }
   function hasOrderAccess() {
     return isAdmin() || isSupplier();
