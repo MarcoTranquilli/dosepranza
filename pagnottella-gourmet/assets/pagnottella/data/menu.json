@@ -3019,7 +3019,11 @@
     "activeUntil": "2026-08-30",
     "fallbackRate": 0
   },
-  "whatsapp": "393921512515",
+  "whatsapp": {
+    "supplierName": "Pagnottella Gourmet",
+    "displayNumber": "+39 392 151 2515",
+    "normalizedNumber": "393921512515"
+  },
   "bread": [
     {
       "label": "Pane bianco",
@@ -3076,8 +3080,6 @@
   ],
   "contact": {
     "phone": "06 64 82 40 24",
-    "whatsappLabel": "392 151 25 15",
-    "whatsappUrl": "https://api.whatsapp.com/send/?phone=393921512515",
     "address": "Via Quintino Sella 53, Roma",
     "hours": "Lun-Ven 8:30 - 16:30",
     "website": "https://www.lapagnottellagourmet.it/"

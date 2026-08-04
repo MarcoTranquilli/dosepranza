@@ -11,25 +11,32 @@
   <p>Accesso a DOSepranza in corso...</p>
   <script>
     (async () => {
+      const release = 'post-go-live-1';
+      const releaseKey = 'dose_cache_release';
+      const current = new URL(window.location.href);
+      const forcedReset = current.searchParams.has('swreset');
       try {
-        if ('serviceWorker' in navigator) {
-          const registrations = await navigator.serviceWorker.getRegistrations();
-          if (registrations.length) {
+        const storedRelease = localStorage.getItem(releaseKey) || '';
+        if (forcedReset || storedRelease !== release) {
+          let registrations = [];
+          let cacheKeys = [];
+          if ('serviceWorker' in navigator) {
+            registrations = await navigator.serviceWorker.getRegistrations();
             await Promise.all(registrations.map((registration) => registration.unregister()));
-            if ('caches' in window) {
-              const keys = await caches.keys();
-              await Promise.all(keys.map((key) => caches.delete(key)));
-            }
           }
+          if ('caches' in window) {
+            cacheKeys = await caches.keys();
+            await Promise.all(cacheKeys.map((key) => caches.delete(key)));
+          }
+          localStorage.setItem(releaseKey, release);
         }
       } catch (error) {
         // Il redirect resta disponibile anche se il browser nega la pulizia cache.
       }
 
-      const current = new URL(window.location.href);
       const target = new URL('./pagnottella-gourmet/', current);
       target.searchParams.set('suite', 'production');
-      target.searchParams.set('v', 'official-entry-1');
+      target.searchParams.set('v', release);
       if (current.searchParams.has('swreset')) target.searchParams.set('swreset', '1');
       window.location.replace(target.toString());
     })();
