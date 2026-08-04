@@ -1147,7 +1147,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             const check = document.getElementById('order-send-check');
             const submit = document.getElementById('order-send-submit');
             if(!modal || !box || !check || !submit) return;
-            if(isLocalE2E) {
+            if(isLocalE2E && typeof window.__DOSE_E2E_SAVE_ORDER__ !== 'function') {
                 state.pendingOrder = null;
                 state.cart = [];
                 const cartCount = document.getElementById('cart-count');
@@ -1174,28 +1174,72 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             state.pendingOrder = null;
         }
 
+        async function resolveOrderAuthUser() {
+            if(typeof auth_fb.authStateReady === 'function') await auth_fb.authStateReady();
+            let user = auth_fb.currentUser;
+            if(!user || user.isAnonymous) {
+                await window.DoseSupplierAccess?.resolveSession?.();
+                if(typeof auth_fb.authStateReady === 'function') await auth_fb.authStateReady();
+                user = auth_fb.currentUser;
+            }
+            if(!user || user.isAnonymous || !user.uid) {
+                const error = new Error('Sessione Google non disponibile');
+                error.code = 'auth/session-missing';
+                throw error;
+            }
+            return user;
+        }
+
+        const orderSaveDiagnostics = (error, phase) => ({
+            phase,
+            code: String(error?.code || 'unknown'),
+            hasCurrentUser: Boolean(auth_fb.currentUser),
+            isAnonymous: Boolean(auth_fb.currentUser?.isAnonymous),
+            hasUid: Boolean(auth_fb.currentUser?.uid),
+            supplierId: 'russo',
+            version: 'russo-order-save-1'
+        });
+
+        async function createRussoOrder(payload) {
+            if(isLocalE2E && typeof window.__DOSE_E2E_SAVE_ORDER__ === 'function') {
+                return window.__DOSE_E2E_SAVE_ORDER__(payload);
+            }
+            const authenticatedUser = await resolveOrderAuthUser();
+            return addDoc(ordersCol, {
+                user: state.user.name,
+                email: state.user.email,
+                uid: authenticatedUser.uid,
+                supplierId: 'russo',
+                items: payload.items,
+                total: payload.total,
+                allergies: payload.allergies || '',
+                posate: payload.posate || 'No',
+                paymentStatus: 'pending',
+                reconciled: false,
+                orderStatus: 'submitted',
+                orderType: 'order',
+                createdAt: serverTimestamp()
+            });
+        }
+
         async function confirmSendOrder() {
             if(!state.pendingOrder || state.orderSubmitting) return;
             const check = document.getElementById('order-send-check');
             if(check && !check.checked) return window.toast("Conferma l'invio");
             const payload = state.pendingOrder;
             const submit = document.getElementById('order-send-submit');
+            const errorBox = document.getElementById('order-send-error');
             state.orderSubmitting = true;
-            if(submit) submit.disabled = true;
+            if(errorBox) {
+                errorBox.textContent = '';
+                errorBox.classList.add('hidden');
+            }
+            if(submit) {
+                submit.disabled = true;
+                submit.textContent = 'Invio ordine in corso…';
+            }
             try {
-                const docRef = await addDoc(ordersCol, { 
-                    user: state.user.name, email: state.user.email,
-                    uid: auth_fb.currentUser.uid,
-                    supplierId: "russo",
-                    items: payload.items, total: payload.total, 
-                    allergies: payload.allergies,
-                    posate: payload.posate,
-                    paymentStatus: "pending",
-                    reconciled: false,
-                    orderStatus: "submitted",
-                    orderType: "order",
-                    createdAt: serverTimestamp() 
-                });
+                const docRef = await createRussoOrder(payload);
                 closeSendConfirm();
                 const summary = buildOrderConfirmSummary(docRef.id, payload.items, payload.total);
                 showOrderConfirm(summary);
@@ -1210,10 +1254,21 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 state.pendingOrder = null;
                 state.cart = []; document.getElementById('cart-count').textContent='0'; window.navigate('history'); window.toast("Inviato!");
             } catch(e) {
-                window.toast("Ordine non salvato: riprova tra un istante.");
+                console.warn('order save failed', orderSaveDiagnostics(e, 'firestore-create'));
+                const message = e?.code === 'auth/session-missing'
+                    ? 'Sessione Google non disponibile. Torna alla scelta fornitore, accedi di nuovo e riprova.'
+                    : 'Ordine non salvato. Il carrello è intatto: controlla la connessione e riprova.';
+                if(errorBox) {
+                    errorBox.textContent = message;
+                    errorBox.classList.remove('hidden');
+                }
+                window.toast(message);
             } finally {
                 state.orderSubmitting = false;
-                if(submit) submit.disabled = !state.pendingOrder || !(check && check.checked);
+                if(submit) {
+                    submit.textContent = 'Invia ordine';
+                    submit.disabled = !state.pendingOrder || !(check && check.checked);
+                }
             }
         }
 

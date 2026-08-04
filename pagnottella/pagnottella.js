@@ -200,7 +200,7 @@ function hydrateStatic(){
   byId('heroText').textContent = `Menu dedicato con prezzi originali e scontati sempre visibili. Ordina e paga entro le ${orderCutoffCopy}, poi ricevi la consegna gratuita alle ${deliveryTimeCopy}.`;
   byId('contact-address').textContent = DATA.contact.address;
   byId('contact-hours').textContent = DATA.contact.hours;
-  byId('contact-whatsapp').href = DATA.contact.whatsappUrl;
+  byId('contact-whatsapp').href = whatsappUrl('Buongiorno, desidero informazioni sul servizio DOSepranza.');
   byId('contact-site').href = DATA.contact.website;
   byId('price-validity-note').textContent = DATA.notes?.priceValidity
     || `Ricette e prezzi soggetti a conferma del punto vendita. Lo sconto estivo viene applicato automaticamente fino al ${formatDate(DATA.discount?.activeUntil)}.`;
@@ -844,7 +844,10 @@ function buildMessage(){
   return msg;
 }
 function cap(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
-function whatsappUrl(){ const params = new URLSearchParams({ phone:DATA.whatsapp, text:buildMessage(), type:'phone_number', app_absent:'0' }); return 'https://api.whatsapp.com/send/?' + params.toString(); }
+function whatsappUrl(message = buildMessage()){
+  const number = String(DATA?.whatsapp?.normalizedNumber || DATA?.whatsapp || '').replace(/\D/g, '');
+  return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+}
 function buildOrderPayload(){
   const t = totals();
   const items = t.items.flatMap(item => Array.from({ length:item.qty }, () => ({

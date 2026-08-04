@@ -17,7 +17,12 @@ const state = {
   option:null,
   selectedExtras:[],
   sending:false,
-  lastSubmittedMessage:''
+  lastSubmittedMessage:'',
+  lastSubmittedFingerprint:'',
+  lastOrderId:'',
+  lastWhatsAppUrl:'',
+  whatsappOpened:false,
+  confirmationAction:'submit'
 };
 const authState = { loading:false, user:null, message:'' };
 let supplierAccess = window.DoseSupplierAccess;
@@ -59,6 +64,7 @@ const discountLabel = () => {
   return `${DATA.discount.label || 'Sconto attivo'} -${rate}%`;
 };
 const ORDER_LOG_KEY = 'pg_order_logs';
+const CHECKOUT_STATE_KEY = 'pg_checkout_state_v1';
 const deliveryCopy = () => DATA?.copy?.delivery || 'Ordini e pagamenti entro le 12:00, consegna gratuita alle 12:30';
 const paymentStatusCopy = () => `${DATA.payment.model}. ${DATA.payment.pickup}.`;
 const getStoredDoseUser = () => {
@@ -75,7 +81,8 @@ const deliverySiteCopy = () => DATA?.orderContext?.deliverySite || 'Via Arno, 52
 const paymentBeneficiary = () => DATA?.payment?.beneficiary || '';
 const paymentIban = () => DATA?.payment?.iban || '';
 const paymentNoteCopy = () => 'Satispay è il metodo principale; in alternativa è disponibile il bonifico bancario. PayPal e Nexi saranno attivati da settembre.';
-const finalizeOrderLabel = 'Finalizza l’ordine tramite il suo invio su WhatsApp';
+const finalizeOrderLabel = () => `Apri WhatsApp con ${whatsappConfig().supplierName}`;
+const reopenOrderLabel = 'Riapri il riepilogo su WhatsApp';
 const orderCutoffCopy = '12:00';
 const deliveryTimeCopy = '12:30';
 const discountedPrice = v => Math.round(v * (1 - discountRate()) * 100) / 100;
@@ -88,6 +95,7 @@ const setAuthButtonsDisabled = (disabled) => {
 };
 
 async function bootstrap(){
+  await (window.__DOSE_CACHE_READY__ || Promise.resolve());
   if(!supplierAccess) throw new Error('Modulo di accesso fornitori non disponibile.');
   DATA = await loadData();
   normalizeAssetPaths(DATA);
@@ -179,24 +187,24 @@ function renderPaymentOptions(){
     availableFrom: method.availableFrom || 'settembre',
     enabled: method.enabled === true
   })).filter(method => method.label);
-  const selectable = [
-    ...activeMethods.map(label => ({ label, enabled:true })),
-    ...futureMethods
-  ];
   const selected = document.querySelector('input[name="paymentMethod"]:checked')?.value || activeMethods[0] || '';
   const options = byId('paymentOptions');
   if(options){
-    options.innerHTML = selectable.map((method, index) => {
+    const renderOption = (method, index) => {
       const meta = paymentMethodMeta(method.label);
       const disabled = !method.enabled;
       const checked = !disabled && (method.label === selected || (!selected && index === 0));
-      return `<label class="paymentOption ${disabled ? 'isDisabled' : ''}">
-        <input type="radio" name="paymentMethod" value="${esc(method.label)}" ${checked ? 'checked' : ''} ${disabled ? 'disabled' : ''}>
+      return `<label class="paymentOption ${disabled ? 'isDisabled' : ''} ${checked ? 'isSelected' : ''}">
+        <input type="radio" name="paymentMethod" value="${esc(method.label)}" aria-label="${esc(method.label)}" aria-describedby="paymentChoiceHelp" ${checked ? 'checked' : ''} ${disabled ? 'disabled' : ''}>
         <span class="paymentOptionIcon" aria-hidden="true">${esc(meta.icon)}</span>
         <span class="paymentOptionCopy"><strong>${esc(method.label)}</strong><small>${esc(meta.description)}</small></span>
-        <span class="paymentOptionState">${disabled ? 'Prossimamente' : 'Seleziona'}</span>
+        <span class="paymentOptionState" aria-hidden="true">${disabled ? 'Prossimamente' : (checked ? '✓ Selezionato' : 'Seleziona')}</span>
       </label>`;
-    }).join('');
+    };
+    const activeOptions = activeMethods.map((label, index) => renderOption({ label, enabled:true }, index)).join('');
+    const futureOptions = futureMethods.map((method, index) => renderOption(method, activeMethods.length + index)).join('');
+    options.innerHTML = `<div class="paymentGroupTitle">Disponibili ora</div>${activeOptions}${futureOptions ? `<div class="paymentGroupTitle isFuture">In attivazione</div>${futureOptions}` : ''}`;
+    options.dataset.sponsorPolished = '1';
   }
   const summary = byId('paymentMethods');
   if(summary){
@@ -242,8 +250,13 @@ function hydrateStatic(){
   byId('heroText').textContent = `Menu dedicato con prezzi originali e scontati sempre visibili. Ordina e paga entro le ${orderCutoffCopy}, poi ricevi la consegna gratuita alle ${deliveryTimeCopy}.`;
   byId('contact-address').textContent = DATA.contact.address;
   byId('contact-hours').textContent = DATA.contact.hours;
-  byId('contact-whatsapp').href = DATA.contact.whatsappUrl;
+  byId('contact-whatsapp').href = whatsappUrl('Buongiorno, desidero informazioni sul servizio DOSepranza.');
   byId('contact-site').href = DATA.contact.website;
+  const recipient = whatsappConfig();
+  const recipientCopy = byId('whatsappRecipientCopy');
+  if(recipientCopy) recipientCopy.textContent = `Il riepilogo verrà aperto nella chat WhatsApp di ${recipient.supplierName} al numero ${recipient.displayNumber}. L’ordine sarà completato solo quando confermerai di aver inviato il messaggio.`;
+  const fallbackRecipient = byId('whatsappFallbackRecipient');
+  if(fallbackRecipient) fallbackRecipient.textContent = `${recipient.supplierName} · ${recipient.displayNumber}`;
   byId('price-validity-note').textContent = DATA.notes?.priceValidity
     || `Ricette e prezzi soggetti a conferma del punto vendita. Lo sconto estivo viene applicato automaticamente fino al ${formatDate(DATA.discount?.activeUntil)}.`;
   byId('heroStats').innerHTML = DATA.highlights.map(h => `<span class="heroStat"><strong>${esc(h.label)}</strong> · ${esc(h.value)}</span>`).join('');
@@ -288,6 +301,34 @@ function hydrateStatic(){
   if(allCat) byId('heroImage').src = allCat.hero;
 }
 
+function updateSendButtonState(){
+  const button = byId('sendOrderBtn');
+  const label = byId('sendOrderLabel');
+  const hasPreparedOrder = Boolean(state.lastOrderId && state.lastWhatsAppUrl);
+  if(button){
+    button.disabled = state.sending || isOrderingClosed();
+    button.classList.toggle('isBusy', state.sending);
+    button.classList.toggle('isWhatsAppOpened', hasPreparedOrder);
+    button.setAttribute('aria-label', state.sending ? 'Apertura di WhatsApp in corso' : (hasPreparedOrder ? reopenOrderLabel : finalizeOrderLabel()));
+  }
+  if(label){
+    label.textContent = isOrderingClosed()
+      ? 'Ordini sospesi durante la chiusura'
+      : (state.sending ? 'Apertura di WhatsApp in corso…' : (hasPreparedOrder ? reopenOrderLabel : finalizeOrderLabel()));
+  }
+}
+
+function resetCurrentTransmissionState(){
+  state.lastSubmittedMessage = '';
+  state.lastSubmittedFingerprint = '';
+  state.lastOrderId = '';
+  state.lastWhatsAppUrl = '';
+  state.whatsappOpened = false;
+  state.confirmationAction = 'submit';
+  byId('whatsappStatus')?.classList.add('hidden');
+  updateSendButtonState();
+}
+
 function bind(){
   byId('search').addEventListener('input', e => { state.query = e.target.value.trim().toLowerCase(); renderCatalog(); });
   byId('sort').addEventListener('change', e => { state.sort = e.target.value; renderCatalog(); });
@@ -295,13 +336,21 @@ function bind(){
   byId('extraSearch')?.addEventListener('input', renderDrawerExtras);
   ['customer','notes'].forEach(id => {
     const el = byId(id);
-    if(el) el.addEventListener('input', () => { state.lastSubmittedMessage=''; renderCart(); });
+    if(el) el.addEventListener('input', () => { resetCurrentTransmissionState(); renderCart(); });
   });
   byId('paymentOptions')?.addEventListener('change', () => {
-    state.lastSubmittedMessage='';
+    resetCurrentTransmissionState();
+    renderPaymentOptions();
     renderPaymentDetails();
     renderCart();
   });
+  byId('whatsappCompleteBtn')?.addEventListener('click', requestCompleteWhatsappOrder);
+  byId('whatsappReopenBtn')?.addEventListener('click', requestReopenWhatsapp);
+  byId('whatsappCopyBtn')?.addEventListener('click', copyWhatsAppMessage);
+  byId('paymentConfirmCancel')?.addEventListener('click', closePaymentConfirmation);
+  byId('paymentConfirmAccept')?.addEventListener('click', confirmPaymentAndSend);
+  byId('checkoutCompleteClose')?.addEventListener('click', closeCheckoutComplete);
+  byId('sendOrderBtn')?.addEventListener('click', sendWA);
   document.addEventListener('keydown', e => {
     if(e.key === 'Escape'){
       closePaymentConfirmation();
@@ -827,12 +876,12 @@ function addToCart(p,o,extras=[]){
   const key = [p.id, o.label, ...normalizedExtras.map(extra => extra.name)].join('|');
   if(!state.cart[key]) state.cart[key] = {...p,cartKey:key,opt:o.label,optExtra:o.extra,extras:normalizedExtras,extrasTotal,originalUnit,qty:0};
   state.cart[key].qty++;
-  state.lastSubmittedMessage='';
+  resetCurrentTransmissionState();
   toast(`${p.name} aggiunto al carrello`);
   renderCart();
   return true;
 }
-function changeQty(key,delta){ if(!state.cart[key]) return; state.cart[key].qty += delta; if(state.cart[key].qty <= 0) delete state.cart[key]; state.lastSubmittedMessage=''; renderCart(); }
+function changeQty(key,delta){ if(!state.cart[key]) return; state.cart[key].qty += delta; if(state.cart[key].qty <= 0) delete state.cart[key]; resetCurrentTransmissionState(); renderCart(); }
 function totals(){ const items = Object.values(state.cart); const orig = items.reduce((a,i)=>a+i.originalUnit*i.qty,0); const total = discountedPrice(orig); return {items, count:items.reduce((a,i)=>a+i.qty,0), orig, total, saving:orig-total}; }
 function renderCart(){
   const t = totals();
@@ -850,10 +899,7 @@ function renderCart(){
   byId('origTotal').textContent = money(t.orig);
   byId('saving').textContent = '-' + money(t.saving);
   byId('finalTotal').textContent = money(t.total);
-  const sendButton = byId('sendOrderBtn');
-  if(sendButton) sendButton.disabled = isOrderingClosed();
-  const sendLabel = byId('sendOrderLabel');
-  if(sendLabel && isOrderingClosed()) sendLabel.textContent = 'Ordini sospesi durante la chiusura';
+  updateSendButtonState();
   updateAdmin();
 }
 function scrollToExtras(){ byId('extrasGrid')?.scrollIntoView({ behavior:'smooth', block:'start' }); }
@@ -904,7 +950,34 @@ function buildMessage(){
   return msg;
 }
 function cap(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
-function whatsappUrl(){ const params = new URLSearchParams({ phone:DATA.whatsapp, text:buildMessage(), type:'phone_number', app_absent:'0' }); return 'https://api.whatsapp.com/send/?' + params.toString(); }
+function whatsappConfig(){
+  const value = DATA?.whatsapp || {};
+  const normalizedNumber = String(value.normalizedNumber || '').replace(/\D/g, '');
+  return {
+    supplierName:String(value.supplierName || DATA?.copy?.brand || 'Pagnottella Gourmet'),
+    displayNumber:String(value.displayNumber || normalizedNumber),
+    normalizedNumber
+  };
+}
+function whatsappUrl(message = buildMessage()){
+  const { normalizedNumber } = whatsappConfig();
+  return `https://wa.me/${normalizedNumber}?text=${encodeURIComponent(message)}`;
+}
+function checkoutFingerprint(){
+  const t = totals();
+  return JSON.stringify({
+    customer:(byId('customer')?.value || authenticatedCustomerName() || '').trim(),
+    notes:(byId('notes')?.value || '').trim(),
+    paymentMethod:selectedPaymentMethod(),
+    total:t.total,
+    items:t.items.map(item => ({
+      id:item.id,
+      option:item.opt,
+      extras:(item.extras || []).map(extra => extra.name),
+      qty:item.qty
+    }))
+  });
+}
 function buildOrderPayload(){
   const t = totals();
   const items = t.items.flatMap(item => Array.from({ length:item.qty }, () => ({
@@ -944,46 +1017,158 @@ function buildOrderPayload(){
 }
 function setSendBusy(busy){
   state.sending = busy;
-  const button = byId('sendOrderBtn');
-  const label = byId('sendOrderLabel');
-  if(button) button.disabled = busy || isOrderingClosed();
-  if(label) label.textContent = busy ? 'Salvataggio ordine...' : (isOrderingClosed() ? 'Ordini sospesi durante la chiusura' : finalizeOrderLabel);
+  updateSendButtonState();
+}
+function persistCheckoutState(status){
+  try{
+    localStorage.setItem(CHECKOUT_STATE_KEY, JSON.stringify({
+      orderId:state.lastOrderId,
+      status,
+      whatsappOpened:Boolean(state.whatsappOpened),
+      updatedAt:new Date().toISOString()
+    }));
+  }catch(error){
+    // Il flusso resta operativo anche se lo storage locale non è disponibile.
+  }
+}
+function showWhatsAppStatus(opened){
+  const panel = byId('whatsappStatus');
+  const title = byId('whatsappStatusTitle');
+  const copy = byId('whatsappStatusCopy');
+  if(!panel || !title || !copy) return;
+  panel.classList.remove('hidden');
+  const recipient = whatsappConfig();
+  title.textContent = opened ? `WhatsApp aperto con ${recipient.supplierName}` : 'Apertura automatica bloccata';
+  copy.textContent = opened
+    ? `WhatsApp è stato aperto sul contatto ${recipient.displayNumber}. Invia il messaggio per completare l’ordine.`
+    : `Apri manualmente la chat di ${recipient.supplierName} al numero ${recipient.displayNumber}, oppure copia il riepilogo qui sotto.`;
+  byId('whatsappFallback')?.classList.toggle('hidden', opened);
+  const fallbackMessage = byId('whatsappFallbackMessage');
+  if(fallbackMessage) fallbackMessage.textContent = state.lastSubmittedMessage || buildMessage();
+  requestAnimationFrame(() => {
+    const scroller = panel.closest('.cartBody');
+    if(scroller) scroller.scrollTop = Math.max(0, panel.offsetTop - scroller.clientHeight / 3);
+    else panel.scrollIntoView({ block:'nearest' });
+  });
+}
+function configureConfirmation(action){
+  state.confirmationAction = action;
+  const title = byId('paymentConfirmTitle');
+  const copy = byId('paymentConfirmCopy');
+  const method = byId('paymentConfirmMethod');
+  const accept = byId('paymentConfirmAccept');
+  if(action === 'reopen'){
+    title.textContent = 'Riaprire il riepilogo?';
+    copy.textContent = 'Hai già aperto questo ordine su WhatsApp. Vuoi aprirlo nuovamente? Non verrà creato un secondo ordine.';
+    method.textContent = `Ordine: ${state.lastOrderId || 'già registrato'}`;
+    accept.textContent = 'Riapri WhatsApp';
+  }else if(action === 'complete'){
+    title.textContent = 'Confermare l’invio?';
+    copy.textContent = 'Conferma solo dopo aver inviato il messaggio nella chat WhatsApp di Pagnottella Gourmet.';
+    method.textContent = `Ordine: ${state.lastOrderId || 'corrente'}`;
+    accept.textContent = 'Sì, ho inviato l’ordine';
+  }else{
+    const paymentMethod = selectedPaymentMethod();
+    const recipient = whatsappConfig();
+    title.textContent = 'Hai completato il pagamento?';
+    copy.textContent = paymentMethod === 'Bonifico bancario'
+      ? `Hai selezionato Bonifico bancario. Il riepilogo verrà aperto nella chat WhatsApp di ${recipient.supplierName} al numero ${recipient.displayNumber}: allega la ricevuta prima dell’invio.`
+      : `Il riepilogo verrà aperto nella chat WhatsApp di ${recipient.supplierName} al numero ${recipient.displayNumber}.`;
+    method.textContent = `Metodo selezionato: ${paymentMethod} · Destinatario: ${recipient.displayNumber}`;
+    accept.textContent = 'Conferma e apri WhatsApp';
+  }
+  byId('paymentConfirmModal')?.classList.add('show');
+  accept?.focus();
 }
 async function sendWA(){
-  if(totals().count === 0 || state.sending) return;
+  const button = byId('sendOrderBtn');
+  if(totals().count === 0){
+    if(button) button.dataset.checkoutStatus = 'empty';
+    return;
+  }
+  if(state.sending){
+    if(button) button.dataset.checkoutStatus = 'busy';
+    return;
+  }
   if(isOrderingClosed()){
+    if(button) button.dataset.checkoutStatus = 'closed';
     byId('confirm').classList.add('show', 'isError');
     byId('confirm').textContent = closureCopy(activeClosure());
     return;
   }
-  const message = buildMessage();
-  if(state.lastSubmittedMessage === message){
-    byId('confirm').classList.add('show');
-    byId('confirm').textContent = 'Questo ordine è già stato salvato. Modifica il carrello o crea un nuovo ordine per inviarne un altro.';
+  const fingerprint = checkoutFingerprint();
+  if(state.lastSubmittedFingerprint === fingerprint && state.lastWhatsAppUrl){
+    if(button) button.dataset.checkoutStatus = 'reopen';
+    requestReopenWhatsapp();
     return;
   }
-  const method = selectedPaymentMethod();
-  const modalCopy = byId('paymentConfirmCopy');
-  if(modalCopy){
-    modalCopy.textContent = method === 'Bonifico bancario'
-      ? 'Hai selezionato Bonifico bancario. Per completare l’ordine il bonifico deve essere istantaneo. Dopo l’apertura di WhatsApp, allega la ricevuta del pagamento al messaggio prima dell’invio.'
-      : 'Prima di finalizzare l’ordine, conferma di aver effettuato il pagamento secondo il metodo selezionato.';
-  }
-  const methodLabel = byId('paymentConfirmMethod');
-  if(methodLabel) methodLabel.textContent = `Metodo selezionato: ${method}`;
-  byId('paymentConfirmModal')?.classList.add('show');
-  byId('paymentConfirmAccept')?.focus();
+  if(button) button.dataset.checkoutStatus = 'confirming';
+  configureConfirmation('submit');
 }
 function closePaymentConfirmation(){
   byId('paymentConfirmModal')?.classList.remove('show');
   byId('sendOrderBtn')?.focus();
 }
+function requestReopenWhatsapp(){
+  if(!state.lastWhatsAppUrl) return sendWA();
+  configureConfirmation('reopen');
+}
+function requestCompleteWhatsappOrder(){
+  if(!state.lastOrderId) return;
+  configureConfirmation('complete');
+}
+function reopenWhatsapp(){
+  const popup = window.open(state.lastWhatsAppUrl, '_blank');
+  if(popup) popup.opener = null;
+  state.whatsappOpened = Boolean(popup);
+  persistCheckoutState(state.whatsappOpened ? 'whatsapp_opened' : 'whatsapp_popup_blocked');
+  showWhatsAppStatus(state.whatsappOpened);
+  byId('confirm').classList.add('show');
+  byId('confirm').textContent = state.whatsappOpened
+    ? 'WhatsApp è stato riaperto. Invia il messaggio nella chat per trasmettere l’ordine.'
+    : 'Il browser ha bloccato WhatsApp. Premi nuovamente “Riapri WhatsApp” e autorizza la nuova scheda.';
+  updateSendButtonState();
+}
+function copyWhatsAppMessage(){
+  const message = state.lastSubmittedMessage || buildMessage();
+  navigator.clipboard?.writeText(message)
+    .then(() => toast('Riepilogo copiato'))
+    .catch(() => toast('Copia non disponibile: seleziona il testo del riepilogo'));
+}
+function completeWhatsappOrder(){
+  const t = totals();
+  const orderId = state.lastOrderId;
+  persistCheckoutState('user_confirmed_sent');
+  byId('checkoutCompleteSummary').textContent = `${orderId ? `Ordine ${orderId} · ` : ''}${t.count} ${t.count === 1 ? 'prodotto' : 'prodotti'} · Totale ${money(t.total)}`;
+  state.cart = {};
+  byId('notes').value = '';
+  resetCurrentTransmissionState();
+  renderCart();
+  byId('checkoutCompleteModal')?.classList.add('show');
+}
+function closeCheckoutComplete(){
+  byId('checkoutCompleteModal')?.classList.remove('show');
+  closeCart();
+}
 async function confirmPaymentAndSend(){
   if(totals().count === 0 || state.sending) return;
+  if(state.confirmationAction === 'reopen'){
+    closePaymentConfirmation();
+    reopenWhatsapp();
+    return;
+  }
+  if(state.confirmationAction === 'complete'){
+    closePaymentConfirmation();
+    completeWhatsappOrder();
+    return;
+  }
   closePaymentConfirmation();
   const message = buildMessage();
-  const popup = window.open('about:blank', '_blank');
+  const fingerprint = checkoutFingerprint();
+  const target = whatsappUrl(message);
+  const popup = window.open(target, '_blank');
   if(popup) popup.opener = null;
+  const opened = Boolean(popup);
   setSendBusy(true);
   byId('confirm').classList.remove('show', 'isError');
   try{
@@ -991,16 +1176,22 @@ async function confirmPaymentAndSend(){
     const result = await supplierAccess.createPagnottellaOrder(payload);
     logOrder(result.id, { firebaseSaved: !result.local });
     state.lastSubmittedMessage = message;
-    const target = whatsappUrl();
-    if(popup) popup.location.replace(target);
-    else window.open(target, '_blank', 'noopener');
+    state.lastSubmittedFingerprint = fingerprint;
+    state.lastOrderId = result.id;
+    state.lastWhatsAppUrl = target;
+    state.whatsappOpened = opened;
+    persistCheckoutState(opened ? 'whatsapp_opened' : 'whatsapp_popup_blocked');
+    showWhatsAppStatus(opened);
     byId('confirm').classList.add('show');
-    byId('confirm').textContent = `Ordine ${result.id} salvato. Pagamento dichiarato effettuato; WhatsApp è stato aperto con il riepilogo per il ristoratore.`;
+    byId('confirm').textContent = opened
+      ? `Ordine ${result.id} registrato. WhatsApp è stato aperto: invia il messaggio per trasmetterlo a Pagnottella Gourmet.`
+      : `Ordine ${result.id} registrato, ma il browser ha bloccato WhatsApp. Usa “Riapri WhatsApp” per trasmettere il riepilogo.`;
     window.dispatchEvent(new CustomEvent('pagnottella:order-saved', { detail:{ id:result.id } }));
   }catch(error){
-    if(popup) popup.close();
     byId('confirm').classList.add('show', 'isError');
-    byId('confirm').textContent = 'Ordine non salvato: riprova tra un istante.';
+    byId('confirm').textContent = opened
+      ? 'WhatsApp è stato aperto, ma la registrazione tecnica non è riuscita. Invia il riepilogo al fornitore e conserva il carrello.'
+      : 'Registrazione tecnica non riuscita e apertura WhatsApp bloccata. Il carrello è intatto: riprova.';
   }finally{
     setSendBusy(false);
   }
@@ -1056,7 +1247,15 @@ function logOrder(orderId, payload){
   localStorage.setItem(ORDER_LOG_KEY, JSON.stringify(logs.slice(0,25)));
   updateAdmin();
 }
-function newOrder(){ state.cart = {}; state.lastSubmittedMessage=''; byId('notes').value = ''; byId('confirm').classList.remove('show', 'isError'); renderCart(); closeCart(); }
+function newOrder(){
+  state.cart = {};
+  resetCurrentTransmissionState();
+  try{ localStorage.removeItem(CHECKOUT_STATE_KEY); }catch(error){}
+  byId('notes').value = '';
+  byId('confirm').classList.remove('show', 'isError');
+  renderCart();
+  closeCart();
+}
 function openCart(){ byId('cart').classList.add('open'); byId('cartBackdrop').classList.add('show'); }
 function closeCart(){ byId('cart').classList.remove('open'); byId('cartBackdrop').classList.remove('show'); }
 function toast(txt){ const el = byId('toast'); el.textContent = txt; el.classList.add('show'); clearTimeout(window.__toast); window.__toast = setTimeout(() => el.classList.remove('show'), 1600); }
@@ -1082,7 +1281,8 @@ Object.assign(window, {
   setCat, setDiet, openFilterPanel, closeFilterPanel,
   setPendingCategory, setPendingDiet, togglePendingFilter, applyFilters, resetFilters, renderIngredientFilters,
   openDetails, pickOption, toggleDrawerExtra, closeDrawer, quickAdd, drawerAdd, changeQty,
-  sendWA, closePaymentConfirmation, confirmPaymentAndSend, newOrder, openCart, closeCart,
+  sendWA, closePaymentConfirmation, confirmPaymentAndSend, requestReopenWhatsapp, requestCompleteWhatsappOrder, copyWhatsAppMessage,
+  closeCheckoutComplete, newOrder, openCart, closeCart,
   exportCSV, copyPaymentIban, scrollToExtras, toast
 });
 bootstrap().catch(err => {

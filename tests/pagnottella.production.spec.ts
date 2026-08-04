@@ -37,7 +37,7 @@ const sample=[
 export const getFirestore=()=>({});export const collection=(db,name)=>({name});export const where=(field,op,value)=>({type:'where',field,op,value});export const orderBy=(field,direction)=>({type:'orderBy',field,direction});export const query=(ref,...constraints)=>{globalThis.__firestoreQueries=(globalThis.__firestoreQueries||[]).concat([{collection:ref.name,constraints}]);return{ref,constraints}};
 export const onSnapshot=(q,next)=>{const filter=q.constraints?.find(c=>c.type==='where'&&c.field==='supplierId');next({docs:filter?sample.filter(doc=>doc.data().supplierId===filter.value):sample});return()=>{}};
 export const getDoc=async()=>({exists:()=>false,data:()=>({})});export const setDoc=async()=>{};export const doc=(db,col,id)=>({col,id});export const serverTimestamp=()=>({serverTimestamp:true});
-export const addDoc=async(ref,order)=>{globalThis.__lastOrder=order;return{id:'pg-created'}};export const updateDoc=async(ref,data)=>{globalThis.__lastUpdate={ref,data}};
+export const addDoc=async(ref,order)=>{globalThis.__orderCreates=(globalThis.__orderCreates||0)+1;globalThis.__lastOrder=order;return{id:'pg-created'}};export const updateDoc=async(ref,data)=>{globalThis.__lastUpdate={ref,data}};
 `
   }));
 }
@@ -46,6 +46,21 @@ async function googleLogin(page: Page) {
   await page.getByRole('button', {name:'Accedi con Google'}).click();
   await expect(page.locator('#supplierStage')).not.toHaveClass(/hidden/);
 }
+
+test('bootstrap elimina cache legacy senza richiedere swreset', async ({page}, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'Scenario cache desktop');
+  await page.goto('./?e2e=1');
+  await page.evaluate(async () => {
+    localStorage.setItem('dose_cache_release', 'release-obsoleta');
+    const legacy = await caches.open('dose-legacy-cache');
+    await legacy.put('./legacy-response', new Response('stale'));
+  });
+  await page.goto('./?e2e=1');
+  await expect.poll(() => page.evaluate(() => caches.keys())).not.toContain('dose-legacy-cache');
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('dose_cache_release'))).toBe('post-go-live-1');
+  await expect(page).not.toHaveURL(/swreset/);
+  await expect(page.locator('#authGateGoogle')).toBeVisible();
+});
 
 test('UI production pulita, responsive e catalogo compliant', async ({page}, testInfo) => {
   await page.goto('./?e2e=1');
@@ -115,6 +130,72 @@ test('matrice ruoli e accessi è calcolata dall’email', async ({page}) => {
   })).toEqual(['Amministratore', 'Utente DOS', 'Ristoratore / Fornitore', 'Non autorizzato']);
 });
 
+test('metodo di pagamento comunica selezione senza sovrapposizioni', async ({page}, testInfo) => {
+  await mockFirebase(page);
+  await page.goto('.');
+  await googleLogin(page);
+  await page.locator('.pagnottellaCard').click();
+  await page.locator('#search').fill('Saporito');
+  await page.locator('#grid .card').first().locator('.add').click();
+  await page.getByRole('button', {name:'Aggiungi al carrello'}).click();
+  await page.getByRole('button', {name:'Vedi carrello'}).click();
+
+  const satispay = page.locator('.paymentOption').filter({hasText:'Satispay'});
+  const transfer = page.locator('.paymentOption').filter({hasText:'Bonifico bancario'});
+  await expect(satispay.locator('.paymentOptionState')).toHaveText('✓ Selezionato');
+  await expect(satispay.locator('input')).toBeChecked();
+  await expect(transfer.locator('.paymentOptionState')).toHaveText('Seleziona');
+  await transfer.click();
+  await expect(transfer.locator('.paymentOptionState')).toHaveText('✓ Selezionato');
+  await expect(transfer.locator('input')).toBeChecked();
+  await expect(satispay.locator('.paymentOptionState')).toHaveText('Seleziona');
+
+  const geometry = await transfer.evaluate(label => {
+    const copy = label.querySelector('.paymentOptionCopy')?.getBoundingClientRect();
+    const state = label.querySelector('.paymentOptionState')?.getBoundingClientRect();
+    if(!copy || !state) return {overlap:true, copy:null, state:null};
+    return {
+      overlap:!(copy.right <= state.left || copy.bottom <= state.top || state.bottom <= copy.top),
+      copy:{left:copy.left,right:copy.right,top:copy.top,bottom:copy.bottom},
+      state:{left:state.left,right:state.right,top:state.top,bottom:state.bottom}
+    };
+  });
+  expect(geometry.overlap, `${testInfo.project.name}: badge pagamento sovrapposto ${JSON.stringify(geometry)}`).toBe(false);
+  await transfer.locator('input').focus();
+  await expect(transfer).toHaveCSS('outline-style', 'solid');
+  await transfer.locator('input').press('ArrowLeft');
+  await expect(satispay.locator('input')).toBeChecked();
+  await expect(satispay.locator('.paymentOptionState')).toHaveText('✓ Selezionato');
+});
+
+test('popup WhatsApp bloccato mantiene carrello e non duplica ordine', async ({page}, testInfo) => {
+  await mockFirebase(page);
+  await page.goto('.');
+  await googleLogin(page);
+  await page.locator('.pagnottellaCard').click();
+  await page.locator('#search').fill('Saporito');
+  await page.locator('#grid .card').first().locator('.add').click();
+  await page.getByRole('button', {name:'Aggiungi al carrello'}).click();
+  if (testInfo.project.name === 'mobile') await page.getByRole('button', {name:'Vedi carrello'}).click();
+  await page.evaluate(() => { window.open = () => null; });
+  if (testInfo.project.name === 'webkit') {
+    await page.locator('#sendOrderBtn').dispatchEvent('click');
+  } else {
+    await page.locator('#sendOrderBtn').click();
+  }
+  await page.locator('#paymentConfirmAccept').click();
+  await expect(page.locator('#confirm')).toContainText('browser ha bloccato');
+  await expect(page.locator('#whatsappStatusTitle')).toHaveText('Apertura automatica bloccata');
+  await expect(page.locator('#whatsappStatusCopy')).toContainText('+39 392 151 2515');
+  await expect(page.locator('#whatsappFallbackMessage')).toContainText('Riepilogo Ordine');
+  await expect(page.locator('#cartCount')).toHaveText('1');
+  expect(await page.evaluate(() => (globalThis as typeof globalThis & {__orderCreates?:number}).__orderCreates)).toBe(1);
+  await page.getByRole('button', {name:'Riprova WhatsApp'}).click();
+  await page.locator('#paymentConfirmAccept').click();
+  expect(await page.evaluate(() => (globalThis as typeof globalThis & {__orderCreates?:number}).__orderCreates)).toBe(1);
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('pg_checkout_state_v1') || 'null'))).toMatchObject({status:'whatsapp_popup_blocked'});
+});
+
 test('utente DOS Google salva ordine Pagnottella con UID Firebase', async ({page}, testInfo) => {
   await mockFirebase(page);
   await page.goto('.');
@@ -129,19 +210,41 @@ test('utente DOS Google salva ordine Pagnottella con UID Firebase', async ({page
   await page.getByRole('button', {name:'Aggiungi al carrello'}).click();
   await page.locator('#notes').fill('Allergia di test');
   if (testInfo.project.name === 'mobile') {
-    await page.locator('#sendOrderBtn').evaluate(element => element.scrollIntoView({block:'center'}));
-    await page.locator('#sendOrderBtn').dispatchEvent('click');
-  } else {
-    await page.locator('#sendOrderBtn').click();
+    await page.getByRole('button', {name:'Vedi carrello'}).click();
   }
+  await page.locator('#sendOrderBtn').evaluate(element => {
+    const scroller = element.closest('.cartBody') as HTMLElement | null;
+    if(scroller) scroller.scrollTop = Math.max(0, (element as HTMLElement).offsetTop - scroller.clientHeight / 2);
+  });
+  if(testInfo.project.name === 'webkit') await page.locator('#sendOrderBtn').dispatchEvent('click');
+  else await page.locator('#sendOrderBtn').click();
+  await expect(page.locator('#paymentConfirmModal')).toHaveClass(/show/);
+  await expect(page.locator('#paymentConfirmCopy')).toContainText('Pagnottella Gourmet');
+  await expect(page.locator('#paymentConfirmCopy')).toContainText('+39 392 151 2515');
+  await expect(page.locator('#paymentConfirmAccept')).toHaveText('Conferma e apri WhatsApp');
+  await page.evaluate(() => {
+    const nativeOpen = window.open.bind(window);
+    window.open = (url?:string | URL, target?:string, features?:string) => {
+      (window as typeof window & {__lastWhatsAppOpen?:string}).__lastWhatsAppOpen = String(url || '');
+      return nativeOpen(url, target, features);
+    };
+  });
   const popupPromise = page.waitForEvent('popup');
   await page.locator('#paymentConfirmAccept').click();
   const popup = await popupPromise;
+  await expect.poll(() => page.evaluate(() => (window as typeof window & {__lastWhatsAppOpen?:string}).__lastWhatsAppOpen)).toContain('https://wa.me/393921512515?text=');
   await popup.close();
-  await expect(page.locator('#confirm')).toContainText('Ordine pg-created salvato');
+  await expect(page.locator('#confirm')).toContainText('Ordine pg-created registrato');
+  await expect(page.locator('#confirm')).toContainText('invia il messaggio');
+  await expect(page.locator('#whatsappStatus')).toBeVisible();
+  await expect(page.locator('#whatsappStatusCopy')).toContainText('+39 392 151 2515');
+  await expect(page.locator('#sendOrderLabel')).toHaveText('Riapri il riepilogo su WhatsApp');
+  await expect(page.locator('#cartCount')).toHaveText('1');
   const saved = await page.evaluate(() => ({
     user:JSON.parse(localStorage.getItem('dose_user') || 'null'),
-    order:(globalThis as typeof globalThis & {__lastOrder?:Record<string,unknown>}).__lastOrder
+    order:(globalThis as typeof globalThis & {__lastOrder?:Record<string,unknown>}).__lastOrder,
+    creates:(globalThis as typeof globalThis & {__orderCreates?:number}).__orderCreates,
+    checkout:JSON.parse(localStorage.getItem('pg_checkout_state_v1') || 'null')
   }));
   expect(saved.user).toMatchObject({email:'veronica.battaglia@dos.design',role:'dos_user',provider:'google.com'});
   expect(saved.order).toMatchObject({
@@ -151,6 +254,26 @@ test('utente DOS Google salva ordine Pagnottella con UID Firebase', async ({page
     supplierName:'La Pagnottella Gourmet',
     allergies:'Allergia di test'
   });
+  expect(saved.creates).toBe(1);
+  expect(saved.checkout).toMatchObject({orderId:'pg-created',status:'whatsapp_opened',whatsappOpened:true});
+  expect(saved.checkout).not.toHaveProperty('message');
+  expect(saved.checkout).not.toHaveProperty('notes');
+
+  await page.locator('#sendOrderBtn').click();
+  await expect(page.locator('#paymentConfirmTitle')).toHaveText('Riaprire il riepilogo?');
+  const reopenPromise = page.waitForEvent('popup');
+  await page.locator('#paymentConfirmAccept').click();
+  const reopened = await reopenPromise;
+  await reopened.close();
+  expect(await page.evaluate(() => (globalThis as typeof globalThis & {__orderCreates?:number}).__orderCreates)).toBe(1);
+
+  await page.getByRole('button', {name:'Ho inviato l’ordine'}).click();
+  await expect(page.locator('#paymentConfirmTitle')).toHaveText('Confermare l’invio?');
+  await page.locator('#paymentConfirmAccept').click();
+  await expect(page.locator('#checkoutCompleteModal')).toHaveClass(/show/);
+  await expect(page.locator('#checkoutCompleteSummary')).toContainText('Ordine pg-created');
+  await expect(page.locator('#cartCount')).toHaveText('0');
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('pg_checkout_state_v1') || 'null'))).toMatchObject({status:'user_confirmed_sent'});
 });
 
 test('supplier Pagnottella esegue solo query Pagnottella e non vede funzioni globali', async ({page}) => {

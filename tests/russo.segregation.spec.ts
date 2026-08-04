@@ -67,6 +67,49 @@ test('utente DOS ordina senza accesso a storico, analytics o export admin', asyn
   await expect(page.locator('#cart-count')).toHaveText('0');
 });
 
+async function prepareRussoOrderSave(page:Page, mode:'success'|'failure'|'delayed') {
+  await page.addInitScript(({user, mode}) => {
+    localStorage.setItem('dose_e2e', '1');
+    localStorage.setItem('dose_user', JSON.stringify(user));
+    localStorage.setItem('dose_e2e_orders_today', '[]');
+    (window as typeof window & {__russoSaveCalls?:number; __DOSE_E2E_SAVE_ORDER__?:(payload:unknown)=>Promise<{id:string}>}).__russoSaveCalls = 0;
+    (window as typeof window & {__russoSaveCalls?:number; __DOSE_E2E_SAVE_ORDER__?:(payload:unknown)=>Promise<{id:string}>}).__DOSE_E2E_SAVE_ORDER__ = async payload => {
+      const target = window as typeof window & {__russoSaveCalls?:number};
+      target.__russoSaveCalls = (target.__russoSaveCalls || 0) + 1;
+      if(mode === 'failure') throw Object.assign(new Error('simulated'), {code:'permission-denied'});
+      if(mode === 'delayed') await new Promise(resolve => setTimeout(resolve, 150));
+      if((payload as {supplierId?:string}).supplierId !== undefined) throw new Error('supplierId belongs to persisted document');
+      return {id:'russo-e2e-order'};
+    };
+  }, {user:users.dos_user, mode});
+  await page.goto('/russo/?e2e=1', {waitUntil:'domcontentloaded'});
+  await page.locator('#btn-menu').click();
+  const addButton = page.locator('[data-action="add-std"]:not([disabled])').first();
+  const productId = await addButton.getAttribute('data-id');
+  await page.evaluate(id => (window as typeof window & {addStdToCart:(value:string|null)=>void}).addStdToCart(id), productId);
+  await page.locator('#btn-cart').click();
+  await page.locator('[data-action="send-order"]').click();
+  await expect(page.locator('#order-send-modal')).toBeVisible();
+  await page.locator('#order-send-check').check();
+}
+
+test('salvataggio Russo conferma una sola scrittura e mostra successo', async ({page}) => {
+  await prepareRussoOrderSave(page, 'delayed');
+  const submit = page.locator('#order-send-submit');
+  await submit.dblclick({delay:10});
+  await expect(page.locator('#order-confirm-modal')).toBeVisible();
+  await expect.poll(() => page.evaluate(() => (window as typeof window & {__russoSaveCalls?:number}).__russoSaveCalls)).toBe(1);
+  await expect(page.locator('#cart-count')).toHaveText('0');
+});
+
+test('errore salvataggio Russo conserva carrello e consente retry', async ({page}) => {
+  await prepareRussoOrderSave(page, 'failure');
+  await page.locator('#order-send-submit').click();
+  await expect(page.locator('#order-send-error')).toContainText('Il carrello è intatto');
+  await expect(page.locator('#cart-count')).toHaveText('1');
+  await expect(page.locator('#order-send-submit')).toBeEnabled();
+});
+
 test('suite apre Russo senza nuovo login e torna alla scelta fornitore preservando la sessione', async ({ page }) => {
   await page.addInitScript(user => {
     localStorage.setItem('dose_e2e', '1');
@@ -114,7 +157,7 @@ test('sorgente Russo applica supplierId, query segregata e guard fornitore', asy
   const guard = fs.readFileSync('russo/russo-auth-guard.js', 'utf8');
   const access = fs.readFileSync('supplier-access.js', 'utf8');
   const suite = fs.readFileSync('pagnottella-gourmet/index.html', 'utf8');
-  expect(app).toContain('supplierId: "russo"');
+  expect(app).toContain("supplierId: 'russo'");
   expect(app).toContain('where("supplierId", "==", "russo")');
   expect(app).toContain('if(!isAdmin()) return;');
   expect(app).toContain("state.authzSource !== 'claims' && googleSession");
@@ -122,7 +165,9 @@ test('sorgente Russo applica supplierId, query segregata e guard fornitore', asy
   expect(app).toContain('requireSuiteGoogleSession()');
   expect(app).toContain('if(!state.pendingOrder || state.orderSubmitting) return;');
   expect(app).toContain('state.orderSubmitting = true;');
-  expect(app).toContain('Ordine non salvato: riprova tra un istante.');
+  expect(app).toContain('resolveOrderAuthUser');
+  expect(app).toContain('auth/session-missing');
+  expect(app).toContain('Il carrello è intatto');
   expect(guard).toContain("canAccessSupplier('russo', session)");
   expect(guard).toContain("params.get('suite') === 'production'");
   expect(guard).toContain("'/dosepranza/pagnottella-gourmet/?suite=production&v=suite-return-2'");

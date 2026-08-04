@@ -14,9 +14,10 @@
   }
   function polishCheckout(){
     const label = byId('sendOrderLabel');
-    if(label && !['Salvataggio ordine...', 'Ordini sospesi durante la chiusura'].includes(label.textContent)) label.textContent = 'Finalizza l’ordine tramite il suo invio su WhatsApp';
     const send = byId('sendOrderBtn');
-    if(send) send.setAttribute('aria-label', 'Finalizza l’ordine tramite il suo invio su WhatsApp');
+    if(!send || send.classList.contains('isBusy') || send.classList.contains('isWhatsAppOpened')) return;
+    if(label && label.textContent !== 'Ordini sospesi durante la chiusura') label.textContent = 'Apri il riepilogo su WhatsApp';
+    send.setAttribute('aria-label', 'Apri il riepilogo su WhatsApp');
   }
   function paymentHeading(text){
     const el = document.createElement('div');
