@@ -177,7 +177,19 @@ test('popup WhatsApp bloccato mantiene carrello e non duplica ordine', async ({p
   await page.locator('#grid .card').first().locator('.add').click();
   await page.getByRole('button', {name:'Aggiungi al carrello'}).click();
   if (testInfo.project.name === 'mobile') await page.getByRole('button', {name:'Vedi carrello'}).click();
-  await page.evaluate(() => { window.open = () => null; });
+  await page.evaluate(() => {
+    window.open = url => {
+      (window as typeof window & {__lastBlockedOpen?:string}).__lastBlockedOpen = String(url || '');
+      return null;
+    };
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable:true,
+      value:{writeText:(text:string) => {
+        (window as typeof window & {__copiedWhatsApp?:string}).__copiedWhatsApp = text;
+        return Promise.resolve();
+      }}
+    });
+  });
   if (testInfo.project.name === 'webkit') {
     await page.locator('#sendOrderBtn').dispatchEvent('click');
   } else {
@@ -188,6 +200,11 @@ test('popup WhatsApp bloccato mantiene carrello e non duplica ordine', async ({p
   await expect(page.locator('#whatsappStatusTitle')).toHaveText('Apertura automatica bloccata');
   await expect(page.locator('#whatsappStatusCopy')).toContainText('+39 392 151 2515');
   await expect(page.locator('#whatsappFallbackMessage')).toContainText('Riepilogo Ordine');
+  const blockedUrl = await page.evaluate(() => (window as typeof window & {__lastBlockedOpen?:string}).__lastBlockedOpen || '');
+  expect(blockedUrl).toContain('https://wa.me/393921512515?text=');
+  expect(blockedUrl.length).toBeGreaterThan(500);
+  await page.getByRole('button', {name:'Copia riepilogo'}).click();
+  await expect.poll(() => page.evaluate(() => (window as typeof window & {__copiedWhatsApp?:string}).__copiedWhatsApp)).toContain('Riepilogo Ordine');
   await expect(page.locator('#cartCount')).toHaveText('1');
   expect(await page.evaluate(() => (globalThis as typeof globalThis & {__orderCreates?:number}).__orderCreates)).toBe(1);
   await page.getByRole('button', {name:'Riprova WhatsApp'}).click();
