@@ -177,6 +177,7 @@ test('popup WhatsApp bloccato mantiene carrello e non duplica ordine', async ({p
   await page.locator('#grid .card').first().locator('.add').click();
   await page.getByRole('button', {name:'Aggiungi al carrello'}).click();
   if (testInfo.project.name === 'mobile') await page.getByRole('button', {name:'Vedi carrello'}).click();
+  await expect(page.locator('#sendOrderLabel')).toHaveText('Apri WhatsApp con Pagnottella Gourmet');
   await page.evaluate(() => {
     window.open = url => {
       (window as typeof window & {__lastBlockedOpen?:string}).__lastBlockedOpen = String(url || '');
