@@ -57,7 +57,7 @@ test('bootstrap elimina cache legacy senza richiedere swreset', async ({page}, t
   });
   await page.goto('./?e2e=1');
   await expect.poll(() => page.evaluate(() => caches.keys())).not.toContain('dose-legacy-cache');
-  await expect.poll(() => page.evaluate(() => localStorage.getItem('dose_cache_release'))).toBe('post-go-live-1');
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('dose_cache_release'))).toBe('post-go-live-2');
   await expect(page).not.toHaveURL(/swreset/);
   await expect(page.locator('#authGateGoogle')).toBeVisible();
 });
