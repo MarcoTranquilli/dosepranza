@@ -16,8 +16,8 @@
     const label = byId('sendOrderLabel');
     const send = byId('sendOrderBtn');
     if(!send || send.classList.contains('isBusy') || send.classList.contains('isWhatsAppOpened')) return;
-    if(label && label.textContent !== 'Ordini sospesi durante la chiusura') label.textContent = 'Apri il riepilogo su WhatsApp';
-    send.setAttribute('aria-label', 'Apri il riepilogo su WhatsApp');
+    const currentLabel = label?.textContent?.trim();
+    if(currentLabel) send.setAttribute('aria-label', currentLabel);
   }
   function paymentHeading(text){
     const el = document.createElement('div');
