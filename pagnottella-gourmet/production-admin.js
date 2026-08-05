@@ -41,7 +41,9 @@
     return localDay(new Date());
   }
   function supplierLabel(order) {
-    return order.supplierId === 'pagnottella' ? 'La Pagnottella Gourmet' : 'Alimentari Russo';
+    if (order.supplierId === 'pagnottella') return 'La Pagnottella Gourmet';
+    if (order.supplierId === 'russo') return 'Alimentari Russo';
+    return 'Ordine legacy non classificato';
   }
   function selectedSupplier() {
     if (!isAdmin()) return 'pagnottella';
@@ -50,7 +52,7 @@
   function scopedOrders() {
     const supplier = selectedSupplier();
     return supplier === 'all' ? orders : orders.filter(order => {
-      if (supplier === 'russo') return !order.supplierId || order.supplierId === 'russo';
+      if (supplier === 'russo') return order.supplierId === 'russo';
       return order.supplierId === supplier;
     });
   }
