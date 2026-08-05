@@ -28,13 +28,41 @@ test('supplier Russo vede esclusivamente ordini Russo e nessun controllo admin',
   await expect(page.locator('#btn-analytics')).toBeHidden();
 });
 
-test('Marco vede entrambi i fornitori e mantiene analytics', async ({ page }) => {
+test('Marco nel pannello Russo vede solo Russo e mantiene analytics segregate', async ({ page }) => {
   await openAs(page, users.admin);
   await page.locator('#btn-history').click();
-  await expect(page.locator('#orders-summary-count')).toHaveText('3 ordini · 7 pezzi');
-  await expect(page.locator('#all-orders-list')).toContainText('La Pagnottella Gourmet');
+  await expect(page.locator('#orders-summary-count')).toHaveText('2 ordini · 6 pezzi');
+  await expect(page.locator('#all-orders-list')).not.toContainText('La Pagnottella Gourmet');
+  await expect(page.locator('#all-orders-list')).not.toContainText('Saporito');
   await expect(page.locator('#history-ops-recon')).toBeVisible();
   await expect(page.locator('#btn-analytics')).toBeVisible();
+});
+
+test('listener realtime Russo ignora Pagnottella, legacy e pulisce lo stato al cambio account', async ({ page }) => {
+  await openAs(page, users.supplier);
+  await page.locator('#btn-history').click();
+  const legacy = {...coreOrdersFixture[0], id:'legacy-russo', supplierId:undefined, user:'Legacy Russo'};
+  const newPagnottella = {...pagnottellaOrderFixture, id:'pg-realtime', user:'Pagnottella Realtime'};
+  await page.evaluate(({orders, legacy, newPagnottella}) => {
+    const target = window as typeof window & {__DOSE_E2E_APPLY_ORDERS__?:(orders:unknown[])=>void};
+    target.__DOSE_E2E_APPLY_ORDERS__?.([...orders, legacy, newPagnottella]);
+  }, {orders:coreOrdersFixture, legacy, newPagnottella});
+  await expect(page.locator('#orders-summary-count')).toHaveText('2 ordini · 6 pezzi');
+  await expect(page.locator('#all-orders-list')).not.toContainText('Pagnottella Realtime');
+  await expect(page.locator('#all-orders-list')).not.toContainText('Legacy Russo');
+
+  const newRusso = {...coreOrdersFixture[0], id:'russo-realtime', user:'Russo Realtime'};
+  await page.evaluate(({orders, newRusso}) => {
+    const target = window as typeof window & {__DOSE_E2E_APPLY_ORDERS__?:(orders:unknown[])=>void};
+    target.__DOSE_E2E_APPLY_ORDERS__?.([...orders, newRusso]);
+  }, {orders:coreOrdersFixture, newRusso});
+  await expect(page.locator('#all-orders-list')).toContainText('Russo Realtime');
+
+  await page.evaluate(() => {
+    const target = window as typeof window & {__DOSE_E2E_RESET_STAFF__?:()=>void};
+    target.__DOSE_E2E_RESET_STAFF__?.();
+  });
+  await expect(page.locator('#all-orders-list')).not.toContainText('Russo Realtime');
 });
 
 test('Marco resta admin entrando in Russo dalla suite', async ({ page }) => {
@@ -159,6 +187,7 @@ test('sorgente Russo applica supplierId, query segregata e guard fornitore', asy
   const suite = fs.readFileSync('pagnottella-gourmet/index.html', 'utf8');
   expect(app).toContain("supplierId: 'russo'");
   expect(app).toContain('where("supplierId", "==", "russo")');
+  expect(app).not.toContain('query(ordersCol, orderBy("createdAt", "desc"))');
   expect(app).toContain('if(!isAdmin()) return;');
   expect(app).toContain("state.authzSource !== 'claims' && googleSession");
   expect(app).not.toContain("ROLE_EMAILS.admin.includes(e) || ROLE_NAMES.admin.includes(n)");

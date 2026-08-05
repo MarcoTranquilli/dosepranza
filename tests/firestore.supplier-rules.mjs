@@ -8,6 +8,7 @@ import {
   Timestamp,
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -28,6 +29,9 @@ const dos_user = env.authenticatedContext('uid-dos_user', googleClaims('utente@d
 const pagnottella = env.authenticatedContext('uid-pg', googleClaims('commerciale@lapagnottellagourmet.it')).firestore();
 const isidoro = env.authenticatedContext('uid-isidoro', googleClaims('isidorovagnozzi@gmail.com')).firestore();
 const russo = env.authenticatedContext('uid-russo', googleClaims('russolorenzo11@gmail.com')).firestore();
+const russoWithAdminClaim = env.authenticatedContext('uid-russo-claim', {
+  ...googleClaims('russolorenzo11@gmail.com'), role:'admin'
+}).firestore();
 const external = env.authenticatedContext('uid-ext', googleClaims('utente@gmail.com')).firestore();
 
 const order = (supplierId, uid, email) => ({
@@ -71,6 +75,11 @@ try {
   await assertFails(getDocs(globalQuery(russo)));
   await assertFails(getDoc(doc(russo, 'orders', 'pg-order')));
   await assertFails(getDoc(doc(russo, 'orders', 'legacy-order')));
+  const russoClaimResult = await assertSucceeds(getDocs(russoQuery(russoWithAdminClaim)));
+  if (russoClaimResult.size !== 1 || russoClaimResult.docs[0].id !== 'russo-order') throw new Error('Russo admin claim escaped supplier scope');
+  await assertFails(getDocs(globalQuery(russoWithAdminClaim)));
+  await assertFails(getDoc(doc(russoWithAdminClaim, 'orders', 'pg-order')));
+  await assertFails(deleteDoc(doc(russoWithAdminClaim, 'orders', 'russo-order')));
 
   const adminResult = await assertSucceeds(getDocs(globalQuery(admin)));
   if (adminResult.size !== 3) throw new Error('Admin global query incomplete');

@@ -479,6 +479,7 @@ async function changeLocalUser(){
   localStorage.removeItem('dose_preview_mode');
   authState.user = null;
   authState.message = '';
+  window.dispatchEvent(new CustomEvent('pagnottella:session-changed'));
   window.renderPagnottellaAdmin?.();
   showRecognition();
 }
