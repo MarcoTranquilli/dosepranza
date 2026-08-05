@@ -1,5 +1,5 @@
 (() => {
-  const RELEASE = 'post-go-live-2';
+  const RELEASE = 'supplier-segregation-1';
   const RELEASE_KEY = 'dose_cache_release';
   const currentUrl = new URL(window.location.href);
   const forcedReset = currentUrl.searchParams.has('swreset');

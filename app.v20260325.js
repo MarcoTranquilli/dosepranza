@@ -1,6 +1,6 @@
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut, signInAnonymously, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addDoc, serverTimestamp, query, orderBy, getDocs, runTransaction, doc, where, limit, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, serverTimestamp, query, orderBy, getDocs, runTransaction, doc, where, limit, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- DATABASE PRODOTTI COMPLETO ---
         const DIETS_CONFIG = { "carne/pesce": "🥩 Carne/Pesce", "vegetariano": "🧀 Vegetariano", "vegano": "🌱 Vegano" };
@@ -296,7 +296,25 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         const auth_fb = getAuth(app_fb);
         setPersistence(auth_fb, browserLocalPersistence).catch((e) => console.warn('auth persistence setup failed', e));
         if(!window.auth_fb) window.auth_fb = auth_fb;
-        const db_fb = initializeFirestore(app_fb, { experimentalForceLongPolling: true, localCache: persistentLocalCache() });
+        const purgeLegacyFirestorePersistence = async () => {
+            if(!window.indexedDB?.databases) return;
+            try {
+                const databases = await window.indexedDB.databases();
+                await Promise.all((databases || [])
+                    .map(entry => entry?.name || '')
+                    .filter(name => name.startsWith('firestore/'))
+                    .map(name => new Promise(resolve => {
+                        const request = window.indexedDB.deleteDatabase(name);
+                        request.onsuccess = () => resolve();
+                        request.onerror = () => resolve();
+                        request.onblocked = () => resolve();
+                    })));
+            } catch(e) {
+                console.warn('legacy Firestore cache cleanup skipped');
+            }
+        };
+        await purgeLegacyFirestorePersistence();
+        const db_fb = initializeFirestore(app_fb, { experimentalForceLongPolling: true, localCache: memoryLocalCache() });
         const ordersCol = collection(db_fb, "orders");
         const ordersAuditCol = collection(db_fb, "orders_audit");
         const frigeProductsCol = collection(db_fb, "frige_products");
@@ -422,11 +440,30 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 state.analytics.unsub[key] = null;
             });
         };
+        const clearStaffOrderState = () => {
+            state.ordersRawToday = [];
+            state.ordersToday = [];
+            state.ordersSelected = {};
+            state.analytics.ordersAll = [];
+            const list = document.getElementById('all-orders-list');
+            if(list) list.replaceChildren();
+            const total = document.getElementById('grand-total-display');
+            if(total) total.textContent = formatCurrency(0);
+            const summaryCount = document.getElementById('orders-summary-count');
+            if(summaryCount) summaryCount.textContent = '0 ordini · 0 pezzi';
+            const dailyCount = document.getElementById('daily-summary-count');
+            if(dailyCount) dailyCount.textContent = '0 ordini · 0 pezzi';
+        };
         const resetStaffSubscriptions = () => {
             resetOrdersSubscription();
             resetFrigeSubscription();
             resetAnalyticsSubscriptions();
         };
+        const resetStaffSessionState = () => {
+            resetStaffSubscriptions();
+            clearStaffOrderState();
+        };
+        if(isLocalE2E) window.__DOSE_E2E_RESET_STAFF__ = resetStaffSessionState;
         const resolveItemCategory = (item) => {
             const rawCat = (item?.cat || '').toString().trim();
             if(rawCat && rawCat !== 'Crea') return rawCat;
@@ -1003,7 +1040,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
 
         window.signOutUser = async () => {
             try {
-                resetStaffSubscriptions();
+                resetStaffSessionState();
                 resetMyOrdersSubscription();
                 await signOut(auth_fb);
                 state.user = null;
@@ -1341,7 +1378,11 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         };
 
         window.exportFullHistory = async () => {
-            const snap = await getDocs(query(ordersCol, orderBy("createdAt", "desc")));
+            const snap = await getDocs(query(
+                ordersCol,
+                where("supplierId", "==", "russo"),
+                orderBy("createdAt", "desc")
+            ));
             const fmt = (n) => {
                 if(n === null || n === undefined || n === '') return '';
                 const num = Number(n);
@@ -1351,6 +1392,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             let csv = "OrderID;TimestampISO8601;DataLeggibile;UserID;Utente;EmailUtente;Prodotto;Dettagli;CategoriaProdotto;Quantita;PrezzoUnitario;TotaleRiga;MetodoPagamento;Allergie;Posate;CanaleOrdine;StatoPagamento;RispostaRistoratore\n";
             snap.forEach(d => {
                 const o = d.data();
+                if(o.supplierId !== 'russo') return;
                 if(!isValidOrder(o)) return;
                 const ts = o.createdAt?.toDate();
                 o.items.forEach(i => {
@@ -2334,8 +2376,9 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 let totalG = 0;
                 const rawToday = (orders || [])
                     .map((order, index) => normalizeFixtureOrder(order, `order-${index + 1}`))
+                    .filter(o => o.supplierId === 'russo')
                     .filter(o => o.createdAt && o.createdAt.toDate() >= now)
-                    .filter(o => isAdmin() || (o.supplierId || 'russo') !== 'pagnottella');
+                    ;
                 state.ordersRawToday = rawToday;
                 state.ordersToday = rawToday.filter(isValidOrder);
                 const listEl = document.getElementById('all-orders-list');
@@ -2392,6 +2435,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 updateInvalidOrdersUI();
                 autoVoidInvalidOrders();
             };
+            if(isLocalE2E) window.__DOSE_E2E_APPLY_ORDERS__ = applyOrdersSnapshot;
             if(isLocalE2E) {
                 applyOrdersSnapshot(getE2EOrdersFixture() || []);
                 state.subs.orders = () => {};
@@ -2424,9 +2468,11 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 renderOrdersKPIs();
                 renderDailySummaryInline();
             };
-            const staffOrdersQuery = isAdmin()
-                ? query(ordersCol, orderBy("createdAt", "desc"))
-                : query(ordersCol, where("supplierId", "==", "russo"), orderBy("createdAt", "desc"));
+            const staffOrdersQuery = query(
+                ordersCol,
+                where("supplierId", "==", "russo"),
+                orderBy("createdAt", "desc")
+            );
             state.subs.orders = onSnapshot(staffOrdersQuery, snap => {
                 applyOrdersSnapshot(snap.docs.map(d => ({id: d.id, ...d.data()})));
             }, renderOrdersLoadError);
@@ -2671,9 +2717,14 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 renderAnalytics();
                 return;
             }
-            state.analytics.unsub.orders = onSnapshot(query(ordersCol, orderBy("createdAt", "desc")), snap => {
+            state.analytics.unsub.orders = onSnapshot(query(
+                ordersCol,
+                where("supplierId", "==", "russo"),
+                orderBy("createdAt", "desc")
+            ), snap => {
                 state.analytics.ordersAll = snap.docs
                     .map(d => ({ id: d.id, ...d.data() }))
+                    .filter(o => o.supplierId === 'russo')
                     .filter(isValidOrder);
                 renderAnalytics();
             });
@@ -3643,6 +3694,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
 
         async function setRole(email) {
             const e = normalizeEmail(email);
+            clearStaffOrderState();
             let role = 'user';
             state.authzSource = 'claims';
             state.authSignInProvider = '';
@@ -3688,6 +3740,19 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                         role = 'facility';
                         state.authzSource = 'email-map-fallback';
                     }
+                }
+                if(googleSession) {
+                    const mappedRole = ROLE_EMAILS.admin.includes(e)
+                        ? 'admin'
+                        : ROLE_EMAILS.ristoratore.includes(e)
+                            ? 'ristoratore'
+                            : ROLE_EMAILS.facility.includes(e)
+                                ? 'facility'
+                                : 'user';
+                    if(role !== mappedRole) state.authzSource = 'email-map-google';
+                    role = mappedRole;
+                } else {
+                    role = 'user';
                 }
                 state.role = role;
             }

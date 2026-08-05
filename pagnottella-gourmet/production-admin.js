@@ -185,8 +185,18 @@
     renderAnalytics();
     renderMenuGovernance();
   }
-  async function loadOrders() {
+  function clearOrderState() {
     if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+    orders = [];
+    firestore = null;
+    ['adminOrdersCount', 'analyticsOrders'].forEach(id => { if (byId(id)) byId(id).textContent = '0'; });
+    ['adminRevenue', 'adminAverage', 'adminPending', 'analyticsRevenue', 'analyticsAverage', 'analyticsPending'].forEach(id => {
+      if (byId(id)) byId(id).textContent = money(0);
+    });
+    if (byId('adminOrdersList')) byId('adminOrdersList').replaceChildren();
+  }
+  async function loadOrders() {
+    clearOrderState();
     if (!hasOrderAccess()) { renderAll(); return; }
     try {
       const [appSdk, firestoreSdk] = await Promise.all([
