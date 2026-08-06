@@ -39,19 +39,19 @@
     "id": "panini-carne-contadino-4",
     "name": "Contadino",
     "category": "panini-carne",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/panini_contadino__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "panini_contadino__supplier_20260806.webp"
   },
   {
     "id": "panini-carne-delicato-5",
     "name": "Delicato",
     "category": "panini-carne",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/panini_delicato__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "panini_delicato__supplier_20260806.webp"
   },
   {
     "id": "panini-carne-delizioso-6",
@@ -75,10 +75,10 @@
     "id": "panini-carne-emiliano-8",
     "name": "Emiliano",
     "category": "panini-carne",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/panini_emiliano__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "panini_emiliano__supplier_20260806.webp"
   },
   {
     "id": "panini-carne-fumino-9",
@@ -102,10 +102,10 @@
     "id": "panini-carne-gustoso-11",
     "name": "Gustoso",
     "category": "panini-carne",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/panini_gustoso__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "panini_gustoso__supplier_20260806.webp"
   },
   {
     "id": "panini-carne-marchigiano-12",
@@ -147,19 +147,19 @@
     "id": "panini-carne-oregan-16",
     "name": "Oregan",
     "category": "panini-carne",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/panini_oregan__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "panini_oregan__supplier_20260806.webp"
   },
   {
     "id": "panini-carne-paesano-17",
     "name": "Paesano",
     "category": "panini-carne",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/panini_paesano__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "panini_paesano__supplier_20260806.webp"
   },
   {
     "id": "panini-carne-pagnottella-18",
@@ -174,10 +174,10 @@
     "id": "panini-carne-quirino-19",
     "name": "Quirino",
     "category": "panini-carne",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/panini_quirino__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "panini_quirino__supplier_20260806.webp"
   },
   {
     "id": "panini-carne-rucolino-20",
@@ -210,10 +210,10 @@
     "id": "panini-carne-spock-23",
     "name": "Spock",
     "category": "panini-carne",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/panini_spock__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "panini_spock__supplier_20260806.webp"
   },
   {
     "id": "panini-carne-tartare-24",
@@ -228,19 +228,19 @@
     "id": "panini-carne-tirolo-25",
     "name": "Tirolo",
     "category": "panini-carne",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/panini_tirolo__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "panini_tirolo__supplier_20260806.webp"
   },
   {
     "id": "panini-carne-tonnato-26",
     "name": "Tonnato",
     "category": "panini-carne",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/panini_tonnato__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "panini_tonnato__supplier_20260806.webp"
   },
   {
     "id": "panini-carne-toscanaccio-27",
@@ -264,28 +264,28 @@
     "id": "panini-carne-transalpino-29",
     "name": "Transalpino",
     "category": "panini-carne",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/panini_transalpino__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "panini_transalpino__supplier_20260806.webp"
   },
   {
     "id": "panini-carne-trentino-30",
     "name": "Trentino",
     "category": "panini-carne",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/panini_trentino__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "panini_trentino__supplier_20260806.webp"
   },
   {
     "id": "panini-carne-trevigiano-31",
     "name": "Trevigiano",
     "category": "panini-carne",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/panini_trevigiano__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "panini_trevigiano__supplier_20260806.webp"
   },
   {
     "id": "panini-carne-valtella-32",
@@ -318,10 +318,10 @@
     "id": "panini-pesce-fumarello-1",
     "name": "Fumarello",
     "category": "panini-pesce",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/panini_fumarello__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "panini_fumarello__supplier_20260806.webp"
   },
   {
     "id": "panini-pesce-lampedusa-2",
@@ -408,28 +408,28 @@
     "id": "panini-pesce-san-jose-11",
     "name": "San Jose",
     "category": "panini-pesce",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/panini_san_jose__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "panini_san_jose__supplier_20260806.webp"
   },
   {
     "id": "panini-pesce-scirocco-12",
     "name": "Scirocco",
     "category": "panini-pesce",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/panini_scirocco__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "panini_scirocco__supplier_20260806.webp"
   },
   {
     "id": "panini-pesce-verduzzo-13",
     "name": "Verduzzo",
     "category": "panini-pesce",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/panini_verduzzo__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "panini_verduzzo__supplier_20260806.webp"
   },
   {
     "id": "panini-veg-burrata-0",
@@ -444,19 +444,19 @@
     "id": "panini-veg-campagnolo-1",
     "name": "Campagnolo",
     "category": "panini-veg",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/panini_campagnolo__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "panini_campagnolo__supplier_20260806.webp"
   },
   {
     "id": "panini-veg-caprese-2",
     "name": "Caprese",
     "category": "panini-veg",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/panini_caprese__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "panini_caprese__supplier_20260806.webp"
   },
   {
     "id": "panini-veg-ortolino-3",
@@ -498,19 +498,19 @@
     "id": "insalate-carne-giardiniera-0",
     "name": "Giardiniera",
     "category": "insalate-carne",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/insalate_giardiniera__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "insalate_giardiniera__supplier_20260806.webp"
   },
   {
     "id": "insalate-carne-leggera-1",
     "name": "Leggera",
     "category": "insalate-carne",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/insalate_leggera__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "insalate_leggera__supplier_20260806.webp"
   },
   {
     "id": "insalate-carne-suprema-2",
@@ -525,28 +525,28 @@
     "id": "insalate-carne-tartare-3",
     "name": "Tartare",
     "category": "insalate-carne",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/insalate_tartare__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "insalate_tartare__supplier_20260806.webp"
   },
   {
     "id": "insalate-carne-trevigiana-4",
     "name": "Trevigiana",
     "category": "insalate-carne",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/insalate_trevigiana__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "insalate_trevigiana__supplier_20260806.webp"
   },
   {
     "id": "insalate-carne-valtellina-5",
     "name": "Valtellina",
     "category": "insalate-carne",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/insalate_valtellina__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "insalate_valtellina__supplier_20260806.webp"
   },
   {
     "id": "insalate-carne-newyorkese-6",
@@ -561,10 +561,10 @@
     "id": "insalate-pesce-asiatica-0",
     "name": "Asiatica",
     "category": "insalate-pesce",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/insalate_asiatica__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "insalate_asiatica__supplier_20260806.webp"
   },
   {
     "id": "insalate-pesce-baccala-1",
@@ -588,28 +588,28 @@
     "id": "insalate-pesce-delicata-3",
     "name": "Delicata",
     "category": "insalate-pesce",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/insalate_delicata__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "insalate_delicata__supplier_20260806.webp"
   },
   {
     "id": "insalate-pesce-estiva-4",
     "name": "Estiva",
     "category": "insalate-pesce",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/insalate_estiva__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "insalate_estiva__supplier_20260806.webp"
   },
   {
     "id": "insalate-pesce-fresca-5",
     "name": "Fresca",
     "category": "insalate-pesce",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/insalate_fresca__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "insalate_fresca__supplier_20260806.webp"
   },
   {
     "id": "insalate-pesce-hawaii-6",
@@ -624,19 +624,19 @@
     "id": "insalate-pesce-isolana-7",
     "name": "Isolana",
     "category": "insalate-pesce",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/insalate_isolana__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "insalate_isolana__supplier_20260806.webp"
   },
   {
     "id": "insalate-pesce-lampedusa-8",
     "name": "Lampedusa",
     "category": "insalate-pesce",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/insalate_lampedusa__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "insalate_lampedusa__supplier_20260806.webp"
   },
   {
     "id": "insalate-pesce-mediterranea-9",
@@ -660,10 +660,10 @@
     "id": "insalate-pesce-pantelleria-11",
     "name": "Pantelleria",
     "category": "insalate-pesce",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/insalate_pantelleria__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "insalate_pantelleria__supplier_20260806.webp"
   },
   {
     "id": "insalate-pesce-salentina-12",
@@ -678,19 +678,19 @@
     "id": "insalate-pesce-san-jose-13",
     "name": "San Jose",
     "category": "insalate-pesce",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/insalate_san_jose__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "insalate_san_jose__supplier_20260806.webp"
   },
   {
     "id": "insalate-pesce-sicula-14",
     "name": "Sicula",
     "category": "insalate-pesce",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/insalate_sicula__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "insalate_sicula__supplier_20260806.webp"
   },
   {
     "id": "insalate-pesce-siracusa-15",
@@ -723,28 +723,28 @@
     "id": "insalate-pesce-vanitosa-18",
     "name": "Vanitosa",
     "category": "insalate-pesce",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/insalate_vanitosa__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "insalate_vanitosa__supplier_20260806.webp"
   },
   {
     "id": "insalate-veg-burrata-0",
     "name": "Burrata",
     "category": "insalate-veg",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/insalate_burrata__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "insalate_burrata__supplier_20260806.webp"
   },
   {
     "id": "insalate-veg-caprese-1",
     "name": "Caprese",
     "category": "insalate-veg",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/insalate_caprese__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "insalate_caprese__supplier_20260806.webp"
   },
   {
     "id": "insalate-veg-greca-2",
@@ -777,10 +777,10 @@
     "id": "insalate-veg-vegetariana-5",
     "name": "Vegetariana",
     "category": "insalate-veg",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
+    "image": "../assets/pagnottella/images/products/insalate_vegetariana__supplier_20260806.webp",
+    "specific": true,
+    "auditPublishable": true,
+    "sourceAsset": "insalate_vegetariana__supplier_20260806.webp"
   },
   {
     "id": "speciali-apollo-0",

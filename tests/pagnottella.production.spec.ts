@@ -321,3 +321,23 @@ test('Marco vede query globale e può riconciliare dopo update Firestore', async
   expect(update).toBeTruthy();
   expect(JSON.stringify(update)).toContain('reconciledBy');
 });
+
+test('foto fornitore responsive mantengono accessibilità e resa mobile/desktop', async ({page}) => {
+  await mockFirebase(page);
+  await page.goto('.');
+  await googleLogin(page);
+  await page.locator('.pagnottellaCard').click();
+  const card = page.locator('#grid .card').filter({hasText:'Contadino'}).first();
+  const image = card.locator('img');
+  await expect(image).toHaveAttribute('srcset', /640w.*1200w/);
+  await expect(image).toHaveAttribute('alt', 'Contadino');
+  await expect(image).toHaveAttribute('loading', 'lazy');
+  await expect(image).toHaveAttribute('decoding', 'async');
+  await image.scrollIntoViewIfNeeded();
+  await expect(image).toBeVisible();
+  await expect.poll(() => image.evaluate(element => ({
+    complete:(element as HTMLImageElement).complete,
+    width:(element as HTMLImageElement).naturalWidth
+  }))).toMatchObject({complete:true});
+  expect(await image.evaluate(element => (element as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
+});

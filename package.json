@@ -4,6 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "import:pagnottella-dos-images": "node scripts/import_pagnottella_dos_images.mjs",
+    "test:pagnottella-dos-images": "node tests/pagnottella.dos-images.mjs",
     "test:uat": "playwright test",
     "test:uat:headed": "playwright test --headed",
     "test:approval": "playwright test -c playwright.approval.config.ts",

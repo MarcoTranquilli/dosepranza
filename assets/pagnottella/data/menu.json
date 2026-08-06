@@ -121,21 +121,27 @@
       "price": 8,
       "desc": "crudo, mozzarella, melanzane grigliate*, pomodori secchi",
       "cat": "panini",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/panini_contadino__supplier_20260806.webp",
       "tags": [
         "Panino"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "panini_contadino__supplier_20260806.webp",
+        "sourceFilename": "contadino.jpg",
+        "sourceChecksum": "9bd5941e461c768463604869ecfd00213054cf08296ae07d7e8062ca538f111b",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/panini_contadino__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/panini_contadino__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "panini",
       "dietType": "onnivora",
@@ -148,22 +154,28 @@
       "price": 8,
       "desc": "petto di tacchino arrosto, zucchine grigliate*, mozzarella",
       "cat": "panini",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/panini_delicato__supplier_20260806.webp",
       "tags": [
         "Panino",
         "Proteico"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "panini_delicato__supplier_20260806.webp",
+        "sourceFilename": "delicato.JPG",
+        "sourceChecksum": "65fe181ca08a4cffce05bef56abfe032f91ebac6782dac8c21f9de1eed201da6",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/panini_delicato__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/panini_delicato__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "panini",
       "dietType": "onnivora",
@@ -231,22 +243,28 @@
       "price": 7,
       "desc": "crudo, stracchino, rucola",
       "cat": "panini",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/panini_emiliano__supplier_20260806.webp",
       "tags": [
         "Panino",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "panini_emiliano__supplier_20260806.webp",
+        "sourceFilename": "emiliano.jpg",
+        "sourceChecksum": "1ec20e87d585a29b360061a8d491e88c7973118238c126389f2cd8ec6ac3261a",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/panini_emiliano__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/panini_emiliano__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "panini",
       "dietType": "onnivora",
@@ -319,21 +337,27 @@
       "price": 7,
       "desc": "speck, ricotta, melanzane grigliate*",
       "cat": "panini",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/panini_gustoso__supplier_20260806.webp",
       "tags": [
         "Panino"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "panini_gustoso__supplier_20260806.webp",
+        "sourceFilename": "gustoso.jpg",
+        "sourceChecksum": "84b571b449924ec2161e03b0efc2f42309a0d65df73712a643e748b5dc51ac5c",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/panini_gustoso__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/panini_gustoso__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "panini",
       "dietType": "onnivora",
@@ -462,21 +486,27 @@
       "price": 7,
       "desc": "crudo, pomodoro, origano",
       "cat": "panini",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/panini_oregan__supplier_20260806.webp",
       "tags": [
         "Panino"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "panini_oregan__supplier_20260806.webp",
+        "sourceFilename": "oregan.jpg",
+        "sourceChecksum": "3cbd2269698ff0a33b23becedb7dad593380e4ce404a2322fe405f05b3454955",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/panini_oregan__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/panini_oregan__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "panini",
       "dietType": "onnivora",
@@ -489,21 +519,27 @@
       "price": 7,
       "desc": "crudo, melanzane grigliate*, provola affumicata",
       "cat": "panini",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/panini_paesano__supplier_20260806.webp",
       "tags": [
         "Panino"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "panini_paesano__supplier_20260806.webp",
+        "sourceFilename": "paesano.JPG",
+        "sourceChecksum": "577041df06ee4c17f89c7fc3015cc06c1dda92620425b7a759da56a7967ab9ab",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/panini_paesano__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/panini_paesano__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "panini",
       "dietType": "onnivora",
@@ -544,22 +580,28 @@
       "price": 8,
       "desc": "pastrami di manzo, mozzarella, pomodori secchi",
       "cat": "panini",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/panini_quirino__supplier_20260806.webp",
       "tags": [
         "Panino",
         "Proteico"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "panini_quirino__supplier_20260806.webp",
+        "sourceFilename": "quirino.jpg",
+        "sourceChecksum": "65e6b4688f9401d02fb3683a7f8924af87572b1a58d897e70f5db79519fc43de",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/panini_quirino__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/panini_quirino__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "panini",
       "dietType": "onnivora",
@@ -660,21 +702,27 @@
       "price": 8,
       "desc": "speck, pomodoro, provola affumicata, melanzane grigliate*",
       "cat": "panini",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/panini_spock__supplier_20260806.webp",
       "tags": [
         "Panino"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "panini_spock__supplier_20260806.webp",
+        "sourceFilename": "spock.JPG",
+        "sourceChecksum": "a7889ece20d1eb703275e834dd82f0188e8f9ca002aa2d4eace7e25561cb929e",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/panini_spock__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/panini_spock__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "panini",
       "dietType": "onnivora",
@@ -721,22 +769,28 @@
       "price": 8,
       "desc": "speck, crema di noci, brie, spinaci",
       "cat": "panini",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/panini_tirolo__supplier_20260806.webp",
       "tags": [
         "Panino",
         "Frutta secca"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "panini_tirolo__supplier_20260806.webp",
+        "sourceFilename": "tirolo.jpg",
+        "sourceChecksum": "b472b2a525567cd284a803ae96c17e9b3d46a10b74bdb4d5d598d24328de96bb",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/panini_tirolo__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/panini_tirolo__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "panini",
       "dietType": "onnivora",
@@ -749,22 +803,28 @@
       "price": 8,
       "desc": "pastrami di manzo, salsa tonnata, funghi champignon crudi",
       "cat": "panini",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/panini_tonnato__supplier_20260806.webp",
       "tags": [
         "Panino",
         "Proteico"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "panini_tonnato__supplier_20260806.webp",
+        "sourceFilename": "tonnato.jpg",
+        "sourceChecksum": "90e6f3f0309a629e40c273039834116831a4f26d8654a61e9517c331981cb958",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/panini_tonnato__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/panini_tonnato__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "panini",
       "dietType": "onnivora",
@@ -837,23 +897,29 @@
       "price": 7,
       "desc": "petto di tacchino arrosto, senape al miele, provola affumicata, insalata",
       "cat": "panini",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/panini_transalpino__supplier_20260806.webp",
       "tags": [
         "Panino",
         "Proteico",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "panini_transalpino__supplier_20260806.webp",
+        "sourceFilename": "transalpino.jpg",
+        "sourceChecksum": "ea94bbfcb394699261a12302fc1a264a0a72084fd0400287a4c9403afabb434e",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/panini_transalpino__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/panini_transalpino__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "panini",
       "dietType": "onnivora",
@@ -866,21 +932,27 @@
       "price": 7,
       "desc": "speck, brie, funghi champignon crudi",
       "cat": "panini",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/panini_trentino__supplier_20260806.webp",
       "tags": [
         "Panino"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "panini_trentino__supplier_20260806.webp",
+        "sourceFilename": "trentino.JPG",
+        "sourceChecksum": "64c06aa0c0ca80a275f4e643d71142e9ee6cd4ffd276a1e33635282f8175cbe4",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/panini_trentino__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/panini_trentino__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "panini",
       "dietType": "onnivora",
@@ -893,22 +965,28 @@
       "price": 8,
       "desc": "speck, gorgonzola, miele, noci, radicchio",
       "cat": "panini",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/panini_trevigiano__supplier_20260806.webp",
       "tags": [
         "Panino",
         "Frutta secca"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "panini_trevigiano__supplier_20260806.webp",
+        "sourceFilename": "trevigiano.jpg",
+        "sourceChecksum": "8b7930fc6f408e55aa4b75814871999d17ad9a6fe7e1d7cdafea75810544cbf3",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/panini_trevigiano__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/panini_trevigiano__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "panini",
       "dietType": "onnivora",
@@ -1006,22 +1084,28 @@
       "price": 8,
       "desc": "salmone, carciofini, provola affumicata",
       "cat": "panini",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/panini_fumarello__supplier_20260806.webp",
       "tags": [
         "Panino",
         "Proteico"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "panini_fumarello__supplier_20260806.webp",
+        "sourceFilename": "fumarello.jpg",
+        "sourceChecksum": "12dcebabcbe2f3a42889e5cd7eaa6d2137634058de76d62711b487c16e80a74a",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/panini_fumarello__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/panini_fumarello__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "panini",
       "dietType": "pescetariana",
@@ -1300,22 +1384,28 @@
       "price": 9,
       "desc": "carpaccio di tonno, guacamole, pomodoro, cavolo rosso",
       "cat": "panini",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/panini_san_jose__supplier_20260806.webp",
       "tags": [
         "Panino",
         "Proteico"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "panini_san_jose__supplier_20260806.webp",
+        "sourceFilename": "sanjose.jpg",
+        "sourceChecksum": "523db323a63fb7f720b046a1e9c230a2ee3c8281f46d18ed5d997ba3dd9dea2f",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/panini_san_jose__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/panini_san_jose__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "panini",
       "dietType": "pescetariana",
@@ -1328,23 +1418,29 @@
       "price": 10,
       "desc": "carpaccio di tonno, pate di olive, pomodoro, mozzarella, insalata",
       "cat": "panini",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/panini_scirocco__supplier_20260806.webp",
       "tags": [
         "Panino",
         "Proteico",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "panini_scirocco__supplier_20260806.webp",
+        "sourceFilename": "scirocco.jpg",
+        "sourceChecksum": "22698788d449b4b2d026c447f4e285b00e7de39268f5db2c25b85cd4d7feb159",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/panini_scirocco__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/panini_scirocco__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "panini",
       "dietType": "pescetariana",
@@ -1357,23 +1453,29 @@
       "price": 8,
       "desc": "salmone, guacamole, rucola, riduzione di balsamico",
       "cat": "panini",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/panini_verduzzo__supplier_20260806.webp",
       "tags": [
         "Panino",
         "Proteico",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "panini_verduzzo__supplier_20260806.webp",
+        "sourceFilename": "verduzzo.jpg",
+        "sourceChecksum": "76626fea039d8b3458de42bb71e05da48982a7a46fbe3db4e5c1422c7e3424ae",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/panini_verduzzo__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/panini_verduzzo__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "panini",
       "dietType": "pescetariana",
@@ -1420,22 +1522,28 @@
       "price": 8,
       "desc": "melanzane e zucchine grigliate*, pomodori secchi, ricotta",
       "cat": "panini",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/panini_campagnolo__supplier_20260806.webp",
       "tags": [
         "Panino",
         "Vegetariano"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "panini_campagnolo__supplier_20260806.webp",
+        "sourceFilename": "campagnolo.jpg",
+        "sourceChecksum": "b0845b3939b562747635492e847b1348e288c6647c3bc5bd1ee80da27ddeca94",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/panini_campagnolo__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/panini_campagnolo__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "panini",
       "dietType": "vegetariana",
@@ -1448,7 +1556,7 @@
       "price": 7,
       "desc": "mozzarella, pomodoro, basilico",
       "cat": "panini",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/panini_caprese__supplier_20260806.webp",
       "tags": [
         "Panino",
         "Vegetariano",
@@ -1456,16 +1564,22 @@
         "Leggero"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "panini_caprese__supplier_20260806.webp",
+        "sourceFilename": "caprese.JPG",
+        "sourceChecksum": "6eac9036f136c80d90c71d959785cdb052bc82ed8c6c9cb7263a14f4f8c482b5",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/panini_caprese__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/panini_caprese__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "panini",
       "dietType": "vegetariana",
@@ -1592,22 +1706,28 @@
       "price": 10,
       "desc": "uovo sodo, tonno, prosciutto cotto, mais, zucchine grigliate*",
       "cat": "insalate",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/insalate_giardiniera__supplier_20260806.webp",
       "tags": [
         "Insalata",
         "Proteico"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "insalate_giardiniera__supplier_20260806.webp",
+        "sourceFilename": "giardiniera.jpg",
+        "sourceChecksum": "abe4466e414c95476e2128e98f420f71fbf0f99c5340455b0ac004f25e8c11ec",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/insalate_giardiniera__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/insalate_giardiniera__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "insalate",
       "dietType": "onnivora",
@@ -1620,23 +1740,29 @@
       "price": 9,
       "desc": "cotto, mais, pachino, provola affumicata",
       "cat": "insalate",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/insalate_leggera__supplier_20260806.webp",
       "tags": [
         "Insalata",
         "Fresco",
         "Leggero"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "insalate_leggera__supplier_20260806.webp",
+        "sourceFilename": "leggera.jpg",
+        "sourceChecksum": "f59354163969de4be4c0187f2cdd8fe50c29977bc4ac3397f67f77120da9c033",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/insalate_leggera__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/insalate_leggera__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "insalate",
       "dietType": "onnivora",
@@ -1681,7 +1807,7 @@
       "price": 11,
       "desc": "tartare di manzo al coltello condita con capperi, senape al miele, tabasco, pepe, sale, olio, cavolo rosso, insalata",
       "cat": "insalate",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/insalate_tartare__supplier_20260806.webp",
       "tags": [
         "Insalata",
         "Proteico",
@@ -1689,16 +1815,22 @@
         "Top"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "insalate_tartare__supplier_20260806.webp",
+        "sourceFilename": "tartare.jpg",
+        "sourceChecksum": "bd2366a2414b5da49c68158cf7076dcbff4d7d9d532ee34d7b5f92448c6fca4e",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/insalate_tartare__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/insalate_tartare__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "insalate",
       "dietType": "onnivora",
@@ -1711,22 +1843,28 @@
       "price": 10,
       "desc": "speck, provola affumicata, noci, radicchio",
       "cat": "insalate",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/insalate_trevigiana__supplier_20260806.webp",
       "tags": [
         "Insalata",
         "Frutta secca"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "insalate_trevigiana__supplier_20260806.webp",
+        "sourceFilename": "trevigiana.jpg",
+        "sourceChecksum": "66de9e025ea6327e5190c7311b05bfd05ce7e16dc46f0d48b5798d0fdee46b13",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/insalate_trevigiana__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/insalate_trevigiana__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "insalate",
       "dietType": "onnivora",
@@ -1739,23 +1877,29 @@
       "price": 11,
       "desc": "bresaola, Grana Padano DOP, rucola, funghi champignon crudi, carpaccio di limone",
       "cat": "insalate",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/insalate_valtellina__supplier_20260806.webp",
       "tags": [
         "Insalata",
         "Proteico",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "insalate_valtellina__supplier_20260806.webp",
+        "sourceFilename": "valtellina.jpg",
+        "sourceChecksum": "951061bc2c38714b409ca9e2bc0cf13c933fb7ca694bfec3bccf9c7e5cd17ff2",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/insalate_valtellina__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/insalate_valtellina__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "insalate",
       "dietType": "onnivora",
@@ -1797,22 +1941,28 @@
       "price": 10,
       "desc": "salmone, edamame*, cavolo rosso, salsa di soia, sesamo",
       "cat": "insalate",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/insalate_asiatica__supplier_20260806.webp",
       "tags": [
         "Insalata",
         "Proteico"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "insalate_asiatica__supplier_20260806.webp",
+        "sourceFilename": "asiatica.jpg",
+        "sourceChecksum": "f794b5c068ffc52693f11384bdbc20d8976c67522c878aa4e0f46c703e533085",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/insalate_asiatica__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/insalate_asiatica__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "insalate",
       "dietType": "pescetariana",
@@ -1890,7 +2040,7 @@
       "price": 10,
       "desc": "salmone, zucchine grigliate*, rucola",
       "cat": "insalate",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/insalate_delicata__supplier_20260806.webp",
       "tags": [
         "Insalata",
         "Proteico",
@@ -1898,16 +2048,22 @@
         "Leggero"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "insalate_delicata__supplier_20260806.webp",
+        "sourceFilename": "delicata.jpg",
+        "sourceChecksum": "f6baf2769f02abed3ac524e0d3a1eee59845995a0b0ef6dab223460ff8b1e779",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/insalate_delicata__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/insalate_delicata__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "insalate",
       "dietType": "pescetariana",
@@ -1920,23 +2076,29 @@
       "price": 10,
       "desc": "gamberetti, mozzarella, pachino, mais",
       "cat": "insalate",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/insalate_estiva__supplier_20260806.webp",
       "tags": [
         "Insalata",
         "Proteico",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "insalate_estiva__supplier_20260806.webp",
+        "sourceFilename": "estiva.jpg",
+        "sourceChecksum": "0505eec9df9af83a8d12ad0c57bda36ca263624ab4272ce38658192d70bcf91d",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/insalate_estiva__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/insalate_estiva__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "insalate",
       "dietType": "pescetariana",
@@ -1949,23 +2111,29 @@
       "price": 10,
       "desc": "salmone, feta, cetriolo, semi di chia, rucola",
       "cat": "insalate",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/insalate_fresca__supplier_20260806.webp",
       "tags": [
         "Insalata",
         "Proteico",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "insalate_fresca__supplier_20260806.webp",
+        "sourceFilename": "fresca.jpg",
+        "sourceChecksum": "cf24023dfab950133d36693c3b14e042b091197e47376d12de84dcd9fbb24519",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/insalate_fresca__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/insalate_fresca__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "insalate",
       "dietType": "pescetariana",
@@ -2011,22 +2179,28 @@
       "price": 9,
       "desc": "tonno, feta, olive**, carciofini",
       "cat": "insalate",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/insalate_isolana__supplier_20260806.webp",
       "tags": [
         "Insalata",
         "Proteico"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "insalate_isolana__supplier_20260806.webp",
+        "sourceFilename": "isolana.jpg",
+        "sourceChecksum": "060c2064f4288ea222ffc0c965c6e934b31fa75a2ed8442eabb25f91c95c9412",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/insalate_isolana__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/insalate_isolana__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "insalate",
       "dietType": "pescetariana",
@@ -2039,23 +2213,29 @@
       "price": 11,
       "desc": "carpaccio di tonno, capperi, carpaccio di limone, basilico, insalata, zucchine grigliate*",
       "cat": "insalate",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/insalate_lampedusa__supplier_20260806.webp",
       "tags": [
         "Insalata",
         "Proteico",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "insalate_lampedusa__supplier_20260806.webp",
+        "sourceFilename": "lampedusa.jpg",
+        "sourceChecksum": "fb38ae5df91d987f3783cb50f5368a5b852eb2ce2ec682127f06db5cbd73ab3e",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/insalate_lampedusa__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/insalate_lampedusa__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "insalate",
       "dietType": "pescetariana",
@@ -2130,23 +2310,29 @@
       "price": 11,
       "desc": "carpaccio di pesce spada, melanzane grigliate*, pomodori secchi, granella di pistacchio",
       "cat": "insalate",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/insalate_pantelleria__supplier_20260806.webp",
       "tags": [
         "Insalata",
         "Proteico",
         "Frutta secca"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "insalate_pantelleria__supplier_20260806.webp",
+        "sourceFilename": "pantelleria.jpg",
+        "sourceChecksum": "57e639a01fac865e5e0557274363e795f48e54c1f69ac88a35f327dacb2d5647",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/insalate_pantelleria__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/insalate_pantelleria__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "insalate",
       "dietType": "pescetariana",
@@ -2189,22 +2375,28 @@
       "price": 11,
       "desc": "carpaccio di tonno, guacamole, pomodoro, cavolo rosso",
       "cat": "insalate",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/insalate_san_jose__supplier_20260806.webp",
       "tags": [
         "Insalata",
         "Proteico"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "insalate_san_jose__supplier_20260806.webp",
+        "sourceFilename": "sanjose.jpg",
+        "sourceChecksum": "6ea05e33bf07b3a4f23c34bbdf1d26692fffff60f300158b6417671a4662115d",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/insalate_san_jose__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/insalate_san_jose__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "insalate",
       "dietType": "pescetariana",
@@ -2217,23 +2409,29 @@
       "price": 10,
       "desc": "acciughe, pinoli, uvetta, mozzarella, pachino, origano",
       "cat": "insalate",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/insalate_sicula__supplier_20260806.webp",
       "tags": [
         "Insalata",
         "Fresco",
         "Frutta secca"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "insalate_sicula__supplier_20260806.webp",
+        "sourceFilename": "sicula.jpg",
+        "sourceChecksum": "469ab8bb6f9e9aec0f135f734c1e59f68836ff2f890f162a0a858877e3314515",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/insalate_sicula__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/insalate_sicula__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "insalate",
       "dietType": "pescetariana",
@@ -2342,23 +2540,29 @@
       "price": 10,
       "desc": "salmone, ceci, pachino, cavolo rosso",
       "cat": "insalate",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/insalate_vanitosa__supplier_20260806.webp",
       "tags": [
         "Insalata",
         "Proteico",
         "Fresco"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "insalate_vanitosa__supplier_20260806.webp",
+        "sourceFilename": "vanitosa.jpg",
+        "sourceChecksum": "c17d5761cb9dcafe05237d08316aa61a56f9f26a09acb14c4dd8c938555564ef",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/insalate_vanitosa__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/insalate_vanitosa__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "insalate",
       "dietType": "pescetariana",
@@ -2371,7 +2575,7 @@
       "price": 11,
       "desc": "burrata pugliese, pomodori secchi, pinoli, rucola",
       "cat": "insalate",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/insalate_burrata__supplier_20260806.webp",
       "tags": [
         "Insalata",
         "Vegetariano",
@@ -2379,16 +2583,22 @@
         "Frutta secca"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "insalate_burrata__supplier_20260806.webp",
+        "sourceFilename": "burrata_CMYK.jpg",
+        "sourceChecksum": "4b6ed62d475987ad5fa6e05a6e98e9cf37cfea8fbcea3b1814e707df5f46d99b",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/insalate_burrata__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/insalate_burrata__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "insalate",
       "dietType": "vegetariana",
@@ -2401,7 +2611,7 @@
       "price": 9,
       "desc": "mozzarella, pachino, basilico, olive**",
       "cat": "insalate",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/insalate_caprese__supplier_20260806.webp",
       "tags": [
         "Insalata",
         "Vegetariano",
@@ -2409,16 +2619,22 @@
         "Leggero"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "insalate_caprese__supplier_20260806.webp",
+        "sourceFilename": "caprese.jpg",
+        "sourceChecksum": "b642499f0a47d76ab0afa461cab64eb5b3b6d735419a9aa35d94ed3b05fee542",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/insalate_caprese__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/insalate_caprese__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "insalate",
       "dietType": "vegetariana",
@@ -2527,7 +2743,7 @@
       "price": 9,
       "desc": "melanzane e zucchine grigliate*, pomodori secchi, basilico",
       "cat": "insalate",
-      "img": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "img": "../assets/pagnottella/images/products/insalate_vegetariana__supplier_20260806.webp",
       "tags": [
         "Insalata",
         "Vegetariano",
@@ -2535,16 +2751,22 @@
         "Leggero"
       ],
       "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "assigned": true,
+        "specific": true,
+        "source": "fornitore-dos-20260806",
+        "confidence": "alta",
+        "label": "Foto specifica fornita dal ristoratore",
+        "mappingType": "foto_specifica_fornitore",
+        "filename": "insalate_vegetariana__supplier_20260806.webp",
+        "sourceFilename": "vegetariana.jpg",
+        "sourceChecksum": "c8e3962f45a937c504ba2b41f5ff1785280c915532ebcb56b83e48ef3fb56b73",
         "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
+        "requiresSupplierPhoto": false,
+        "auditPublishable": true,
+        "responsive": {
+          "mobile": "../assets/pagnottella/images/products/insalate_vegetariana__supplier_20260806-640.webp",
+          "desktop": "../assets/pagnottella/images/products/insalate_vegetariana__supplier_20260806.webp"
+        }
       },
       "categoryGroup": "insalate",
       "dietType": "vegana",
