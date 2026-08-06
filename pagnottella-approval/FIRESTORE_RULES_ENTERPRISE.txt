@@ -1,0 +1,181 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isRole(role) {
+      return isSignedIn() && request.auth.token.role == role;
+    }
+
+    function isGoogleProvider() {
+      return isSignedIn()
+        && request.auth.token.firebase.sign_in_provider == 'google.com';
+    }
+
+    function isStaffEmail() {
+      return isSignedIn() && request.auth.token.email in [
+        'marco.tranquilli@dos.design',
+        'lorenzo.russo@alimentarirusso',
+        'russolorenzo11@gmail.com',
+        'beatrice.binini@dos.design',
+        'commerciale@lapagnottellagourmet.it',
+        'isidorovagnozzi@gmail.com'
+      ];
+    }
+
+    function isAdminEmail() {
+      return isSignedIn()
+        && request.auth.token.email == 'marco.tranquilli@dos.design';
+    }
+
+    function isDosUser() {
+      return isGoogleProvider()
+        && request.auth.token.email.matches('^[^@]+@dos[.]design$');
+    }
+
+    function isPagnottellaSupplier() {
+      return isGoogleProvider()
+        && request.auth.token.email in [
+          'commerciale@lapagnottellagourmet.it',
+          'isidorovagnozzi@gmail.com'
+        ];
+    }
+
+    function isRussoSupplier() {
+      return isGoogleProvider()
+        && request.auth.token.email in [
+          'lorenzo.russo@alimentarirusso',
+          'russolorenzo11@gmail.com'
+        ];
+    }
+
+    function isStaff() {
+      return isSignedIn()
+        && (request.auth.token.role in ['admin', 'ristoratore', 'facility']);
+    }
+
+    function isStaffIdentity() {
+      return isStaff() || isStaffEmail();
+    }
+
+    function isOwnerByUid() {
+      return isSignedIn()
+        && resource.data.uid == request.auth.uid;
+    }
+
+    function isCreateOwnerByUid() {
+      return isSignedIn()
+        && request.resource.data.uid == request.auth.uid;
+    }
+
+    function isPagnottellaOrder() {
+      return 'supplierId' in resource.data
+        && resource.data.supplierId == 'pagnottella';
+    }
+
+    function isRussoOrder() {
+      return 'supplierId' in resource.data
+        && resource.data.supplierId == 'russo';
+    }
+
+    // Ordini:
+    // - utenti vedono i propri ordini tramite uid
+    // - admin vede tutti gli ordini
+    // - supplier Pagnottella vede solo ordini Pagnottella
+    // - supplier Russo vede solo ordini Russo
+    // - create consentita solo agli utenti DOS per il proprio uid
+    match /orders/{doc} {
+      allow read: if isAdminEmail()
+        || (isDosUser() && isOwnerByUid())
+        || (isPagnottellaSupplier() && isPagnottellaOrder())
+        || (isRussoSupplier() && isRussoOrder());
+
+      allow create: if isDosUser()
+        && isCreateOwnerByUid()
+        && request.resource.data.supplierId in ['russo', 'pagnottella'];
+
+      allow update: if isAdminEmail()
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.get('supplierId', null) == resource.data.get('supplierId', null)
+        && request.resource.data.diff(resource.data).changedKeys()
+          .hasOnly([
+            'paymentStatus',
+            'reconciled',
+            'reconciledAt',
+            'reconciledBy',
+            'orderStatus',
+            'statusUpdatedAt',
+            'statusUpdatedBy',
+            'voidedAt',
+            'voidedBy'
+          ]);
+
+      allow delete: if isAdminEmail();
+    }
+
+    // Configurazione multi-fornitore:
+    // - tutti gli utenti Google autenticati leggono lo stato pubblicato
+    // - solo l'amministratore modifica la visibilità
+    match /app_config/suppliers {
+      allow read: if isGoogleProvider();
+      allow create, update, delete: if isRole('admin') || isAdminEmail();
+    }
+
+    // Frige prodotti: gestione staff
+    match /frige_products/{doc} {
+      allow read: if isStaffIdentity();
+      allow write: if isStaffIdentity();
+    }
+
+    // Frige acquisti:
+    // - utente crea e legge i propri acquisti
+    // - staff legge/aggiorna tutti
+    match /frige_purchases/{doc} {
+      allow read: if isStaffIdentity() || isOwnerByUid();
+      allow create: if isCreateOwnerByUid();
+      allow update: if isStaffIdentity();
+    }
+
+    match /frige_refills/{doc} {
+      allow read, write: if isStaffIdentity();
+    }
+
+    // Disponibilità menu: lettura utenti, gestione staff
+    match /menu_products/{doc} {
+      allow read: if isSignedIn();
+      allow write: if isStaffIdentity();
+    }
+
+    // Storico creazioni custom e voti
+    match /custom_creations/{doc} {
+      allow read: if isSignedIn();
+
+      allow create: if isCreateOwnerByUid();
+
+      allow update: if isOwnerByUid() || (
+        isSignedIn()
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.email == resource.data.email
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.diff(resource.data).changedKeys()
+          .hasOnly(['votes', 'voters', 'updatedAt'])
+      );
+
+      allow delete: if isRole('admin');
+    }
+
+    // Audit menu: solo staff
+    match /menu_audit/{doc} {
+      allow read, write: if isStaffIdentity();
+    }
+
+    // Audit ordini: solo staff
+    match /orders_audit/{doc} {
+      allow read, write: if isStaffIdentity();
+    }
+  }
+}

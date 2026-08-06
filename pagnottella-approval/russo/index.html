@@ -16,7 +16,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css?v=20260210p">
-    <script src="supplier-access.js?v=4"></script>
+    <script src="supplier-access.js?v=7"></script>
     <script src="russo/russo-auth-guard.js?v=4"></script>
 </head>
 <body class="bg-background text-text-main pb-20 font-sans">
@@ -869,6 +869,7 @@
                 <input id="order-send-check" type="checkbox" class="h-4 w-4">
                 <span class="text-[11px] font-black text-primary">Confermo di voler inviare l’ordine</span>
             </label>
+            <p id="order-send-error" class="hidden mt-3 rounded-2xl border border-red-200 bg-red-50 p-3 text-[11px] font-bold text-red-700" role="alert"></p>
             <div class="flex gap-2 mt-4">
                 <button data-action="close-send-confirm" class="flex-1 btn btn-ghost text-[11px] py-3">Annulla</button>
                 <button id="order-send-submit" data-action="confirm-send-order" class="flex-1 btn btn-primary text-[11px] py-3" disabled>Invia ordine</button>
@@ -880,8 +881,8 @@
         <p id="toast-message"></p>
     </div>
 
-    <script type="module" src="sw-killer.js?v=pages-recovery-1"></script>
-    <script type="module" src="app.v20260325.js?v=16"></script>
+    <script type="module" src="sw-killer.js?v=pages-recovery-2"></script>
+    <script type="module" src="app.v20260325.js?v=supplier-segregation-1"></script>
 
 </body>
 </html>

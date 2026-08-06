@@ -1,6 +1,6 @@
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut, signInAnonymously, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addDoc, serverTimestamp, query, orderBy, getDocs, runTransaction, doc, where, limit, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, serverTimestamp, query, orderBy, getDocs, runTransaction, doc, where, limit, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- DATABASE PRODOTTI COMPLETO ---
         const DIETS_CONFIG = { "carne/pesce": "🥩 Carne/Pesce", "vegetariano": "🧀 Vegetariano", "vegano": "🌱 Vegano" };
@@ -180,6 +180,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             cart: [], currentView: 'menu', search: '', cat: 'all', diet: 'all', posate: false,
             custom: { base: null, subtype: null, ings: [], total: 3.5 },
             ordersToday: [], menuData: [], menuExtras: [], customMenuItems: [], menuOverrides: new Map(), disabledProducts: new Set(),
+            orderSubmitting: false,
             frige: { products: [], purchasesToday: [], refillsToday: [], selected: null, filter: 'all', paymentFilter: 'pending' },
             customCreations: [],
             customFilter: 'all',
@@ -215,7 +216,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(host.endsWith('github.io')) return '';
             return '/.netlify/functions/order_confirmation';
         })();
-        const SATISPAY_RUSSO_URL = 'http://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0';
+        const SATISPAY_RUSSO_URL = 'https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0';
         const STAFF_ORDERS_ENDPOINT = (() => {
             try {
                 const override = localStorage.getItem('dose_notify_base_url');
@@ -285,10 +286,6 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             ristoratore: ['lorenzo.russo@alimentarirusso', 'russolorenzo11@gmail.com'],
             facility: ['beatrice.binini@dos.design', 'monica.porta@dos.design']
         };
-        const ROLE_NAMES = {
-            admin: ['marco tranquilli'],
-            ristoratore: ['lorenzo russo']
-        };
         const isMappedStaffEmail = (email) => {
             const e = normalizeEmail(email);
             return ROLE_EMAILS.admin.includes(e) || ROLE_EMAILS.ristoratore.includes(e) || ROLE_EMAILS.facility.includes(e);
@@ -299,7 +296,25 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         const auth_fb = getAuth(app_fb);
         setPersistence(auth_fb, browserLocalPersistence).catch((e) => console.warn('auth persistence setup failed', e));
         if(!window.auth_fb) window.auth_fb = auth_fb;
-        const db_fb = initializeFirestore(app_fb, { experimentalForceLongPolling: true, localCache: persistentLocalCache() });
+        const purgeLegacyFirestorePersistence = async () => {
+            if(!window.indexedDB?.databases) return;
+            try {
+                const databases = await window.indexedDB.databases();
+                await Promise.all((databases || [])
+                    .map(entry => entry?.name || '')
+                    .filter(name => name.startsWith('firestore/'))
+                    .map(name => new Promise(resolve => {
+                        const request = window.indexedDB.deleteDatabase(name);
+                        request.onsuccess = () => resolve();
+                        request.onerror = () => resolve();
+                        request.onblocked = () => resolve();
+                    })));
+            } catch(e) {
+                console.warn('legacy Firestore cache cleanup skipped');
+            }
+        };
+        await purgeLegacyFirestorePersistence();
+        const db_fb = initializeFirestore(app_fb, { experimentalForceLongPolling: true, localCache: memoryLocalCache() });
         const ordersCol = collection(db_fb, "orders");
         const ordersAuditCol = collection(db_fb, "orders_audit");
         const frigeProductsCol = collection(db_fb, "frige_products");
@@ -333,6 +348,19 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(isLocalE2E) return true;
             if(state.authSignInProvider === 'google.com') return true;
             return !!auth_fb.currentUser && !auth_fb.currentUser.isAnonymous && getProviderIds().includes('google.com');
+        };
+        const isProductionSuiteEntry = () => new URLSearchParams(window.location.search).get('suite') === 'production';
+        const getSuiteSession = () => {
+            if(!isProductionSuiteEntry()) return null;
+            const session = window.DoseSupplierAccess?.getStoredUser?.();
+            return session?.provider === 'google.com' && session?.supplierIds?.includes('russo')
+                ? session
+                : null;
+        };
+        const requireSuiteGoogleSession = () => {
+            if(!isProductionSuiteEntry() || hasGoogleSession()) return true;
+            window.toast("Sessione Google in ripristino. Torna alla scelta fornitore e riprova.");
+            return false;
         };
         const requiresGoogleStaffVerification = (email = state.user?.email || '') => false;
         const canWriteMenuAdmin = () => (isAdmin() || isRistoratore()) && (
@@ -412,11 +440,30 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 state.analytics.unsub[key] = null;
             });
         };
+        const clearStaffOrderState = () => {
+            state.ordersRawToday = [];
+            state.ordersToday = [];
+            state.ordersSelected = {};
+            state.analytics.ordersAll = [];
+            const list = document.getElementById('all-orders-list');
+            if(list) list.replaceChildren();
+            const total = document.getElementById('grand-total-display');
+            if(total) total.textContent = formatCurrency(0);
+            const summaryCount = document.getElementById('orders-summary-count');
+            if(summaryCount) summaryCount.textContent = '0 ordini · 0 pezzi';
+            const dailyCount = document.getElementById('daily-summary-count');
+            if(dailyCount) dailyCount.textContent = '0 ordini · 0 pezzi';
+        };
         const resetStaffSubscriptions = () => {
             resetOrdersSubscription();
             resetFrigeSubscription();
             resetAnalyticsSubscriptions();
         };
+        const resetStaffSessionState = () => {
+            resetStaffSubscriptions();
+            clearStaffOrderState();
+        };
+        if(isLocalE2E) window.__DOSE_E2E_RESET_STAFF__ = resetStaffSessionState;
         const resolveItemCategory = (item) => {
             const rawCat = (item?.cat || '').toString().trim();
             if(rawCat && rawCat !== 'Crea') return rawCat;
@@ -502,7 +549,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 window.toast("Accesso non autorizzato");
                 return;
             }
-            if(!isLocalE2E && v === 'analytics' && !(isAdmin() || isRistoratore())) {
+            if(!isLocalE2E && v === 'analytics' && !isAdmin()) {
                 window.toast("Accesso non autorizzato");
                 return;
             }
@@ -778,7 +825,13 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             })();
             const email = state.user?.email || cached?.email || '-';
             const role = state.user ? state.role : 'non autenticato';
-            txt.textContent = `${email} · ${role}`;
+            const resolvedRole = state.user
+                ? (window.DoseSupplierAccess?.roleForEmail?.(email) || role)
+                : role;
+            const roleCopy = state.user
+                ? (window.DoseSupplierAccess?.roleLabel?.(resolvedRole) || resolvedRole)
+                : 'Non autenticato';
+            txt.textContent = `${email} · ${roleCopy}`;
 
             if(state.user) {
                 quick.classList.remove('hidden');
@@ -920,6 +973,13 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         };
 
         window.saveUserData = async () => {
+            const suiteSession = getSuiteSession();
+            if(suiteSession) {
+                persistUserIdentity(suiteSession.name, suiteSession.email);
+                document.getElementById('user-modal').classList.add('hidden');
+                await setRole(suiteSession.email);
+                return;
+            }
             if(auth_fb.currentUser && !auth_fb.currentUser.isAnonymous && auth_fb.currentUser.email) {
                 await adoptAuthenticatedUser(auth_fb.currentUser);
                 return;
@@ -940,7 +1000,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 document.getElementById('user-modal').classList.add('hidden');
                 await setRole(email);
                 syncMyOrders();
-                
+
             }
         };
 
@@ -980,7 +1040,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
 
         window.signOutUser = async () => {
             try {
-                resetStaffSubscriptions();
+                resetStaffSessionState();
                 resetMyOrdersSubscription();
                 await signOut(auth_fb);
                 state.user = null;
@@ -1010,6 +1070,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
 
         window.sendOrder = async () => {
             if(!state.user) return document.getElementById('user-modal').classList.remove('hidden');
+            if(!requireSuiteGoogleSession()) return;
             if(!ensureOrderWindow()) return;
             if(!state.cart.length) return window.toast("Carrello vuoto");
             const total = state.cart.reduce((s,i)=>s+i.price, 0);
@@ -1123,7 +1184,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             const check = document.getElementById('order-send-check');
             const submit = document.getElementById('order-send-submit');
             if(!modal || !box || !check || !submit) return;
-            if(isLocalE2E) {
+            if(isLocalE2E && typeof window.__DOSE_E2E_SAVE_ORDER__ !== 'function') {
                 state.pendingOrder = null;
                 state.cart = [];
                 const cartCount = document.getElementById('cart-count');
@@ -1150,24 +1211,72 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             state.pendingOrder = null;
         }
 
+        async function resolveOrderAuthUser() {
+            if(typeof auth_fb.authStateReady === 'function') await auth_fb.authStateReady();
+            let user = auth_fb.currentUser;
+            if(!user || user.isAnonymous) {
+                await window.DoseSupplierAccess?.resolveSession?.();
+                if(typeof auth_fb.authStateReady === 'function') await auth_fb.authStateReady();
+                user = auth_fb.currentUser;
+            }
+            if(!user || user.isAnonymous || !user.uid) {
+                const error = new Error('Sessione Google non disponibile');
+                error.code = 'auth/session-missing';
+                throw error;
+            }
+            return user;
+        }
+
+        const orderSaveDiagnostics = (error, phase) => ({
+            phase,
+            code: String(error?.code || 'unknown'),
+            hasCurrentUser: Boolean(auth_fb.currentUser),
+            isAnonymous: Boolean(auth_fb.currentUser?.isAnonymous),
+            hasUid: Boolean(auth_fb.currentUser?.uid),
+            supplierId: 'russo',
+            version: 'russo-order-save-1'
+        });
+
+        async function createRussoOrder(payload) {
+            if(isLocalE2E && typeof window.__DOSE_E2E_SAVE_ORDER__ === 'function') {
+                return window.__DOSE_E2E_SAVE_ORDER__(payload);
+            }
+            const authenticatedUser = await resolveOrderAuthUser();
+            return addDoc(ordersCol, {
+                user: state.user.name,
+                email: state.user.email,
+                uid: authenticatedUser.uid,
+                supplierId: 'russo',
+                items: payload.items,
+                total: payload.total,
+                allergies: payload.allergies || '',
+                posate: payload.posate || 'No',
+                paymentStatus: 'pending',
+                reconciled: false,
+                orderStatus: 'submitted',
+                orderType: 'order',
+                createdAt: serverTimestamp()
+            });
+        }
+
         async function confirmSendOrder() {
-            if(!state.pendingOrder) return;
+            if(!state.pendingOrder || state.orderSubmitting) return;
             const check = document.getElementById('order-send-check');
             if(check && !check.checked) return window.toast("Conferma l'invio");
             const payload = state.pendingOrder;
+            const submit = document.getElementById('order-send-submit');
+            const errorBox = document.getElementById('order-send-error');
+            state.orderSubmitting = true;
+            if(errorBox) {
+                errorBox.textContent = '';
+                errorBox.classList.add('hidden');
+            }
+            if(submit) {
+                submit.disabled = true;
+                submit.textContent = 'Invio ordine in corso…';
+            }
             try {
-                const docRef = await addDoc(ordersCol, { 
-                    user: state.user.name, email: state.user.email,
-                    uid: auth_fb.currentUser.uid,
-                    items: payload.items, total: payload.total, 
-                    allergies: payload.allergies,
-                    posate: payload.posate,
-                    paymentStatus: "pending",
-                    reconciled: false,
-                    orderStatus: "submitted",
-                    orderType: "order",
-                    createdAt: serverTimestamp() 
-                });
+                const docRef = await createRussoOrder(payload);
                 closeSendConfirm();
                 const summary = buildOrderConfirmSummary(docRef.id, payload.items, payload.total);
                 showOrderConfirm(summary);
@@ -1181,7 +1290,23 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                     });
                 state.pendingOrder = null;
                 state.cart = []; document.getElementById('cart-count').textContent='0'; window.navigate('history'); window.toast("Inviato!");
-            } catch(e) { alert("Connessione fallita. Carica online!"); }
+            } catch(e) {
+                console.warn('order save failed', orderSaveDiagnostics(e, 'firestore-create'));
+                const message = e?.code === 'auth/session-missing'
+                    ? 'Sessione Google non disponibile. Torna alla scelta fornitore, accedi di nuovo e riprova.'
+                    : 'Ordine non salvato. Il carrello è intatto: controlla la connessione e riprova.';
+                if(errorBox) {
+                    errorBox.textContent = message;
+                    errorBox.classList.remove('hidden');
+                }
+                window.toast(message);
+            } finally {
+                state.orderSubmitting = false;
+                if(submit) {
+                    submit.textContent = 'Invia ordine';
+                    submit.disabled = !state.pendingOrder || !(check && check.checked);
+                }
+            }
         }
 
         function showOrderConfirm(summary) {
@@ -1253,7 +1378,11 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         };
 
         window.exportFullHistory = async () => {
-            const snap = await getDocs(query(ordersCol, orderBy("createdAt", "desc")));
+            const snap = await getDocs(query(
+                ordersCol,
+                where("supplierId", "==", "russo"),
+                orderBy("createdAt", "desc")
+            ));
             const fmt = (n) => {
                 if(n === null || n === undefined || n === '') return '';
                 const num = Number(n);
@@ -1263,6 +1392,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             let csv = "OrderID;TimestampISO8601;DataLeggibile;UserID;Utente;EmailUtente;Prodotto;Dettagli;CategoriaProdotto;Quantita;PrezzoUnitario;TotaleRiga;MetodoPagamento;Allergie;Posate;CanaleOrdine;StatoPagamento;RispostaRistoratore\n";
             snap.forEach(d => {
                 const o = d.data();
+                if(o.supplierId !== 'russo') return;
                 if(!isValidOrder(o)) return;
                 const ts = o.createdAt?.toDate();
                 o.items.forEach(i => {
@@ -1588,7 +1718,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         };
 
         window.markOrderPayment = async (id, nextStatus) => {
-            if(!isRistoratore() && !isAdmin()) return;
+            if(!isAdmin()) return;
             try {
                 await runTransaction(db_fb, async (tx) => {
                     const ref = doc(db_fb, "orders", id);
@@ -1609,7 +1739,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         };
 
         window.setOrderStatus = async (id, status) => {
-            if(!isRistoratore() && !isAdmin()) return;
+            if(!isAdmin()) return;
             try {
                 await runTransaction(db_fb, async (tx) => {
                     const ref = doc(db_fb, "orders", id);
@@ -1669,7 +1799,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         };
 
         window.reconcileSelectedOrders = async () => {
-            if(!isRistoratore() && !isAdmin()) return;
+            if(!isAdmin()) return;
             const ids = Object.entries(state.ordersSelected).filter(([,v]) => v).map(([k]) => k);
             if(ids.length === 0) return window.toast("Nessun ordine selezionato");
             try {
@@ -1713,14 +1843,15 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 fullBtn.classList.toggle('btn-ghost', showOps);
             }
             if(subtitle) subtitle.textContent = showOps ? 'Vista operativa ristoratore' : 'Vista completa dettagli';
-            [opsPanel, opsKitchen, opsRecon].forEach(el => {
+            [opsPanel, opsKitchen].forEach(el => {
                 if(!el) return;
                 el.classList.toggle('hidden', !showOps);
             });
+            if(opsRecon) opsRecon.classList.toggle('hidden', !showOps || !isAdmin());
         };
 
         window.cleanupInvalidOrders = async () => {
-            if(!isRistoratore() && !isAdmin()) return;
+            if(!isAdmin()) return;
             const invalid = (state.ordersRawToday || []).filter(o => !isValidOrder(o));
             if(invalid.length === 0) return window.toast("Nessun tentativo da pulire");
             const ok = window.confirm(`Vuoi rimuovere ${invalid.length} ordini non validi di oggi?`);
@@ -1744,7 +1875,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         };
 
         async function autoVoidInvalidOrders() {
-            if(!isAdmin() && !isRistoratore()) return;
+            if(!isAdmin()) return;
             try {
                 const key = 'dose_auto_void_ts';
                 const last = parseInt(localStorage.getItem(key) || '0', 10);
@@ -2245,8 +2376,9 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 let totalG = 0;
                 const rawToday = (orders || [])
                     .map((order, index) => normalizeFixtureOrder(order, `order-${index + 1}`))
+                    .filter(o => o.supplierId === 'russo')
                     .filter(o => o.createdAt && o.createdAt.toDate() >= now)
-                    .filter(o => isAdmin() || (o.supplierId || 'russo') !== 'pagnottella');
+                    ;
                 state.ordersRawToday = rawToday;
                 state.ordersToday = rawToday.filter(isValidOrder);
                 const listEl = document.getElementById('all-orders-list');
@@ -2267,7 +2399,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                             ? `<div class="mt-2 text-[11px] text-red-700 font-bold">⚠️ ${esc(o.allergies.trim())}</div>`
                             : '';
                         const statusLabel = (o.orderStatus || 'submitted').toUpperCase();
-                        const statusBar = (isAdmin() || isRistoratore()) ? `
+                        const statusBar = isAdmin() ? `
                             <div class="mt-3 flex flex-wrap items-center gap-2">
                                 <span class="badge badge-quiet">Stato: ${esc(statusLabel)}</span>
                                 <button data-action="order-set-status" data-id="${o.id}" data-status="accepted" class="btn btn-ghost text-[10px] px-3 py-2">In preparazione</button>
@@ -2303,6 +2435,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 updateInvalidOrdersUI();
                 autoVoidInvalidOrders();
             };
+            if(isLocalE2E) window.__DOSE_E2E_APPLY_ORDERS__ = applyOrdersSnapshot;
             if(isLocalE2E) {
                 applyOrdersSnapshot(getE2EOrdersFixture() || []);
                 state.subs.orders = () => {};
@@ -2335,7 +2468,12 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 renderOrdersKPIs();
                 renderDailySummaryInline();
             };
-            state.subs.orders = onSnapshot(query(ordersCol, orderBy("createdAt", "desc")), snap => {
+            const staffOrdersQuery = query(
+                ordersCol,
+                where("supplierId", "==", "russo"),
+                orderBy("createdAt", "desc")
+            );
+            state.subs.orders = onSnapshot(staffOrdersQuery, snap => {
                 applyOrdersSnapshot(snap.docs.map(d => ({id: d.id, ...d.data()})));
             }, renderOrdersLoadError);
         }
@@ -2574,13 +2712,19 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
 
         function syncAnalytics() {
             if(!state.authReady) return;
+            if(!isAdmin()) return;
             if(state.analytics.unsub.orders || state.analytics.unsub.frige || state.analytics.unsub.products) {
                 renderAnalytics();
                 return;
             }
-            state.analytics.unsub.orders = onSnapshot(query(ordersCol, orderBy("createdAt", "desc")), snap => {
+            state.analytics.unsub.orders = onSnapshot(query(
+                ordersCol,
+                where("supplierId", "==", "russo"),
+                orderBy("createdAt", "desc")
+            ), snap => {
                 state.analytics.ordersAll = snap.docs
                     .map(d => ({ id: d.id, ...d.data() }))
+                    .filter(o => o.supplierId === 'russo')
                     .filter(isValidOrder);
                 renderAnalytics();
             });
@@ -3550,13 +3694,13 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
 
         async function setRole(email) {
             const e = normalizeEmail(email);
-            const n = normalizeName(state.user?.name);
+            clearStaffOrderState();
             let role = 'user';
             state.authzSource = 'claims';
             state.authSignInProvider = '';
 
             if(isLocalE2E) {
-                if(ROLE_EMAILS.admin.includes(e) || ROLE_NAMES.admin.includes(n)) role = 'admin';
+                if(ROLE_EMAILS.admin.includes(e)) role = 'admin';
                 else if(ROLE_EMAILS.ristoratore.includes(e)) role = 'ristoratore';
                 else if(ROLE_EMAILS.facility.includes(e)) role = 'facility';
                 state.role = role;
@@ -3585,17 +3729,30 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
                 }
 
                 // 2) Fallback: mapped staff emails (recovery mode)
-                if(role === 'user' && state.authzSource !== 'claims') {
-                    if(ROLE_EMAILS.admin.includes(e) || ROLE_NAMES.admin.includes(n)) {
+                if(role === 'user' && state.authzSource !== 'claims' && googleSession) {
+                    if(ROLE_EMAILS.admin.includes(e)) {
                         role = 'admin';
                         state.authzSource = 'email-map-fallback';
-                    } else if(ROLE_EMAILS.ristoratore.includes(e) || ROLE_NAMES.ristoratore.includes(n)) {
+                    } else if(ROLE_EMAILS.ristoratore.includes(e)) {
                         role = 'ristoratore';
                         state.authzSource = 'email-map-fallback';
                     } else if(ROLE_EMAILS.facility.includes(e)) {
                         role = 'facility';
                         state.authzSource = 'email-map-fallback';
                     }
+                }
+                if(googleSession) {
+                    const mappedRole = ROLE_EMAILS.admin.includes(e)
+                        ? 'admin'
+                        : ROLE_EMAILS.ristoratore.includes(e)
+                            ? 'ristoratore'
+                            : ROLE_EMAILS.facility.includes(e)
+                                ? 'facility'
+                                : 'user';
+                    if(role !== mappedRole) state.authzSource = 'email-map-google';
+                    role = mappedRole;
+                } else {
+                    role = 'user';
                 }
                 state.role = role;
             }
@@ -3608,6 +3765,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             const restockForm = document.getElementById('frige-restock-form');
             const historyBtn = document.getElementById('btn-history');
             const analyticsBtn = document.getElementById('btn-analytics');
+            const ordersReconPanel = document.getElementById('history-ops-recon');
             const mainNav = document.getElementById('main-nav');
             const frigeBtn = document.getElementById('btn-frige');
             const frigeWip = document.getElementById('frige-wip');
@@ -3623,6 +3781,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             hide(restockForm);
             hide(historyBtn);
             hide(analyticsBtn);
+            hide(ordersReconPanel);
 
             if(isAdmin()) show(adminExportBtn);
             if(isAdmin() || isRistoratore() || isFacility()) show(adminTools);
@@ -3631,7 +3790,8 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             if(isAdmin() || isRistoratore()) show(addForm);
             if(isAdmin() || isFacility()) show(restockForm);
             if(isAdmin() || isRistoratore()) show(historyBtn);
-            if(isAdmin() || isRistoratore()) show(analyticsBtn);
+            if(isAdmin()) show(analyticsBtn);
+            if(isAdmin()) show(ordersReconPanel);
 
             if (frigeBtn) {
                 if (isAdmin() || isRistoratore() || isFacility()) {
@@ -3725,6 +3885,13 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
             } else {
                 state.authReady = false;
                 state.authSignInProvider = '';
+                const suiteSession = getSuiteSession();
+                if(suiteSession) {
+                    persistUserIdentity(suiteSession.name, suiteSession.email);
+                    document.getElementById('user-modal').classList.add('hidden');
+                    await setRole(suiteSession.email);
+                    return;
+                }
                 // ensure we have an auth session to satisfy Firestore rules
                 try {
                     await signInAnonymously(auth_fb);
@@ -3829,7 +3996,7 @@ import { initializeFirestore, persistentLocalCache, collection, onSnapshot, addD
         });
 
         const init = () => {
-            if(!auth_fb.currentUser) {
+            if(!auth_fb.currentUser && !isProductionSuiteEntry()) {
                 signInAnonymously(auth_fb).catch(() => {});
             }
             state.menuData = Object.entries(RAW_MENU).flatMap(([cat, items]) => items.map((it, idx) => ({ ...it, cat, id: cat.replace(/\s/g,'')+idx })));

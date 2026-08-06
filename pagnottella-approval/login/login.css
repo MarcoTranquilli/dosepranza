@@ -1,0 +1,9 @@
+:root { --accent:#d6804f; --ink:#2f3327; --bg:#f7f6f1; }
+* { box-sizing: border-box; }
+body { margin:0; font-family: Arial, sans-serif; background: var(--bg); color: var(--ink); }
+.shell { min-height: 100vh; display:flex; align-items:center; justify-content:center; padding: 24px; }
+.card { background: #fff; border: 1px solid #e6e1d7; border-radius: 16px; padding: 28px; width: 100%; max-width: 420px; box-shadow: 0 8px 20px rgba(0,0,0,0.06); text-align:center; }
+h1 { font-size: 20px; margin-bottom: 8px; }
+p { font-size: 14px; color: #5b5f50; margin-bottom: 18px; }
+.btn { background: var(--accent); color: #fff; border: 0; padding: 12px 18px; border-radius: 12px; font-weight: 700; cursor: pointer; }
+.status { margin-top: 12px; font-size: 12px; color: #8a8f7f; }
