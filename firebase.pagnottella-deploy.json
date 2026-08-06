@@ -1,0 +1,6 @@
+{
+  "firestore": {
+    "rules": "firestore.pagnottella-production.proposed.rules",
+    "indexes": "firestore.pagnottella-production.proposed.indexes.json"
+  }
+}

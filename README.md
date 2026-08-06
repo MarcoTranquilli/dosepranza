@@ -4,9 +4,11 @@
 
 ## Produzione attiva
 
-- URL live: `https://marcotranquilli.github.io/dosepranza/`
-- Deploy: GitHub Pages (branch `main`)
-- Nota: le sezioni Netlify sotto sono legacy e non usate nel flusso corrente.
+- Link ufficiale utenti: `https://app-dosepranza.netlify.app/`
+- Fallback tecnico GitHub Pages: `https://marcotranquilli.github.io/dosepranza/`
+- Reset tecnico, solo se necessario: `https://marcotranquilli.github.io/dosepranza/?swreset=1`
+- La root Netlify reindirizza alla suite multi-fornitore pubblicata su GitHub Pages.
+- I percorsi diretti Russo, Pagnottella e approval restano riservati a test tecnici e regressione.
 
 ## Release Policy
 
@@ -23,8 +25,9 @@ Regola operativa:
 - non si pubblica su Netlify per provare fix frontend che possono essere validati prima su GitHub Pages
 
 Documenti di riferimento:
-- [Core Guardrails](/Users/marcotranquilli/Documents/GitHub/dosepranza/docs/CORE_GUARDRAILS.md)
-- [Secure Implementation Plan](/Users/marcotranquilli/Documents/GitHub/dosepranza/docs/SECURE_IMPLEMENTATION_PLAN.md)
+- [Core Guardrails](docs/CORE_GUARDRAILS.md)
+- [Secure Implementation Plan](docs/SECURE_IMPLEMENTATION_PLAN.md)
+- [Runbook multi-fornitore](docs/MULTI_SUPPLIER_RUNBOOK.md)
 
 ## Rilascio rapido su Netlify
 

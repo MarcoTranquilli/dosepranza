@@ -9,6 +9,7 @@ function todayAt(hour: number, minute: number, second = 0) {
 export const coreOrdersFixture = [
   {
     id: 'order-gabriele',
+    supplierId: 'russo',
     user: 'Gabriele Maria Cirulli',
     email: 'gabrielemariacirulli@gmail.com',
     createdAt: todayAt(11, 5, 15),
@@ -26,6 +27,7 @@ export const coreOrdersFixture = [
   },
   {
     id: 'order-lorenzo-zuaro',
+    supplierId: 'russo',
     user: 'Lorenzo Zuaro',
     email: 'lorenzo.zuaro@gmail.com',
     createdAt: todayAt(9, 43, 56),
@@ -58,11 +60,37 @@ export const userOrdersFixture = [
   }
 ];
 
+export const pagnottellaOrderFixture = {
+  id: 'order-pagnottella-marco',
+  supplierId: 'pagnottella',
+  supplierName: 'La Pagnottella Gourmet',
+  user: 'Marco Tranquilli',
+  email: 'marco.tranquilli@dos.design',
+  uid: 'admin-e2e',
+  createdAt: todayAt(11, 20, 0),
+  orderStatus: 'submitted',
+  paymentStatus: 'pending',
+  paymentMethod: 'Satispay',
+  reconciled: false,
+  total: 6.4,
+  allergies: 'No cipolla',
+  items: [
+    { name: 'Saporito', details: 'Pane bianco', price: 6.4 }
+  ]
+};
+
 export async function seedCoreOrders(page: Page) {
   await page.addInitScript((orders) => {
     window.localStorage.setItem('dose_e2e', '1');
     window.localStorage.setItem('dose_e2e_orders_today', JSON.stringify(orders));
   }, coreOrdersFixture);
+}
+
+export async function seedMultiSupplierOrders(page: Page) {
+  await page.addInitScript((orders) => {
+    window.localStorage.setItem('dose_e2e', '1');
+    window.localStorage.setItem('dose_e2e_orders_today', JSON.stringify(orders));
+  }, [...coreOrdersFixture, pagnottellaOrderFixture]);
 }
 
 export async function seedUserOrders(page: Page) {

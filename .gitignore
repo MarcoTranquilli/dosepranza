@@ -1,7 +1,15 @@
 node_modules/
+backfill-manifests/
+.DS_Store
 playwright-report/
 test-results/
+firestore-debug.log
 tests/.auth/
-.DS_Store
 dist/
+dist-approval/
+dist-production/
 output/
+tmp/
+
+# Local Netlify folder
+.netlify

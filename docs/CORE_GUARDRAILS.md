@@ -4,7 +4,7 @@
 Proteggere i flussi core di DOSepranza da regressioni durante futuri sviluppi.
 
 ## Flussi core da considerare bloccanti
-1. Accesso utente con `nome + mail`.
+1. Accesso utente con sessione Google verificata; `localStorage` non e' una sorgente di autorizzazione in produzione.
 2. Accesso staff con riconoscimento ruolo coerente.
 3. Visualizzazione `I tuoi ordini`.
 4. Visualizzazione `TUTTI` con:
@@ -13,6 +13,12 @@ Proteggere i flussi core di DOSepranza da regressioni durante futuri sviluppi.
    - lista ordini da riconciliare
 5. Gestione menu admin.
 6. Flussi `Fridge` per staff.
+7. Instradamento multi-fornitore:
+   - scelta fornitore visibile ad admin e utenti DOS
+   - supplier limitato al proprio fornitore
+   - utenti esterni esclusi
+   - admin sempre autorizzato su tutti i fornitori
+8. Salvataggio ordine Pagnottella su Firestore prima dell'apertura di WhatsApp.
 
 ## Regole operative
 1. Il percorso dati core deve avere una sola sorgente primaria.
@@ -25,6 +31,7 @@ Proteggere i flussi core di DOSepranza da regressioni durante futuri sviluppi.
    - admin
    - ristoratore
    - facility
+6. Le modifiche a `supplier-access.js`, `app_config/suppliers` o al payload ordini richiedono test multi-ruolo e test del salvataggio ordine.
 
 ## Guardrail automatici gia' attivi
 1. UAT Playwright su GitHub Actions.

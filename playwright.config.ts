@@ -22,8 +22,8 @@ export default defineConfig({
       testMatch: /.*\.setup\.ts/
     },
     {
-      name: 'security',
-      testMatch: /.*security\.auth\.spec\.ts/
+      name: 'preview',
+      testMatch: /.*pagnottella\.preview\.spec\.ts/
     },
     {
       name: 'user',
