@@ -140,7 +140,7 @@ test('sessione suite condivisa apre Russo senza seconda autenticazione', async (
       provider:'google.com'
     }));
   });
-  await page.goto('russo/?suite=approval&e2e=1');
+  await page.goto('russo/?suite=approval&e2e=1', {waitUntil:'domcontentloaded'});
   await expect(page.locator('#btn-menu')).toBeVisible();
   await expect(page.locator('#user-modal')).toHaveClass(/hidden/);
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('dose_user') || 'null'))).toMatchObject({
