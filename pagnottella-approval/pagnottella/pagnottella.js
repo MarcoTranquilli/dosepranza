@@ -200,7 +200,7 @@ function hydrateStatic(){
   byId('heroText').textContent = `Menu dedicato con prezzi originali e scontati sempre visibili. Ordina e paga entro le ${orderCutoffCopy}, poi ricevi la consegna gratuita alle ${deliveryTimeCopy}.`;
   byId('contact-address').textContent = DATA.contact.address;
   byId('contact-hours').textContent = DATA.contact.hours;
-  byId('contact-whatsapp').href = whatsappUrl('Buongiorno, desidero informazioni sul servizio DOSepranza.');
+  byId('contact-whatsapp').href = DATA.contact.whatsappUrl;
   byId('contact-site').href = DATA.contact.website;
   byId('price-validity-note').textContent = DATA.notes?.priceValidity
     || `Ricette e prezzi soggetti a conferma del punto vendita. Lo sconto estivo viene applicato automaticamente fino al ${formatDate(DATA.discount?.activeUntil)}.`;
@@ -695,11 +695,7 @@ function card(p){
   const hasSpecificImage = p.imageMeta?.specific === true;
   const alt = hasSpecificImage ? p.name : `La Pagnottella Gourmet - foto specifica non disponibile per ${p.name}`;
   const addLabel = isOrderingClosed() ? 'Ordini sospesi' : `Aggiungi ${p.name}`;
-  const responsive = p.imageMeta?.responsive;
-  const srcset = responsive?.mobile && responsive?.desktop
-    ? ` srcset="${esc(responsive.mobile)} 640w, ${esc(responsive.desktop)} 1200w" sizes="(max-width:640px) 92vw, (max-width:1100px) 46vw, 360px"`
-    : '';
-  return `<article class="card ${hasSpecificImage ? '' : 'imageFallback'}"><div class="pic"><img src="${esc(p.img)}"${srcset} alt="${esc(alt)}" loading="lazy" decoding="async"><div class="badges">${badges.map(t=>`<span class="badge">${esc(t)}</span>`).join('')}</div>${hasSpecificImage ? '' : '<span class="imageNotice">Foto specifica non disponibile</span>'}</div><div class="body"><div class="nameRow"><h4>${esc(p.name)}</h4><div class="price"><span class="old">${money(p.price)}</span>${money(discountedPrice(p.price))}</div></div><p class="desc">${esc(p.desc)}</p><div class="meta"><span class="tag">${esc(clusterLabel(p.categoryGroup))}</span>${(p.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div><div class="actions"><button class="details" onclick="openDetails('${p.id}')">Dettagli</button><button class="add" aria-label="${esc(addLabel)}" onclick="quickAdd('${p.id}')" ${isOrderingClosed() ? 'disabled' : ''}>${isOrderingClosed() ? 'Chiuso' : '+'}</button></div></div></article>`;
+  return `<article class="card ${hasSpecificImage ? '' : 'imageFallback'}"><div class="pic"><img src="${p.img}" alt="${esc(alt)}" loading="lazy"><div class="badges">${badges.map(t=>`<span class="badge">${esc(t)}</span>`).join('')}</div>${hasSpecificImage ? '' : '<span class="imageNotice">Foto specifica non disponibile</span>'}</div><div class="body"><div class="nameRow"><h4>${esc(p.name)}</h4><div class="price"><span class="old">${money(p.price)}</span>${money(discountedPrice(p.price))}</div></div><p class="desc">${esc(p.desc)}</p><div class="meta"><span class="tag">${esc(clusterLabel(p.categoryGroup))}</span>${(p.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div><div class="actions"><button class="details" onclick="openDetails('${p.id}')">Dettagli</button><button class="add" aria-label="${esc(addLabel)}" onclick="quickAdd('${p.id}')" ${isOrderingClosed() ? 'disabled' : ''}>${isOrderingClosed() ? 'Chiuso' : '+'}</button></div></div></article>`;
 }
 function openDetails(id){
   const p = PRODUCTS.find(x => x.id === id);
@@ -707,9 +703,6 @@ function openDetails(id){
   state.option = defaultOption(p);
   state.selectedExtras = [];
   byId('drawerImg').src = p.img;
-  byId('drawerImg').srcset = p.imageMeta?.responsive
-    ? `${p.imageMeta.responsive.mobile} 640w, ${p.imageMeta.responsive.desktop} 1200w`
-    : '';
   byId('drawerImg').alt = p.name;
   byId('drawerName').textContent = p.name;
   byId('drawerDesc').textContent = p.desc;
@@ -851,10 +844,7 @@ function buildMessage(){
   return msg;
 }
 function cap(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
-function whatsappUrl(message = buildMessage()){
-  const number = String(DATA?.whatsapp?.normalizedNumber || DATA?.whatsapp || '').replace(/\D/g, '');
-  return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
-}
+function whatsappUrl(){ const params = new URLSearchParams({ phone:DATA.whatsapp, text:buildMessage(), type:'phone_number', app_absent:'0' }); return 'https://api.whatsapp.com/send/?' + params.toString(); }
 function buildOrderPayload(){
   const t = totals();
   const items = t.items.flatMap(item => Array.from({ length:item.qty }, () => ({
