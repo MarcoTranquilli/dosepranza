@@ -56,8 +56,9 @@ test('bootstrap elimina cache legacy senza richiedere swreset', async ({page}, t
     await legacy.put('./legacy-response', new Response('stale'));
   });
   await page.goto('./?e2e=1');
+  await expect(page).toHaveURL(/cachev=discount-whatsapp-1/);
   await expect.poll(() => page.evaluate(() => caches.keys())).not.toContain('dose-legacy-cache');
-  await expect.poll(() => page.evaluate(() => localStorage.getItem('dose_cache_release'))).toBe('supplier-segregation-1');
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('dose_cache_release'))).toBe('discount-whatsapp-1');
   await expect(page).not.toHaveURL(/swreset/);
   await expect(page.locator('#authGateGoogle')).toBeVisible();
 });
@@ -170,12 +171,18 @@ test('metodo di pagamento comunica selezione senza sovrapposizioni', async ({pag
 
 test('popup WhatsApp bloccato mantiene carrello e non duplica ordine', async ({page}, testInfo) => {
   await mockFirebase(page);
+  await page.addInitScript(() => {
+    (window as Window & { __PAGNOTTELLA_NOW__?: string }).__PAGNOTTELLA_NOW__ = '2026-09-01T10:51:00+02:00';
+  });
   await page.goto('.');
   await googleLogin(page);
   await page.locator('.pagnottellaCard').click();
   await page.locator('#search').fill('Saporito');
   await page.locator('#grid .card').first().locator('.add').click();
   await page.getByRole('button', {name:'Aggiungi al carrello'}).click();
+  await expect(page.locator('#discountLabel')).toContainText('10%');
+  await expect(page.locator('#discountLabel')).toContainText('Sconto DOSepranza');
+  await expect(page.locator('#finalTotal')).toContainText('€7,20');
   if (testInfo.project.name === 'mobile') await page.getByRole('button', {name:'Vedi carrello'}).click();
   await expect(page.locator('#sendOrderLabel')).toHaveText('Apri WhatsApp con Pagnottella Gourmet');
   await page.evaluate(() => {
@@ -200,12 +207,21 @@ test('popup WhatsApp bloccato mantiene carrello e non duplica ordine', async ({p
   await expect(page.locator('#confirm')).toContainText('browser ha bloccato');
   await expect(page.locator('#whatsappStatusTitle')).toHaveText('Apertura automatica bloccata');
   await expect(page.locator('#whatsappStatusCopy')).toContainText('+39 392 151 2515');
-  await expect(page.locator('#whatsappFallbackMessage')).toContainText('Riepilogo Ordine');
+  await expect(page.locator('#whatsappFallbackMessage')).toContainText('Ordine tramite DOSepranza');
+  await expect(page.locator('#whatsappFallbackMessage')).toContainText('👤 Cliente');
+  await expect(page.locator('#whatsappFallbackMessage')).toContainText('🥪 Ordine');
+  await expect(page.locator('#whatsappFallbackMessage')).not.toContainText('Punto Vendita');
+  await expect(page.locator('#whatsappFallbackMessage')).not.toContainText('Note pagamento:');
   const blockedUrl = await page.evaluate(() => (window as typeof window & {__lastBlockedOpen?:string}).__lastBlockedOpen || '');
   expect(blockedUrl).toContain('https://wa.me/393921512515?text=');
-  expect(blockedUrl.length).toBeGreaterThan(500);
+  const decodedMessage = new URL(blockedUrl).searchParams.get('text') || '';
+  expect(decodedMessage).toContain('👤 Cliente');
+  expect(decodedMessage).toContain('🥪 Ordine');
+  expect(decodedMessage).not.toContain('�');
+  expect(decodedMessage).not.toContain('&#x20;');
+  expect(blockedUrl.length).toBeGreaterThan(250);
   await page.getByRole('button', {name:'Copia riepilogo'}).click();
-  await expect.poll(() => page.evaluate(() => (window as typeof window & {__copiedWhatsApp?:string}).__copiedWhatsApp)).toContain('Riepilogo Ordine');
+  await expect.poll(() => page.evaluate(() => (window as typeof window & {__copiedWhatsApp?:string}).__copiedWhatsApp)).toContain('Ordine tramite DOSepranza');
   await expect(page.locator('#cartCount')).toHaveText('1');
   expect(await page.evaluate(() => (globalThis as typeof globalThis & {__orderCreates?:number}).__orderCreates)).toBe(1);
   await page.getByRole('button', {name:'Riprova WhatsApp'}).click();
