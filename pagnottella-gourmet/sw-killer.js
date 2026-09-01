@@ -1,5 +1,5 @@
 (() => {
-  const RELEASE = 'discount-whatsapp-1';
+  const RELEASE = 'discount-included-1';
   const RELEASE_KEY = 'dose_cache_release';
   const currentUrl = new URL(window.location.href);
   const forcedReset = currentUrl.searchParams.has('swreset');
