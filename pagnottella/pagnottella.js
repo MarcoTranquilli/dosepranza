@@ -57,9 +57,11 @@ const discountLabel = () => {
   const rate = Math.round(discountRate() * 100);
   if(!rate) return 'Prezzo standard';
   const limit = DATA.discount?.activeUntil ? new Date(`${DATA.discount.activeUntil}T23:59:59`) : null;
-  const label = limit && currentDate() > limit
+  const fallbackActive = Boolean(limit && currentDate() > limit);
+  const label = fallbackActive
     ? DATA.discount.fallbackLabel
     : DATA.discount.label;
+  if(fallbackActive && DATA.discount.fallbackIncludedInPrice) return `${label || 'Sconto DOSepranza'} ${rate}% già incluso`;
   return `${label || 'Sconto attivo'} -${rate}%`;
 };
 const ORDER_LOG_KEY = 'pg_order_logs';
@@ -82,7 +84,13 @@ const paymentNoteCopy = () => 'Satispay è il metodo principale; in alternativa 
 const finalizeOrderLabel = 'Finalizza l’ordine tramite il suo invio su WhatsApp';
 const orderCutoffCopy = '12:00';
 const deliveryTimeCopy = '12:30';
-const discountedPrice = v => Math.round(v * (1 - discountRate()) * 100) / 100;
+const appliedDiscountRate = () => {
+  const cfg = DATA?.discount;
+  if(!cfg || typeof cfg !== 'object' || !cfg.fallbackIncludedInPrice) return discountRate();
+  const limit = cfg.activeUntil ? new Date(`${cfg.activeUntil}T23:59:59`) : null;
+  return limit && currentDate() > limit ? 0 : discountRate();
+};
+const discountedPrice = v => Math.round(v * (1 - appliedDiscountRate()) * 100) / 100;
 const isLocalPreview = () => location.protocol === 'file:';
 const setAuthButtonsDisabled = (disabled) => {
   ['authGateGoogle', 'authGateLocal'].forEach((id) => {
@@ -703,7 +711,7 @@ function card(p){
   const srcset = responsive?.mobile && responsive?.desktop
     ? ` srcset="${esc(responsive.mobile)} 640w, ${esc(responsive.desktop)} 1200w" sizes="(max-width:640px) 92vw, (max-width:1100px) 46vw, 360px"`
     : '';
-  return `<article class="card ${hasSpecificImage ? '' : 'imageFallback'}"><div class="pic"><img src="${esc(p.img)}"${srcset} alt="${esc(alt)}" loading="lazy" decoding="async"><div class="badges">${badges.map(t=>`<span class="badge">${esc(t)}</span>`).join('')}</div>${hasSpecificImage ? '' : '<span class="imageNotice">Foto specifica non disponibile</span>'}</div><div class="body"><div class="nameRow"><h4>${esc(p.name)}</h4><div class="price"><span class="old">${money(p.price)}</span>${money(discountedPrice(p.price))}</div></div><p class="desc">${esc(p.desc)}</p><div class="meta"><span class="tag">${esc(clusterLabel(p.categoryGroup))}</span>${(p.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div><div class="actions"><button class="details" onclick="openDetails('${p.id}')">Dettagli</button><button class="add" aria-label="${esc(addLabel)}" onclick="quickAdd('${p.id}')" ${isOrderingClosed() ? 'disabled' : ''}>${isOrderingClosed() ? 'Chiuso' : '+'}</button></div></div></article>`;
+  return `<article class="card ${hasSpecificImage ? '' : 'imageFallback'}"><div class="pic"><img src="${esc(p.img)}"${srcset} alt="${esc(alt)}" loading="lazy" decoding="async"><div class="badges">${badges.map(t=>`<span class="badge">${esc(t)}</span>`).join('')}</div>${hasSpecificImage ? '' : '<span class="imageNotice">Foto specifica non disponibile</span>'}</div><div class="body"><div class="nameRow"><h4>${esc(p.name)}</h4><div class="price">${appliedDiscountRate() ? `<span class="old">${money(p.price)}</span>` : ''}${money(discountedPrice(p.price))}</div></div><p class="desc">${esc(p.desc)}</p><div class="meta"><span class="tag">${esc(clusterLabel(p.categoryGroup))}</span>${(p.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div><div class="actions"><button class="details" onclick="openDetails('${p.id}')">Dettagli</button><button class="add" aria-label="${esc(addLabel)}" onclick="quickAdd('${p.id}')" ${isOrderingClosed() ? 'disabled' : ''}>${isOrderingClosed() ? 'Chiuso' : '+'}</button></div></div></article>`;
 }
 function openDetails(id){
   const p = PRODUCTS.find(x => x.id === id);
@@ -878,7 +886,7 @@ function buildOrderPayload(){
     serviceWindow: `Ordini/pagamenti entro le ${orderCutoffCopy} · Consegna gratuita alle ${deliveryTimeCopy}`,
     items,
     subtotalOriginal: t.orig,
-    discountRate: discountRate(),
+    discountRate: appliedDiscountRate(),
     discountAmount: t.saving,
     total: t.total,
     paymentMethod: selectedPaymentMethod(),

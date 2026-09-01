@@ -3237,7 +3237,8 @@ window.__PAGNOTTELLA_MENU__ = {
     "label": "Sconto lancio estate",
     "activeUntil": "2026-08-30",
     "fallbackRate": 0.1,
-    "fallbackLabel": "Sconto DOSepranza"
+    "fallbackLabel": "Sconto DOSepranza",
+    "fallbackIncludedInPrice": true
   },
   "whatsapp": {
     "supplierName": "Pagnottella Gourmet",
@@ -3335,7 +3336,7 @@ window.__PAGNOTTELLA_MENU__ = {
     "allergens": "1 glutine, 2 crostacei, 3 uova, 4 pesce, 5 arachidi, 6 soia, 7 latte, 8 frutta a guscio, 9 sedano, 10 senape, 11 sesamo, 12 solfiti, 13 lupini, 14 molluschi.",
     "frozen": "* Prodotto surgelato.",
     "olive": "** Le olive potrebbero contenere eccezionalmente noccioli.",
-    "priceValidity": "Promo estate 2026: sconto 20% fino al 30/08/2026. Dal 31/08/2026 si applica lo sconto DOSepranza del 10%."
+    "priceValidity": "Promo estate 2026: sconto 20% fino al 30/08/2026. Dal 31/08/2026 i prezzi esposti includono già lo sconto DOSepranza del 10%."
   },
   "extras": [
     {
