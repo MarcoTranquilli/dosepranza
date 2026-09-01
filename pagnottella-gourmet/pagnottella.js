@@ -61,7 +61,11 @@ const discountRate = () => {
 const discountLabel = () => {
   const rate = Math.round(discountRate() * 100);
   if(!rate) return 'Prezzo standard';
-  return `${DATA.discount.label || 'Sconto attivo'} -${rate}%`;
+  const limit = DATA.discount?.activeUntil ? new Date(`${DATA.discount.activeUntil}T23:59:59`) : null;
+  const label = limit && currentDate() > limit
+    ? DATA.discount.fallbackLabel
+    : DATA.discount.label;
+  return `${label || 'Sconto attivo'} -${rate}%`;
 };
 const ORDER_LOG_KEY = 'pg_order_logs';
 const CHECKOUT_STATE_KEY = 'pg_checkout_state_v1';
@@ -928,32 +932,25 @@ function buildMessage(){
   const now = currentDate();
   const date = now.toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   const time = now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
-  let msg = `📦 Riepilogo Ordine – ${DATA.copy.brand}`;
-  msg += `\nOrdine tramite DOSepranza`;
-  msg += `\n\n👤 Cliente`;
+  let msg = 'Ordine tramite DOSepranza';
+  msg += `\n\n\u{1F464} Cliente`;
   msg += `\n${name} – ${company}`;
   msg += `\nConsegna: ${costCenter}`;
   msg += `\nData: ${cap(date)} - ${time}`;
-  msg += `\n\n🏪 Punto Vendita`;
-  msg += `\n${DATA.contact.address}`;
-  msg += `\nFinestra servizio: Ordini/pagamenti entro le ${orderCutoffCopy} · Consegna gratuita alle ${deliveryTimeCopy}`;
-  msg += `\n\n🥪 Ordine`;
+  msg += `\n\n\u{1F96A} Ordine`;
   t.items.forEach(i => {
-    msg += `\n- ${i.qty}x ${i.name} — ${i.opt}`;
+    msg += `\n\u2022 ${i.qty}x ${i.name} — ${i.opt}`;
     if((i.extras || []).length) msg += `\n  Extra: ${i.extras.map(extra => `${extra.name} +${money(extra.price)}`).join(', ')}`;
     msg += `\n  ${money(discountedPrice(i.originalUnit)*i.qty)}`;
   });
-  const rate = Math.round(discountRate() * 100);
   msg += `\nTotale: ${money(t.total)}`;
-  if(rate) msg += `\nSconti applicati: ${discountLabel()}`;
-  msg += `\n\n💳 Pagamento`;
+  msg += `\n\n\u{1F4B3} Pagamento`;
   msg += `\nMetodo selezionato: ${paymentMethod || 'Non specificato'}`;
-  msg += `\nNote pagamento: ${paymentNoteCopy()}`;
   if(paymentMethod === 'Bonifico bancario'){
     if(paymentBeneficiary()) msg += `\nIntestatario: ${paymentBeneficiary()}`;
     if(paymentIban()) msg += `\nIBAN: ${paymentIban()}`;
   }
-  msg += `\n\n⚠️ Note / Allergie`;
+  msg += `\n\n\u26A0\uFE0F Note / Allergie`;
   msg += `\n${notes || 'Nessuna'}`;
   return msg;
 }
@@ -969,7 +966,8 @@ function whatsappConfig(){
 }
 function whatsappUrl(message = buildMessage()){
   const { normalizedNumber } = whatsappConfig();
-  return `https://wa.me/${normalizedNumber}?text=${encodeURIComponent(message)}`;
+  const normalizedMessage = String(message).replace(/&#x20;|&#32;|&nbsp;/gi, ' ').normalize('NFC');
+  return `https://wa.me/${normalizedNumber}?text=${encodeURIComponent(normalizedMessage)}`;
 }
 function checkoutFingerprint(){
   const t = totals();
