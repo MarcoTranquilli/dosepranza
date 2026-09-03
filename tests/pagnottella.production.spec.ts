@@ -186,7 +186,7 @@ test('popup WhatsApp bloccato mantiene carrello e non duplica ordine', async ({p
   await expect(page.locator('#discountLabel')).toContainText('già incluso');
   await expect(page.locator('#finalTotal')).toContainText('€8,00');
   if (testInfo.project.name === 'mobile') await page.getByRole('button', {name:'Vedi carrello'}).click();
-  await expect(page.locator('#sendOrderLabel')).toHaveText('Apri WhatsApp con Pagnottella Gourmet');
+  await expect(page.locator('#sendOrderLabel')).toHaveText('Rivedi e conferma ordine');
   await page.evaluate(() => {
     window.open = url => {
       (window as typeof window & {__lastBlockedOpen?:string}).__lastBlockedOpen = String(url || '');
@@ -205,6 +205,8 @@ test('popup WhatsApp bloccato mantiene carrello e non duplica ordine', async ({p
   } else {
     await page.locator('#sendOrderBtn').click();
   }
+  await expect(page.locator('#paymentConfirmAccept')).toBeDisabled();
+  await page.locator('#paymentConfirmConsent').check();
   await page.locator('#paymentConfirmAccept').click();
   await expect(page.locator('#confirm')).toContainText('browser ha bloccato');
   await expect(page.locator('#whatsappStatusTitle')).toHaveText('Apertura automatica bloccata');
@@ -261,7 +263,12 @@ test('utente DOS Google salva ordine Pagnottella con UID Firebase', async ({page
   await expect(page.locator('#paymentConfirmModal')).toHaveClass(/show/);
   await expect(page.locator('#paymentConfirmCopy')).toContainText('Pagnottella Gourmet');
   await expect(page.locator('#paymentConfirmCopy')).toContainText('+39 392 151 2515');
-  await expect(page.locator('#paymentConfirmAccept')).toHaveText('Conferma e apri WhatsApp');
+  await expect(page.locator('#paymentConfirmSummary')).toContainText('Saporito');
+  await expect(page.locator('#paymentConfirmSummary')).toContainText('Totale');
+  await expect(page.locator('#paymentConfirmAccept')).toHaveText('Apri WhatsApp con Pagnottella Gourmet ›');
+  await expect(page.locator('#paymentConfirmAccept')).toBeDisabled();
+  await page.locator('#paymentConfirmConsent').check();
+  await expect(page.locator('#paymentConfirmAccept')).toBeEnabled();
   await page.evaluate(() => {
     const nativeOpen = window.open.bind(window);
     window.open = (url?:string | URL, target?:string, features?:string) => {
