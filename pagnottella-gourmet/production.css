@@ -23,7 +23,8 @@
 .paymentChoice .paymentOption.isDisabled .paymentOptionState::after{content:'Da settembre';font-size:11px;font-weight:950}
 .paymentChoice .paymentOption.isDisabled:hover{transform:none;box-shadow:0 1px 0 rgba(23,23,23,.03)}
 .whatsappSupport{margin:2px 2px 9px;color:#596457;font-size:12px;line-height:1.45}.whatsappMain #sendOrderLabel{font-weight:950;letter-spacing:-.01em}.whatsappMain.isSponsorReady{background:linear-gradient(180deg,#2fc96d,#1f9f52)}.whatsappMain.isWhatsAppOpened{background:linear-gradient(180deg,#237a49,#195f39)}.whatsappMain.isBusy{cursor:wait;opacity:.72}
-.checkoutBody{padding-bottom:160px}
+.checkoutBody{padding-bottom:24px;max-height:calc(100vh - 270px)}
+.cartPrimaryAction{position:relative;z-index:4;display:grid;gap:11px;padding:14px 18px 16px;border-bottom:1px solid #e7dfd5;background:linear-gradient(180deg,#fffdf9,#f8f3eb);box-shadow:0 8px 18px rgba(38,42,36,.08)}.cartPrimaryAction.hidden{display:none}.cartPrimaryActionText{display:grid;gap:3px}.cartPrimaryActionText>span{color:#c66d3d;font-size:10px;font-weight:950;letter-spacing:.12em;text-transform:uppercase}.cartPrimaryActionText strong{color:#252a24;font-size:15px}.cartPrimaryActionText small{color:#696e66;font-size:11px;line-height:1.4}.cartPrimaryAction .whatsappMain{min-height:50px}
 .whatsappStatus{margin-top:12px;padding:15px;border:1px solid #bcd9c4;border-radius:18px;background:linear-gradient(180deg,#f5fff7,#ecf8ef);color:#24482e}.whatsappStatus strong{display:block;font-size:14px}.whatsappStatus p{margin:5px 0 0;font-size:12px;line-height:1.5;color:#4d6453}.whatsappStatusActions{display:grid;grid-template-columns:1.25fr 1fr;gap:8px;margin-top:12px}.whatsappStatusActions button{min-height:44px;border-radius:13px}.whatsappStatusActions .primary{border:0;background:#276c3b;color:#fff;font-weight:900}.whatsappStatusActions .ghost{border:1px solid #a8cbb1;background:#fff;color:#285238;font-weight:900}
 .whatsappFallback{margin-top:12px;padding:12px;border:1px solid #d8c9b1;border-radius:14px;background:#fff}.whatsappFallback pre{max-height:180px;margin:10px 0 0;padding:10px;overflow:auto;border-radius:10px;background:#f7f3ec;color:#28302b;font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap}.whatsappStatusActions{grid-template-columns:1.25fr 1fr 1fr}
 .copySummaryBtn{width:100%;min-height:48px;border-radius:18px;border:1px solid #b8d8c5;background:#f5fff8;color:#147a3d;font-weight:950;box-shadow:0 6px 18px rgba(37,211,102,.10)}
@@ -73,12 +74,12 @@
 @media (max-width:880px){
   .searchLine{grid-template-columns:minmax(0,1fr) auto}.searchLine .primary.gold{grid-column:1/-1}
   .filterPanel{top:auto;width:100%;height:min(88vh,820px);border-left:0;border-top:1px solid #ded7ca;border-radius:25px 25px 0 0;transform:translateY(105%)}.filterPanel.show{transform:translateY(0)}
-  .adminMetrics,.analyticsMetrics{grid-template-columns:1fr 1fr}.adminWorkspace{border-radius:24px}.adminView{padding:18px}
+  .adminMetrics,.analyticsMetrics{grid-template-columns:1fr 1fr}.adminWorkspace{border-radius:24px}.adminView{padding:18px}.checkoutBody{max-height:calc(86vh - 205px)}
   .sheet{left:0;right:0;top:auto;bottom:0;width:100%;height:min(90vh,820px);border-radius:26px 26px 0 0}.sheetImg{flex-basis:180px}
 }
 @media (max-width:560px){
   .tabs,.filters{display:grid;grid-template-columns:70px minmax(0,1fr);gap:7px}.filterLevelLabel{margin:0}.categoryFilterOptions,.dietFilterOptions{display:none}.mobileTaxonomySelect{display:block}.visibleFilterReset{grid-column:2;width:max-content;min-width:82px;margin-top:0}.activeFilterSummary{margin-top:4px}.filterPanelBody{padding:16px}.filterPanel header,.filterPanel footer{padding-left:16px;padding-right:16px}
-  .drawerExtras{grid-template-columns:1fr}.paymentConfirmCard{padding:22px;border-radius:23px}.paymentConfirmCard h2{font-size:28px}.paymentConfirmActions{grid-template-columns:1fr}.orderConfirmCard{max-height:94vh}.orderConfirmSummary{padding:12px}.orderConfirmLine{font-size:12px}
+  .drawerExtras{grid-template-columns:1fr}.paymentConfirmCard{padding:22px;border-radius:23px}.paymentConfirmCard h2{font-size:28px}.paymentConfirmActions{grid-template-columns:1fr}.orderConfirmCard{max-height:94vh}.orderConfirmSummary{padding:12px}.orderConfirmLine{font-size:12px}.cartPrimaryAction{padding:12px 16px 14px}.cartPrimaryActionText small{display:none}
   .adminSectionHead{align-items:flex-start;flex-direction:column}.adminActions{width:100%}.adminActions button{flex:1}.adminMetrics,.analyticsMetrics,.analyticsGrid{grid-template-columns:1fr}.adminView{padding:15px}.adminSectionHead h2{font-size:27px}
 }
 .entryLanding{min-height:calc(100vh - 40px);display:grid;place-items:center;padding:20px 0}

@@ -187,6 +187,9 @@ test('popup WhatsApp bloccato mantiene carrello e non duplica ordine', async ({p
   await expect(page.locator('#finalTotal')).toContainText('€8,00');
   if (testInfo.project.name === 'mobile') await page.getByRole('button', {name:'Vedi carrello'}).click();
   await expect(page.locator('#sendOrderLabel')).toHaveText('Rivedi e conferma ordine');
+  await expect(page.locator('#cartPrimaryAction')).toBeVisible();
+  await expect(page.locator('#cartActionTotal')).toHaveText('€8,00');
+  await expect(page.locator('#sendOrderBtn')).toBeInViewport();
   await page.evaluate(() => {
     window.open = url => {
       (window as typeof window & {__lastBlockedOpen?:string}).__lastBlockedOpen = String(url || '');

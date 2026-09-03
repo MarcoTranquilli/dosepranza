@@ -909,6 +909,8 @@ function totals(){ const items = Object.values(state.cart); const orig = items.r
 function renderCart(){
   const t = totals();
   byId('cartCount').textContent = t.count;
+  byId('cartPrimaryAction')?.classList.toggle('hidden', t.count === 0);
+  if(byId('cartActionTotal')) byId('cartActionTotal').textContent = money(t.total);
   byId('mobileCount').textContent = t.count;
   byId('mobileTotal').textContent = money(t.total);
   byId('mobileBar').classList.toggle('hidden', t.count === 0);
