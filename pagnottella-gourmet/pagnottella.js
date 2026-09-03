@@ -87,7 +87,7 @@ const deliverySiteCopy = () => DATA?.orderContext?.deliverySite || 'Via Arno, 52
 const paymentBeneficiary = () => DATA?.payment?.beneficiary || '';
 const paymentIban = () => DATA?.payment?.iban || '';
 const paymentNoteCopy = () => 'Satispay è il metodo principale; in alternativa è disponibile il bonifico bancario. PayPal e Nexi saranno attivati da settembre.';
-const finalizeOrderLabel = () => `Apri WhatsApp con ${whatsappConfig().supplierName}`;
+const finalizeOrderLabel = () => 'Rivedi e conferma ordine';
 const reopenOrderLabel = 'Riapri il riepilogo su WhatsApp';
 const orderCutoffCopy = '12:00';
 const deliveryTimeCopy = '12:30';
@@ -361,6 +361,9 @@ function bind(){
   byId('whatsappCopyBtn')?.addEventListener('click', copyWhatsAppMessage);
   byId('paymentConfirmCancel')?.addEventListener('click', closePaymentConfirmation);
   byId('paymentConfirmAccept')?.addEventListener('click', confirmPaymentAndSend);
+  byId('paymentConfirmConsent')?.addEventListener('change', event => {
+    if(state.confirmationAction === 'submit') byId('paymentConfirmAccept').disabled = !event.target.checked;
+  });
   byId('checkoutCompleteClose')?.addEventListener('click', closeCheckoutComplete);
   byId('sendOrderBtn')?.addEventListener('click', sendWA);
   document.addEventListener('keydown', e => {
@@ -1065,12 +1068,29 @@ function showWhatsAppStatus(opened){
     else panel.scrollIntoView({ block:'nearest' });
   });
 }
+function orderConfirmationSummaryHtml(){
+  const t = totals();
+  const items = t.items.map(item => {
+    const extras = (item.extras || []).map(extra => extra.name).join(', ');
+    const detail = [item.opt, extras ? `Extra: ${extras}` : ''].filter(Boolean).join(' · ');
+    return `<div class="orderConfirmLine"><span><b>${item.qty}× ${esc(item.name)}</b>${detail ? `<small class="orderConfirmMeta">${esc(detail)}</small>` : ''}</span><strong>${money(discountedPrice(item.originalUnit) * item.qty)}</strong></div>`;
+  }).join('');
+  return `${items}<div class="orderConfirmLine orderConfirmTotal"><span>Totale</span><strong>${money(t.total)}</strong></div>`;
+}
 function configureConfirmation(action){
   state.confirmationAction = action;
   const title = byId('paymentConfirmTitle');
   const copy = byId('paymentConfirmCopy');
   const method = byId('paymentConfirmMethod');
   const accept = byId('paymentConfirmAccept');
+  const summary = byId('paymentConfirmSummary');
+  const consentWrap = byId('paymentConfirmConsentWrap');
+  const consent = byId('paymentConfirmConsent');
+  const isSubmit = action === 'submit';
+  summary?.classList.toggle('hidden', !isSubmit);
+  consentWrap?.classList.toggle('hidden', !isSubmit);
+  if(consent) consent.checked = false;
+  if(accept) accept.disabled = isSubmit;
   if(action === 'reopen'){
     title.textContent = 'Riaprire il riepilogo?';
     copy.textContent = 'Hai già aperto questo ordine su WhatsApp. Vuoi aprirlo nuovamente? Non verrà creato un secondo ordine.';
@@ -1084,15 +1104,16 @@ function configureConfirmation(action){
   }else{
     const paymentMethod = selectedPaymentMethod();
     const recipient = whatsappConfig();
-    title.textContent = 'Hai completato il pagamento?';
+    title.textContent = 'Controlla prima di procedere';
     copy.textContent = paymentMethod === 'Bonifico bancario'
       ? `Hai selezionato Bonifico bancario. Il riepilogo verrà aperto nella chat WhatsApp di ${recipient.supplierName} al numero ${recipient.displayNumber}: allega la ricevuta prima dell’invio.`
       : `Il riepilogo verrà aperto nella chat WhatsApp di ${recipient.supplierName} al numero ${recipient.displayNumber}.`;
     method.textContent = `Metodo selezionato: ${paymentMethod} · Destinatario: ${recipient.displayNumber}`;
-    accept.textContent = 'Conferma e apri WhatsApp';
+    if(summary) summary.innerHTML = orderConfirmationSummaryHtml();
+    accept.textContent = `Apri WhatsApp con ${recipient.supplierName} ›`;
   }
   byId('paymentConfirmModal')?.classList.add('show');
-  accept?.focus();
+  (isSubmit ? consent : accept)?.focus();
 }
 async function sendWA(){
   const button = byId('sendOrderBtn');
@@ -1166,6 +1187,7 @@ function closeCheckoutComplete(){
 }
 async function confirmPaymentAndSend(){
   if(totals().count === 0 || state.sending) return;
+  if(state.confirmationAction === 'submit' && !byId('paymentConfirmConsent')?.checked) return;
   if(state.confirmationAction === 'reopen'){
     closePaymentConfirmation();
     reopenWhatsapp();
