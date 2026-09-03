@@ -1224,6 +1224,21 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
                 error.code = 'auth/session-missing';
                 throw error;
             }
+            const providerIds = (user.providerData || []).map(provider => provider?.providerId).filter(Boolean);
+            const authenticatedEmail = normalizeEmail(user.email || (user.providerData || []).map(provider => provider?.email).find(Boolean));
+            if(!providerIds.some(providerId => providerId === 'google.com')) {
+                const error = new Error('Provider Google non disponibile');
+                error.code = 'auth/provider-mismatch';
+                throw error;
+            }
+            if(!authenticatedEmail.endsWith('@dos.design')) {
+                const error = new Error('Account Google non autorizzato agli ordini');
+                error.code = 'auth/account-not-authorized';
+                throw error;
+            }
+            if(normalizeEmail(state.user?.email) !== authenticatedEmail) {
+                await adoptAuthenticatedUser(user);
+            }
             return user;
         }
 
@@ -1237,14 +1252,16 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             version: 'russo-order-save-1'
         });
 
+        const isFirestorePermissionDenied = error => ['permission-denied', 'firestore/permission-denied'].includes(String(error?.code || ''));
+
         async function createRussoOrder(payload) {
             if(isLocalE2E && typeof window.__DOSE_E2E_SAVE_ORDER__ === 'function') {
                 return window.__DOSE_E2E_SAVE_ORDER__(payload);
             }
             const authenticatedUser = await resolveOrderAuthUser();
-            return addDoc(ordersCol, {
-                user: state.user.name,
-                email: state.user.email,
+            const order = {
+                user: authenticatedUser.displayName || state.user.name,
+                email: normalizeEmail(authenticatedUser.email || state.user.email),
                 uid: authenticatedUser.uid,
                 supplierId: 'russo',
                 items: payload.items,
@@ -1256,8 +1273,24 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
                 orderStatus: 'submitted',
                 orderType: 'order',
                 createdAt: serverTimestamp()
-            });
+            };
+            try {
+                return await addDoc(ordersCol, order);
+            } catch(error) {
+                if(!isFirestorePermissionDenied(error)) throw error;
+                await authenticatedUser.getIdToken(true);
+                return addDoc(ordersCol, order);
+            }
         }
+
+        const orderSaveErrorMessage = error => {
+            const code = String(error?.code || '');
+            if(code === 'auth/account-not-authorized') return 'Usa il tuo account Google aziendale @dos.design per inviare l\'ordine.';
+            if(['auth/session-missing', 'auth/provider-mismatch', 'permission-denied', 'firestore/permission-denied'].includes(code)) {
+                return 'Sessione Google non valida per salvare l\'ordine. Esci, accedi di nuovo con l\'account @dos.design e riprova: il carrello resta intatto.';
+            }
+            return 'Ordine non salvato per un problema di rete. Il carrello è intatto: controlla la connessione e riprova.';
+        };
 
         async function confirmSendOrder() {
             if(!state.pendingOrder || state.orderSubmitting) return;
@@ -1292,9 +1325,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
                 state.cart = []; document.getElementById('cart-count').textContent='0'; window.navigate('history'); window.toast("Inviato!");
             } catch(e) {
                 console.warn('order save failed', orderSaveDiagnostics(e, 'firestore-create'));
-                const message = e?.code === 'auth/session-missing'
-                    ? 'Sessione Google non disponibile. Torna alla scelta fornitore, accedi di nuovo e riprova.'
-                    : 'Ordine non salvato. Il carrello è intatto: controlla la connessione e riprova.';
+                const message = orderSaveErrorMessage(e);
                 if(errorBox) {
                     errorBox.textContent = message;
                     errorBox.classList.remove('hidden');

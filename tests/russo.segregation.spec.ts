@@ -133,7 +133,7 @@ test('salvataggio Russo conferma una sola scrittura e mostra successo', async ({
 test('errore salvataggio Russo conserva carrello e consente retry', async ({page}) => {
   await prepareRussoOrderSave(page, 'failure');
   await page.locator('#order-send-submit').click();
-  await expect(page.locator('#order-send-error')).toContainText('Il carrello è intatto');
+  await expect(page.locator('#order-send-error')).toContainText('Sessione Google non valida');
   await expect(page.locator('#cart-count')).toHaveText('1');
   await expect(page.locator('#order-send-submit')).toBeEnabled();
 });
@@ -196,6 +196,10 @@ test('sorgente Russo applica supplierId, query segregata e guard fornitore', asy
   expect(app).toContain('state.orderSubmitting = true;');
   expect(app).toContain('resolveOrderAuthUser');
   expect(app).toContain('auth/session-missing');
+  expect(app).toContain("authenticatedEmail.endsWith('@dos.design')");
+  expect(app).toContain("providerId === 'google.com'");
+  expect(app).toContain('authenticatedUser.getIdToken(true)');
+  expect(app).toContain('Sessione Google non valida per salvare');
   expect(app).toContain('Il carrello è intatto');
   expect(guard).toContain("canAccessSupplier('russo', session)");
   expect(guard).toContain("params.get('suite') === 'production'");
@@ -203,6 +207,7 @@ test('sorgente Russo applica supplierId, query segregata e guard fornitore', asy
   expect(guard).not.toContain("params.get('preview') === 'admin'");
   expect(access).toContain('suiteFallbackSession');
   expect(access).toContain('recoverGoogleSession');
+  expect(access).toContain('firebaseVerified: true');
   expect(suite).toContain('../russo/?suite=production');
   expect(app).toContain("https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0");
   expect(app).not.toContain("http://web.satispay.com/");
