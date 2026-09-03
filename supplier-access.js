@@ -243,7 +243,8 @@
       role,
       isAdmin,
       supplierIds: supplierIdsForIdentity(email, role),
-      provider: GOOGLE_PROVIDER_ID
+      provider: GOOGLE_PROVIDER_ID,
+      firebaseVerified: true
     });
   }
 
