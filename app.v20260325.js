@@ -3888,6 +3888,12 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
                 let cached = null;
                 try { cached = JSON.parse(localStorage.getItem('dose_user') || 'null'); } catch(e) {}
                 const isAnon = !!u.isAnonymous;
+                if(isAnon && isProductionSuiteEntry() && !isLocalE2E) {
+                    state.user = null;
+                    document.getElementById('user-modal').classList.remove('hidden');
+                    renderRoleStatus();
+                    return;
+                }
                 const email = normalizeEmail(isAnon ? cached?.email : u.email);
                 const name = normalizeName(isAnon ? cached?.name : (u.displayName || u.email?.split('@')[0] || ''));
                 if(email) {
@@ -4027,6 +4033,9 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
         });
 
         const init = () => {
+            if(isProductionSuiteEntry() && !isLocalE2E) {
+                document.querySelectorAll('[data-manual-auth]').forEach(element => element.classList.add('hidden'));
+            }
             if(!auth_fb.currentUser && !isProductionSuiteEntry()) {
                 signInAnonymously(auth_fb).catch(() => {});
             }
