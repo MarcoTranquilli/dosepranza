@@ -36,8 +36,9 @@ service cloud.firestore {
     }
 
     function isDosUser() {
-      return isGoogleProvider()
-        && request.auth.token.email.matches('^[^@]+@dos[.]design$');
+      return isSignedIn()
+        && request.auth.token.get('email_verified', false) == true
+        && request.auth.token.get('email', '').matches('^[^@]+@dos[.]design$');
     }
 
     function isPagnottellaSupplier() {

@@ -184,6 +184,7 @@ test('sorgente Russo applica supplierId, query segregata e guard fornitore', asy
   const app = fs.readFileSync('app.v20260325.js', 'utf8');
   const guard = fs.readFileSync('russo/russo-auth-guard.js', 'utf8');
   const access = fs.readFileSync('supplier-access.js', 'utf8');
+  const russoIndex = fs.readFileSync('russo/index.html', 'utf8');
   const suite = fs.readFileSync('pagnottella-gourmet/index.html', 'utf8');
   expect(app).toContain("supplierId: 'russo'");
   expect(app).toContain('where("supplierId", "==", "russo")');
@@ -208,6 +209,8 @@ test('sorgente Russo applica supplierId, query segregata e guard fornitore', asy
   expect(access).toContain('suiteFallbackSession');
   expect(access).toContain('recoverGoogleSession');
   expect(access).toContain('firebaseVerified: true');
+  expect(russoIndex).toContain('src="../supplier-access.js?v=russo-auth-session-3"');
+  expect(russoIndex).not.toContain('src="supplier-access.js');
   expect(suite).toContain('../russo/?suite=production');
   expect(app).toContain("https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0");
   expect(app).not.toContain("http://web.satispay.com/");
