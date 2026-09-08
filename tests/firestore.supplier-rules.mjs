@@ -26,6 +26,13 @@ const env = await initializeTestEnvironment({ projectId, firestore:{ rules } });
 
 const admin = env.authenticatedContext('uid-admin', googleClaims('marco.tranquilli@dos.design')).firestore();
 const dos_user = env.authenticatedContext('uid-dos_user', googleClaims('utente@dos.design')).firestore();
+const linkedGoogleDosUser = env.authenticatedContext('uid-dos_user', {
+  email:'utente@dos.design',
+  firebase:{ sign_in_provider:'anonymous', identities:{ 'google.com':['utente@dos.design'] } }
+}).firestore();
+const nonGoogleDosUser = env.authenticatedContext('uid-dos_user', {
+  email:'utente@dos.design', firebase:{ sign_in_provider:'anonymous' }
+}).firestore();
 const pagnottella = env.authenticatedContext('uid-pg', googleClaims('commerciale@lapagnottellagourmet.it')).firestore();
 const isidoro = env.authenticatedContext('uid-isidoro', googleClaims('isidorovagnozzi@gmail.com')).firestore();
 const russo = env.authenticatedContext('uid-russo', googleClaims('russolorenzo11@gmail.com')).firestore();
@@ -98,6 +105,10 @@ try {
   await assertFails(getDocs(globalQuery(dos_user)));
   await assertSucceeds(addDoc(collection(dos_user, 'orders'), order('russo', 'uid-dos_user', 'utente@dos.design')));
   await assertSucceeds(addDoc(collection(dos_user, 'orders'), order('pagnottella', 'uid-dos_user', 'utente@dos.design')));
+  await assertSucceeds(getDoc(doc(linkedGoogleDosUser, 'orders', 'pg-order')));
+  await assertSucceeds(addDoc(collection(linkedGoogleDosUser, 'orders'), order('russo', 'uid-dos_user', 'utente@dos.design')));
+  await assertFails(getDoc(doc(nonGoogleDosUser, 'orders', 'pg-order')));
+  await assertFails(addDoc(collection(nonGoogleDosUser, 'orders'), order('russo', 'uid-dos_user', 'utente@dos.design')));
   await assertFails(addDoc(collection(dos_user, 'orders'), order('russo', 'uid-other', 'utente@dos.design')));
   const missingSupplier = order('russo', 'uid-dos_user', 'utente@dos.design');
   delete missingSupplier.supplierId;

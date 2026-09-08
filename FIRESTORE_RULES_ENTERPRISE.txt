@@ -13,7 +13,10 @@ service cloud.firestore {
 
     function isGoogleProvider() {
       return isSignedIn()
-        && request.auth.token.firebase.sign_in_provider == 'google.com';
+        && (
+          request.auth.token.get('firebase', {}).get('sign_in_provider', '') == 'google.com'
+          || request.auth.token.get('firebase', {}).get('identities', {}).keys().hasAny(['google.com'])
+        );
     }
 
     function isStaffEmail() {
