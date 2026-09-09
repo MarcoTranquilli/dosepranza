@@ -36,8 +36,7 @@ service cloud.firestore {
     }
 
     function isDosUser() {
-      return isSignedIn()
-        && request.auth.token.get('email_verified', false) == true
+      return isGoogleProvider()
         && request.auth.token.get('email', '').matches('^[^@]+@dos[.]design$');
     }
 
