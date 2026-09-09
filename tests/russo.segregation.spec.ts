@@ -198,6 +198,7 @@ test('sorgente Russo applica supplierId, query segregata e guard fornitore', asy
   expect(app).toContain('resolveOrderAuthUser');
   expect(app).toContain("document.querySelectorAll('[data-manual-auth]')");
   expect(app).toContain('isAnon && isProductionSuiteEntry() && !isLocalE2E');
+  expect(app).toContain('if(isProductionSuiteEntry() && !isLocalE2E) {');
   expect(app).toContain('auth/session-missing');
   expect(app).toContain("authenticatedEmail.endsWith('@dos.design')");
   expect(app).toContain("providerId === 'google.com'");
@@ -213,8 +214,8 @@ test('sorgente Russo applica supplierId, query segregata e guard fornitore', asy
   expect(access).toContain('firebaseVerified: true');
   expect(russoIndex).toContain('<base href="../">');
   expect(russoIndex).toContain('src="supplier-access.js?v=russo-auth-session-3"');
-  expect(russoIndex).toContain('src="app.v20260325.js?v=russo-auth-session-4"');
-  expect(suite).toContain('../russo/?suite=production&v=russo-auth-session-3');
+  expect(russoIndex).toContain('src="app.v20260325.js?v=russo-auth-session-5"');
+  expect(suite).toContain('../russo/?suite=production&v=russo-auth-session-5');
   expect(app).toContain("https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0");
   expect(app).not.toContain("http://web.satispay.com/");
 });

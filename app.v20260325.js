@@ -3924,6 +3924,12 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
                 state.authSignInProvider = '';
                 const suiteSession = getSuiteSession();
                 if(suiteSession) {
+                    if(isProductionSuiteEntry() && !isLocalE2E) {
+                        state.user = null;
+                        document.getElementById('user-modal').classList.remove('hidden');
+                        renderRoleStatus();
+                        return;
+                    }
                     persistUserIdentity(suiteSession.name, suiteSession.email);
                     document.getElementById('user-modal').classList.add('hidden');
                     await setRole(suiteSession.email);
