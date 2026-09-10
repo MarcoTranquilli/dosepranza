@@ -302,8 +302,8 @@ window.__PAGNOTTELLA_MENU__ = {
     {
       "id": "panini-carne-goloso-10",
       "name": "Goloso",
-      "price": 8,
-      "desc": "burrata, mortadella, granella di pistacchio",
+      "price": 9,
+      "desc": "burrata pugliese, mortadella, granella di pistacchio",
       "cat": "panini",
       "img": "./assets/pagnottella/images/products/panini_goloso__panino_goloso.jpg",
       "tags": [
@@ -474,39 +474,6 @@ window.__PAGNOTTELLA_MENU__ = {
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
-      },
-      "categoryGroup": "panini",
-      "dietType": "onnivora",
-      "needsDietReview": false,
-      "supportsExtras": true
-    },
-    {
-      "id": "panini-carne-oregan-16",
-      "name": "Oregan",
-      "price": 7,
-      "desc": "crudo, pomodoro, origano",
-      "cat": "panini",
-      "img": "./assets/pagnottella/images/products/panini_oregan__supplier_20260806.webp",
-      "tags": [
-        "Panino"
-      ],
-      "imageMeta": {
-        "assigned": true,
-        "specific": true,
-        "source": "fornitore-dos-20260806",
-        "confidence": "alta",
-        "label": "Foto specifica fornita dal ristoratore",
-        "mappingType": "foto_specifica_fornitore",
-        "filename": "panini_oregan__supplier_20260806.webp",
-        "sourceFilename": "oregan.jpg",
-        "sourceChecksum": "3cbd2269698ff0a33b23becedb7dad593380e4ce404a2322fe405f05b3454955",
-        "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": false,
-        "auditPublishable": true,
-        "responsive": {
-          "mobile": "./assets/pagnottella/images/products/panini_oregan__supplier_20260806-640.webp",
-          "desktop": "./assets/pagnottella/images/products/panini_oregan__supplier_20260806.webp"
-        }
       },
       "categoryGroup": "panini",
       "dietType": "onnivora",
@@ -867,7 +834,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "id": "panini-carne-toscano-28",
       "name": "Toscano",
       "price": 8,
-      "desc": "finocchiona, pomodoro, olio al tartufo, insalata, provola affumicata",
+      "desc": "finocchiona IGP, pomodoro, olio al tartufo, insalata, provola affumicata",
       "cat": "panini",
       "img": "./assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
@@ -895,7 +862,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "id": "panini-carne-transalpino-29",
       "name": "Transalpino",
       "price": 7,
-      "desc": "petto di tacchino arrosto, senape al miele, provola affumicata, insalata",
+      "desc": "petto di tacchino arrosto, senape, provola affumicata, insalata",
       "cat": "panini",
       "img": "./assets/pagnottella/images/products/panini_transalpino__supplier_20260806.webp",
       "tags": [
@@ -996,7 +963,7 @@ window.__PAGNOTTELLA_MENU__ = {
     {
       "id": "panini-carne-valtella-32",
       "name": "Valtella",
-      "price": 8,
+      "price": 9,
       "desc": "bresaola, pomodoro, rucola, riduzione di balsamico",
       "cat": "panini",
       "img": "./assets/pagnottella/images/optimized/logo_pagnottella.webp",
@@ -1115,7 +1082,7 @@ window.__PAGNOTTELLA_MENU__ = {
     {
       "id": "panini-pesce-lampedusa-2",
       "name": "Lampedusa",
-      "price": 9,
+      "price": 10,
       "desc": "carpaccio di tonno, zucchine grigliate*, capperi, insalata, carpaccio di limone, basilico",
       "cat": "panini",
       "img": "./assets/pagnottella/images/optimized/logo_pagnottella.webp",
@@ -1172,7 +1139,7 @@ window.__PAGNOTTELLA_MENU__ = {
     {
       "id": "panini-pesce-marinaro-4",
       "name": "Marinaro",
-      "price": 7,
+      "price": 8,
       "desc": "mozzarella, pomodoro, acciughe, origano",
       "cat": "panini",
       "img": "./assets/pagnottella/images/optimized/logo_pagnottella.webp",
@@ -1187,6 +1154,34 @@ window.__PAGNOTTELLA_MENU__ = {
         "label": "Foto specifica non disponibile",
         "mappingType": "nessuna_foto_specifica",
         "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
+      },
+      "categoryGroup": "panini",
+      "dietType": "pescetariana",
+      "needsDietReview": false,
+      "supportsExtras": true
+    },
+    {
+      "id": "panini-pesce-marinaro-duepuntozero-5",
+      "name": "Marinaro duepuntozero",
+      "price": 10,
+      "desc": "burrata pugliese, cicoria ripassata, alici",
+      "cat": "panini",
+      "img": "./assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "tags": [
+        "Panino",
+        "Fresco"
+      ],
+      "imageMeta": {
+        "assigned": false,
+        "specific": false,
+        "source": "volantino-sella-2026-09-02",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Nuovo prodotto del volantino Sella; non è disponibile una foto prodotto separata.",
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
@@ -1230,7 +1225,7 @@ window.__PAGNOTTELLA_MENU__ = {
     {
       "id": "panini-pesce-messicano-6",
       "name": "Messicano",
-      "price": 8,
+      "price": 9,
       "desc": "tonno, pomodoro, guacamole, jalapenos, insalata",
       "cat": "panini",
       "img": "./assets/pagnottella/images/products/panini_messicano__panino_messicano.jpg",
@@ -1319,7 +1314,7 @@ window.__PAGNOTTELLA_MENU__ = {
     {
       "id": "panini-pesce-parigino-9",
       "name": "Parigino",
-      "price": 7,
+      "price": 8,
       "desc": "tonno, carciofini, salsa tartara, insalata",
       "cat": "panini",
       "img": "./assets/pagnottella/images/optimized/logo_pagnottella.webp",
@@ -1381,7 +1376,7 @@ window.__PAGNOTTELLA_MENU__ = {
     {
       "id": "panini-pesce-san-jose-11",
       "name": "San Jose",
-      "price": 9,
+      "price": 10,
       "desc": "carpaccio di tonno, guacamole, pomodoro, cavolo rosso",
       "cat": "panini",
       "img": "./assets/pagnottella/images/products/panini_san_jose__supplier_20260806.webp",
@@ -1804,7 +1799,7 @@ window.__PAGNOTTELLA_MENU__ = {
     {
       "id": "insalate-carne-tartare-3",
       "name": "Tartare",
-      "price": 11,
+      "price": 12,
       "desc": "tartare di manzo al coltello condita con capperi, senape al miele, tabasco, pepe, sale, olio, cavolo rosso, insalata",
       "cat": "insalate",
       "img": "./assets/pagnottella/images/products/insalate_tartare__supplier_20260806.webp",
@@ -1907,35 +1902,6 @@ window.__PAGNOTTELLA_MENU__ = {
       "supportsExtras": true
     },
     {
-      "id": "insalate-carne-newyorkese-6",
-      "name": "Newyorkese",
-      "price": 11,
-      "desc": "pastrami di manzo, cetriolini, salsa tartara, pachino",
-      "cat": "insalate",
-      "img": "./assets/pagnottella/images/optimized/logo_pagnottella.webp",
-      "tags": [
-        "Insalata",
-        "Proteico",
-        "Fresco"
-      ],
-      "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Prodotto presente nel menu testuale; non ho trovato una foto univoca sul sito pubblico.",
-        "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
-      },
-      "categoryGroup": "insalate",
-      "dietType": "onnivora",
-      "needsDietReview": false,
-      "supportsExtras": true
-    },
-    {
       "id": "insalate-pesce-asiatica-0",
       "name": "Asiatica",
       "price": 10,
@@ -2005,7 +1971,7 @@ window.__PAGNOTTELLA_MENU__ = {
     {
       "id": "insalate-pesce-cefalu-2",
       "name": "Cefalu",
-      "price": 11,
+      "price": 12,
       "desc": "carpaccio di pesce spada, mozzarella, pomodoro, origano, olive**",
       "cat": "insalate",
       "img": "./assets/pagnottella/images/products/insalate_cefalu__insalata_cefalu.jpg",
@@ -2109,7 +2075,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "id": "insalate-pesce-fresca-5",
       "name": "Fresca",
       "price": 10,
-      "desc": "salmone, feta, cetriolo, semi di chia, rucola",
+      "desc": "salmone, feta, cetriolo, sesamo nero, rucola",
       "cat": "insalate",
       "img": "./assets/pagnottella/images/products/insalate_fresca__supplier_20260806.webp",
       "tags": [
@@ -2143,8 +2109,8 @@ window.__PAGNOTTELLA_MENU__ = {
     {
       "id": "insalate-pesce-hawaii-6",
       "name": "Hawaii",
-      "price": 11,
-      "desc": "salmone, anacardi, edamame, hummus di ceci, cavolo rosso, sesamo nero",
+      "price": 12,
+      "desc": "salmone, hummus di ceci, edamame, anacardi, cavolo rosso, sesamo nero",
       "cat": "insalate",
       "img": "./assets/pagnottella/images/products/insalate_hawaii__insalata_hawaii.jpg",
       "tags": [
@@ -2176,7 +2142,7 @@ window.__PAGNOTTELLA_MENU__ = {
     {
       "id": "insalate-pesce-isolana-7",
       "name": "Isolana",
-      "price": 9,
+      "price": 10,
       "desc": "tonno, feta, olive**, carciofini",
       "cat": "insalate",
       "img": "./assets/pagnottella/images/products/insalate_isolana__supplier_20260806.webp",
@@ -2307,7 +2273,7 @@ window.__PAGNOTTELLA_MENU__ = {
     {
       "id": "insalate-pesce-pantelleria-11",
       "name": "Pantelleria",
-      "price": 11,
+      "price": 12,
       "desc": "carpaccio di pesce spada, melanzane grigliate*, pomodori secchi, granella di pistacchio",
       "cat": "insalate",
       "img": "./assets/pagnottella/images/products/insalate_pantelleria__supplier_20260806.webp",
@@ -2342,7 +2308,7 @@ window.__PAGNOTTELLA_MENU__ = {
     {
       "id": "insalate-pesce-salentina-12",
       "name": "Salentina",
-      "price": 11,
+      "price": 12,
       "desc": "Burrata pugliese, pomodoro, acciughe, capperi, olive**, origano",
       "cat": "insalate",
       "img": "./assets/pagnottella/images/products/insalate_salentina__insalata_salentina.jpg",
@@ -2441,7 +2407,7 @@ window.__PAGNOTTELLA_MENU__ = {
     {
       "id": "insalate-pesce-siracusa-15",
       "name": "Siracusa",
-      "price": 9,
+      "price": 10,
       "desc": "tonno, capperi, feta, cipolla, radicchio",
       "cat": "insalate",
       "img": "./assets/pagnottella/images/products/insalate_siracusa__insalata_siracusa.jpg",
@@ -2707,7 +2673,7 @@ window.__PAGNOTTELLA_MENU__ = {
       "id": "insalate-veg-reginella-4",
       "name": "Reginella",
       "price": 12,
-      "desc": "mozzarella di Bufala DOP 125gr, pachino gialli e rossi, melanzane e zucchine grigliate, pinoli, basilico",
+      "desc": "mozzarella di Bufala DOP 125gr, pachino rossi e gialli, melanzane e zucchine grigliate*, pinoli, basilico",
       "cat": "insalate",
       "img": "./assets/pagnottella/images/products/insalate_reginella__insalata_reginella.jpg",
       "tags": [
@@ -2774,39 +2740,6 @@ window.__PAGNOTTELLA_MENU__ = {
       "supportsExtras": true
     },
     {
-      "id": "speciali-apollo-0",
-      "name": "Apollo",
-      "price": 12,
-      "desc": "Pollo CBT, uovo sodo, pachino, salsa tartara, rucola e sesamo nero.",
-      "cat": "speciali",
-      "img": "./assets/pagnottella/images/products/speciali_apollo__apollo.jpg",
-      "tags": [
-        "Top",
-        "Insalata",
-        "Proteico",
-        "Fresco"
-      ],
-      "imageMeta": {
-        "assigned": true,
-        "specific": true,
-        "source": "fornitore-email-2026-07-24",
-        "confidence": "alta",
-        "label": "Foto prodotto fornita dal fornitore",
-        "mappingType": "foto_specifica_fornitore",
-        "originalFilename": "apollo_2.jpeg",
-        "filename": "speciali_apollo__apollo.jpg",
-        "basis": "filename fornito dal ristoratore + contenuto coerente con il prodotto",
-        "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": false,
-        "sourcePage": "Email La Pagnottella Gourmet del 24/07/2026",
-        "auditPublishable": true
-      },
-      "categoryGroup": "speciali",
-      "dietType": "onnivora",
-      "needsDietReview": false,
-      "supportsExtras": false
-    },
-    {
       "id": "insalate-pesce-tropicana-19",
       "name": "Tropicana",
       "price": 12,
@@ -2834,6 +2767,36 @@ window.__PAGNOTTELLA_MENU__ = {
       "dietType": "pescetariana",
       "needsDietReview": false,
       "supportsExtras": true
+    },
+    {
+      "id": "speciali-olivia-0",
+      "name": "Olivia",
+      "price": 12,
+      "desc": "pollo CBT, cavolo rosso, zucchine grigliate*, anacardi e pomodori secchi",
+      "cat": "speciali",
+      "img": "./assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "tags": [
+        "Top",
+        "Insalata",
+        "Proteico",
+        "Fresco"
+      ],
+      "imageMeta": {
+        "assigned": false,
+        "specific": false,
+        "source": "volantino-sella-2026-09-02",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Nuova proposta del volantino Sella; la foto impaginata non è disponibile come asset prodotto separato.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
+      },
+      "categoryGroup": "speciali",
+      "dietType": "onnivora",
+      "needsDietReview": false,
+      "supportsExtras": false
     },
     {
       "id": "bevande-acqua-0",
@@ -2891,38 +2854,10 @@ window.__PAGNOTTELLA_MENU__ = {
       "supportsExtras": false
     },
     {
-      "id": "bevande-macedonia-2",
-      "name": "Macedonia",
-      "price": 2.5,
-      "desc": "Macedonia fresca pronta per il pranzo.",
-      "cat": "dolci",
-      "img": "./assets/pagnottella/images/optimized/logo_pagnottella.webp",
-      "tags": [
-        "Dessert",
-        "Fresco"
-      ],
-      "imageMeta": {
-        "assigned": false,
-        "specific": false,
-        "source": "audit-completo",
-        "confidence": "nessuna",
-        "label": "Foto specifica non disponibile",
-        "mappingType": "nessuna_foto_specifica",
-        "basis": "Il catalogo pubblico non espone una fotografia univoca per questo prodotto.",
-        "needsSupplierConfirmation": false,
-        "requiresSupplierPhoto": true,
-        "auditPublishable": false
-      },
-      "categoryGroup": "dolci",
-      "dietType": "vegana",
-      "needsDietReview": false,
-      "supportsExtras": false
-    },
-    {
       "id": "bevande-birre-3",
       "name": "Birre artigianali",
       "price": 5,
-      "desc": "Selezione di birre artigianali del punto vendita.",
+      "desc": "Selezione di birre artigianali del punto vendita, da €5 a €6.",
       "cat": "bevande",
       "img": "./assets/pagnottella/images/optimized/logo_pagnottella.webp",
       "tags": [
@@ -2936,6 +2871,63 @@ window.__PAGNOTTELLA_MENU__ = {
         "label": "Foto specifica non disponibile",
         "mappingType": "nessuna_foto_specifica",
         "basis": "Il catalogo pubblico non espone una fotografia univoca per questo prodotto.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
+      },
+      "categoryGroup": "bevande",
+      "dietType": "tutte",
+      "needsDietReview": false,
+      "supportsExtras": false,
+      "isActive": false,
+      "orderable": false,
+      "disabledReason": "Prodotto non ordinabile tramite DOSepranza"
+    },
+    {
+      "id": "bevande-caffe-4",
+      "name": "Caffè",
+      "price": 1,
+      "desc": "Caffè espresso.",
+      "cat": "bevande",
+      "img": "./assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "tags": [
+        "Bevanda"
+      ],
+      "imageMeta": {
+        "assigned": false,
+        "specific": false,
+        "source": "volantino-sella-2026-09-02",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Voce presente nel nuovo volantino Sella senza fotografia prodotto dedicata.",
+        "needsSupplierConfirmation": false,
+        "requiresSupplierPhoto": true,
+        "auditPublishable": false
+      },
+      "categoryGroup": "bevande",
+      "dietType": "tutte",
+      "needsDietReview": false,
+      "supportsExtras": false
+    },
+    {
+      "id": "bevande-calice-vino-5",
+      "name": "Calice di vino",
+      "price": 5,
+      "desc": "Calice di vino disponibile al punto vendita.",
+      "cat": "bevande",
+      "img": "./assets/pagnottella/images/optimized/logo_pagnottella.webp",
+      "tags": [
+        "Bevanda"
+      ],
+      "imageMeta": {
+        "assigned": false,
+        "specific": false,
+        "source": "volantino-sella-2026-09-02",
+        "confidence": "nessuna",
+        "label": "Foto specifica non disponibile",
+        "mappingType": "nessuna_foto_specifica",
+        "basis": "Voce presente nel nuovo volantino Sella senza fotografia prodotto dedicata.",
         "needsSupplierConfirmation": false,
         "requiresSupplierPhoto": true,
         "auditPublishable": false
@@ -3339,7 +3331,7 @@ window.__PAGNOTTELLA_MENU__ = {
     "allergens": "1 glutine, 2 crostacei, 3 uova, 4 pesce, 5 arachidi, 6 soia, 7 latte, 8 frutta a guscio, 9 sedano, 10 senape, 11 sesamo, 12 solfiti, 13 lupini, 14 molluschi.",
     "frozen": "* Prodotto surgelato.",
     "olive": "** Le olive potrebbero contenere eccezionalmente noccioli.",
-    "priceValidity": "Promo estate 2026: sconto 20% fino al 30/08/2026. Dal 31/08/2026 lo sconto DOSepranza del 10% viene applicato automaticamente ai prezzi esposti."
+    "priceValidity": "Ricette e prezzi indicati nel volantino validi fino al 31/12/2027. Lo sconto DOSepranza del 10% viene applicato automaticamente ai prezzi esposti."
   },
   "extras": [
     {
