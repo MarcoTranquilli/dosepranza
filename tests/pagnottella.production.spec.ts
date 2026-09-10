@@ -56,9 +56,9 @@ test('bootstrap elimina cache legacy senza richiedere swreset', async ({page}, t
     await legacy.put('./legacy-response', new Response('stale'));
   });
   await page.goto('./?e2e=1');
-  await expect(page).toHaveURL(/cachev=discount-included-1/);
+  await expect(page).toHaveURL(/cachev=discount-applied-2/);
   await expect.poll(() => page.evaluate(() => caches.keys())).not.toContain('dose-legacy-cache');
-  await expect.poll(() => page.evaluate(() => localStorage.getItem('dose_cache_release'))).toBe('discount-included-1');
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('dose_cache_release'))).toBe('discount-applied-2');
   await expect(page).not.toHaveURL(/swreset/);
   await expect(page.locator('#authGateGoogle')).toBeVisible();
 });
@@ -137,7 +137,8 @@ test('metodo di pagamento comunica selezione senza sovrapposizioni', async ({pag
   await googleLogin(page);
   await page.locator('.pagnottellaCard').click();
   await page.locator('#search').fill('Saporito');
-  await expect(page.locator('#grid .card .old')).toHaveCount(0);
+  await expect(page.locator('#grid .card .old')).toHaveText('€8,00');
+  await expect(page.locator('#grid .card .price')).toContainText('€7,20');
   await page.locator('#grid .card').first().locator('.add').click();
   await page.getByRole('button', {name:'Aggiungi al carrello'}).click();
   await page.getByRole('button', {name:'Vedi carrello'}).click();
@@ -183,12 +184,12 @@ test('popup WhatsApp bloccato mantiene carrello e non duplica ordine', async ({p
   await page.getByRole('button', {name:'Aggiungi al carrello'}).click();
   await expect(page.locator('#discountLabel')).toContainText('10%');
   await expect(page.locator('#discountLabel')).toContainText('Sconto DOSepranza');
-  await expect(page.locator('#discountLabel')).toContainText('già incluso');
-  await expect(page.locator('#finalTotal')).toContainText('€8,00');
+  await expect(page.locator('#discountLabel')).toContainText('-10%');
+  await expect(page.locator('#finalTotal')).toContainText('€7,20');
   if (testInfo.project.name === 'mobile') await page.getByRole('button', {name:'Vedi carrello'}).click();
   await expect(page.locator('#sendOrderLabel')).toHaveText('Rivedi e conferma ordine');
   await expect(page.locator('#cartPrimaryAction')).toBeVisible();
-  await expect(page.locator('#cartActionTotal')).toHaveText('€8,00');
+  await expect(page.locator('#cartActionTotal')).toHaveText('€7,20');
   await expect(page.locator('#sendOrderBtn')).toBeInViewport();
   await page.evaluate(() => {
     window.open = url => {
@@ -232,8 +233,8 @@ test('popup WhatsApp bloccato mantiene carrello e non duplica ordine', async ({p
   await expect(page.locator('#cartCount')).toHaveText('1');
   expect(await page.evaluate(() => (globalThis as typeof globalThis & {__orderCreates?:number}).__orderCreates)).toBe(1);
   expect(await page.evaluate(() => (globalThis as typeof globalThis & {__lastOrder?:unknown}).__lastOrder)).toMatchObject({
-    total:8,
-    discountRate:0
+    total:7.2,
+    discountRate:0.1
   });
   await page.getByRole('button', {name:'Riprova WhatsApp'}).click();
   await page.locator('#paymentConfirmAccept').click();
