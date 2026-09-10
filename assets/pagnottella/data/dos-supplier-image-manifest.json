@@ -1,7 +1,7 @@
 {
   "importBatch": "2026-08-06",
   "sourcePackage": "foto dos design",
-  "count": 37,
+  "count": 36,
   "images": [
     {
       "productId": "panini-veg-campagnolo-1",
@@ -85,18 +85,6 @@
       "mobile": "../assets/pagnottella/images/products/panini_gustoso__supplier_20260806-640.webp",
       "desktopBytes": 83884,
       "mobileBytes": 19878,
-      "colorConversion": "source_RGB"
-    },
-    {
-      "productId": "panini-carne-oregan-16",
-      "productName": "Oregan",
-      "category": "panini",
-      "sourceFilename": "oregan.jpg",
-      "sourceChecksum": "3cbd2269698ff0a33b23becedb7dad593380e4ce404a2322fe405f05b3454955",
-      "desktop": "../assets/pagnottella/images/products/panini_oregan__supplier_20260806.webp",
-      "mobile": "../assets/pagnottella/images/products/panini_oregan__supplier_20260806-640.webp",
-      "desktopBytes": 95614,
-      "mobileBytes": 37472,
       "colorConversion": "source_RGB"
     },
     {

@@ -299,7 +299,7 @@ test('tassonomia completa e combinazioni cluster-regime coerenti', async ({ page
       invalidExtras: products.filter(product => product.supportsExtras !== ['panini', 'insalate'].includes(String(product.categoryGroup))).length
     };
   });
-  expect(taxonomy).toEqual({ total:102, missing:0, reviews:4, beverages:11, invalidExtras:0 });
+  expect(taxonomy).toEqual({ total:102, missing:0, reviews:4, beverages:13, invalidExtras:0 });
 
   for(const [cluster, diet] of [
     ['all', 'vegana'],
@@ -381,7 +381,7 @@ test('ingredienti aggiuntivi solo sui prodotti personalizzabili', async ({ page 
     await expect(page.locator('#drawerExtrasSection')).not.toHaveClass(/hidden/);
     await closeProductDrawer(page);
   }
-  for(const product of ['Acqua 0,5 lt', 'Pane e Nutella', 'Apollo']) {
+  for(const product of ['Acqua 0,5 lt', 'Pane e Nutella', 'Olivia']) {
     await page.locator('#search').fill(product);
     await page.locator('#grid .card').filter({ hasText:product }).first().locator('.details').click();
     await expect(page.locator('#drawerExtrasSection')).toHaveClass(/hidden/);
@@ -398,7 +398,7 @@ test('personalizzazioni ed extra creano righe distinte e aggiornano il totale', 
   await expect(page.locator('#cartItems')).toContainText('Pane integrale ai cereali');
   await expect(page.locator('#cartItems')).toContainText('Pane bianco');
   await expect(page.locator('#cartItems')).toContainText('Extra: Funghi (+€0,50)');
-  await expect(page.locator('#finalTotal')).toHaveText('€13,60');
+  await expect(page.locator('#finalTotal')).toHaveText('€15,30');
   await expect(page.locator('#cartCount')).toHaveText('2');
 });
 
@@ -446,7 +446,7 @@ test('WhatsApp include configurazioni ed extra senza preview visibile', async ({
   await expect.poll(whatsappText).toContain('Pane integrale ai cereali');
   await expect.poll(whatsappText).toContain('Funghi');
   await expect.poll(whatsappText).toContain('Pesto');
-  await expect.poll(whatsappText).toContain('entro le 12:00');
+  await expect.poll(whatsappText).not.toContain('entro le 12:00');
   await popup.close();
 });
 
@@ -456,8 +456,8 @@ test('ordini giornata, riconciliazione, analisi ed export CSV', async ({ page },
   await page.getByRole('button', { name:'Vedi carrello' }).click();
   await confirmOrder(page);
   await expect(page.locator('#adminOrdersCount')).toHaveText('1');
-  await expect(page.locator('#adminRevenue')).toHaveText('€7,20');
-  await expect(page.locator('#adminAverage')).toHaveText('€7,20');
+  await expect(page.locator('#adminRevenue')).toHaveText('€8,10');
+  await expect(page.locator('#adminAverage')).toHaveText('€8,10');
   await expect(page.locator('#adminOrdersList')).toContainText('Pane integrale ai cereali');
   await expect(page.locator('#adminOrdersList')).toContainText('Funghi');
   await expect(page.locator('#adminOrdersList')).toContainText('Dichiarato pagato');

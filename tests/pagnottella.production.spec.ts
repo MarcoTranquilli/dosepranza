@@ -56,9 +56,9 @@ test('bootstrap elimina cache legacy senza richiedere swreset', async ({page}, t
     await legacy.put('./legacy-response', new Response('stale'));
   });
   await page.goto('./?e2e=1');
-  await expect(page).toHaveURL(/cachev=discount-applied-2/);
+  await expect(page).toHaveURL(/cachev=flyer-sella-1/);
   await expect.poll(() => page.evaluate(() => caches.keys())).not.toContain('dose-legacy-cache');
-  await expect.poll(() => page.evaluate(() => localStorage.getItem('dose_cache_release'))).toBe('discount-applied-2');
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('dose_cache_release'))).toBe('flyer-sella-1');
   await expect(page).not.toHaveURL(/swreset/);
   await expect(page.locator('#authGateGoogle')).toBeVisible();
 });
@@ -76,7 +76,7 @@ test('UI production pulita, responsive e catalogo compliant', async ({page}, tes
   });
   await page.reload();
   await page.locator('.pagnottellaCard').click();
-  await expect(page.locator('#grid .card')).toHaveCount(101);
+  await expect(page.locator('#grid .card')).toHaveCount(100);
   await page.locator('#search').fill('Birre artigianali');
   await expect(page.locator('#grid .card')).toHaveCount(0);
   await page.locator('#search').fill('Saporito');
@@ -85,6 +85,38 @@ test('UI production pulita, responsive e catalogo compliant', async ({page}, tes
     await expect(page.locator('#mobileBar')).toBeHidden();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   }
+});
+
+test('catalogo recepisce il volantino Sella aggiornato', async ({page}, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'Verifica dati catalogo desktop');
+  await page.goto('./?e2e=1');
+  await page.evaluate(() => {
+    localStorage.setItem('dose_e2e', '1');
+    localStorage.setItem('dose_user', JSON.stringify({uid:'dos_user',name:'Utente DOS',email:'dos_user@dos.design',provider:'google.com'}));
+  });
+  await page.reload();
+  await page.locator('.pagnottellaCard').click();
+
+  for (const [name, listPrice, discounted] of [
+    ['Goloso', '€9,00', '€8,10'],
+    ['Marinaro duepuntozero', '€10,00', '€9,00'],
+    ['Olivia', '€12,00', '€10,80'],
+    ['Caffè', '€1,00', '€0,90']
+  ]) {
+    await page.locator('#search').fill(name);
+    const card = page.locator('#grid .card').filter({hasText:name}).first();
+    await expect(card).toBeVisible();
+    await expect(card.locator('.old')).toHaveText(listPrice);
+    await expect(card.locator('.price')).toContainText(discounted);
+  }
+
+  for (const removed of ['Oregan', 'Apollo', 'Macedonia']) {
+    await page.locator('#search').fill(removed);
+    await expect(page.locator('#grid .card')).toHaveCount(0);
+  }
+  await page.locator('#search').fill('Calice di vino');
+  await expect(page.locator('#grid .card')).toHaveCount(0);
+  await expect(page.locator('#price-validity-note')).toContainText('31/12/2027');
 });
 
 test('matrice ruoli e accessi è calcolata dall’email', async ({page}) => {
