@@ -175,12 +175,24 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             ]
         };
 
+        const RUSSO_PENDING_CHECKOUT_KEY = 'dose_russo_pending_checkout';
+        const restoredCheckout = (() => {
+            try {
+                const value = JSON.parse(sessionStorage.getItem(RUSSO_PENDING_CHECKOUT_KEY) || 'null');
+                if(!value || !Array.isArray(value.cart) || !value.pendingOrder) return null;
+                return value;
+            } catch(e) {
+                sessionStorage.removeItem(RUSSO_PENDING_CHECKOUT_KEY);
+                return null;
+            }
+        })();
         const state = {
             user: JSON.parse(localStorage.getItem('dose_user')) || null,
-            cart: [], currentView: 'menu', search: '', cat: 'all', diet: 'all', posate: false,
+            cart: restoredCheckout?.cart || [], currentView: 'menu', search: '', cat: 'all', diet: 'all', posate: false,
             custom: { base: null, subtype: null, ings: [], total: 3.5 },
             ordersToday: [], menuData: [], menuExtras: [], customMenuItems: [], menuOverrides: new Map(), disabledProducts: new Set(),
             orderSubmitting: false,
+            checkoutRestored: false,
             frige: { products: [], purchasesToday: [], refillsToday: [], selected: null, filter: 'all', paymentFilter: 'pending' },
             customCreations: [],
             customFilter: 'all',
@@ -189,7 +201,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             ordersSelected: {},
             menuAudit: [],
             menuAuditFilter: 'all',
-            pendingOrder: null,
+            pendingOrder: restoredCheckout?.pendingOrder || null,
             e2eNavDone: false,
             authReady: false,
             analytics: { ordersAll: [], frigeAll: [], frigeProducts: [], refillsOpen: [], unsub: {}, range: 'today', lastPreset: 'today', resolution: { orders: 'daily', frige: 'daily' }, targets: { orders: { min: null, max: null }, frige: { min: null, max: null } }, chartData: {}, zoom: { orders: null, frige: null } },
@@ -1209,6 +1221,15 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             const modal = document.getElementById('order-send-modal');
             if(modal) modal.classList.add('hidden');
             state.pendingOrder = null;
+            sessionStorage.removeItem(RUSSO_PENDING_CHECKOUT_KEY);
+        }
+
+        function preserveCheckoutForGoogleRedirect() {
+            sessionStorage.setItem(RUSSO_PENDING_CHECKOUT_KEY, JSON.stringify({
+                cart: state.cart,
+                pendingOrder: state.pendingOrder,
+                savedAt: Date.now()
+            }));
         }
 
         async function resolveOrderAuthUser() {
@@ -1286,8 +1307,11 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
         const orderSaveErrorMessage = error => {
             const code = String(error?.code || '');
             if(code === 'auth/account-not-authorized') return 'Usa il tuo account Google aziendale @dos.design per inviare l\'ordine.';
-            if(['auth/session-missing', 'auth/provider-mismatch', 'permission-denied', 'firestore/permission-denied'].includes(code)) {
-                return 'Sessione Google non valida per salvare l\'ordine. Esci, accedi di nuovo con l\'account @dos.design e riprova: il carrello resta intatto.';
+            if(['auth/session-missing', 'auth/provider-mismatch'].includes(code)) {
+                return 'La sessione Google deve essere riconfermata. Il carrello resta intatto.';
+            }
+            if(['permission-denied', 'firestore/permission-denied'].includes(code)) {
+                return 'Firestore ha negato il salvataggio dell\'ordine. Il carrello resta intatto: segnala il problema al supporto.';
             }
             return 'Ordine non salvato per un problema di rete. Il carrello è intatto: controlla la connessione e riprova.';
         };
@@ -1322,15 +1346,21 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
                         console.warn('order confirmation notification failed', err);
                     });
                 state.pendingOrder = null;
+                sessionStorage.removeItem(RUSSO_PENDING_CHECKOUT_KEY);
                 state.cart = []; document.getElementById('cart-count').textContent='0'; window.navigate('history'); window.toast("Inviato!");
             } catch(e) {
                 console.warn('order save failed', orderSaveDiagnostics(e, 'firestore-create'));
                 const message = orderSaveErrorMessage(e);
+                const needsGoogleReconnect = ['auth/session-missing', 'auth/provider-mismatch'].includes(String(e?.code || ''));
                 if(errorBox) {
-                    errorBox.textContent = message;
+                    errorBox.textContent = needsGoogleReconnect ? `${message} Reindirizzamento a Google in corso…` : message;
                     errorBox.classList.remove('hidden');
                 }
                 window.toast(message);
+                if(needsGoogleReconnect && window.DoseSupplierAccess?.signInWithGoogle) {
+                    preserveCheckoutForGoogleRedirect();
+                    await window.DoseSupplierAccess.signInWithGoogle();
+                }
             } finally {
                 state.orderSubmitting = false;
                 if(submit) {
@@ -3919,6 +3949,11 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
                 }
                 syncMyOrders();
                 renderDailySummaryInline();
+                if(!isAnon && restoredCheckout && !state.checkoutRestored) {
+                    state.checkoutRestored = true;
+                    sessionStorage.removeItem(RUSSO_PENDING_CHECKOUT_KEY);
+                    openSendConfirm(restoredCheckout.pendingOrder);
+                }
             } else {
                 state.authReady = false;
                 state.authSignInProvider = '';
@@ -4055,6 +4090,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             document.getElementById('category-select').onchange = (e) => { state.cat = e.target.value; renderMenu(); };
             document.getElementById('diet-select').onchange = (e) => { state.diet = e.target.value; renderMenu(); };
             renderMenu();
+            document.getElementById('cart-count').textContent = String(state.cart.length);
             // Refresh menu lock state every minute
             setInterval(renderMenu, 60000);
             if(window.innerWidth < 430) document.body.classList.add('compact');
@@ -4065,6 +4101,11 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             renderMyOrderStatus();
             if(isLocalE2E && state.user?.email) {
                 setRole(state.user.email);
+            }
+            if(isLocalE2E && restoredCheckout && !state.checkoutRestored) {
+                state.checkoutRestored = true;
+                sessionStorage.removeItem(RUSSO_PENDING_CHECKOUT_KEY);
+                openSendConfirm(restoredCheckout.pendingOrder);
             }
             window.setHistoryView?.('ops');
             ensureHistoryVisibleForE2E();
