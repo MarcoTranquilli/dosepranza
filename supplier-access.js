@@ -78,6 +78,7 @@
   const isFilePreview = () => window.location.protocol === 'file:';
   const isLoopback = () => ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
   const isProductionSuiteEntry = () => new URLSearchParams(window.location.search).get('suite') === 'production';
+  const isGitHubPages = () => window.location.hostname === 'marcotranquilli.github.io';
   const isE2E = () => {
     if (!isLoopback()) return false;
     const params = new URLSearchParams(window.location.search);
@@ -393,6 +394,7 @@
     provider.addScope('email');
     provider.addScope('profile');
     provider.setCustomParameters({ prompt: 'select_account' });
+    if (isGitHubPages()) return startGoogleRedirect(auth, authSdk, provider);
     try {
       let result;
       try {
