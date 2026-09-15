@@ -19,8 +19,15 @@ service cloud.firestore {
         );
     }
 
+    function authenticatedEmail() {
+      return request.auth.token.get(
+        'email',
+        request.auth.token.get('firebase', {}).get('identities', {}).get('google.com', [''])[0]
+      );
+    }
+
     function isStaffEmail() {
-      return isSignedIn() && request.auth.token.email in [
+      return isSignedIn() && authenticatedEmail() in [
         'marco.tranquilli@dos.design',
         'lorenzo.russo@alimentarirusso',
         'russolorenzo11@gmail.com',
@@ -32,17 +39,17 @@ service cloud.firestore {
 
     function isAdminEmail() {
       return isSignedIn()
-        && request.auth.token.email == 'marco.tranquilli@dos.design';
+        && authenticatedEmail() == 'marco.tranquilli@dos.design';
     }
 
     function isDosUser() {
       return isGoogleProvider()
-        && request.auth.token.get('email', '').matches('^[^@]+@dos[.]design$');
+        && authenticatedEmail().matches('^[^@]+@dos[.]design$');
     }
 
     function isPagnottellaSupplier() {
       return isGoogleProvider()
-        && request.auth.token.email in [
+        && authenticatedEmail() in [
           'commerciale@lapagnottellagourmet.it',
           'isidorovagnozzi@gmail.com'
         ];
@@ -50,7 +57,7 @@ service cloud.firestore {
 
     function isRussoSupplier() {
       return isGoogleProvider()
-        && request.auth.token.email in [
+        && authenticatedEmail() in [
           'lorenzo.russo@alimentarirusso',
           'russolorenzo11@gmail.com'
         ];

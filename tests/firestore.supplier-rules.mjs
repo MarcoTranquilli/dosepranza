@@ -30,6 +30,9 @@ const linkedGoogleDosUser = env.authenticatedContext('uid-dos_user', {
   email:'utente@dos.design', email_verified:true,
   firebase:{ sign_in_provider:'anonymous', identities:{ 'google.com':['utente@dos.design'] } }
 }).firestore();
+const googleDosUserWithoutPrimaryEmail = env.authenticatedContext('uid-dos_user', {
+  firebase:{ sign_in_provider:'google.com', identities:{ 'google.com':['utente@dos.design'] } }
+}).firestore();
 const nonGoogleDosUser = env.authenticatedContext('uid-dos_user', {
   email:'utente@dos.design', firebase:{ sign_in_provider:'anonymous' }
 }).firestore();
@@ -107,6 +110,8 @@ try {
   await assertSucceeds(addDoc(collection(dos_user, 'orders'), order('pagnottella', 'uid-dos_user', 'utente@dos.design')));
   await assertSucceeds(getDoc(doc(linkedGoogleDosUser, 'orders', 'pg-order')));
   await assertSucceeds(addDoc(collection(linkedGoogleDosUser, 'orders'), order('russo', 'uid-dos_user', 'utente@dos.design')));
+  await assertSucceeds(getDoc(doc(googleDosUserWithoutPrimaryEmail, 'orders', 'pg-order')));
+  await assertSucceeds(addDoc(collection(googleDosUserWithoutPrimaryEmail, 'orders'), order('russo', 'uid-dos_user', 'utente@dos.design')));
   await assertFails(getDoc(doc(nonGoogleDosUser, 'orders', 'pg-order')));
   await assertFails(addDoc(collection(nonGoogleDosUser, 'orders'), order('russo', 'uid-dos_user', 'utente@dos.design')));
   await assertFails(addDoc(collection(dos_user, 'orders'), order('russo', 'uid-other', 'utente@dos.design')));
