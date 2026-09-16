@@ -224,6 +224,14 @@
 
   async function firebaseUserPayload(firebaseUser, { result = null } = {}) {
     if (!firebaseUser || firebaseUser.isAnonymous || !firebaseUser.uid) return null;
+    if (!firebaseUser.email && hasGoogleProvider(firebaseUser.providerData)) {
+      try {
+        await firebaseUser.reload();
+        await firebaseUser.getIdToken(true);
+      } catch (error) {
+        recordAuthError(error);
+      }
+    }
     const identity = resolveAuthenticatedIdentity(firebaseUser, result);
     if (!identity.email) return null;
     let tokenResult = null;

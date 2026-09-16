@@ -3913,6 +3913,14 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             resetStaffSubscriptions();
             resetMyOrdersSubscription();
             if(u) {
+                if(!u.isAnonymous && !u.email && (u.providerData || []).some(provider => provider?.providerId === 'google.com')) {
+                    try {
+                        await u.reload();
+                        await u.getIdToken(true);
+                    } catch(e) {
+                        console.warn('Google identity refresh failed', e?.code || 'auth/identity-refresh-failed');
+                    }
+                }
                 state.authReady = true;
                 state.authSignInProvider = u.isAnonymous ? '' : (getProviderIds().includes('google.com') ? 'google.com' : state.authSignInProvider);
                 let cached = null;

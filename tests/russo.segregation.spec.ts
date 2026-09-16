@@ -237,9 +237,11 @@ test('sorgente Russo applica supplierId, query segregata e guard fornitore', asy
   expect(access).toContain('if (isGitHubPages()) return startGoogleRedirect');
   expect(access).toContain('firebaseVerified: true');
   expect(russoIndex).toContain('<base href="../">');
-  expect(russoIndex).toContain('src="supplier-access.js?v=russo-auth-reconnect-1"');
-  expect(russoIndex).toContain('src="app.v20260325.js?v=russo-auth-reconnect-1"');
-  expect(suite).toContain('../russo/?suite=production&v=russo-auth-reconnect-1');
+  expect(russoIndex).toContain('src="supplier-access.js?v=auth-record-refresh-1"');
+  expect(russoIndex).toContain('src="app.v20260325.js?v=auth-record-refresh-1"');
+  expect(suite).toContain('../russo/?suite=production&v=auth-record-refresh-1');
+  expect(app).toContain("await u.reload()");
+  expect(access).toContain('await firebaseUser.reload()');
   expect(app).toContain("https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0");
   expect(app).not.toContain("http://web.satispay.com/");
 });
