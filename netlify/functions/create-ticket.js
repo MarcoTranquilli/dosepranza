@@ -102,6 +102,10 @@ async function jiraJson(url, options) {
   if (!response.ok) {
     const error = new Error(`Jira HTTP ${response.status}`);
     error.statusCode = response.status;
+    error.upstreamMessage = cleanText(
+      body.errorMessage || body.i18nErrorMessage?.i18nKey || body.errorMessages?.join(' ') || '',
+      300,
+    );
     throw error;
   }
   return body;
@@ -187,6 +191,7 @@ export async function handler(event) {
       success: false,
       error: 'Jira non ha accettato la segnalazione. Riprova più tardi.',
       upstreamStatus: error.statusCode || 500,
+      upstreamMessage: error.upstreamMessage || '',
     }, origin);
   }
 }
