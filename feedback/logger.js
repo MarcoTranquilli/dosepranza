@@ -31,7 +31,7 @@
     if (entries.length > MAX_ENTRIES) entries.splice(0, entries.length - MAX_ENTRIES);
   }
 
-  ['log', 'warn', 'error'].forEach((level) => {
+  ['log', 'info', 'warn', 'error'].forEach((level) => {
     const original = console[level].bind(console);
     console[level] = function wrappedConsole(...args) {
       capture(level, args);

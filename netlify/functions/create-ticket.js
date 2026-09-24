@@ -171,7 +171,7 @@ export async function handler(event) {
       const image = Buffer.from(screenshotMatch[2], 'base64');
       if (image.length <= MAX_SCREENSHOT_BYTES) {
         try {
-          await uploadAttachment(config, issueKey, image, `dosepranza-${Date.now()}.${screenshotMatch[1] === 'jpeg' ? 'jpg' : 'png'}`, `image/${screenshotMatch[1]}`);
+          await uploadAttachment(config, issueKey, image, `screenshot_${Date.now()}.${screenshotMatch[1] === 'jpeg' ? 'jpg' : 'png'}`, `image/${screenshotMatch[1]}`);
         } catch (_) {
           attachmentWarnings.push('screenshot');
         }
@@ -179,7 +179,7 @@ export async function handler(event) {
     }
     if (logs.length) {
       try {
-        await uploadAttachment(config, issueKey, Buffer.from(JSON.stringify(logs, null, 2), 'utf8'), `dosepranza-logs-${Date.now()}.json`, 'application/json');
+        await uploadAttachment(config, issueKey, Buffer.from(JSON.stringify(logs, null, 2), 'utf8'), `console_logs_${Date.now()}.txt`, 'text/plain');
       } catch (_) {
         attachmentWarnings.push('logs');
       }
