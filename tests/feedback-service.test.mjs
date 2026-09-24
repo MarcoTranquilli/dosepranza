@@ -13,6 +13,8 @@ assert.doesNotMatch(logs[0].message, /super-secret|eyJabcdefgh/);
 
 const blocked = await handler({ httpMethod: 'POST', headers: { origin: 'https://evil.example' }, body: JSON.stringify(valid) });
 assert.equal(blocked.statusCode, 403);
+const previewOrigin = await handler({ httpMethod: 'POST', headers: { origin: 'https://abc123--app-dosepranza.netlify.app' }, body: '{' });
+assert.equal(previewOrigin.statusCode, 400);
 const invalid = await handler({ httpMethod: 'POST', headers: { origin: 'https://marcotranquilli.github.io' }, body: '{' });
 assert.equal(invalid.statusCode, 400);
 const unconfigured = await handler({ httpMethod: 'POST', headers: { origin: 'https://marcotranquilli.github.io' }, body: JSON.stringify(valid) });

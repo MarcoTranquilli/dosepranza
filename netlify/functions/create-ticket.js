@@ -11,7 +11,8 @@ function allowedOrigins() {
 
 function corsOrigin(event) {
   const origin = event.headers?.origin || event.headers?.Origin || '';
-  return allowedOrigins().includes(origin) ? origin : '';
+  const isDosePreview = /^https:\/\/[a-z0-9-]+--app-dosepranza\.netlify\.app$/i.test(origin);
+  return allowedOrigins().includes(origin) || isDosePreview ? origin : '';
 }
 
 function reply(statusCode, payload, origin = '') {
