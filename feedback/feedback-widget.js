@@ -60,13 +60,16 @@
     if (!global.html2canvas) return;
     try {
       root.style.display = 'none';
-      const canvas = await global.html2canvas(document.body, {
-        backgroundColor: '#ffffff',
-        logging: false,
-        useCORS: true,
-        allowTaint: false,
-        scale: Math.min(global.devicePixelRatio || 1, 1.25),
-      });
+      const canvas = await Promise.race([
+        global.html2canvas(document.body, {
+          backgroundColor: '#ffffff',
+          logging: false,
+          useCORS: true,
+          allowTaint: false,
+          scale: Math.min(global.devicePixelRatio || 1, 1.25),
+        }),
+        new Promise((_, reject) => global.setTimeout(() => reject(new Error('capture-timeout')), 5000)),
+      ]);
       state.screenshot = canvas.toDataURL('image/jpeg', 0.7);
       if (state.screenshot.length > 3_500_000) state.screenshot = canvas.toDataURL('image/jpeg', 0.45);
     } catch (error) {
