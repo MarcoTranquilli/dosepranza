@@ -33,8 +33,6 @@
     "@aws-sdk/client-s3": "^3.637.0",
     "@netlify/blobs": "^7.0.0",
     "firebase-admin": "^12.5.0",
-    "form-data": "^4.0.0",
-    "html2canvas": "^1.4.1",
-    "node-fetch": "^3.3.2"
+    "html2canvas": "^1.4.1"
   }
 }

@@ -1,6 +1,3 @@
-import FormData from 'form-data';
-import fetch from 'node-fetch';
-
 const ALLOWED_TYPES = new Set(['bug', 'feature', 'support']);
 const ALLOWED_COMPONENTS = new Set(['accesso', 'russo', 'pagnottella', 'ordine', 'altro']);
 const DEFAULT_ORIGINS = ['https://app-dosepranza.netlify.app', 'https://marcotranquilli.github.io'];
@@ -111,14 +108,13 @@ async function jiraJson(url, options) {
 
 async function uploadAttachment(config, issueKey, buffer, filename, contentType) {
   const form = new FormData();
-  form.append('file', buffer, { filename, contentType, knownLength: buffer.length });
+  form.append('file', new Blob([buffer], { type: contentType }), filename);
   const response = await fetch(`https://${config.domain}/rest/api/3/issue/${encodeURIComponent(issueKey)}/attachments`, {
     method: 'POST',
     headers: {
       Authorization: `Basic ${Buffer.from(`${config.email}:${config.token}`).toString('base64')}`,
       Accept: 'application/json',
       'X-Atlassian-Token': 'no-check',
-      ...form.getHeaders(),
     },
     body: form,
   });
