@@ -21,6 +21,8 @@ cp "${ROOT_DIR}/favicondosepranza.png" "${DIST_DIR}/"
 cp -R "${ROOT_DIR}/assets/branding/." "${DIST_DIR}/assets/branding/"
 cp -R "${ROOT_DIR}/assets/pagnottella/images/." "${DIST_DIR}/assets/pagnottella/images/"
 cp -R "${ROOT_DIR}/assets/pagnottella/payment/." "${DIST_DIR}/assets/pagnottella/payment/"
+mkdir -p "${DIST_ROOT}/feedback"
+cp -R "${ROOT_DIR}/feedback/." "${DIST_ROOT}/feedback/"
 
 node "${ROOT_DIR}/scripts/build_pagnottella_production.mjs"
 touch "${DIST_ROOT}/.nojekyll"

@@ -28,5 +28,6 @@ cp -R assets "$DIST_DIR/" 2>/dev/null || echo "No assets folder"
 cp -R russo "$DIST_DIR/" 2>/dev/null || echo "No russo folder"
 cp -R pagnottella "$DIST_DIR/" 2>/dev/null || echo "No pagnottella folder"
 cp -R reports "$DIST_DIR/" 2>/dev/null || echo "No reports folder"
+cp -R feedback "$DIST_DIR/" 2>/dev/null || echo "No feedback folder"
 
 echo "--- Build completata con successo nella cartella /$DIST_DIR ---"
