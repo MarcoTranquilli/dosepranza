@@ -7,7 +7,11 @@
   const state = { screenshot: '', status: 'idle' };
 
   function endpoint() {
-    if (global.location.hostname === 'localhost' || global.location.hostname === '127.0.0.1') {
+    if (
+      global.location.hostname === 'localhost' ||
+      global.location.hostname === '127.0.0.1' ||
+      global.location.hostname.endsWith('.netlify.app')
+    ) {
       return '/.netlify/functions/create-ticket';
     }
     return PROD_ENDPOINT;
