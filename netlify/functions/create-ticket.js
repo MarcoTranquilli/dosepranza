@@ -183,7 +183,11 @@ export async function handler(event) {
     return reply(201, { success: true, issueKey, attachmentWarnings }, origin);
   } catch (error) {
     console.error('Jira ticket creation failed', { message: error.message, statusCode: error.statusCode || 500 });
-    return reply(502, { success: false, error: 'Jira non ha accettato la segnalazione. Riprova più tardi.' }, origin);
+    return reply(502, {
+      success: false,
+      error: 'Jira non ha accettato la segnalazione. Riprova più tardi.',
+      upstreamStatus: error.statusCode || 500,
+    }, origin);
   }
 }
 
