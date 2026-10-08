@@ -1,6 +1,7 @@
 (() => {
-  const RELEASE = 'flyer-sella-1';
+  const RELEASE = 'mobile-cache-recovery-1';
   const RELEASE_KEY = 'dose_cache_release';
+  const RECOVERY_KEY = 'dose_asset_recovery';
   const currentUrl = new URL(window.location.href);
   const forcedReset = currentUrl.searchParams.has('swreset');
 
@@ -11,9 +12,7 @@
     storedRelease = '';
   }
 
-  window.__DOSE_CACHE_READY__ = (async () => {
-    if (!forcedReset && storedRelease === RELEASE) return { cleaned:false, release:RELEASE };
-
+  const clearLegacyData = async () => {
     let registrations = [];
     let cacheKeys = [];
     if ('serviceWorker' in navigator) {
@@ -24,6 +23,30 @@
       cacheKeys = await caches.keys();
       await Promise.all(cacheKeys.map(key => caches.delete(key)));
     }
+
+    return { registrations, cacheKeys };
+  };
+
+  const recoverAssets = async reason => {
+    try {
+      if (sessionStorage.getItem(RECOVERY_KEY) === RELEASE) return;
+      sessionStorage.setItem(RECOVERY_KEY, RELEASE);
+    } catch (error) {
+      // Continue even when sessionStorage is unavailable.
+    }
+    await clearLegacyData();
+    const recoveryUrl = new URL(window.location.href);
+    recoveryUrl.searchParams.set('cachev', RELEASE);
+    recoveryUrl.searchParams.set('assetreset', reason || 'asset-error');
+    window.location.replace(recoveryUrl.toString());
+  };
+
+  window.DoseCacheRecovery = { release: RELEASE, recover: recoverAssets };
+
+  window.__DOSE_CACHE_READY__ = (async () => {
+    if (!forcedReset && storedRelease === RELEASE) return { cleaned:false, release:RELEASE };
+
+    const { registrations, cacheKeys } = await clearLegacyData();
 
     try {
       localStorage.setItem(RELEASE_KEY, RELEASE);
