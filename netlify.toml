@@ -18,6 +18,16 @@
     Cache-Control = "no-cache, no-store, must-revalidate"
 
 [[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+[[headers]]
+  for = "/service-worker.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+[[headers]]
   for = "/app*.js"
   [headers.values]
     Cache-Control = "no-cache, no-store, must-revalidate"
@@ -29,7 +39,7 @@
 
 [[redirects]]
   from = "/"
-  to = "https://marcotranquilli.github.io/dosepranza/?entry=supplier-segregation-1"
+  to = "https://marcotranquilli.github.io/dosepranza/?entry=mobile-cache-recovery-1&swreset=1&v=mobile-cache-recovery-1"
   status = 302
   force = true
 

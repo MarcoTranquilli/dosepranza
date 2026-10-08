@@ -22,6 +22,8 @@ cp supplier-access.js "$DIST_DIR/" 2>/dev/null || echo "No supplier access modul
 cp hub-auth.js "$DIST_DIR/" 2>/dev/null || echo "No hub auth module found"
 cp tailwind-config.js "$DIST_DIR/" 2>/dev/null || echo "No Tailwind config found"
 cp sw-killer.js "$DIST_DIR/" 2>/dev/null || echo "No service worker helper found"
+cp sw.js "$DIST_DIR/" 2>/dev/null || echo "No legacy sw endpoint found"
+cp service-worker.js "$DIST_DIR/" 2>/dev/null || echo "No legacy service worker endpoint found"
 cp favicondosepranza.png "$DIST_DIR/" 2>/dev/null || echo "No favicon found"
 cp -R login "$DIST_DIR/" 2>/dev/null || echo "No login folder"
 cp -R assets "$DIST_DIR/" 2>/dev/null || echo "No assets folder"

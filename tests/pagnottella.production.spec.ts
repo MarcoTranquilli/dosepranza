@@ -56,9 +56,9 @@ test('bootstrap elimina cache legacy senza richiedere swreset', async ({page}, t
     await legacy.put('./legacy-response', new Response('stale'));
   });
   await page.goto('./?e2e=1');
-  await expect(page).toHaveURL(/cachev=flyer-sella-1/);
+  await expect(page).toHaveURL(/cachev=mobile-cache-recovery-1/);
   await expect.poll(() => page.evaluate(() => caches.keys())).not.toContain('dose-legacy-cache');
-  await expect.poll(() => page.evaluate(() => localStorage.getItem('dose_cache_release'))).toBe('flyer-sella-1');
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('dose_cache_release'))).toBe('mobile-cache-recovery-1');
   await expect(page).not.toHaveURL(/swreset/);
   await expect(page.locator('#authGateGoogle')).toBeVisible();
 });
