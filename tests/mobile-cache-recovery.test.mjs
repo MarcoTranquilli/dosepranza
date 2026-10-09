@@ -14,7 +14,7 @@ assert.match(killer, new RegExp(`const RELEASE = '${release}'`));
 assert.ok(page.indexOf('sw-killer.js') < page.indexOf('pagnottella.css'), 'cache cleanup must start before CSS');
 assert.equal((page.match(/sw-killer\.js/g) || []).length, 1, 'sw-killer must load once');
 assert.match(page, /pagnottella\.css\?v=mobile-cache-recovery-1[^>]+onerror=/);
-assert.match(page, /production\.css\?v=mobile-cache-recovery-1[^>]+onerror=/);
+assert.match(page, /production\.css\?v=analytics-2[^>]+onerror=/);
 assert.doesNotMatch(entry, /target\.searchParams\.set\('swreset'/);
 assert.match(netlify, /\/sw\.js[\s\S]+no-cache, no-store, must-revalidate/);
 assert.match(netlify, /entry=mobile-cache-recovery-1&swreset=1&v=mobile-cache-recovery-1/);

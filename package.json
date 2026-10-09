@@ -22,7 +22,8 @@
     "sync:pagnottella-images": "node scripts/apply_pagnottella_image_audit.mjs && node scripts/build_pagnottella_inline_menu.mjs",
     "report:pagnottella-images": "node scripts/generate_pagnottella_image_audit.mjs",
     "report:pdf": "node scripts/render_report_pdf.mjs",
-    "build:css": "tailwindcss -c tailwind.config.cjs -i tailwind.input.css -o tailwind.output.css --minify"
+    "build:css": "tailwindcss -c tailwind.config.cjs -i tailwind.input.css -o tailwind.output.css --minify",
+    "test:order-analytics": "node --test tests/order-analytics.test.mjs"
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^5.0.0",
