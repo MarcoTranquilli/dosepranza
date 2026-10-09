@@ -99,3 +99,17 @@
   .entryBrand{padding:16px}.entryBrand img{width:108px}.entryBrand div{display:none}.entryCopy h1{font-size:38px}.entryCopy p{font-size:14px}.authGateCard{padding:18px;margin-top:22px}.authGateCard h2{font-size:27px}.authGateActions{display:grid}.authGateActions button{width:100%}.supplierChoiceCard{padding:22px;min-height:215px}.supplierChoiceCard h2{font-size:28px}.pagnottellaCard img{width:56px;height:56px}
 }
 .authDebugPanel{max-height:280px;overflow:auto;margin:4px 0 0;padding:14px;border:1px solid rgba(255,255,255,.18);border-radius:13px;background:#101c16;color:#dce8df;font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap}
+/* Shared analytics scope and readable, contained comparisons on small screens. */
+.analysisFilters{display:flex;flex-wrap:wrap;align-items:end;gap:12px;padding:20px 24px 8px;background:#faf8f3}
+.analysisFilters .periodSelect{display:grid;gap:6px;min-width:145px;font-size:13px;font-weight:700}
+.analysisFilters button,.analysisDates input,#adminLoadMore{min-height:44px;padding:10px 14px;border:1px solid #d7d3c6;border-radius:10px;background:#fff;color:#30362a;font:inherit}
+.analysisDates{display:flex;gap:12px;flex-wrap:wrap}.analysisDates[hidden]{display:none}.analysisDates label{display:grid;gap:6px;font-size:13px}
+.analysisScope,.analysisStatus{margin:0;padding:8px 24px;font-size:13px;line-height:1.5;overflow-wrap:anywhere}.analysisScope{font-weight:700}.analysisStatus{color:#44614d;border-bottom:1px solid #e5ded3}
+.analysisStatus[data-state="cache"],.analysisStatus[data-state="error"]{color:#9b4219;background:#fff6eb}
+.analysisQualityNotice{padding:14px;border:1px solid #e9c79e;border-radius:12px;background:#fff6e9;color:#824818;font-size:13px;line-height:1.5}
+.analysisHelp,.analyticsDefinitions{font-size:13px;line-height:1.6;color:#5f625b}.analyticsDefinitions{margin-top:20px;padding:16px;border:1px solid #dcded5;border-radius:14px;background:#f9faf6}.analyticsDefinitions summary{cursor:pointer;font-weight:700;color:#30362a}.analyticsDefinitions p{margin:12px 0}
+.supplierComparison{margin-top:24px;min-width:0}.supplierComparison h3{margin-bottom:12px}.tableScroll{overflow-x:auto;border:1px solid #ddd6ca;border-radius:14px}.tableScroll:focus-visible{outline:2px solid #b7653c;outline-offset:3px}.tableScroll table{width:100%;border-collapse:collapse;white-space:nowrap;font-size:13px}.tableScroll caption{text-align:left;padding:12px;color:#626557;white-space:normal}.tableScroll th,.tableScroll td{padding:12px;text-align:right;border-top:1px solid #e5ded3}.tableScroll th:first-child{text-align:left}.tableScroll thead{background:#f3f1e9}
+.analyticsMetrics{grid-template-columns:repeat(4,minmax(0,1fr))}.adminMetrics article{min-width:0}.adminMetrics small{display:block;font-size:11px;color:#64705a}.adminMetrics strong{overflow-wrap:anywhere}
+#revenueByDay{max-height:360px;overflow-y:auto}.adminWorkspace button:disabled{opacity:.5;cursor:not-allowed}.adminView{min-width:0}
+@media(max-width:900px){.analyticsMetrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.analysisFilters{padding:15px;align-items:stretch}.analysisFilters .periodSelect{flex:1;min-width:125px}.analysisFilters select{width:100%;min-height:44px}.analysisDates{width:100%}.analysisDates label{flex:1;min-width:125px}.analysisDates input{width:100%;box-sizing:border-box}.analysisScope,.analysisStatus{padding:10px 15px}.analyticsMetrics{grid-template-columns:1fr}.tableScroll{max-width:100%}}

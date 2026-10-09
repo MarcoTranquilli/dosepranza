@@ -12,6 +12,15 @@
   let orders = [];
   let unsubscribe = null;
   let firestore = null;
+  const analytics = window.DoseOrderAnalytics;
+  let generation = 0;
+  let queryKey = '';
+  let loadState = 'idle';
+  let loadMessage = '';
+  let visibleLimit = 50;
+  let updatedAt = null;
+  const moneyCents = value => value == null ? '—' : money(value / 100);
+  const percent = value => value == null ? '—' : `${Math.round(value * 100)}%`;
 
   function session() {
     return window.DoseSupplierAccess?.getStoredUser?.() || null;
@@ -29,13 +38,10 @@
     return isAdmin() || isSupplier();
   }
   function toDate(value) {
-    if (typeof value?.toDate === 'function') return value.toDate();
-    const date = new Date(value || 0);
-    return Number.isNaN(date.getTime()) ? new Date(0) : date;
+    return analytics.toDate(value);
   }
   function localDay(value) {
-    const date = toDate(value);
-    return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, '0'), String(date.getDate()).padStart(2, '0')].join('-');
+    return analytics.day(value);
   }
   function todayKey() {
     return localDay(new Date());
@@ -50,42 +56,32 @@
     return byId('adminSupplierFilter')?.value || 'all';
   }
   function scopedOrders() {
-    const supplier = selectedSupplier();
-    return supplier === 'all' ? orders : orders.filter(order => {
-      if (supplier === 'russo') return order.supplierId === 'russo';
-      return order.supplierId === supplier;
-    });
+    try { return analytics.select(orders, selection()).rows; } catch { return []; }
   }
-  function todayOrders() {
-    return scopedOrders().filter(order => localDay(order.createdAt) === todayKey());
+  function selection() {
+    return { supplier: selectedSupplier(), range: analytics.rangeFor(isAdmin() ? byId('analysisPeriod')?.value || 'today' : 'today', new Date(), byId('analysisFrom')?.value, byId('analysisTo')?.value) };
   }
   function orderStatus(order) {
-    if (order.reconciled) return 'Riconciliato';
-    if (order.paymentStatus === 'declared_paid') return 'Dichiarato pagato';
+    if (analytics.payment(order) === 'reconciled') return 'Riconciliato';
+    if (analytics.payment(order) === 'declared') return 'Dichiarato pagato';
     return 'Da verificare';
   }
   function statusClass(order) {
-    return order.reconciled ? 'isReconciled' : order.paymentStatus === 'declared_paid' ? 'isDeclared' : 'isPending';
+    return analytics.payment(order) === 'reconciled' ? 'isReconciled' : analytics.payment(order) === 'declared' ? 'isDeclared' : 'isPending';
   }
   function itemCopy(item) {
-    const extras = (item.extras || []).map(extra => `${extra.name} (+${money(extra.price)})`).join(', ');
-    return `${item.name} — ${item.option || item.details || 'Standard'}${extras ? ` · Extra: ${extras}` : ''}`;
+    const extras = (Array.isArray(item.extras) ? item.extras : []).filter(extra => extra?.name).map(extra => `${extra.name} (+${money(extra.price)})`).join(', ');
+    return `${analytics.quantity(item)}x ${item.name} — ${item.option || item.details || 'Standard'}${extras ? ` · Extra: ${extras}` : ''}`;
   }
   function orderItems(order) {
     return (order.items || []).map(itemCopy);
   }
   function metrics(values) {
-    const revenue = values.reduce((sum, order) => sum + Number(order.total || 0), 0);
-    return {
-      count: values.length,
-      revenue,
-      average: values.length ? revenue / values.length : 0,
-      pending: values.filter(order => !order.reconciled).reduce((sum, order) => sum + Number(order.total || 0), 0)
-    };
+    return analytics.aggregate(values);
   }
   function setLoadError(message) {
-    const list = byId('adminOrdersList');
-    if (list) list.innerHTML = `<div class="adminEmpty">${escapeHtml(message)}</div>`;
+    orders = []; loadState = 'error'; loadMessage = message; updatedAt = null;
+    renderAll();
   }
   function renderIdentity() {
     const user = session();
@@ -95,29 +91,21 @@
       : 'Accesso fornitore: sono caricati esclusivamente gli ordini La Pagnottella Gourmet.';
   }
   function renderOrders() {
-    const values = todayOrders();
+    const values = scopedOrders();
     const summary = metrics(values);
     byId('adminOrdersCount').textContent = String(summary.count);
-    byId('adminRevenue').textContent = money(summary.revenue);
-    byId('adminAverage').textContent = money(summary.average);
-    byId('adminPending').textContent = money(summary.pending);
-    byId('adminOrdersList').innerHTML = values.length ? values.map(order => `
+    byId('adminRevenue').textContent = moneyCents(summary.cents);
+    byId('adminAverage').textContent = moneyCents(summary.averageCents);
+    byId('adminPending').textContent = moneyCents(summary.pendingCents);
+    byId('adminOrdersList').innerHTML = values.length ? values.slice(0, visibleLimit).map(order => `
       <article class="adminOrderCard" data-order-id="${escapeHtml(order.id)}">
-        <header><div><strong>${escapeHtml(order.user || 'Cliente')}</strong><span>${toDate(order.createdAt).toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'})} · ${escapeHtml(supplierLabel(order))}</span></div><span class="orderStatus ${statusClass(order)}">${orderStatus(order)}</span></header>
+        <header><div><strong>${escapeHtml(order.user || 'Cliente')}</strong><span>${toDate(order.createdAt).toLocaleString('it-IT', {timeZone:analytics.ZONE, day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'})} · ${escapeHtml(supplierLabel(order))}</span></div><span class="orderStatus ${statusClass(order)}">${orderStatus(order)}</span></header>
         <ul>${orderItems(order).map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
-        <footer><span>${escapeHtml(order.paymentMethod || 'Metodo non indicato')}</span><strong>${money(order.total)}</strong>${order.reconciled || !isAdmin() ? '' : `<button type="button" onclick="reconcilePagnottellaOrder('${escapeHtml(order.id)}')">Segna riconciliato</button>`}</footer>
-      </article>`).join('') : '<div class="adminEmpty">Nessun ordine registrato oggi.</div>';
-  }
-  function periodOrders() {
-    const period = byId('analysisPeriod')?.value || 'today';
-    const values = scopedOrders();
-    if (period === 'all') return values;
-    const days = period === '30' ? 30 : period === '7' ? 7 : 1;
-    const threshold = Date.now() - days * 86400000;
-    return values.filter(order => toDate(order.createdAt).getTime() >= threshold);
-  }
-  function ranked(values) {
-    return Object.entries(values).sort((a, b) => b[1] - a[1]).slice(0, 5);
+        <footer><span>${escapeHtml(order.paymentMethod || 'Metodo non indicato')}</span><strong>${money(order.total)}</strong>${analytics.payment(order) === 'reconciled' || !isAdmin() ? '' : `<button type="button" data-reconcile="${escapeHtml(order.id)}" ${loadState !== 'live' ? 'disabled' : ''}>Segna riconciliato</button>`}</footer>
+      </article>`).join('') : `<div class="adminEmpty">${escapeHtml(loadState === 'error' ? loadMessage : loadState === 'loading' ? 'Caricamento dal server...' : 'Nessun ordine valido nel periodo selezionato.')}</div>`;
+    byId('adminOrdersList').querySelectorAll('[data-reconcile]').forEach(button => button.addEventListener('click', () => reconcileOrder(button.dataset.reconcile)));
+    byId('adminLoadMore').hidden = values.length <= visibleLimit;
+    byId('adminOrderCoverage').textContent = values.length ? `${Math.min(visibleLimit, values.length)} di ${values.length} ordini mostrati. Indicatori ed export includono tutti gli ordini validi del filtro.` : '';
   }
   function renderRanking(id, entries, formatter = String) {
     byId(id).innerHTML = entries.length
@@ -126,35 +114,23 @@
   }
   function renderAnalytics() {
     if (!isAdmin()) return;
-    const values = periodOrders();
-    const summary = metrics(values);
-    const byUser = {};
-    const byProduct = {};
-    const bySupplier = {};
-    const byDay = {};
-    values.forEach(order => {
-      const user = order.user || order.email || 'Cliente';
-      byUser[user] = (byUser[user] || 0) + 1;
-      bySupplier[supplierLabel(order)] = (bySupplier[supplierLabel(order)] || 0) + 1;
-      const day = localDay(order.createdAt);
-      byDay[day] = (byDay[day] || 0) + Number(order.total || 0);
-      (order.items || []).forEach(item => { byProduct[item.name] = (byProduct[item.name] || 0) + 1; });
-    });
-    const uniqueUsers = Object.keys(byUser).length;
-    const repeatUsers = Object.values(byUser).filter(count => count > 1).length;
-    const beforeCutoff = values.filter(order => {
-      const date = toDate(order.createdAt);
-      return date.getHours() < 12 || (date.getHours() === 12 && date.getMinutes() === 0);
-    }).length;
-    byId('analyticsUnique').textContent = String(uniqueUsers);
-    byId('analyticsRepeat').textContent = uniqueUsers ? `${Math.round(repeatUsers / uniqueUsers * 100)}%` : '0%';
-    byId('analyticsPerUser').textContent = money(uniqueUsers ? summary.revenue / uniqueUsers : 0);
-    byId('analyticsPending').textContent = money(summary.pending);
-    byId('analyticsCutoff').textContent = values.length ? `${Math.round(beforeCutoff / values.length * 100)}%` : '0%';
-    renderRanking('topUsers', ranked(byUser));
-    renderRanking('topProducts', ranked(byProduct));
-    renderRanking('salesMix', ranked(bySupplier));
-    renderRanking('revenueByDay', ranked(byDay), money);
+    let selected;
+    try { selected = analytics.select(orders, selection()); } catch { selected = { rows:[], excluded:0, exclusions:{} }; }
+    const summary = metrics(selected.rows);
+    const values = { analyticsOrders:summary.count, analyticsRevenue:moneyCents(summary.cents), analyticsReconciled:moneyCents(summary.reconciledCents), analyticsDeclared:moneyCents(summary.declaredCents), analyticsUnverified:moneyCents(summary.unverifiedCents), analyticsAverage:moneyCents(summary.averageCents), analyticsUnits:summary.units, analyticsUnique:summary.uniqueUsers, analyticsRepeat:percent(summary.repeatRate), analyticsPerUser:moneyCents(summary.perUserCents), analyticsPending:moneyCents(summary.pendingCents), analyticsCutoff:percent(summary.cutoffRate) };
+    Object.entries(values).forEach(([id, value]) => { byId(id).textContent = String(value); });
+    byId('analyticsCutoffBase').textContent = `${summary.cutoffCount} / ${summary.cutoffEligible} ordini classificati`;
+    renderRanking('topUsers', summary.topUsers);
+    renderRanking('topProducts', summary.topProducts);
+    renderRanking('salesMix', summary.suppliers.map(group => [group.label, group.count]));
+    renderRanking('revenueByDay', summary.days, moneyCents);
+    byId('supplierComparisonBody').innerHTML = summary.suppliers.map(group => `<tr><th scope="row">${escapeHtml(group.label)}</th><td>${group.count}</td><td>${moneyCents(group.cents)}</td><td>${moneyCents(group.reconciledCents)}</td><td>${moneyCents(group.cents - group.reconciledCents)}</td><td>${percent(group.cutoffEligible ? group.cutoffCount / group.cutoffEligible : null)}</td></tr>`).join('') || '<tr><td colspan="6">Nessun dato nel periodo.</td></tr>';
+    const labels = { missingDate:'data assente/non valida', futureDate:'data futura', excludedStatus:'bozze/annullamenti/altri tipi', invalidTotal:'totale non valido', invalidItems:'prodotti/quantita non validi', duplicateDocument:'documenti duplicati' };
+    const details = Object.entries(selected.exclusions).map(([key, count]) => `${count} ${labels[key]}`);
+    byId('analyticsQuality').textContent = `${selected.excluded} esclusi${details.length ? ` (${details.join('; ')})` : ''}. ${summary.unclassified} non classificati; ${summary.missingIdentity} senza identita; ${summary.paymentConflicts} incoerenze pagamento; ${summary.possibleDuplicates} possibili duplicati clientOrderId (inclusi, da verificare).`;
+    const qualityIssues = selected.excluded + summary.unclassified + summary.missingIdentity + summary.paymentConflicts + summary.possibleDuplicates;
+    byId('analyticsQualityNotice').hidden = !qualityIssues || loadState === 'error' || loadState === 'loading';
+    byId('analyticsQualityNotice').textContent = 'Dati da verificare: ordini esclusi, incompleti o incoerenti. Consulta "Qualità dei dati" prima di usare questi valori per decisioni economiche.';
   }
   async function renderMenuGovernance() {
     if (!isAdmin()) return;
@@ -182,47 +158,73 @@
     if (!hasOrderAccess()) return;
     document.querySelectorAll('[data-admin-restricted]').forEach(element => element.classList.toggle('hidden', !isAdmin()));
     byId('adminSupplierFilter')?.classList.toggle('hidden', !isAdmin());
+    if (!isAdmin()) showAdminView('orders');
+    byId('analysisCustomDates').hidden = !isAdmin() || byId('analysisPeriod').value !== 'custom';
+    try { const current = selection(); byId('analysisScope').textContent = `${current.supplier === 'all' ? 'Tutti i fornitori' : analytics.SUPPLIERS[current.supplier]} · ${current.range.label} · Europe/Rome`; } catch { byId('analysisScope').textContent = 'Intervallo non valido'; }
+    byId('analysisStatus').textContent = loadState === 'live' ? `Confermato dal server · ${orders.length} documenti ricevuti · ${updatedAt?.toLocaleTimeString('it-IT', {timeZone:analytics.ZONE})}` : loadState === 'cache' ? 'Dati locali non confermati dal server. Export e riconciliazione sospesi.' : loadState === 'error' ? loadMessage : 'Caricamento dal server...';
+    byId('analysisStatus').dataset.state = loadState;
+    document.querySelectorAll('[data-server-required]').forEach(button => { button.disabled = loadState !== 'live'; });
     renderIdentity();
     renderOrders();
     renderAnalytics();
+    if (!['live', 'cache'].includes(loadState)) {
+      document.querySelectorAll('.adminMetrics strong:not(#menuActiveCount):not(#menuLowCount)').forEach(element => { element.textContent = '—'; });
+      byId('analyticsCutoffBase').textContent = 'Dati non disponibili';
+    }
     renderMenuGovernance();
   }
   function clearOrderState() {
+    generation++;
     if (unsubscribe) { unsubscribe(); unsubscribe = null; }
     orders = [];
     firestore = null;
-    ['adminOrdersCount', 'analyticsOrders'].forEach(id => { if (byId(id)) byId(id).textContent = '0'; });
-    ['adminRevenue', 'adminAverage', 'adminPending', 'analyticsRevenue', 'analyticsAverage', 'analyticsPending'].forEach(id => {
-      if (byId(id)) byId(id).textContent = money(0);
-    });
+    queryKey = ''; updatedAt = null; visibleLimit = 50; loadState = 'loading'; loadMessage = '';
+    document.querySelectorAll('.adminMetrics strong').forEach(element => { element.textContent = '—'; });
+    ['topUsers', 'topProducts', 'salesMix', 'revenueByDay', 'supplierComparisonBody', 'analyticsQuality', 'analysisStatus', 'analysisScope'].forEach(id => byId(id)?.replaceChildren());
     if (byId('adminOrdersList')) byId('adminOrdersList').replaceChildren();
   }
-  async function loadOrders() {
+  async function loadOrders(force = false) {
+    let selected;
+    if (!hasOrderAccess()) { clearOrderState(); renderAll(); return; }
+    try { selected = selection(); } catch (error) { clearOrderState(); setLoadError(error.message); return; }
+    const key = `${normalizedEmail()}:${session()?.role}:${selected.supplier}:${selected.range.from}:${selected.range.to}`;
+    if (!force && key === queryKey && loadState !== 'error') { renderAll(); return; }
     clearOrderState();
-    if (!hasOrderAccess()) { renderAll(); return; }
+    queryKey = key;
+    const activeGeneration = generation;
+    const activeEmail = normalizedEmail();
+    const activeRole = session()?.role;
+    const stillActive = () => generation === activeGeneration && hasOrderAccess() && normalizedEmail() === activeEmail && session()?.role === activeRole;
+    renderAll();
     try {
       const [appSdk, firestoreSdk] = await Promise.all([
         import('https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js'),
         import('https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js')
       ]);
+      if (!stillActive()) return;
       const app = appSdk.getApps().find(candidate => candidate.name === '[DEFAULT]');
       if (!app) throw new Error('Firebase non inizializzato.');
       const db = firestoreSdk.getFirestore(app);
       const ordersRef = firestoreSdk.collection(db, 'orders');
-      const ordersQuery = isAdmin()
-        ? firestoreSdk.query(ordersRef, firestoreSdk.orderBy('createdAt', 'desc'))
-        : firestoreSdk.query(ordersRef, firestoreSdk.where('supplierId', '==', 'pagnottella'), firestoreSdk.orderBy('createdAt', 'desc'));
+      const constraints = [];
+      if (['russo', 'pagnottella'].includes(selected.supplier)) constraints.push(firestoreSdk.where('supplierId', '==', selected.supplier));
+      if (selected.range.startDate) constraints.push(firestoreSdk.where('createdAt', '>=', selected.range.startDate), firestoreSdk.where('createdAt', '<', selected.range.endDate), firestoreSdk.orderBy('createdAt', 'desc'));
+      // Full history intentionally includes documents with missing dates for the quality audit (admin only).
+      const ordersQuery = firestoreSdk.query(ordersRef, ...constraints);
       firestore = { db, sdk:firestoreSdk };
-      unsubscribe = firestoreSdk.onSnapshot(ordersQuery, snapshot => {
-        orders = snapshot.docs.map(document => ({id:document.id, ...document.data()}));
+      unsubscribe = firestoreSdk.onSnapshot(ordersQuery, {includeMetadataChanges:true}, snapshot => {
+        if (!stillActive()) return;
+        orders = snapshot.docs.map(document => ({...document.data(), id:document.id}));
+        loadState = snapshot.metadata?.fromCache || snapshot.metadata?.hasPendingWrites ? 'cache' : 'live';
+        updatedAt = new Date();
         renderAll();
-      }, error => setLoadError(`Impossibile caricare gli ordini (${error?.code || 'errore Firestore'}).`));
+      }, error => { if (stillActive()) setLoadError(`Impossibile caricare gli ordini (${error?.code || 'errore Firestore'}). Usa Aggiorna per riprovare.`); });
     } catch (error) {
-      setLoadError(`Impossibile caricare gli ordini (${error?.code || error?.message || 'errore Firestore'}).`);
+      if (stillActive()) setLoadError(`Impossibile caricare gli ordini (${error?.code || error?.message || 'errore Firestore'}).`);
     }
   }
   async function reconcileOrder(orderId) {
-    if (!isAdmin() || !firestore) return;
+    if (!isAdmin() || !firestore || loadState !== 'live' || !scopedOrders().some(order => order.id === orderId)) return;
     try {
       await firestore.sdk.updateDoc(firestore.sdk.doc(firestore.db, 'orders', orderId), {
         paymentStatus:'reconciled',
@@ -236,9 +238,9 @@
     }
   }
   function daySummary() {
-    const values = todayOrders();
+    const values = scopedOrders();
     const summary = metrics(values);
-    const lines = [`ORDINI — ${new Date().toLocaleDateString('it-IT')}`, `${values.length} ordini · ${money(summary.revenue)}`];
+    const lines = [`ORDINI — ${byId('analysisScope').textContent}`, `${values.length} ordini · Ordinato ${moneyCents(summary.cents)} · Riconciliato ${moneyCents(summary.reconciledCents)}`];
     values.forEach((order, index) => {
       lines.push(`\n${index + 1}. ${order.user || 'Cliente'} · ${supplierLabel(order)} · ${orderStatus(order)} · ${money(order.total)}`);
       orderItems(order).forEach(item => lines.push(`- ${item}`));
@@ -246,21 +248,18 @@
     return lines.join('\n');
   }
   async function copyDaySummary() {
+    if (!hasOrderAccess() || loadState !== 'live') return;
     const text = daySummary();
     try { await navigator.clipboard.writeText(text); window.toast?.('Riepilogo copiato'); }
     catch { window.prompt('Copia il riepilogo:', text); }
   }
   function exportOrdersCsv() {
-    if (!isAdmin()) return;
-    const rows = [['data_ora','fornitore','cliente','email','prodotti','metodo_pagamento','stato_pagamento','totale']];
-    scopedOrders().forEach(order => rows.push([
-      toDate(order.createdAt).toISOString(), supplierLabel(order), order.user || '', order.email || '',
-      (order.items || []).map(item => item.name).join(' | '), order.paymentMethod || '', orderStatus(order), Number(order.total || 0).toFixed(2)
-    ]));
-    const csv = rows.map(row => row.map(value => `"${String(value).replace(/"/g, '""')}"`).join(',')).join('\n');
+    if (!isAdmin() || loadState !== 'live') return;
+    const csv = analytics.csv(scopedOrders());
     const link = document.createElement('a');
     link.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
-    link.download = `ordini-${selectedSupplier()}-${todayKey()}.csv`;
+    const {range} = selection();
+    link.download = `ordini-${selectedSupplier()}-${range.from || 'storico'}-${range.to}.csv`;
     link.click();
     URL.revokeObjectURL(link.href);
   }
@@ -288,9 +287,12 @@
     togglePagnottellaMenuManagement:() => byId('menuManagementBody')?.classList.toggle('hidden'),
     togglePagnottellaSupplierVisibility:toggleSupplierVisibility,
     scrollToPagnottellaAdmin:() => byId('adminWorkspace')?.scrollIntoView({behavior:'smooth', block:'start'}),
-    renderPagnottellaAdmin:renderAll
+    renderPagnottellaAdmin:() => loadOrders(),
+    refreshPagnottellaAnalytics:() => loadOrders(true),
+    loadMorePagnottellaOrders:() => { visibleLimit += 50; renderOrders(); }
   });
-  window.addEventListener('pagnottella:session-changed', loadOrders);
-  window.addEventListener('pagnottella:order-saved', loadOrders);
+  window.addEventListener('pagnottella:session-changed', () => loadOrders(true));
+  window.addEventListener('pagnottella:order-saved', () => loadOrders(true));
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) loadOrders(); });
   document.addEventListener('DOMContentLoaded', () => setTimeout(loadOrders, 300));
 })();
