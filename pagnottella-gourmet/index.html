@@ -2,6 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="utf-8">
+<meta name="dose-release" content="analytics-3">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -17,10 +18,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./pagnottella.css?v=mobile-cache-recovery-1" onerror="window.DoseCacheRecovery?.recover('pagnottella-css')">
-<link rel="stylesheet" href="./production.css?v=analytics-2" onerror="window.DoseCacheRecovery?.recover('production-css')">
+<link rel="stylesheet" href="./production.css?v=analytics-3" onerror="window.DoseCacheRecovery?.recover('production-css')">
 <link rel="stylesheet" href="../feedback/feedback-widget.css?v=mobile-cache-recovery-1">
 </head>
 <body>
+<aside id="releaseNotice" class="releaseNotice" role="status" aria-live="polite" hidden><p id="releaseCopy"></p><div><button id="releaseRefresh" type="button">Aggiorna DOSepranza</button><button id="releaseLater" type="button">Più tardi</button></div></aside>
 <div class="wrap">
   <section id="landing" class="landing entryLanding" aria-label="Accesso DOSepranza">
     <div class="entryShell">
@@ -62,8 +64,8 @@
       <header class="adminAccess"><div><span>Accesso</span><strong id="adminIdentity">marco.tranquilli@dos.design · admin</strong><p id="adminAccessCopy">Accesso avanzato attivo: puoi gestire prodotti, ordini e disponibilità.</p></div></header>
       <nav class="adminNav" aria-label="Sezioni amministrative"><button class="active" data-admin-view="orders" onclick="showPagnottellaAdminView('orders')">Tutti gli ordini</button><button data-admin-restricted data-admin-view="analytics" onclick="showPagnottellaAdminView('analytics')">Analisi</button><button data-admin-restricted data-admin-view="menu" onclick="showPagnottellaAdminView('menu')">Gestione menù</button><button data-admin-restricted data-admin-view="export" onclick="showPagnottellaAdminView('export')">Export</button></nav>
 <div class="analysisFilters" data-admin-restricted>
-<label class="periodSelect">Periodo<select id="analysisPeriod" onchange="renderPagnottellaAdmin()"><option value="today">Oggi</option><option value="7">7 giorni</option><option value="30">30 giorni</option><option value="all">Intero storico</option><option value="custom">Personalizzato</option></select></label>
-<label class="periodSelect">Fornitore<select id="adminSupplierFilter" onchange="renderPagnottellaAdmin()"><option value="all">Tutti</option><option value="pagnottella">Pagnottella</option><option value="russo">Russo</option><option value="unclassified">Non classificati</option></select></label>
+<label class="periodSelect">Periodo<select id="analysisPeriod" aria-label="Periodo" onchange="renderPagnottellaAdmin()"><option value="today">Oggi</option><option value="7">7 giorni</option><option value="30">30 giorni</option><option value="all">Intero storico</option><option value="custom">Personalizzato</option></select></label>
+<label class="periodSelect">Fornitore<select id="adminSupplierFilter" aria-label="Fornitore" onchange="renderPagnottellaAdmin()"><option value="all">Tutti</option><option value="pagnottella">Pagnottella</option><option value="russo">Russo</option><option value="unclassified">Non classificati</option></select></label>
 <div id="analysisCustomDates" class="analysisDates" hidden><label>Dal<input id="analysisFrom" type="date" onchange="renderPagnottellaAdmin()"></label><label>Al<input id="analysisTo" type="date" onchange="renderPagnottellaAdmin()"></label></div>
 <button type="button" onclick="refreshPagnottellaAnalytics()">Aggiorna</button></div>
 <p id="analysisScope" class="analysisScope"></p><p id="analysisStatus" class="analysisStatus" role="status" aria-live="polite"></p>
@@ -85,10 +87,11 @@
 <div id="toast" class="toast"></div>
 <script src="./supplier-access.js?v=auth-record-refresh-1" onerror="window.DoseCacheRecovery?.recover('supplier-access')"></script>
 <script src="./assets/pagnottella/data/menu.inline.js?v=mobile-cache-recovery-1"></script>
-<script src="./pagnottella.js?v=checkout-action-preview-1" onerror="window.DoseCacheRecovery?.recover('catalog-script')"></script>
+<script src="./pagnottella.js?v=analytics-3" onerror="window.DoseCacheRecovery?.recover('catalog-script')"></script>
 <script src="./production-polish.js?v=prod-4"></script>
-<script src="./order-analytics.js?v=analytics-2" onerror="window.DoseCacheRecovery?.recover('analytics-engine')"></script>
-<script src="./production-admin.js?v=analytics-2" onerror="window.DoseCacheRecovery?.recover('analytics-ui')"></script>
+<script src="./order-analytics.js?v=analytics-3" onerror="window.DoseCacheRecovery?.recover('analytics-engine')"></script>
+<script src="./production-admin.js?v=analytics-3" onerror="window.DoseCacheRecovery?.recover('analytics-ui')"></script>
+<script src="./release-watch.js?v=analytics-3"></script>
 <script src="../feedback/vendor/html2canvas.min.js?v=feedback-1"></script>
 <script src="../feedback/logger.js?v=feedback-1"></script>
 <script src="../feedback/diagnostics.js?v=feedback-1"></script>
