@@ -906,6 +906,8 @@ function addToCart(p,o,extras=[]){
 }
 function changeQty(key,delta){ if(!state.cart[key]) return; state.cart[key].qty += delta; if(state.cart[key].qty <= 0) delete state.cart[key]; resetCurrentTransmissionState(); renderCart(); }
 function totals(){ const items = Object.values(state.cart); const orig = items.reduce((a,i)=>a+i.originalUnit*i.qty,0); const total = discountedPrice(orig); return {items, count:items.reduce((a,i)=>a+i.qty,0), orig, total, saving:orig-total}; }
+window.DoseCanReload = () => Boolean(DATA) && !authState.loading && !state.sending && totals().count === 0
+  && !byId('paymentConfirmModal')?.classList.contains('show') && !byId('checkoutCompleteModal')?.classList.contains('show');
 function renderCart(){
   const t = totals();
   byId('cartCount').textContent = t.count;

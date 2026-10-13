@@ -2,6 +2,82 @@ import { test, expect, Page } from '@playwright/test';
 
 const forbiddenCopy = /preview|approval|review sponsor|anteprima locale|demo locale|non usa firebase/i;
 
+test('release update reloads only after explicit click with an empty checkout', async ({page}) => {
+  let checks=0;
+  await page.route('**/release.json', route => route.fulfill({json:{version:++checks === 1 ? 'analytics-next' : 'analytics-3'}}));
+  await mockFirebase(page);
+  await page.goto('.');
+  await expect(page.locator('#releaseRefresh')).toBeEnabled();
+  await Promise.all([page.waitForEvent('load'), page.locator('#releaseRefresh').click()]);
+  await expect.poll(()=>checks).toBe(2);
+  await expect(page.locator('#releaseNotice')).toBeHidden();
+  await expect(page.locator('#authGateGoogle')).toBeVisible();
+});
+
+test('release notification is optional, throttled and cannot reload a nonempty checkout', async ({page}, testInfo) => {
+  let checks=0;
+  await page.route('**/release.json', route => { checks++; return route.fulfill({json:{version:'analytics-next'}}); });
+  await mockFirebase(page);
+  await page.goto('.');
+  await expect(page.locator('#releaseNotice')).toBeVisible();
+  await googleLogin(page);
+  await page.locator('.pagnottellaCard').click();
+  await expect(page.locator('#releaseRefresh')).toBeEnabled();
+  await page.locator('#search').fill('Saporito');
+  await page.locator('#grid .card').first().locator('.add').click();
+  await page.getByRole('button', {name:'Aggiungi al carrello'}).click();
+  await expect(page.locator('#cartCount')).toHaveText('1');
+  await expect(page.locator('#releaseRefresh')).toBeDisabled();
+  await expect(page.locator('#releaseNotice')).toBeInViewport({ratio:1});
+  expect(await page.locator('#releaseLater').evaluate(element => element.getBoundingClientRect().height)).toBeGreaterThanOrEqual(44);
+  await page.screenshot({path:testInfo.outputPath('release-notice.png')});
+  const before=page.url();
+  await page.evaluate(()=>{ document.getElementById('releaseRefresh')?.dispatchEvent(new Event('click')); dispatchEvent(new Event('online')); document.dispatchEvent(new Event('visibilitychange')); });
+  expect(page.url()).toBe(before);
+  await expect(page.locator('#cartCount')).toHaveText('1');
+  expect(checks).toBe(1);
+  await page.getByRole('button',{name:'Più tardi',exact:true}).click();
+  await expect(page.locator('#releaseNotice')).toBeHidden();
+  await expect(page.locator('#cartCount')).toHaveText('1');
+});
+
+test('release probe failure never blocks authentication, catalog or order analytics', async ({page}) => {
+  await page.route('**/release.json', route => route.fulfill({status:503,body:'unavailable'}));
+  await mockFirebase(page, 'marco.tranquilli@dos.design');
+  await page.goto('.'); await googleLogin(page); await page.locator('.pagnottellaCard').click();
+  await expect(page.locator('#releaseNotice')).toBeHidden();
+  await expect(page.locator('#grid .card')).toHaveCount(100);
+  await expect(page.locator('#adminOrdersCount')).toHaveText('2');
+});
+
+test('analytics reuses listeners and only fetches menu settings on demand', async ({page}) => {
+  await mockFirebase(page, 'marco.tranquilli@dos.design');
+  await page.goto('.'); await googleLogin(page); await page.locator('.pagnottellaCard').click();
+  await expect(page.locator('#adminOrdersCount')).toHaveText('2');
+  await page.evaluate(()=>{const w=window as any;w.__governanceReads=0;w.DoseSupplierAccess={...w.DoseSupplierAccess,getSupplierSettings:async()=>{w.__governanceReads++;return {pagnottella:{enabledForUsers:true}}}};});
+  const queryCount=await page.evaluate(()=>(window as any).__firestoreQueries.length);
+  await page.evaluate(()=>{const w=window as any;for(let i=0;i<3;i++){w.__ordersNext(w.__ordersSnapshot);dispatchEvent(new Event('pagnottella:session-changed'));dispatchEvent(new Event('pagnottella:order-saved'));}});
+  expect(await page.evaluate(()=>(window as any).__governanceReads)).toBe(0);
+  expect(await page.evaluate(()=>(window as any).__firestoreQueries.length)).toBe(queryCount);
+  await page.locator('[data-admin-view="menu"]').click();
+  await expect(page.locator('#supplierVisibilityStatus')).toHaveText('Visibile agli utenti autorizzati');
+  expect(await page.evaluate(()=>(window as any).__governanceReads)).toBe(1);
+  await page.evaluate(()=>{const w=window as any;for(let i=0;i<4;i++)w.__ordersNext(w.__ordersSnapshot)});
+  await page.locator('[data-admin-view="analytics"]').click();
+  await page.locator('[data-admin-view="menu"]').click();
+  expect(await page.evaluate(()=>(window as any).__governanceReads)).toBe(1);
+});
+
+test('analytics invalidates the listener when the Firebase UID changes even for the same email', async ({page}) => {
+  await mockFirebase(page, 'marco.tranquilli@dos.design');
+  await page.goto('.'); await googleLogin(page); await page.locator('.pagnottellaCard').click();
+  await expect(page.locator('#adminOrdersCount')).toHaveText('2');
+  const before=await page.evaluate(()=>(window as any).__firestoreQueries.length);
+  await page.evaluate(()=>{const w=window as any;const late=w.__ordersNext;const snapshot=w.__ordersSnapshot;const user=w.DoseSupplierAccess.getStoredUser();w.DoseSupplierAccess={...w.DoseSupplierAccess,getStoredUser:()=>({...user,uid:'replacement-uid'})};dispatchEvent(new Event('pagnottella:session-changed'));late({...snapshot,docs:[]});});
+  await expect.poll(()=>page.evaluate(()=>(window as any).__firestoreQueries.length)).toBe(before+1);
+  await expect(page.locator('#adminOrdersCount')).toHaveText('2');
+});
+
 test('critical script transient failure recovers without a reload loop', async ({page}) => {
   let requests=0;
   await page.route('**/supplier-access.js?*', route => ++requests===1 ? route.abort('connectionreset') : route.continue());
@@ -158,7 +234,7 @@ test('UI production pulita, responsive e catalogo compliant', async ({page}, tes
   await expect(page.locator('#grid .card')).toHaveCount(0);
   await page.locator('#search').fill('Saporito');
   await expect(page.locator('#grid .card')).toHaveCount(1);
-  if (testInfo.project.name === 'mobile') {
+  if (['mobile', 'pixel'].includes(testInfo.project.name)) {
     await expect(page.locator('#mobileBar')).toBeHidden();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   }
@@ -295,7 +371,7 @@ test('popup WhatsApp bloccato mantiene carrello e non duplica ordine', async ({p
   await expect(page.locator('#discountLabel')).toContainText('Sconto DOSepranza');
   await expect(page.locator('#discountLabel')).toContainText('-10%');
   await expect(page.locator('#finalTotal')).toContainText('€7,20');
-  if (testInfo.project.name === 'mobile') await page.getByRole('button', {name:'Vedi carrello'}).click();
+  if (['mobile', 'pixel'].includes(testInfo.project.name)) await page.getByRole('button', {name:'Vedi carrello'}).click();
   await expect(page.locator('#sendOrderLabel')).toHaveText('Rivedi e conferma ordine');
   await expect(page.locator('#cartPrimaryAction')).toBeVisible();
   await expect(page.locator('#cartActionTotal')).toHaveText('€7,20');
@@ -364,7 +440,7 @@ test('utente DOS Google salva ordine Pagnottella con UID Firebase', async ({page
   await page.locator('#drawerExtras .drawerExtra').filter({hasText:'Funghi'}).click();
   await page.getByRole('button', {name:'Aggiungi al carrello'}).click();
   await page.locator('#notes').fill('Allergia di test');
-  if (testInfo.project.name === 'mobile') {
+  if (['mobile', 'pixel'].includes(testInfo.project.name)) {
     await page.getByRole('button', {name:'Vedi carrello'}).click();
   }
   await page.locator('#sendOrderBtn').evaluate(element => {

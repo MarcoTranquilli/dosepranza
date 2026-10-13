@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+const root = new URL('../', import.meta.url);
+const read = path => fs.readFileSync(new URL(path, root), 'utf8');
+const {version} = JSON.parse(read('pagnottella-gourmet/release.json'));
+assert.match(version, /^[a-z0-9.-]{1,64}$/);
+const html = read('pagnottella-gourmet/index.html');
+assert.ok(html.includes(`<meta name="dose-release" content="${version}">`));
+for (const asset of ['production.css','production-admin.js','order-analytics.js','pagnottella.js','release-watch.js']) assert.ok(html.includes(`./${asset}?v=${version}`), `${asset}: cache version differs from release`);
+const build = read('scripts/build_pagnottella_production.sh');
+for (const asset of ['release.json','release-watch.js','order-analytics.js']) assert.ok(build.includes(`pagnottella-gourmet/${asset}`), `${asset}: missing build copy`);
+const watcher = read('pagnottella-gourmet/release-watch.js');
+assert.ok(watcher.includes("credentials:'omit'"));
+assert.ok(watcher.includes("cache:'no-store'"));
+assert.ok(watcher.includes('window.DoseCanReload?.() !== true'));
+assert.doesNotMatch(watcher, /localStorage|sessionStorage|signOut|location\.replace/);
+console.log(`release integrity: ${version} OK`);

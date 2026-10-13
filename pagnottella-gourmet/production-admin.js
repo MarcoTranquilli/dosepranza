@@ -19,6 +19,9 @@
   let loadMessage = '';
   let visibleLimit = 50;
   let updatedAt = null;
+  let settingsOwner = '';
+  let settingsReadAt = 0;
+  let settingsInFlight = null;
   const moneyCents = value => value == null ? '—' : money(value / 100);
   const percent = value => value == null ? '—' : `${Math.round(value * 100)}%`;
 
@@ -27,6 +30,10 @@
   }
   function normalizedEmail() {
     return String(session()?.email || '').trim().toLowerCase();
+  }
+  function identityKey() {
+    const user = session();
+    return `${normalizedEmail()}:${user?.role || ''}:${user?.uid || ''}`;
   }
   function isAdmin() {
     return normalizedEmail() === ADMIN_EMAIL;
@@ -132,22 +139,31 @@
     byId('analyticsQualityNotice').hidden = !qualityIssues || loadState === 'error' || loadState === 'loading';
     byId('analyticsQualityNotice').textContent = 'Dati da verificare: ordini esclusi, incompleti o incoerenti. Consulta "Qualità dei dati" prima di usare questi valori per decisioni economiche.';
   }
-  async function renderMenuGovernance() {
-    if (!isAdmin()) return;
+  async function renderMenuGovernance(force = false) {
+    if (!isAdmin() || !byId('menuManagementBody')?.closest('.adminView')?.classList.contains('active')) return;
     const products = window.__PAGNOTTELLA_MENU__?.products || [];
     const active = products.filter(product => product.isActive !== false);
     const inactive = products.filter(product => product.isActive === false);
     byId('menuActiveCount').textContent = String(active.length);
     byId('menuLowCount').textContent = String(inactive.length);
     byId('menuStatusList').innerHTML = inactive.map(product => `<li><span>${escapeHtml(product.name)}</span><strong>Non ordinabile</strong></li>`).join('') || '<li class="adminEmpty">Tutti i prodotti sono ordinabili.</li>';
+    const owner = identityKey();
+    if (owner !== settingsOwner) { settingsOwner = owner; settingsReadAt = 0; settingsInFlight = null; }
+    if (settingsInFlight || (!force && Date.now() - settingsReadAt < 60_000)) return;
+    const request = Promise.resolve().then(() => window.DoseSupplierAccess.getSupplierSettings());
+    settingsInFlight = request;
     try {
-      const settings = await window.DoseSupplierAccess.getSupplierSettings();
+      const settings = await request;
+      if (identityKey() !== owner || settingsInFlight !== request || !isAdmin()) return;
       const enabled = settings.pagnottella.enabledForUsers;
       byId('supplierVisibilityStatus').textContent = enabled ? 'Visibile agli utenti autorizzati' : 'Nascosto agli utenti';
       byId('supplierVisibilityToggle').textContent = enabled ? 'Disabilita fornitore' : 'Abilita fornitore';
       byId('supplierVisibilityToggle').dataset.enabled = String(enabled);
+      settingsReadAt = Date.now();
     } catch {
-      byId('supplierVisibilityStatus').textContent = 'Configurazione non disponibile';
+      if (identityKey() === owner && settingsInFlight === request) byId('supplierVisibilityStatus').textContent = 'Configurazione non disponibile';
+    } finally {
+      if (settingsInFlight === request) settingsInFlight = null;
     }
   }
   function renderAll() {
@@ -187,14 +203,13 @@
     let selected;
     if (!hasOrderAccess()) { clearOrderState(); renderAll(); return; }
     try { selected = selection(); } catch (error) { clearOrderState(); setLoadError(error.message); return; }
-    const key = `${normalizedEmail()}:${session()?.role}:${selected.supplier}:${selected.range.from}:${selected.range.to}`;
+    const key = `${identityKey()}:${selected.supplier}:${selected.range.from}:${selected.range.to}`;
     if (!force && key === queryKey && loadState !== 'error') { renderAll(); return; }
     clearOrderState();
     queryKey = key;
     const activeGeneration = generation;
-    const activeEmail = normalizedEmail();
-    const activeRole = session()?.role;
-    const stillActive = () => generation === activeGeneration && hasOrderAccess() && normalizedEmail() === activeEmail && session()?.role === activeRole;
+    const activeIdentity = identityKey();
+    const stillActive = () => generation === activeGeneration && hasOrderAccess() && identityKey() === activeIdentity;
     renderAll();
     try {
       const [appSdk, firestoreSdk] = await Promise.all([
@@ -268,7 +283,7 @@
     const enabled = byId('supplierVisibilityToggle').dataset.enabled === 'true';
     try {
       await window.DoseSupplierAccess.setSupplierEnabled('pagnottella', !enabled);
-      await renderMenuGovernance();
+      await renderMenuGovernance(true);
     } catch (error) {
       window.toast?.(error?.message || 'Configurazione non aggiornata');
     }
@@ -277,6 +292,7 @@
     if (!isAdmin() && view !== 'orders') return;
     document.querySelectorAll('.adminNav button').forEach(button => button.classList.toggle('active', button.dataset.adminView === view));
     document.querySelectorAll('.adminView').forEach(section => section.classList.toggle('active', section.dataset.adminPanel === view));
+    if (view === 'menu') renderMenuGovernance();
   }
 
   Object.assign(window, {
@@ -291,8 +307,8 @@
     refreshPagnottellaAnalytics:() => loadOrders(true),
     loadMorePagnottellaOrders:() => { visibleLimit += 50; renderOrders(); }
   });
-  window.addEventListener('pagnottella:session-changed', () => loadOrders(true));
-  window.addEventListener('pagnottella:order-saved', () => loadOrders(true));
+  window.addEventListener('pagnottella:session-changed', () => loadOrders());
+  window.addEventListener('pagnottella:order-saved', () => loadOrders());
   document.addEventListener('visibilitychange', () => { if (!document.hidden) loadOrders(); });
   document.addEventListener('DOMContentLoaded', () => setTimeout(loadOrders, 300));
 })();

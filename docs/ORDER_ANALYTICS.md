@@ -68,13 +68,63 @@ does not substitute for verification on the physical phone. Critical-script
 connection failures reuse the existing single-reload asset recovery without
 modifying authentication or credentials.
 
-Build with `npm run build:pagnottella-production`. Release ONLY the four files
-index.html, production-admin.js, production.css and order-analytics.js under
-gh-pages/pagnottella-gourmet. Their cache version is analytics-2. Never publish mocks.
+Build with `npm run build:pagnottella-production`. Release ONLY index.html,
+production-admin.js, production.css, order-analytics.js, pagnottella.js,
+release-watch.js and release.json under gh-pages/pagnottella-gourmet.
+Their cache version is analytics-3. Never publish mocks.
 No main, rules, indexes, Netlify settings, authentication or existing orders change.
-Rollback those four assets together; this release has no data migration to undo.
+Rollback these assets together; this release has no data migration to undo.
 After publishing, verify asset hashes and actual server queries/index availability
 with an authorized account before declaring live analytics validated.
+
+## Resilience and read budget (analytics-3)
+
+- Order listeners are reused for identical identity/supplier/date scopes. An order
+  saved event does not restart an already healthy realtime listener. Explicit
+  refresh, errors or identity changes can restart it. Firebase UID is part of the
+  identity key; late callbacks from a former UID are ignored even for the same email.
+- Menu configuration is read only when the menu administration view is opened,
+  coalesced while pending and reused for 60 seconds per identity. Explicit changes
+  invalidate this brief cache. Order snapshots no longer fetch menu settings.
+- release.json is public build metadata, containing no credentials or order data.
+  A visible, online page checks at most once per five minutes, without credentials;
+  the request aborts after four seconds. Failures never block core functionality.
+- A differing release produces an optional update notice. No automatic reload or
+  authentication reset takes place. Updating is blocked while cart items, checkout
+  writes, authentication or confirmation dialogs are active. The guard is rechecked
+  at the click. Cart persistence is NOT claimed: finish/empty it before reloading.
+- Dismissing the notice suppresses it for that page session. Older pages without
+  the watcher need one manual reload to receive this capability.
+- `node tests/release-integrity.test.mjs` checks that HTML cache versions, manifest
+  and build copies agree. Update the manifest and HTML together on each release.
+- Browser tests start their own loopback-only static server with a 128-connection
+  backlog, rather than silently reusing a potentially stale build. Pixel checkout
+  scenarios explicitly use the touch cart path. This server is never deployed.
+
+Live read-only verification on 2026-10-12 of analytics-2: server-confirmed Pagnottella
+history 38 orders / EUR359.85 / 20 users; classified Russo history 61 / EUR324.30.
+Both supplier-specific bounded queries returned server data without new indexes.
+These are point-in-time observations, not fixed targets or proof of settlement.
+
+Verification on 2026-10-13 for analytics-3: 70 production browser checks passed
+(6 intentional desktop-only exclusions), plus 4 release-notice layout checks,
+12 Russo segregation checks, 7 analytics unit tests with TZ=Pacific/Honolulu,
+release-manifest consistency, cache recovery and JavaScript syntax checks.
+Browsers use synthetic identities/orders. This is not a real-user Google login
+or physical Pixel certification, and no production order was created or changed.
+
+## Architectural boundaries
+
+- Keep metric calculation pure and independent from Firebase and the DOM. Query
+  ownership belongs to production-admin.js; renderers consume the same scope.
+- Session identity includes Firebase UID, email and role. Generation guards reject
+  stale async callbacks, independently of UI visibility. Server rules remain the
+  authorization boundary; no client cache can grant supplier access.
+- Release discovery is an optional, isolated module with bounded polling and a
+  checkout-owned safety contract. Discovery failures must not affect ordering.
+- Keep this a modular static client for now. Add a backend aggregation pipeline
+  only after measuring read cost and agreeing on payment semantics, not as a
+  speculative microservice rewrite. No cost-saving percentage is claimed.
 
 ## Next decisions, ordered by impact
 
