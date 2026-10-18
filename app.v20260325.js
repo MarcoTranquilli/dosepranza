@@ -218,7 +218,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             localStorage.removeItem('dose_user');
         }
         const LOW_STOCK_THRESHOLD = 2;
-        const ORDER_CUTOFF = { hour: 11, minute: 30 };
+        const ORDER_CUTOFF = { hour: 10, minute: 30 };
         const ORDER_CONFIRM_ENDPOINT = (() => {
             try {
                 const override = localStorage.getItem('dose_notify_base_url');
@@ -544,15 +544,16 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
         const isOrderWindowOpen = () => {
             if(isLocalE2E) return true;
             const now = new Date();
-            const h = now.getHours();
-            const m = now.getMinutes();
+            const parts = new Intl.DateTimeFormat('en-GB', {timeZone:'Europe/Rome', hour:'2-digit', minute:'2-digit', hourCycle:'h23'}).formatToParts(now);
+            const h = Number(parts.find(part => part.type === 'hour').value);
+            const m = Number(parts.find(part => part.type === 'minute').value);
             return h < ORDER_CUTOFF.hour || (h === ORDER_CUTOFF.hour && m < ORDER_CUTOFF.minute);
         };
 
         const ensureOrderWindow = () => {
             if(isLocalE2E) return true;
             if(isOrderWindowOpen()) return true;
-            window.toast("Ordini chiusi dopo le 11:30. Usa Fridge.");
+            window.toast("Ordini chiusi dopo le 10:30. Usa Fridge.");
             return false;
         };
 
@@ -570,7 +571,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
                 return;
             }
             if(!isLocalE2E && (v === 'menu' || v === 'custom' || v === 'cart') && !isOrderWindowOpen()) {
-                window.toast("Ordini chiusi dopo le 11:30. Usa Fridge.");
+                window.toast("Ordini chiusi dopo le 10:30. Usa Fridge.");
                 if(isAdmin() || isRistoratore() || isFacility()) {
                     v = 'frige';
                 }
@@ -1843,8 +1844,8 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             [allBtn, preBtn, postBtn].forEach(b => b.classList.remove('bg-primary','text-white'));
             [allBtn, preBtn, postBtn].forEach(b => b.classList.add('bg-gray-100','text-gray-700'));
             if(filter === 'all') { allBtn.classList.remove('bg-gray-100','text-gray-700'); allBtn.classList.add('bg-primary','text-white'); }
-            if(filter === 'pre1130') { preBtn.classList.remove('bg-gray-100','text-gray-700'); preBtn.classList.add('bg-primary','text-white'); }
-            if(filter === 'post1130') { postBtn.classList.remove('bg-gray-100','text-gray-700'); postBtn.classList.add('bg-primary','text-white'); }
+            if(filter === 'pre1030') { preBtn.classList.remove('bg-gray-100','text-gray-700'); preBtn.classList.add('bg-primary','text-white'); }
+            if(filter === 'post1030') { postBtn.classList.remove('bg-gray-100','text-gray-700'); postBtn.classList.add('bg-primary','text-white'); }
             renderOrdersPayments();
         };
 
@@ -3135,9 +3136,10 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             const ordersBeforeCutoff = ordersRange.filter(o => {
                 const d = o.createdAt?.toDate?.();
                 if(!d) return false;
-                const hour = d.getHours();
-                const minute = d.getMinutes();
-                return hour < ORDER_CUTOFF.hour || (hour === ORDER_CUTOFF.hour && minute <= ORDER_CUTOFF.minute);
+                const parts = new Intl.DateTimeFormat('en-GB', {timeZone:'Europe/Rome', hour:'2-digit', minute:'2-digit', hourCycle:'h23'}).formatToParts(d);
+                const hour = Number(parts.find(part => part.type === 'hour').value);
+                const minute = Number(parts.find(part => part.type === 'minute').value);
+                return hour < ORDER_CUTOFF.hour || (hour === ORDER_CUTOFF.hour && minute < ORDER_CUTOFF.minute);
             }).length;
             const cutoffCompliance = ordersRange.length ? (ordersBeforeCutoff / ordersRange.length) : 0;
 
@@ -3672,9 +3674,10 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
                 items = items.filter(o => {
                     if(!o.createdAt) return false;
                     const d = o.createdAt.toDate();
-                    const minutes = d.getHours() * 60 + d.getMinutes();
-                    const cutoff = 11 * 60 + 30;
-                    return state.ordersTimeFilter === "pre1130" ? minutes <= cutoff : minutes > cutoff;
+                    const parts = new Intl.DateTimeFormat('en-GB', {timeZone:'Europe/Rome', hour:'2-digit', minute:'2-digit', hourCycle:'h23'}).formatToParts(d);
+                    const minutes = Number(parts.find(part => part.type === 'hour').value) * 60 + Number(parts.find(part => part.type === 'minute').value);
+                    const cutoff = ORDER_CUTOFF.hour * 60 + ORDER_CUTOFF.minute;
+                    return state.ordersTimeFilter === "pre1030" ? minutes < cutoff : minutes >= cutoff;
                 });
             }
             return items;
