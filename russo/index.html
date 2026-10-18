@@ -19,6 +19,9 @@
     <link rel="stylesheet" href="feedback/feedback-widget.css?v=feedback-1">
     <script src="supplier-access.js?v=auth-record-refresh-1"></script>
     <script src="russo/russo-auth-guard.js?v=4"></script>
+    <link rel="stylesheet" href="russo/threshold-status.css?v=russo-threshold-1">
+    <script src="pagnottella-gourmet/order-analytics.js?v=russo-threshold-client-1" defer></script>
+    <script src="russo/threshold-status.js?v=russo-threshold-client-1" defer></script>
 </head>
 <body class="bg-background text-text-main pb-20 font-sans">
 
@@ -428,6 +431,7 @@
                         <button data-action="send-order" class="w-full btn btn-primary py-5 text-lg">Conferma ordine</button>
                     </div>
                 </div>
+                <section id="russo-threshold-user" role="status" aria-live="polite" hidden></section>
                 <div id="my-order-status" class="mt-4 text-[11px] text-gray-500 font-bold">Accedi per vedere lo stato del tuo ordine.</div>
                 <div id="daily-summary-inline" class="mt-6 card p-5 rounded-3xl hidden">
                     <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
@@ -883,7 +887,7 @@
     </div>
 
     <script type="module" src="sw-killer.js?v=pages-recovery-2"></script>
-    <script type="module" src="app.v20260325.js?v=auth-record-refresh-1"></script>
+    <script type="module" src="app.v20260325.js?v=russo-threshold-client-1"></script>
     <script src="feedback/vendor/html2canvas.min.js?v=feedback-1"></script>
     <script src="feedback/logger.js?v=feedback-1"></script>
     <script src="feedback/diagnostics.js?v=feedback-1"></script>

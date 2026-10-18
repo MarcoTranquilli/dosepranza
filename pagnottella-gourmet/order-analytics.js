@@ -122,5 +122,28 @@
     for (const order of rows) data.push([order.id, toDate(order.createdAt).toISOString(), day(order.createdAt), SUPPLIERS[supplier(order)], order.user, order.email, order.items.map(item => `${quantity(item)}x ${item.name}`).join(' | '), order.paymentMethod, payment(order), (Math.round(order.total * 100) / 100).toFixed(2)]);
     return '\uFEFF' + data.map(row => row.map(safe).join(',')).join('\r\n');
   }
-  globalThis.DoseOrderAnalytics = Object.freeze({ ZONE, SUPPLIERS, supplier, quantity, toDate, day, rangeFor, payment, select, aggregate, csv });
+  function russoThreshold(orders, {now = new Date()} = {}) {
+    const key = day(now), start = midnight(key), cutoff = new Date(start);
+    // Resolve the civil 10:30 separately from midnight across DST transitions.
+    cutoff.setTime(Date.parse(`${key}T10:30:00Z`));
+    const p = parts(cutoff);
+    cutoff.setTime(cutoff.getTime() + Date.parse(`${key}T10:30:00Z`) - Date.parse(`${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}:${p.second}Z`));
+    let totalCents = 0;
+    const seen = new Set(), excluded = /^(cancelled|canceled|annullato|draft|bozza|void|refunded)$/i;
+    for (const order of orders) {
+      const date = toDate(order.createdAt), cents = Math.round(order.total * 100);
+      if (supplier(order) !== 'russo' || !date || date < start || date >= cutoff || date > now
+        || (order.orderType && order.orderType !== 'order') || order.isTest === true || order.test === true || order.e2e === true
+        || [order.status, order.orderStatus, order.paymentStatus].some(value => excluded.test(value || ''))
+        || typeof order.total !== 'number' || !Number.isSafeInteger(cents) || cents <= 0
+        || Math.abs(order.total * 100 - cents) > 0.00001 || (order.id && seen.has(order.id))) continue;
+      if (order.id) seen.add(order.id);
+      totalCents += cents;
+      if (!Number.isSafeInteger(totalCents)) throw new Error('Totale Russo non valido');
+    }
+    const missingCents = Math.max(0, 2000 - totalCents);
+    return {supplierId:'russo', day:key, cutoff:cutoff.toISOString(), totalCents, thresholdCents:2000, missingCents,
+      progress:Math.min(1, totalCents / 2000), status:totalCents >= 2000 ? 'STATO_CONFERMATO' : now >= cutoff ? 'STATO_NON_CONFERMATO' : 'STATO_IN_ATTESA'};
+  }
+  globalThis.DoseOrderAnalytics = Object.freeze({ ZONE, SUPPLIERS, supplier, quantity, toDate, day, rangeFor, payment, select, aggregate, csv, russoThreshold });
 })();
