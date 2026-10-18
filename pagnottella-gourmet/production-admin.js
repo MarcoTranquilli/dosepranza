@@ -167,7 +167,10 @@
     }
   }
   function renderAll() {
-    window.DoseRussoThreshold?.mount(byId('russo-threshold-admin'), {visible:() => isAdmin() && selectedSupplier() !== 'pagnottella'});
+    window.DoseRussoThreshold?.mount(byId('russo-threshold-admin'), {
+      visible:() => isAdmin() && selectedSupplier() !== 'pagnottella',
+      getSummary:() => window.DoseRussoThreshold.read(firestore?.db)
+    });
     const panel = byId('adminWorkspace');
     if (!panel) return;
     panel.classList.toggle('hidden', !hasOrderAccess());

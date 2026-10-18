@@ -1,5 +1,4 @@
 (() => {
-  const endpoint = 'https://app-dosepranza.netlify.app/.netlify/functions/russo-threshold';
   const targets = new Map();
   let generation = 0, activeIdentity = '', pending = false, lastRead = 0;
   const money = cents => new Intl.NumberFormat('it-IT', {style:'currency', currency:'EUR'}).format(cents / 100);
@@ -40,11 +39,7 @@
     pending = true;
     const ticket = generation;
     try {
-      const token = await visible[0][1].getToken();
-      if (!token) throw new Error('session_unavailable');
-      const response = await fetch(endpoint, {headers:{Authorization:`Bearer ${token}`}, signal:AbortSignal.timeout(10000), cache:'no-store'});
-      if (!response.ok) throw new Error('summary_unavailable');
-      const result = await response.json();
+      const result = await visible[0][1].getSummary();
       if (result.supplierId !== 'russo' || !['STATO_CONFERMATO','STATO_IN_ATTESA','STATO_NON_CONFERMATO'].includes(result.status)
         || !Number.isSafeInteger(result.totalCents) || result.totalCents < 0 || result.thresholdCents !== 2000
         || !Number.isSafeInteger(result.missingCents) || !Number.isFinite(Date.parse(result.asOf))
@@ -56,18 +51,23 @@
       if (ticket === generation) { pending = false; lastRead = Date.now(); }
     }
   }
-  async function currentToken() {
-    const [apps, auth] = await Promise.all([
-      import('https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js'),
-      import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js')
-    ]);
-    const app = apps.getApps()[0];
-    return app ? auth.getAuth(app).currentUser?.getIdToken() : null;
+  async function read(db, {sdk, now = new Date()} = {}) {
+    if (!db) throw new Error('firestore_unavailable');
+    const fs = sdk || await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js');
+    const analytics = window.DoseOrderAnalytics;
+    const range = analytics.rangeFor('today', now);
+    const baseline = analytics.russoThreshold([], {now});
+    const query = fs.query(fs.collection(db, 'orders'), fs.where('supplierId', '==', 'russo'),
+      fs.where('createdAt', '>=', range.startDate), fs.where('createdAt', '<', new Date(baseline.cutoff)),
+      fs.orderBy('createdAt', 'desc'), fs.limit(1001));
+    const snapshot = await fs.getDocsFromServer(query);
+    if (snapshot.size > 1000) throw new Error('summary_limit');
+    return {...analytics.russoThreshold(snapshot.docs.map(doc => ({...doc.data(), id:doc.id})), {now}), asOf:now.toISOString()};
   }
-  window.DoseRussoThreshold = Object.freeze({mount(element, {visible = () => true, getToken = currentToken} = {}) {
+  window.DoseRussoThreshold = Object.freeze({mount(element, {visible = () => true, getSummary} = {}) {
     if (!element) return;
-    targets.set(element, {visible, getToken}); refresh();
-  }, refresh});
+    targets.set(element, {visible, getSummary}); refresh();
+  }, refresh, read});
   setInterval(() => { if (!document.hidden) refresh(); }, 15000);
   window.addEventListener('focus', refresh);
   document.addEventListener('visibilitychange', refresh);

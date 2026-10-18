@@ -98,9 +98,29 @@ service cloud.firestore {
     // - supplier Pagnottella vede solo ordini Pagnottella
     // - supplier Russo vede solo ordini Russo
     // - create consentita solo agli utenti DOS per il proprio uid
+    function romeOffset(time) {
+      let march = timestamp.date(time.year(), 3, 31);
+      let october = timestamp.date(time.year(), 10, 31);
+      let summerStart = march - duration.value(march.dayOfWeek() % 7, 'd') + duration.value(1, 'h');
+      let summerEnd = october - duration.value(october.dayOfWeek() % 7, 'd') + duration.value(1, 'h');
+      return time >= summerStart && time < summerEnd ? 2 : 1;
+    }
+
+    // DOS colleagues share only today's Russo collection window for the collective threshold.
+    function isSharedRussoToday() {
+      let localNow = request.time + duration.value(romeOffset(request.time), 'h');
+      let civilDay = timestamp.date(localNow.year(), localNow.month(), localNow.day());
+      let start = civilDay - duration.value(romeOffset(civilDay - duration.value(2, 'h')), 'h');
+      let cutoff = civilDay + duration.value(630, 'm') - duration.value(romeOffset(civilDay + duration.value(10, 'h')), 'h');
+      return isDosUser() && isRussoOrder()
+        && resource.data.createdAt is timestamp
+        && resource.data.createdAt >= start && resource.data.createdAt < cutoff;
+    }
+
     match /orders/{doc} {
       allow read: if isAdminEmail()
         || (isDosUser() && isOwnerByUid())
+        || isSharedRussoToday()
         || (isPagnottellaSupplier() && isPagnottellaOrder())
         || (isRussoSupplier() && isRussoOrder());
 
