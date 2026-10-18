@@ -109,7 +109,7 @@ test.describe('Preview multi-fornitore', () => {
     await expect(page.locator('#btn-cart')).toBeVisible();
     await page.locator('#btn-menu').click();
     await expect(page.locator('#menu-view').getByText(/pagamento alimentari russo/i)).toBeVisible();
-    await expect(page.getByRole('link', { name: /apri satispay/i })).toHaveAttribute('href', /satispay/i);
+    await expect(page.locator('#menu-view').getByRole('link', { name: /apri satispay/i })).toHaveAttribute('href', /satispay/i);
   });
 
   test('Pagnottella: catalogo, sconto, carrello e riepilogo WhatsApp', async ({ page }) => {

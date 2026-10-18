@@ -8,7 +8,7 @@ test('UAT Utente standard: ordine + frige WIP', async ({ page }) => {
   await page.goto(legacyRussoAppUrl);
 
   await page.click('#btn-menu');
-  await page.click('[data-action="add-std"]');
+  await page.locator('#menu-view [data-action="add-std"]:not([disabled])').first().click();
 
   await page.click('#btn-cart');
   const confirm = page.locator('[data-action="send-order"]');
