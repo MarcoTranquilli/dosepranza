@@ -144,15 +144,6 @@
     "sourceAsset": null
   },
   {
-    "id": "panini-carne-oregan-16",
-    "name": "Oregan",
-    "category": "panini-carne",
-    "image": "../assets/pagnottella/images/products/panini_oregan__supplier_20260806.webp",
-    "specific": true,
-    "auditPublishable": true,
-    "sourceAsset": "panini_oregan__supplier_20260806.webp"
-  },
-  {
     "id": "panini-carne-paesano-17",
     "name": "Paesano",
     "category": "panini-carne",
@@ -344,6 +335,15 @@
   {
     "id": "panini-pesce-marinaro-4",
     "name": "Marinaro",
+    "category": "panini-pesce",
+    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+    "specific": false,
+    "auditPublishable": false,
+    "sourceAsset": null
+  },
+  {
+    "id": "panini-pesce-marinaro-duepuntozero-5",
+    "name": "Marinaro duepuntozero",
     "category": "panini-pesce",
     "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
     "specific": false,
@@ -547,15 +547,6 @@
     "specific": true,
     "auditPublishable": true,
     "sourceAsset": "insalate_valtellina__supplier_20260806.webp"
-  },
-  {
-    "id": "insalate-carne-newyorkese-6",
-    "name": "Newyorkese",
-    "category": "insalate-carne",
-    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
-    "specific": false,
-    "auditPublishable": false,
-    "sourceAsset": null
   },
   {
     "id": "insalate-pesce-asiatica-0",
@@ -783,18 +774,18 @@
     "sourceAsset": "insalate_vegetariana__supplier_20260806.webp"
   },
   {
-    "id": "speciali-apollo-0",
-    "name": "Apollo",
-    "category": "speciali",
+    "id": "insalate-pesce-tropicana-19",
+    "name": "Tropicana",
+    "category": "insalate-pesce",
     "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
     "specific": false,
     "auditPublishable": false,
     "sourceAsset": null
   },
   {
-    "id": "insalate-pesce-tropicana-19",
-    "name": "Tropicana",
-    "category": "insalate-pesce",
+    "id": "speciali-olivia-0",
+    "name": "Olivia",
+    "category": "speciali",
     "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
     "specific": false,
     "auditPublishable": false,
@@ -819,8 +810,8 @@
     "sourceAsset": null
   },
   {
-    "id": "bevande-macedonia-2",
-    "name": "Macedonia",
+    "id": "bevande-birre-3",
+    "name": "Birre artigianali",
     "category": "bevande-dolci",
     "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
     "specific": false,
@@ -828,9 +819,18 @@
     "sourceAsset": null
   },
   {
-    "id": "bevande-birre-3",
-    "name": "Birre artigianali",
-    "category": "bevande-dolci",
+    "id": "bevande-caffe-4",
+    "name": "Caffè",
+    "category": "bevande",
+    "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
+    "specific": false,
+    "auditPublishable": false,
+    "sourceAsset": null
+  },
+  {
+    "id": "bevande-calice-vino-5",
+    "name": "Calice di vino",
+    "category": "bevande",
     "image": "../assets/pagnottella/images/optimized/logo_pagnottella.webp",
     "specific": false,
     "auditPublishable": false,

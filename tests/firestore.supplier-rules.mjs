@@ -21,11 +21,21 @@ import {
 
 const projectId = 'demo-dosepranza-supplier-rules';
 const rules = fs.readFileSync('firestore.pagnottella-production.proposed.rules', 'utf8');
-const googleClaims = email => ({ email, firebase:{ sign_in_provider:'google.com' } });
+const googleClaims = email => ({ email, email_verified:false, firebase:{ sign_in_provider:'google.com' } });
 const env = await initializeTestEnvironment({ projectId, firestore:{ rules } });
 
 const admin = env.authenticatedContext('uid-admin', googleClaims('marco.tranquilli@dos.design')).firestore();
 const dos_user = env.authenticatedContext('uid-dos_user', googleClaims('utente@dos.design')).firestore();
+const linkedGoogleDosUser = env.authenticatedContext('uid-dos_user', {
+  email:'utente@dos.design', email_verified:true,
+  firebase:{ sign_in_provider:'anonymous', identities:{ 'google.com':['utente@dos.design'] } }
+}).firestore();
+const googleDosUserWithoutPrimaryEmail = env.authenticatedContext('uid-dos_user', {
+  firebase:{ sign_in_provider:'google.com', identities:{ 'google.com':['utente@dos.design'] } }
+}).firestore();
+const nonGoogleDosUser = env.authenticatedContext('uid-dos_user', {
+  email:'utente@dos.design', firebase:{ sign_in_provider:'anonymous' }
+}).firestore();
 const pagnottella = env.authenticatedContext('uid-pg', googleClaims('commerciale@lapagnottellagourmet.it')).firestore();
 const isidoro = env.authenticatedContext('uid-isidoro', googleClaims('isidorovagnozzi@gmail.com')).firestore();
 const russo = env.authenticatedContext('uid-russo', googleClaims('russolorenzo11@gmail.com')).firestore();
@@ -98,6 +108,12 @@ try {
   await assertFails(getDocs(globalQuery(dos_user)));
   await assertSucceeds(addDoc(collection(dos_user, 'orders'), order('russo', 'uid-dos_user', 'utente@dos.design')));
   await assertSucceeds(addDoc(collection(dos_user, 'orders'), order('pagnottella', 'uid-dos_user', 'utente@dos.design')));
+  await assertSucceeds(getDoc(doc(linkedGoogleDosUser, 'orders', 'pg-order')));
+  await assertSucceeds(addDoc(collection(linkedGoogleDosUser, 'orders'), order('russo', 'uid-dos_user', 'utente@dos.design')));
+  await assertSucceeds(getDoc(doc(googleDosUserWithoutPrimaryEmail, 'orders', 'pg-order')));
+  await assertSucceeds(addDoc(collection(googleDosUserWithoutPrimaryEmail, 'orders'), order('russo', 'uid-dos_user', 'utente@dos.design')));
+  await assertFails(getDoc(doc(nonGoogleDosUser, 'orders', 'pg-order')));
+  await assertFails(addDoc(collection(nonGoogleDosUser, 'orders'), order('russo', 'uid-dos_user', 'utente@dos.design')));
   await assertFails(addDoc(collection(dos_user, 'orders'), order('russo', 'uid-other', 'utente@dos.design')));
   const missingSupplier = order('russo', 'uid-dos_user', 'utente@dos.design');
   delete missingSupplier.supplierId;

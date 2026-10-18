@@ -78,6 +78,7 @@
   const isFilePreview = () => window.location.protocol === 'file:';
   const isLoopback = () => ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
   const isProductionSuiteEntry = () => new URLSearchParams(window.location.search).get('suite') === 'production';
+  const isGitHubPages = () => window.location.hostname === 'marcotranquilli.github.io';
   const isE2E = () => {
     if (!isLoopback()) return false;
     const params = new URLSearchParams(window.location.search);
@@ -223,6 +224,14 @@
 
   async function firebaseUserPayload(firebaseUser, { result = null } = {}) {
     if (!firebaseUser || firebaseUser.isAnonymous || !firebaseUser.uid) return null;
+    if (!firebaseUser.email && hasGoogleProvider(firebaseUser.providerData)) {
+      try {
+        await firebaseUser.reload();
+        await firebaseUser.getIdToken(true);
+      } catch (error) {
+        recordAuthError(error);
+      }
+    }
     const identity = resolveAuthenticatedIdentity(firebaseUser, result);
     if (!identity.email) return null;
     let tokenResult = null;
@@ -243,7 +252,8 @@
       role,
       isAdmin,
       supplierIds: supplierIdsForIdentity(email, role),
-      provider: GOOGLE_PROVIDER_ID
+      provider: GOOGLE_PROVIDER_ID,
+      firebaseVerified: true
     });
   }
 
@@ -392,6 +402,7 @@
     provider.addScope('email');
     provider.addScope('profile');
     provider.setCustomParameters({ prompt: 'select_account' });
+    if (isGitHubPages()) return startGoogleRedirect(auth, authSdk, provider);
     try {
       let result;
       try {

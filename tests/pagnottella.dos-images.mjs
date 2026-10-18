@@ -7,10 +7,10 @@ const menu = JSON.parse(fs.readFileSync(path.join(root, 'assets/pagnottella/data
 const manifest = JSON.parse(fs.readFileSync(path.join(root, 'assets/pagnottella/data/dos-supplier-image-manifest.json'), 'utf8'));
 const imported = menu.products.filter(product => product.imageMeta?.source === 'fornitore-dos-20260806');
 
-assert.equal(manifest.count, 37);
-assert.equal(imported.length, 37);
-assert.equal(new Set(manifest.images.map(item => item.productId)).size, 37);
-assert.equal(imported.filter(product => product.cat === 'panini').length, 19);
+assert.equal(manifest.count, 36);
+assert.equal(imported.length, 36);
+assert.equal(new Set(manifest.images.map(item => item.productId)).size, 36);
+assert.equal(imported.filter(product => product.cat === 'panini').length, 18);
 assert.equal(imported.filter(product => product.cat === 'insalate').length, 18);
 
 for (const name of ['Caprese', 'San Jose']) {
@@ -38,4 +38,4 @@ assert.deepEqual(
   {sourceFilename:burrata?.sourceFilename, colorConversion:burrata?.colorConversion},
   {sourceFilename:'burrata_CMYK.jpg', colorConversion:'CMYK_to_sRGB'}
 );
-console.log('pagnottella-dos-images: 37/37 passed');
+console.log('pagnottella-dos-images: 36/36 passed');

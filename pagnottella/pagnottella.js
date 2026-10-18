@@ -56,7 +56,13 @@ const discountRate = () => {
 const discountLabel = () => {
   const rate = Math.round(discountRate() * 100);
   if(!rate) return 'Prezzo standard';
-  return `${DATA.discount.label || 'Sconto attivo'} -${rate}%`;
+  const limit = DATA.discount?.activeUntil ? new Date(`${DATA.discount.activeUntil}T23:59:59`) : null;
+  const fallbackActive = Boolean(limit && currentDate() > limit);
+  const label = fallbackActive
+    ? DATA.discount.fallbackLabel
+    : DATA.discount.label;
+  if(fallbackActive && DATA.discount.fallbackIncludedInPrice) return `${label || 'Sconto DOSepranza'} ${rate}% già incluso`;
+  return `${label || 'Sconto attivo'} -${rate}%`;
 };
 const ORDER_LOG_KEY = 'pg_order_logs';
 const deliveryCopy = () => DATA?.copy?.delivery || 'Ordini e pagamenti entro le 12:00, consegna gratuita alle 12:30';
@@ -78,7 +84,13 @@ const paymentNoteCopy = () => 'Satispay è il metodo principale; in alternativa 
 const finalizeOrderLabel = 'Finalizza l’ordine tramite il suo invio su WhatsApp';
 const orderCutoffCopy = '12:00';
 const deliveryTimeCopy = '12:30';
-const discountedPrice = v => Math.round(v * (1 - discountRate()) * 100) / 100;
+const appliedDiscountRate = () => {
+  const cfg = DATA?.discount;
+  if(!cfg || typeof cfg !== 'object' || !cfg.fallbackIncludedInPrice) return discountRate();
+  const limit = cfg.activeUntil ? new Date(`${cfg.activeUntil}T23:59:59`) : null;
+  return limit && currentDate() > limit ? 0 : discountRate();
+};
+const discountedPrice = v => Math.round(v * (1 - appliedDiscountRate()) * 100) / 100;
 const isLocalPreview = () => location.protocol === 'file:';
 const setAuthButtonsDisabled = (disabled) => {
   ['authGateGoogle', 'authGateLocal'].forEach((id) => {
@@ -699,7 +711,7 @@ function card(p){
   const srcset = responsive?.mobile && responsive?.desktop
     ? ` srcset="${esc(responsive.mobile)} 640w, ${esc(responsive.desktop)} 1200w" sizes="(max-width:640px) 92vw, (max-width:1100px) 46vw, 360px"`
     : '';
-  return `<article class="card ${hasSpecificImage ? '' : 'imageFallback'}"><div class="pic"><img src="${esc(p.img)}"${srcset} alt="${esc(alt)}" loading="lazy" decoding="async"><div class="badges">${badges.map(t=>`<span class="badge">${esc(t)}</span>`).join('')}</div>${hasSpecificImage ? '' : '<span class="imageNotice">Foto specifica non disponibile</span>'}</div><div class="body"><div class="nameRow"><h4>${esc(p.name)}</h4><div class="price"><span class="old">${money(p.price)}</span>${money(discountedPrice(p.price))}</div></div><p class="desc">${esc(p.desc)}</p><div class="meta"><span class="tag">${esc(clusterLabel(p.categoryGroup))}</span>${(p.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div><div class="actions"><button class="details" onclick="openDetails('${p.id}')">Dettagli</button><button class="add" aria-label="${esc(addLabel)}" onclick="quickAdd('${p.id}')" ${isOrderingClosed() ? 'disabled' : ''}>${isOrderingClosed() ? 'Chiuso' : '+'}</button></div></div></article>`;
+  return `<article class="card ${hasSpecificImage ? '' : 'imageFallback'}"><div class="pic"><img src="${esc(p.img)}"${srcset} alt="${esc(alt)}" loading="lazy" decoding="async"><div class="badges">${badges.map(t=>`<span class="badge">${esc(t)}</span>`).join('')}</div>${hasSpecificImage ? '' : '<span class="imageNotice">Foto specifica non disponibile</span>'}</div><div class="body"><div class="nameRow"><h4>${esc(p.name)}</h4><div class="price">${appliedDiscountRate() ? `<span class="old">${money(p.price)}</span>` : ''}${money(discountedPrice(p.price))}</div></div><p class="desc">${esc(p.desc)}</p><div class="meta"><span class="tag">${esc(clusterLabel(p.categoryGroup))}</span>${(p.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div><div class="actions"><button class="details" onclick="openDetails('${p.id}')">Dettagli</button><button class="add" aria-label="${esc(addLabel)}" onclick="quickAdd('${p.id}')" ${isOrderingClosed() ? 'disabled' : ''}>${isOrderingClosed() ? 'Chiuso' : '+'}</button></div></div></article>`;
 }
 function openDetails(id){
   const p = PRODUCTS.find(x => x.id === id);
@@ -821,39 +833,33 @@ function buildMessage(){
   const now = currentDate();
   const date = now.toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   const time = now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
-  let msg = `📦 Riepilogo Ordine – ${DATA.copy.brand}`;
-  msg += `\nOrdine tramite DOSepranza`;
-  msg += `\n\n👤 Cliente`;
+  let msg = 'Ordine tramite DOSepranza';
+  msg += `\n\n\u{1F464} Cliente`;
   msg += `\n${name} – ${company}`;
   msg += `\nConsegna: ${costCenter}`;
   msg += `\nData: ${cap(date)} - ${time}`;
-  msg += `\n\n🏪 Punto Vendita`;
-  msg += `\n${DATA.contact.address}`;
-  msg += `\nFinestra servizio: Ordini/pagamenti entro le ${orderCutoffCopy} · Consegna gratuita alle ${deliveryTimeCopy}`;
-  msg += `\n\n🥪 Ordine`;
+  msg += `\n\n\u{1F96A} Ordine`;
   t.items.forEach(i => {
-    msg += `\n- ${i.qty}x ${i.name} — ${i.opt}`;
+    msg += `\n\u2022 ${i.qty}x ${i.name} — ${i.opt}`;
     if((i.extras || []).length) msg += `\n  Extra: ${i.extras.map(extra => `${extra.name} +${money(extra.price)}`).join(', ')}`;
     msg += `\n  ${money(discountedPrice(i.originalUnit)*i.qty)}`;
   });
-  const rate = Math.round(discountRate() * 100);
   msg += `\nTotale: ${money(t.total)}`;
-  if(rate) msg += `\nSconti applicati: ${discountLabel()}`;
-  msg += `\n\n💳 Pagamento`;
+  msg += `\n\n\u{1F4B3} Pagamento`;
   msg += `\nMetodo selezionato: ${paymentMethod || 'Non specificato'}`;
-  msg += `\nNote pagamento: ${paymentNoteCopy()}`;
   if(paymentMethod === 'Bonifico bancario'){
     if(paymentBeneficiary()) msg += `\nIntestatario: ${paymentBeneficiary()}`;
     if(paymentIban()) msg += `\nIBAN: ${paymentIban()}`;
   }
-  msg += `\n\n⚠️ Note / Allergie`;
+  msg += `\n\n\u26A0\uFE0F Note / Allergie`;
   msg += `\n${notes || 'Nessuna'}`;
   return msg;
 }
 function cap(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
 function whatsappUrl(message = buildMessage()){
   const number = String(DATA?.whatsapp?.normalizedNumber || DATA?.whatsapp || '').replace(/\D/g, '');
-  return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+  const normalizedMessage = String(message).replace(/&#x20;|&#32;|&nbsp;/gi, ' ').normalize('NFC');
+  return `https://wa.me/${number}?text=${encodeURIComponent(normalizedMessage)}`;
 }
 function buildOrderPayload(){
   const t = totals();
@@ -880,7 +886,7 @@ function buildOrderPayload(){
     serviceWindow: `Ordini/pagamenti entro le ${orderCutoffCopy} · Consegna gratuita alle ${deliveryTimeCopy}`,
     items,
     subtotalOriginal: t.orig,
-    discountRate: discountRate(),
+    discountRate: appliedDiscountRate(),
     discountAmount: t.saving,
     total: t.total,
     paymentMethod: selectedPaymentMethod(),

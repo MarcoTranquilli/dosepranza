@@ -13,11 +13,21 @@ service cloud.firestore {
 
     function isGoogleProvider() {
       return isSignedIn()
-        && request.auth.token.firebase.sign_in_provider == 'google.com';
+        && (
+          request.auth.token.get('firebase', {}).get('sign_in_provider', '') == 'google.com'
+          || request.auth.token.get('firebase', {}).get('identities', {}).keys().hasAny(['google.com'])
+        );
+    }
+
+    function authenticatedEmail() {
+      return request.auth.token.get(
+        'email',
+        request.auth.token.get('firebase', {}).get('identities', {}).get('google.com', [''])[0]
+      );
     }
 
     function isStaffEmail() {
-      return isSignedIn() && request.auth.token.email in [
+      return isSignedIn() && authenticatedEmail() in [
         'marco.tranquilli@dos.design',
         'lorenzo.russo@alimentarirusso',
         'russolorenzo11@gmail.com',
@@ -29,17 +39,17 @@ service cloud.firestore {
 
     function isAdminEmail() {
       return isSignedIn()
-        && request.auth.token.email == 'marco.tranquilli@dos.design';
+        && authenticatedEmail() == 'marco.tranquilli@dos.design';
     }
 
     function isDosUser() {
       return isGoogleProvider()
-        && request.auth.token.email.matches('^[^@]+@dos[.]design$');
+        && authenticatedEmail().matches('^[^@]+@dos[.]design$');
     }
 
     function isPagnottellaSupplier() {
       return isGoogleProvider()
-        && request.auth.token.email in [
+        && authenticatedEmail() in [
           'commerciale@lapagnottellagourmet.it',
           'isidorovagnozzi@gmail.com'
         ];
@@ -47,7 +57,7 @@ service cloud.firestore {
 
     function isRussoSupplier() {
       return isGoogleProvider()
-        && request.auth.token.email in [
+        && authenticatedEmail() in [
           'lorenzo.russo@alimentarirusso',
           'russolorenzo11@gmail.com'
         ];
@@ -88,9 +98,29 @@ service cloud.firestore {
     // - supplier Pagnottella vede solo ordini Pagnottella
     // - supplier Russo vede solo ordini Russo
     // - create consentita solo agli utenti DOS per il proprio uid
+    function romeOffset(time) {
+      let march = timestamp.date(time.year(), 3, 31);
+      let october = timestamp.date(time.year(), 10, 31);
+      let summerStart = march - duration.value(march.dayOfWeek() % 7, 'd') + duration.value(1, 'h');
+      let summerEnd = october - duration.value(october.dayOfWeek() % 7, 'd') + duration.value(1, 'h');
+      return time >= summerStart && time < summerEnd ? 2 : 1;
+    }
+
+    // DOS colleagues share only today's Russo collection window for the collective threshold.
+    function isSharedRussoToday() {
+      let localNow = request.time + duration.value(romeOffset(request.time), 'h');
+      let civilDay = timestamp.date(localNow.year(), localNow.month(), localNow.day());
+      let start = civilDay - duration.value(romeOffset(civilDay - duration.value(2, 'h')), 'h');
+      let cutoff = civilDay + duration.value(630, 'm') - duration.value(romeOffset(civilDay + duration.value(10, 'h')), 'h');
+      return isDosUser() && isRussoOrder()
+        && resource.data.createdAt is timestamp
+        && resource.data.createdAt >= start && resource.data.createdAt < cutoff;
+    }
+
     match /orders/{doc} {
       allow read: if isAdminEmail()
         || (isDosUser() && isOwnerByUid())
+        || isSharedRussoToday()
         || (isPagnottellaSupplier() && isPagnottellaOrder())
         || (isRussoSupplier() && isRussoOrder());
 

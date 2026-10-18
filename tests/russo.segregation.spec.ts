@@ -133,7 +133,7 @@ test('salvataggio Russo conferma una sola scrittura e mostra successo', async ({
 test('errore salvataggio Russo conserva carrello e consente retry', async ({page}) => {
   await prepareRussoOrderSave(page, 'failure');
   await page.locator('#order-send-submit').click();
-  await expect(page.locator('#order-send-error')).toContainText('Il carrello è intatto');
+  await expect(page.locator('#order-send-error')).toContainText('Firestore ha negato');
   await expect(page.locator('#cart-count')).toHaveText('1');
   await expect(page.locator('#order-send-submit')).toBeEnabled();
 });
@@ -160,6 +160,26 @@ test('suite apre Russo senza nuovo login e torna alla scelta fornitore preservan
   expect(storedEmail).toBe(users.dos_user.email);
 });
 
+test('checkout Russo viene ripristinato dopo il redirect Google senza invio automatico', async ({ page }) => {
+  await page.addInitScript(user => {
+    const cart = [{name:'Prodotto test', price:4, cat:'Piatti Pronti', details:'', cartId:1}];
+    localStorage.setItem('dose_e2e', '1');
+    localStorage.setItem('dose_user', JSON.stringify({...user, provider:'google.com'}));
+    (window as typeof window & {__DOSE_E2E_SAVE_ORDER__?:(payload:unknown)=>Promise<{id:string}>}).__DOSE_E2E_SAVE_ORDER__ = async () => ({id:'not-sent'});
+    sessionStorage.setItem('dose_russo_pending_checkout', JSON.stringify({
+      cart,
+      pendingOrder:{items:cart, total:4, allergies:'', posate:'No'},
+      savedAt:Date.now()
+    }));
+  }, users.dos_user);
+  await page.goto('/russo/?suite=production&e2e=1', {waitUntil:'domcontentloaded'});
+  await expect(page.locator('#cart-count')).toHaveText('1');
+  await expect(page.locator('#order-send-modal')).toBeVisible();
+  await expect(page.locator('#order-send-summary')).toContainText('Prodotto test');
+  await expect(page.locator('#order-send-submit')).toBeDisabled();
+  await expect.poll(() => page.evaluate(() => sessionStorage.getItem('dose_russo_pending_checkout'))).toBeNull();
+});
+
 test('Russo diretto non mostra il ritorno suite e ignora escalation role da localStorage', async ({ page }) => {
   await page.addInitScript(() => {
     localStorage.setItem('dose_e2e', '1');
@@ -184,6 +204,7 @@ test('sorgente Russo applica supplierId, query segregata e guard fornitore', asy
   const app = fs.readFileSync('app.v20260325.js', 'utf8');
   const guard = fs.readFileSync('russo/russo-auth-guard.js', 'utf8');
   const access = fs.readFileSync('supplier-access.js', 'utf8');
+  const russoIndex = fs.readFileSync('russo/index.html', 'utf8');
   const suite = fs.readFileSync('pagnottella-gourmet/index.html', 'utf8');
   expect(app).toContain("supplierId: 'russo'");
   expect(app).toContain('where("supplierId", "==", "russo")');
@@ -195,7 +216,16 @@ test('sorgente Russo applica supplierId, query segregata e guard fornitore', asy
   expect(app).toContain('if(!state.pendingOrder || state.orderSubmitting) return;');
   expect(app).toContain('state.orderSubmitting = true;');
   expect(app).toContain('resolveOrderAuthUser');
+  expect(app).toContain("document.querySelectorAll('[data-manual-auth]')");
+  expect(app).toContain('isAnon && isProductionSuiteEntry() && !isLocalE2E');
+  expect(app).toContain('if(isProductionSuiteEntry() && !isLocalE2E) {');
   expect(app).toContain('auth/session-missing');
+  expect(app).toContain("authenticatedEmail.endsWith('@dos.design')");
+  expect(app).toContain("providerId === 'google.com'");
+  expect(app).toContain('authenticatedUser.getIdToken(true)');
+  expect(app).toContain('La sessione Google deve essere riconfermata');
+  expect(app).toContain('RUSSO_PENDING_CHECKOUT_KEY');
+  expect(app).toContain('Reindirizzamento a Google in corso');
   expect(app).toContain('Il carrello è intatto');
   expect(guard).toContain("canAccessSupplier('russo', session)");
   expect(guard).toContain("params.get('suite') === 'production'");
@@ -203,7 +233,15 @@ test('sorgente Russo applica supplierId, query segregata e guard fornitore', asy
   expect(guard).not.toContain("params.get('preview') === 'admin'");
   expect(access).toContain('suiteFallbackSession');
   expect(access).toContain('recoverGoogleSession');
-  expect(suite).toContain('../russo/?suite=production');
+  expect(access).toContain("window.location.hostname === 'marcotranquilli.github.io'");
+  expect(access).toContain('if (isGitHubPages()) return startGoogleRedirect');
+  expect(access).toContain('firebaseVerified: true');
+  expect(russoIndex).toContain('<base href="../">');
+  expect(russoIndex).toContain('src="supplier-access.js?v=auth-record-refresh-1"');
+  expect(russoIndex).toContain('src="app.v20260325.js?v=auth-record-refresh-1"');
+  expect(suite).toContain('../russo/?suite=production&v=auth-record-refresh-1');
+  expect(app).toContain("await u.reload()");
+  expect(access).toContain('await firebaseUser.reload()');
   expect(app).toContain("https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0");
   expect(app).not.toContain("http://web.satispay.com/");
 });

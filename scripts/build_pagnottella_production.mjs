@@ -13,7 +13,7 @@ const localizeAssets = value => {
   }
   return typeof value === 'string' ? value.replace(/^\.\.\/assets\//, './assets/') : value;
 };
-const restrictedPattern = /\b(birr(?:a|e)|alcol|alcolic|beer)\b/i;
+const restrictedPattern = /\b(birr(?:a|e)|vino|wine|alcol|alcolic)\b/i;
 
 menu.products = menu.products.map(product => {
   const restricted = restrictedPattern.test(`${product.name || ''} ${product.desc || ''} ${(product.tags || []).join(' ')}`);

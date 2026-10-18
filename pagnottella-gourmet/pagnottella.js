@@ -61,7 +61,13 @@ const discountRate = () => {
 const discountLabel = () => {
   const rate = Math.round(discountRate() * 100);
   if(!rate) return 'Prezzo standard';
-  return `${DATA.discount.label || 'Sconto attivo'} -${rate}%`;
+  const limit = DATA.discount?.activeUntil ? new Date(`${DATA.discount.activeUntil}T23:59:59`) : null;
+  const fallbackActive = Boolean(limit && currentDate() > limit);
+  const label = fallbackActive
+    ? DATA.discount.fallbackLabel
+    : DATA.discount.label;
+  if(fallbackActive && DATA.discount.fallbackIncludedInPrice) return `${label || 'Sconto DOSepranza'} ${rate}% già incluso`;
+  return `${label || 'Sconto attivo'} -${rate}%`;
 };
 const ORDER_LOG_KEY = 'pg_order_logs';
 const CHECKOUT_STATE_KEY = 'pg_checkout_state_v1';
@@ -81,11 +87,17 @@ const deliverySiteCopy = () => DATA?.orderContext?.deliverySite || 'Via Arno, 52
 const paymentBeneficiary = () => DATA?.payment?.beneficiary || '';
 const paymentIban = () => DATA?.payment?.iban || '';
 const paymentNoteCopy = () => 'Satispay è il metodo principale; in alternativa è disponibile il bonifico bancario. PayPal e Nexi saranno attivati da settembre.';
-const finalizeOrderLabel = () => `Apri WhatsApp con ${whatsappConfig().supplierName}`;
+const finalizeOrderLabel = () => 'Rivedi e conferma ordine';
 const reopenOrderLabel = 'Riapri il riepilogo su WhatsApp';
 const orderCutoffCopy = '12:00';
 const deliveryTimeCopy = '12:30';
-const discountedPrice = v => Math.round(v * (1 - discountRate()) * 100) / 100;
+const appliedDiscountRate = () => {
+  const cfg = DATA?.discount;
+  if(!cfg || typeof cfg !== 'object' || !cfg.fallbackIncludedInPrice) return discountRate();
+  const limit = cfg.activeUntil ? new Date(`${cfg.activeUntil}T23:59:59`) : null;
+  return limit && currentDate() > limit ? 0 : discountRate();
+};
+const discountedPrice = v => Math.round(v * (1 - appliedDiscountRate()) * 100) / 100;
 const isLocalPreview = () => location.protocol === 'file:';
 const setAuthButtonsDisabled = (disabled) => {
   ['authGateGoogle', 'authGateLocal'].forEach((id) => {
@@ -349,6 +361,9 @@ function bind(){
   byId('whatsappCopyBtn')?.addEventListener('click', copyWhatsAppMessage);
   byId('paymentConfirmCancel')?.addEventListener('click', closePaymentConfirmation);
   byId('paymentConfirmAccept')?.addEventListener('click', confirmPaymentAndSend);
+  byId('paymentConfirmConsent')?.addEventListener('change', event => {
+    if(state.confirmationAction === 'submit') byId('paymentConfirmAccept').disabled = !event.target.checked;
+  });
   byId('checkoutCompleteClose')?.addEventListener('click', closeCheckoutComplete);
   byId('sendOrderBtn')?.addEventListener('click', sendWA);
   document.addEventListener('keydown', e => {
@@ -808,7 +823,7 @@ function card(p){
   const srcset = responsive?.mobile && responsive?.desktop
     ? ` srcset="${esc(responsive.mobile)} 640w, ${esc(responsive.desktop)} 1200w" sizes="(max-width:640px) 92vw, (max-width:1100px) 46vw, 360px"`
     : '';
-  return `<article class="card ${hasSpecificImage ? '' : 'imageFallback'}"><div class="pic"><img src="${esc(p.img)}"${srcset} alt="${esc(alt)}" loading="lazy" decoding="async"><div class="badges">${badges.map(t=>`<span class="badge">${esc(t)}</span>`).join('')}</div>${hasSpecificImage ? '' : '<span class="imageNotice">Foto specifica non disponibile</span>'}</div><div class="body"><div class="nameRow"><h4>${esc(p.name)}</h4><div class="price"><span class="old">${money(p.price)}</span>${money(discountedPrice(p.price))}</div></div><p class="desc">${esc(p.desc)}</p><div class="meta"><span class="tag">${esc(clusterLabel(p.categoryGroup))}</span>${(p.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div><div class="actions"><button class="details" onclick="openDetails('${p.id}')">Dettagli</button><button class="add" aria-label="${esc(addLabel)}" onclick="quickAdd('${p.id}')" ${isOrderingClosed() ? 'disabled' : ''}>${isOrderingClosed() ? 'Chiuso' : '+'}</button></div></div></article>`;
+  return `<article class="card ${hasSpecificImage ? '' : 'imageFallback'}"><div class="pic"><img src="${esc(p.img)}"${srcset} alt="${esc(alt)}" loading="lazy" decoding="async"><div class="badges">${badges.map(t=>`<span class="badge">${esc(t)}</span>`).join('')}</div>${hasSpecificImage ? '' : '<span class="imageNotice">Foto specifica non disponibile</span>'}</div><div class="body"><div class="nameRow"><h4>${esc(p.name)}</h4><div class="price">${appliedDiscountRate() ? `<span class="old">${money(p.price)}</span>` : ''}${money(discountedPrice(p.price))}</div></div><p class="desc">${esc(p.desc)}</p><div class="meta"><span class="tag">${esc(clusterLabel(p.categoryGroup))}</span>${(p.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div><div class="actions"><button class="details" onclick="openDetails('${p.id}')">Dettagli</button><button class="add" aria-label="${esc(addLabel)}" onclick="quickAdd('${p.id}')" ${isOrderingClosed() ? 'disabled' : ''}>${isOrderingClosed() ? 'Chiuso' : '+'}</button></div></div></article>`;
 }
 function openDetails(id){
   const p = PRODUCTS.find(x => x.id === id);
@@ -891,9 +906,13 @@ function addToCart(p,o,extras=[]){
 }
 function changeQty(key,delta){ if(!state.cart[key]) return; state.cart[key].qty += delta; if(state.cart[key].qty <= 0) delete state.cart[key]; resetCurrentTransmissionState(); renderCart(); }
 function totals(){ const items = Object.values(state.cart); const orig = items.reduce((a,i)=>a+i.originalUnit*i.qty,0); const total = discountedPrice(orig); return {items, count:items.reduce((a,i)=>a+i.qty,0), orig, total, saving:orig-total}; }
+window.DoseCanReload = () => Boolean(DATA) && !authState.loading && !state.sending && totals().count === 0
+  && !byId('paymentConfirmModal')?.classList.contains('show') && !byId('checkoutCompleteModal')?.classList.contains('show');
 function renderCart(){
   const t = totals();
   byId('cartCount').textContent = t.count;
+  byId('cartPrimaryAction')?.classList.toggle('hidden', t.count === 0);
+  if(byId('cartActionTotal')) byId('cartActionTotal').textContent = money(t.total);
   byId('mobileCount').textContent = t.count;
   byId('mobileTotal').textContent = money(t.total);
   byId('mobileBar').classList.toggle('hidden', t.count === 0);
@@ -928,32 +947,25 @@ function buildMessage(){
   const now = currentDate();
   const date = now.toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   const time = now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
-  let msg = `📦 Riepilogo Ordine – ${DATA.copy.brand}`;
-  msg += `\nOrdine tramite DOSepranza`;
-  msg += `\n\n👤 Cliente`;
+  let msg = 'Ordine tramite DOSepranza';
+  msg += `\n\n\u{1F464} Cliente`;
   msg += `\n${name} – ${company}`;
   msg += `\nConsegna: ${costCenter}`;
   msg += `\nData: ${cap(date)} - ${time}`;
-  msg += `\n\n🏪 Punto Vendita`;
-  msg += `\n${DATA.contact.address}`;
-  msg += `\nFinestra servizio: Ordini/pagamenti entro le ${orderCutoffCopy} · Consegna gratuita alle ${deliveryTimeCopy}`;
-  msg += `\n\n🥪 Ordine`;
+  msg += `\n\n\u{1F96A} Ordine`;
   t.items.forEach(i => {
-    msg += `\n- ${i.qty}x ${i.name} — ${i.opt}`;
+    msg += `\n\u2022 ${i.qty}x ${i.name} — ${i.opt}`;
     if((i.extras || []).length) msg += `\n  Extra: ${i.extras.map(extra => `${extra.name} +${money(extra.price)}`).join(', ')}`;
     msg += `\n  ${money(discountedPrice(i.originalUnit)*i.qty)}`;
   });
-  const rate = Math.round(discountRate() * 100);
   msg += `\nTotale: ${money(t.total)}`;
-  if(rate) msg += `\nSconti applicati: ${discountLabel()}`;
-  msg += `\n\n💳 Pagamento`;
+  msg += `\n\n\u{1F4B3} Pagamento`;
   msg += `\nMetodo selezionato: ${paymentMethod || 'Non specificato'}`;
-  msg += `\nNote pagamento: ${paymentNoteCopy()}`;
   if(paymentMethod === 'Bonifico bancario'){
     if(paymentBeneficiary()) msg += `\nIntestatario: ${paymentBeneficiary()}`;
     if(paymentIban()) msg += `\nIBAN: ${paymentIban()}`;
   }
-  msg += `\n\n⚠️ Note / Allergie`;
+  msg += `\n\n\u26A0\uFE0F Note / Allergie`;
   msg += `\n${notes || 'Nessuna'}`;
   return msg;
 }
@@ -969,7 +981,8 @@ function whatsappConfig(){
 }
 function whatsappUrl(message = buildMessage()){
   const { normalizedNumber } = whatsappConfig();
-  return `https://wa.me/${normalizedNumber}?text=${encodeURIComponent(message)}`;
+  const normalizedMessage = String(message).replace(/&#x20;|&#32;|&nbsp;/gi, ' ').normalize('NFC');
+  return `https://wa.me/${normalizedNumber}?text=${encodeURIComponent(normalizedMessage)}`;
 }
 function checkoutFingerprint(){
   const t = totals();
@@ -1011,7 +1024,7 @@ function buildOrderPayload(){
     serviceWindow: `Ordini/pagamenti entro le ${orderCutoffCopy} · Consegna gratuita alle ${deliveryTimeCopy}`,
     items,
     subtotalOriginal: t.orig,
-    discountRate: discountRate(),
+    discountRate: appliedDiscountRate(),
     discountAmount: t.saving,
     total: t.total,
     paymentMethod: selectedPaymentMethod(),
@@ -1059,12 +1072,29 @@ function showWhatsAppStatus(opened){
     else panel.scrollIntoView({ block:'nearest' });
   });
 }
+function orderConfirmationSummaryHtml(){
+  const t = totals();
+  const items = t.items.map(item => {
+    const extras = (item.extras || []).map(extra => extra.name).join(', ');
+    const detail = [item.opt, extras ? `Extra: ${extras}` : ''].filter(Boolean).join(' · ');
+    return `<div class="orderConfirmLine"><span><b>${item.qty}× ${esc(item.name)}</b>${detail ? `<small class="orderConfirmMeta">${esc(detail)}</small>` : ''}</span><strong>${money(discountedPrice(item.originalUnit) * item.qty)}</strong></div>`;
+  }).join('');
+  return `${items}<div class="orderConfirmLine orderConfirmTotal"><span>Totale</span><strong>${money(t.total)}</strong></div>`;
+}
 function configureConfirmation(action){
   state.confirmationAction = action;
   const title = byId('paymentConfirmTitle');
   const copy = byId('paymentConfirmCopy');
   const method = byId('paymentConfirmMethod');
   const accept = byId('paymentConfirmAccept');
+  const summary = byId('paymentConfirmSummary');
+  const consentWrap = byId('paymentConfirmConsentWrap');
+  const consent = byId('paymentConfirmConsent');
+  const isSubmit = action === 'submit';
+  summary?.classList.toggle('hidden', !isSubmit);
+  consentWrap?.classList.toggle('hidden', !isSubmit);
+  if(consent) consent.checked = false;
+  if(accept) accept.disabled = isSubmit;
   if(action === 'reopen'){
     title.textContent = 'Riaprire il riepilogo?';
     copy.textContent = 'Hai già aperto questo ordine su WhatsApp. Vuoi aprirlo nuovamente? Non verrà creato un secondo ordine.';
@@ -1078,15 +1108,16 @@ function configureConfirmation(action){
   }else{
     const paymentMethod = selectedPaymentMethod();
     const recipient = whatsappConfig();
-    title.textContent = 'Hai completato il pagamento?';
+    title.textContent = 'Controlla prima di procedere';
     copy.textContent = paymentMethod === 'Bonifico bancario'
       ? `Hai selezionato Bonifico bancario. Il riepilogo verrà aperto nella chat WhatsApp di ${recipient.supplierName} al numero ${recipient.displayNumber}: allega la ricevuta prima dell’invio.`
       : `Il riepilogo verrà aperto nella chat WhatsApp di ${recipient.supplierName} al numero ${recipient.displayNumber}.`;
     method.textContent = `Metodo selezionato: ${paymentMethod} · Destinatario: ${recipient.displayNumber}`;
-    accept.textContent = 'Conferma e apri WhatsApp';
+    if(summary) summary.innerHTML = orderConfirmationSummaryHtml();
+    accept.textContent = `Apri WhatsApp con ${recipient.supplierName} ›`;
   }
   byId('paymentConfirmModal')?.classList.add('show');
-  accept?.focus();
+  (isSubmit ? consent : accept)?.focus();
 }
 async function sendWA(){
   const button = byId('sendOrderBtn');
@@ -1160,6 +1191,7 @@ function closeCheckoutComplete(){
 }
 async function confirmPaymentAndSend(){
   if(totals().count === 0 || state.sending) return;
+  if(state.confirmationAction === 'submit' && !byId('paymentConfirmConsent')?.checked) return;
   if(state.confirmationAction === 'reopen'){
     closePaymentConfirmation();
     reopenWhatsapp();

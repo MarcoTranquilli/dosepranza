@@ -180,13 +180,15 @@ test.describe('Preview multi-fornitore', () => {
     await expect(page.locator('#discountLabel')).toContainText('20%');
 
     await page.locator('#notes').fill('No cipolla');
-    await expect(page.locator('#waPreview')).toContainText('📦 Riepilogo Ordine – La Pagnottella Gourmet');
     await expect(page.locator('#waPreview')).toContainText('Ordine tramite DOSepranza');
+    await expect(page.locator('#waPreview')).toContainText('👤 Cliente');
+    await expect(page.locator('#waPreview')).toContainText('🥪 Ordine');
     await expect(page.locator('#waPreview')).toContainText('Marco Tranquilli – DOS Design S.p.a.');
     await expect(page.locator('#waPreview')).toContainText('Consegna: Via Arno, 52, 00198 Roma RM');
-    await expect(page.locator('#waPreview')).toContainText('Finestra servizio: Ordini/pagamenti entro le 12:00 · Consegna entro le 13:00');
+    await expect(page.locator('#waPreview')).not.toContainText('Punto Vendita');
+    await expect(page.locator('#waPreview')).not.toContainText('Finestra servizio');
     await expect(page.locator('#waPreview')).toContainText('Metodo selezionato: Contanti');
-    await expect(page.locator('#waPreview')).toContainText('Note pagamento: Contanti, POS, Bonifico e Satispay disponibili. PayPal e Nexi saranno attivati da settembre.');
+    await expect(page.locator('#waPreview')).not.toContainText('Note pagamento:');
     await expect(page.locator('#waPreview')).not.toContainText('IBAN: IT35B0832703249000000002986');
     await expect(page.locator('#waPreview')).toContainText('No cipolla');
     await expect(page.locator('#confirm')).toBeHidden();
