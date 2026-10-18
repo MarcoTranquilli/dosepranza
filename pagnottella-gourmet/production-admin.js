@@ -167,6 +167,7 @@
     }
   }
   function renderAll() {
+    window.DoseRussoThreshold?.mount(byId('russo-threshold-admin'), {visible:() => isAdmin() && selectedSupplier() !== 'pagnottella'});
     const panel = byId('adminWorkspace');
     if (!panel) return;
     panel.classList.toggle('hidden', !hasOrderAccess());

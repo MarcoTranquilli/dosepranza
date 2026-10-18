@@ -2138,6 +2138,9 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
         }
 
         function renderMyOrderStatus() {
+            window.DoseRussoThreshold?.mount(document.getElementById('russo-threshold-user'), {
+                getToken: () => auth_fb.currentUser?.getIdToken()
+            });
             const el = document.getElementById('my-order-status');
             if(!el) return;
             if(!state.user) {
