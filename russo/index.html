@@ -29,7 +29,7 @@
         <header class="mb-6 flex flex-col items-center">
             <img src="https://i.postimg.cc/L6H20zfp/logo-dosepranza-People-About-Food.png?v=20260209" class="w-64 md:w-80">
             <div class="glass border-l-4 border-primary p-3 rounded-r-xl mt-4 w-full text-xs font-bold shadow-sm">
-                Ordine entro le 11:30 | Consegna gratuita ore 12:30.
+                Ordine entro le 10:30 | Consegna gratuita ore 12:30.
             </div>
         </header>
 
@@ -515,8 +515,8 @@
                     </div>
                     <div class="flex flex-wrap items-center gap-2 mb-3">
                         <button data-action="orders-time-filter" data-filter="all" id="orders-time-filter-all" class="btn btn-primary text-[10px] px-3 py-2">Tutti</button>
-                        <button data-action="orders-time-filter" data-filter="pre1130" id="orders-time-filter-pre" class="btn btn-ghost text-[10px] px-3 py-2">Entro 11:30</button>
-                        <button data-action="orders-time-filter" data-filter="post1130" id="orders-time-filter-post" class="btn btn-ghost text-[10px] px-3 py-2">Dopo 11:30</button>
+                        <button data-action="orders-time-filter" data-filter="pre1030" id="orders-time-filter-pre" class="btn btn-ghost text-[10px] px-3 py-2">Entro 10:30</button>
+                        <button data-action="orders-time-filter" data-filter="post1030" id="orders-time-filter-post" class="btn btn-ghost text-[10px] px-3 py-2">Dopo 10:30</button>
                         <button data-action="orders-select-all" class="ml-auto btn btn-ghost text-[10px] px-3 py-2">Seleziona tutti</button>
                         <button data-action="orders-reconcile-selected" class="btn btn-primary text-[10px] px-3 py-2">Riconcilia selezionati</button>
                         <button data-action="orders-export-csv" class="btn btn-ghost text-[10px] px-3 py-2">Export CSV</button>
@@ -528,7 +528,7 @@
                     <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&amp;data=https%3A%2F%2Fweb.satispay.com%2Fapp%2Fopen%2Fshops%2F986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" class="w-24 h-24 rounded-2xl shadow-sm border border-gray-100" alt="QR pagamento Alimentari Russo">
                     <div>
                         <p class="font-black text-xs uppercase text-primary mb-1 tracking-widest">Saldo Alimentari Russo</p>
-                        <p class="text-[10px] leading-tight text-gray-500 mb-3 italic">Pagamento obbligatorio entro le 11:30. Puoi usare QR code o link diretto Satispay.</p>
+                        <p class="text-[10px] leading-tight text-gray-500 mb-3 italic">Pagamento obbligatorio entro le 10:30. Puoi usare QR code o link diretto Satispay.</p>
                         <div class="flex flex-wrap gap-2">
                             <a href="https://web.satispay.com/app/open/shops/986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" target="_blank" rel="noopener noreferrer" class="btn btn-ghost text-[10px] px-4 py-2">Apri Satispay</a>
                             <button data-action="copy-satispay-link" class="btn btn-ghost text-[10px] px-4 py-2">Copia link</button>
@@ -620,7 +620,7 @@
                             <p id="analytics-best-day" class="text-lg font-black text-primary">-</p>
                         </div>
                         <div class="kpi-card">
-                            <p class="text-[10px] uppercase text-gray-400 font-black">Compliance 11:30</p>
+                            <p class="text-[10px] uppercase text-gray-400 font-black">Compliance 10:30</p>
                             <p id="analytics-cutoff-compliance" class="kpi-value">0%</p>
                         </div>
                     </div>
@@ -887,7 +887,7 @@
     </div>
 
     <script type="module" src="sw-killer.js?v=pages-recovery-2"></script>
-    <script type="module" src="app.v20260325.js?v=russo-threshold-client-1"></script>
+    <script type="module" src="app.v20260325.js?v=russo-cutoff-1030-1"></script>
     <script src="feedback/vendor/html2canvas.min.js?v=feedback-1"></script>
     <script src="feedback/logger.js?v=feedback-1"></script>
     <script src="feedback/diagnostics.js?v=feedback-1"></script>
