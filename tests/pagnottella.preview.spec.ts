@@ -45,13 +45,25 @@ test.describe('Preview multi-fornitore', () => {
   });
 
   test('Supplier guard: senza sessione rimanda all’hub', async ({ page }) => {
+    // The raw-source UAT server does not perform the production build's asset copies.
+    await page.route('**/pagnottella-gourmet/assets/**', async route => {
+      const url = new URL(route.request().url());
+      url.pathname = url.pathname.replace('/pagnottella-gourmet/assets/', '/assets/');
+      await route.fulfill({response:await route.fetch({url:url.href})});
+    });
+    await page.route('**/pagnottella-gourmet/pagnottella.css*', async route => {
+      const url = new URL(route.request().url());
+      url.pathname = '/pagnottella/pagnottella.css';
+      await route.fulfill({response:await route.fetch({url:url.href})});
+    });
     await page.goto(previewRussoUrl);
 
-    await expect(page).toHaveURL(/\/\?next=russo$/);
-    await expect(page.locator('#hub-auth-status')).toContainText('Nessuna sessione Google attiva');
+    await expect(page).toHaveURL(url => url.pathname === '/pagnottella-gourmet/' && url.searchParams.get('suite') === 'production');
+    await expect(page.locator('#authGateGoogle')).toBeVisible();
+    await expect(page.locator('#authGateStatus')).toContainText('Nessun utente riconosciuto');
   });
 
-  test('Pagnottella: se non pubblicata, un utente standard viene riportato su Russo', async ({ page }) => {
+  test('Pagnottella: un utente DOS autorizzato apre il catalogo pubblicato', async ({ page }) => {
     await page.addInitScript(() => {
       window.localStorage.setItem('dose_e2e', '1');
       window.localStorage.setItem('dose_user', JSON.stringify({
@@ -62,7 +74,9 @@ test.describe('Preview multi-fornitore', () => {
     });
     await page.goto(previewPagnottellaUrl);
 
-    await expect(page).toHaveURL(/\/russo\/(?:\?.*)?$/);
+    await expect(page).toHaveURL(/\/pagnottella\/\?store=pagnottella$/);
+    await expect(page.locator('#shop')).toHaveClass(/show/);
+    await expect(page.locator('#customer')).toHaveValue('Mario Rossi');
   });
 
   test('Hub: con sessione e parametro next apre direttamente il fornitore richiesto', async ({ page }) => {
@@ -100,6 +114,8 @@ test.describe('Preview multi-fornitore', () => {
 
   test('Pagnottella: catalogo, sconto, carrello e riepilogo WhatsApp', async ({ page }) => {
     await page.addInitScript(() => {
+      // Verify the post-summer 10% policy independently of the runner's date.
+      (window as typeof window & {__PAGNOTTELLA_NOW__?:string}).__PAGNOTTELLA_NOW__ = '2026-10-19T08:00:00Z';
       window.localStorage.setItem('dose_e2e', '1');
       window.localStorage.setItem('dose_user', JSON.stringify({
         uid: 'admin-e2e',
@@ -135,21 +151,21 @@ test.describe('Preview multi-fornitore', () => {
     await expect(page.locator('body')).not.toContainText('review stakeholder');
     await expect(page.locator('body')).not.toContainText('Admin demo');
     await expect(page.locator('#heroText')).toContainText('12:00');
-    await expect(page.locator('#heroText')).toContainText('13:00');
+    await expect(page.locator('#heroText')).toContainText('12:30');
     await expect(page.locator('body')).not.toContainText('Documenti locali');
     await expect(page.locator('body')).not.toContainText('Materiali commerciali');
     await expect(page.locator('body')).not.toContainText('Dati aziendali (opzionale)');
     await expect(page.locator('#customer')).toHaveValue('Marco Tranquilli');
-    await expect(page.locator('#paymentCardTitle')).toContainText('Pagamento entro le 12:00');
-    await expect(page.locator('#paymentCardText')).toContainText('PayPal e Nexi non sono ancora selezionabili');
+    await expect(page.locator('#paymentCardTitle')).toHaveText('Effettua pagamento');
+    await expect(page.locator('#paymentCardText')).toContainText('Satispay è il metodo principale');
     await expect(page.locator('#paymentMethods')).toContainText('Satispay');
     await expect(page.locator('#paymentMethods')).toContainText('Bonifico bancario');
-    await expect(page.locator('#paymentMethods')).toContainText('Contanti');
-    await expect(page.locator('#paymentMethods')).toContainText('POS');
-    await expect(page.locator('input[name="paymentMethod"][value="Contanti"]')).toBeChecked();
+    await expect(page.locator('input[name="paymentMethod"][value="Contanti"]')).toHaveCount(0);
+    await expect(page.locator('input[name="paymentMethod"][value="POS"]')).toHaveCount(0);
+    await expect(page.locator('input[name="paymentMethod"][value="Satispay"]')).toBeChecked();
     await expect(page.locator('input[name="paymentMethod"][value="PayPal"]')).toBeDisabled();
     await expect(page.locator('input[name="paymentMethod"][value="Nexi"]')).toBeDisabled();
-    await expect(page.locator('#paymentDetails')).toContainText('Paga in contanti');
+    await expect(page.locator('#paymentDetails')).toContainText('Satispay');
     await expect(page.locator('#paymentDetails')).not.toContainText('IT35B0832703249000000002986');
 
     await page.locator('#search').fill('BBQ');
@@ -175,9 +191,12 @@ test.describe('Preview multi-fornitore', () => {
     await expect(page.locator('#drawer')).not.toHaveClass(/show/);
 
     await page.locator('#grid .card .add').first().click();
+    await expect(page.locator('#drawer')).toHaveClass(/show/);
+    await page.locator('#drawer').getByRole('button', {name:'Pane bianco', exact:true}).click();
+    await page.locator('#drawer').getByRole('button', {name:'Aggiungi al carrello', exact:true}).click();
     await expect(page.locator('#cartCount')).toHaveText('1');
-    await expect(page.locator('#finalTotal')).toContainText('€6,40');
-    await expect(page.locator('#discountLabel')).toContainText('20%');
+    await expect(page.locator('#finalTotal')).toContainText('€7,20');
+    await expect(page.locator('#discountLabel')).toContainText('10%');
 
     await page.locator('#notes').fill('No cipolla');
     await expect(page.locator('#waPreview')).toContainText('Ordine tramite DOSepranza');
@@ -187,7 +206,7 @@ test.describe('Preview multi-fornitore', () => {
     await expect(page.locator('#waPreview')).toContainText('Consegna: Via Arno, 52, 00198 Roma RM');
     await expect(page.locator('#waPreview')).not.toContainText('Punto Vendita');
     await expect(page.locator('#waPreview')).not.toContainText('Finestra servizio');
-    await expect(page.locator('#waPreview')).toContainText('Metodo selezionato: Contanti');
+    await expect(page.locator('#waPreview')).toContainText('Metodo selezionato: Satispay');
     await expect(page.locator('#waPreview')).not.toContainText('Note pagamento:');
     await expect(page.locator('#waPreview')).not.toContainText('IBAN: IT35B0832703249000000002986');
     await expect(page.locator('#waPreview')).toContainText('No cipolla');
@@ -201,11 +220,17 @@ test.describe('Preview multi-fornitore', () => {
     await expect(page.locator('#waPreview')).toContainText('IBAN: IT35B0832703249000000002986');
     await expect(page.locator('#paymentDetails')).toContainText('IT35B0832703249000000002986');
 
-    page.once('popup', async popup => {
-      await popup.close();
-    });
+    await page.route('https://wa.me/**', route => route.fulfill({contentType:'text/plain', body:'WhatsApp test'}));
     await page.locator('button.whatsappMain').click();
-    await expect(page.locator('#confirm')).toContainText('salvato correttamente');
+    await expect(page.locator('#paymentConfirmModal')).toHaveClass(/show/);
+    await expect(page.locator('#paymentConfirmMethod')).toHaveText('Metodo selezionato: Bonifico bancario');
+    await expect(page.locator('#paymentConfirmCopy')).toContainText('ricevuta');
+    expect(await page.evaluate(() => JSON.parse(window.localStorage.getItem('dose_e2e_pagnottella_orders') || '[]'))).toHaveLength(0);
+    const popupPromise = page.waitForEvent('popup');
+    await page.locator('#paymentConfirmAccept').click();
+    const popup = await popupPromise;
+    await expect(page.locator('#confirm')).toContainText('salvato. Pagamento dichiarato effettuato');
+    await popup.close();
     const savedOrders = await page.evaluate(() => JSON.parse(window.localStorage.getItem('dose_e2e_pagnottella_orders') || '[]'));
     expect(savedOrders).toHaveLength(1);
     expect(savedOrders[0]).toMatchObject({
@@ -226,7 +251,7 @@ test.describe('Preview multi-fornitore', () => {
       supplierId: 'pagnottella',
       paymentMethod: 'Bonifico bancario',
       count: 1,
-      total: 6.4,
+      total: 7.2,
       hasNotesOrAllergies: true,
       savedToFirebase: false
     });

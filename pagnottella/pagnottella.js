@@ -809,6 +809,8 @@ function renderCart(){
   byId('origTotal').textContent = money(t.orig);
   byId('saving').textContent = '-' + money(t.saving);
   byId('finalTotal').textContent = money(t.total);
+  const waPreview = byId('waPreview');
+  if(waPreview) waPreview.textContent = buildMessage();
   const sendButton = byId('sendOrderBtn');
   if(sendButton) sendButton.disabled = isOrderingClosed();
   const sendLabel = byId('sendOrderLabel');
