@@ -1,0 +1,9 @@
+title: DOSepranza Russo email batch
+description: Read orders and manage daily batch transaction state. No deletes or IAM administration.
+stage: GA
+includedPermissions:
+  - datastore.databases.get
+  - datastore.entities.get
+  - datastore.entities.list
+  - datastore.entities.create
+  - datastore.entities.update
