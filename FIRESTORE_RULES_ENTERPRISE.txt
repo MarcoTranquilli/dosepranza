@@ -207,5 +207,30 @@ service cloud.firestore {
     match /orders_audit/{doc} {
       allow read, write: if isStaffIdentity();
     }
+
+    match /drafts/{draftId} {
+      function owner() { return request.auth != null && resource.data.userId == request.auth.uid; }
+      function validDraft() {
+        let d = request.resource.data;
+        return request.auth != null && request.auth.token.email_verified == true
+          && request.auth.token.email.matches('.*@dos[.]design$')
+          && d.userId == request.auth.uid && d.userEmail == request.auth.token.email
+          && d.supplierId in ['russo', 'pagnottella']
+          && d.day.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+          && draftId == d.supplierId + '_' + request.auth.uid + '_' + d.day
+          && d.items is list && d.items.size() <= 100
+          && d.totalCents is int && d.totalCents >= 0 && d.totalCents <= 1000000
+          && d.status in ['DRAFT', 'CANCELLED', 'CONFIRMED']
+          && d.updatedAt == request.time;
+      }
+      allow get: if request.auth != null && (resource == null || owner());
+      allow list: if owner();
+      allow create: if validDraft() && request.resource.data.reminderSent == false
+        && request.resource.data.keys().hasOnly(['userId','userEmail','supplierId','day','items','totalCents','status','reminderSent','updatedAt']);
+      allow update: if owner() && validDraft()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['items','totalCents','status','updatedAt'])
+        && (resource.data.status != 'CONFIRMED' || request.resource.data.status == 'CONFIRMED');
+      allow delete: if false;
+    }
   }
 }

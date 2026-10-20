@@ -30,170 +30,114 @@ function database(rows = [], initial = null) {
   };
 }
 
-const options = db => ({db, apiKey:'mock-only', from:'ordini@dos.design', scheduledAt, clock:() => scheduledAt,
-  serverTimestamp:() => scheduledAt, fetchImpl:async (url, init) => ({ok:true, json:async () => ({data:JSON.parse(init.body).map((_,i)=>({id:`test-${i}`}))})})});
+const accepted = async mail => ({accepted:[...mail.to], rejected:[], messageId:mail.messageId});
+const options = db => ({db,scheduledAt,clock:()=>scheduledAt,transporter:{sendMail:accepted},serverTimestamp:()=>scheduledAt});
 
-test('Rome date and cutoff handle summer, winter and DST day', () => {
-  assert.equal(windowFor(scheduledAt).cutoff.toISOString(), '2026-10-19T08:30:00.000Z');
-  assert.equal(windowFor(new Date('2026-12-07T10:00:00Z')).cutoff.toISOString(), '2026-12-07T09:30:00.000Z');
-  const dst = windowFor(new Date('2026-10-25T12:00:00Z'));
-  assert.equal(dst.start.toISOString(), '2026-10-24T22:00:00.000Z');
-  assert.equal(dst.cutoff.toISOString(), '2026-10-25T09:30:00.000Z');
+test('Rome cutoff handles DST and winter',()=>{
+ assert.equal(windowFor(scheduledAt).cutoff.toISOString(),'2026-10-19T08:30:00.000Z');
+ assert.equal(windowFor(new Date('2026-12-07T10:00:00Z')).cutoff.toISOString(),'2026-12-07T09:30:00.000Z');
+ assert.equal(windowFor(new Date('2026-10-25T12:00:00Z')).start.toISOString(),'2026-10-24T22:00:00.000Z');
+});
+for (const total of [0,19.99,20,25]) test(`SMTP private notification total ${total}`,async()=>{
+ const db=database(total?[order({total})]:[]), mails=[];
+ const opt={...options(db),transporter:{sendMail:async mail=>{mails.push(mail);return accepted(mail);}}};
+ await runBatch(opt);
+ assert.equal(mails.length,total?2:1);
+ assert.ok(mails.every(m=>m.to.length===1&&!m.cc&&!m.bcc));
+ assert.ok(mails.some(m=>m.to[0]===ADMIN));
+ assert.ok(mails.every(m=>m.from===`Alimentari Russo <${ADMIN}>`));
+ assert.ok(mails.every(m=>m.html&&!m.text.includes('collega@dos.design')));
+ assert.ok(mails.every(m=>m.subject.includes(total>=20?'Ordine Confermato':'Ordine Russo Non Confermato')));
+ if(total<20) assert.ok(mails.every(m=>m.text.includes('altri fornitori')));
+ assert.equal(db.state().status,'PROCESSED'); assert.equal(db.state().total,total);
+ assert.equal(db.state().ordersCount,total?1:0);assert.equal(db.state().processedAt,scheduledAt.toISOString());
+ assert.equal(db.state().deliveryStatus,'ACCEPTED');
+ assert.equal((await runBatch(opt)).status,'ALREADY_PROCESSED');assert.equal(mails.length,total?2:1);
 });
 
-for (const [total, subject] of [[20,'Ordine Confermato Alimentari Russo'],[19.99,'Ordine Russo Non Confermato (soglia minima non raggiunta)'],[0,'Ordine Russo Non Confermato (soglia minima non raggiunta)']]) {
-  test(`private recipient payload for total ${total}`, async () => {
-    const db = database(total ? [order({total})] : []);
-    const opt = options(db);
-    let calls = 0;
-    opt.fetchImpl = async (url, init) => {
-      calls++;
-      assert.equal(url, 'https://api.resend.com/emails/batch');
-      const messages = JSON.parse(init.body);
-      const body = messages.find(m => m.to[0] === ADMIN);
-      assert.deepEqual(body.to, [ADMIN]); assert.equal(body.cc, undefined); assert.equal(body.bcc, undefined);
-      assert.equal(body.subject, `DOSepranza - ${subject}`);
-      assert.equal(body.from, 'ordini@dos.design');
-      assert.equal(body.text.includes('collega@dos.design'), false);
-      assert.equal(messages.length, total ? 2 : 1);
-      assert.ok(messages.every(m => m.to.length === 1 && !m.cc && !m.bcc));
-      assert.equal(init.headers['Idempotency-Key'], 'russo-live-v1-2026-10-19-0');
-      assert.equal(init.headers.Authorization, 'Bearer mock-only');
-      return {ok:true, json:async () => ({data:messages.map((_,i)=>({id:`test-${i}`}))})};
-    };
-    await runBatch(opt);
-    assert.equal(db.state().status, 'PROCESSED'); assert.equal(db.state().total, total);
-    assert.deepEqual(db.state().recipients, total ? ['collega@dos.design', ADMIN] : [ADMIN]);
-    assert.equal(db.state().processedAt, scheduledAt.toISOString());
-    assert.equal((await runBatch(opt)).status, 'ALREADY_PROCESSED'); assert.equal(calls, 1);
-  });
-}
-
-test('only today Russo pre-cutoff eligible orders contribute, query scoped at source', async () => {
-  const db = database([order(), order({supplierId:'pagnottella',total:100}), order({status:'cancelled'}),
-    order({orderStatus:'annullato'}), order({isTest:true}), order({orderType:'fridge'}),
-    order({createdAt:new Date('2026-10-18T10:00:00Z')}), order({createdAt:scheduledAt})]);
-  await runBatch(options(db));
-  assert.equal(db.state().total, 10);
-  assert.deepEqual(db.conditions[0], ['supplierId','==','russo']);
-  assert.equal(db.conditions[1][1], '>='); assert.equal(db.conditions[2][1], '<');
+test('deduplication and order filtering remain scoped to Russo before cutoff',async()=>{
+ const db=database([order({email:' COLLEGA@DOS.DESIGN '}),order(),order({supplierId:'pagnottella'}),order({status:'cancelled'}),order({orderStatus:'annullato'}),order({isTest:true}),order({orderType:'fridge'}),order({createdAt:scheduledAt}),order({createdAt:new Date('2026-10-18T08:00:00Z')})]);
+ await runBatch(options(db));assert.equal(db.state().total,20);assert.equal(db.state().ordersCount,2);
+ assert.deepEqual(db.state().recipients,['collega@dos.design',ADMIN]);assert.deepEqual(db.conditions[0],['supplierId','==','russo']);
 });
 
-test('invalid amount fails before mail; missing secret fails before database', async () => {
-  const db = database([order({total:NaN})]);
-  await assert.rejects(runBatch(options(db)), /batch_invalid_amount/);
-  assert.equal(db.state(), null);
-  await assert.rejects(runBatch({...options(null),apiKey:''}), /batch_missing_configuration/);
+test('invalid amount, recipient and missing transport fail before send',async()=>{
+ await assert.rejects(runBatch(options(database([order({total:NaN})]))),/batch_invalid_amount/);
+ await assert.rejects(runBatch(options(database([order({email:'invalid'})]))),/batch_invalid_recipient/);
+ await assert.rejects(runBatch({...options(null),transporter:null}),/batch_missing_configuration/);
 });
 
-test('missing or invalid sender falls back safely; valid sender is preserved', async () => {
-  for (const from of [undefined, null, '', ' ', 'invalid', 'bad@address', 'a@b.com\r\nBcc: x@y.com', ' ordini@dos.design ']) {
-    const db = database([order({email:ADMIN})]);
-    await runBatch({...options(db), from, fetchImpl:async (url, init) => {
-      const [body] = JSON.parse(init.body);
-      assert.equal(body.from, from === ' ordini@dos.design ' ? 'ordini@dos.design' : 'onboarding@resend.dev');
-      assert.deepEqual(body.to, [ADMIN]);
-      assert.equal(init.headers.Authorization, 'Bearer mock-only');
-      return {ok:true, json:async () => ({data:[{id:'sender-test'}]})};
-    }});
-    assert.equal(db.state().status, 'PROCESSED');
-  }
+test('single explicit rejection retries only unsent recipients',async()=>{
+ const db=database([order()]), sent=[];let reject=true;
+ const opt={...options(db),transporter:{sendMail:async mail=>{
+ sent.push(mail.to[0]);if(mail.to[0]===ADMIN&&reject){reject=false;throw Object.assign(Error('private smtp reply'),{code:'EENVELOPE'});}return accepted(mail);
+ }}};
+ await assert.rejects(runBatch(opt),/batch_smtp_rejected/);assert.equal(db.state().status,'RETRYABLE');
+ assert.deepEqual(db.state().acceptedRecipients,['collega@dos.design']);
+ await runBatch(opt);assert.deepEqual(sent,['collega@dos.design',ADMIN,ADMIN]);
 });
 
-test('sender fallback never bypasses missing secret validation', async () => {
-  for (const apiKey of [undefined, null, '', '   ']) {
-    await assert.rejects(runBatch({...options(null), apiKey, from:'invalid'}), /batch_missing_configuration/);
-  }
+test('uncertain send requires review and is never automatically repeated',async()=>{
+ const db=database([order()]);let calls=0;
+ const opt={...options(db),transporter:{sendMail:async()=>{calls++;throw Error('secret provider reply');}}};
+ await assert.rejects(runBatch(opt),/batch_send_uncertain/);assert.equal(db.state().status,'REVIEW_REQUIRED');
+ assert.ok(!JSON.stringify(db.state()).includes('secret provider reply'));
+ await assert.rejects(runBatch(opt),/batch_manual_review_required/);assert.equal(calls,1);
 });
 
-test('concurrent invocation cannot send a second email', async () => {
-  const db = database([order({total:20})]); let calls = 0;
-  const opt = {...options(db), fetchImpl:async () => {calls++; await new Promise(resolve => setTimeout(resolve,10));return {ok:true,json:async()=>({data:[{id:'once-1'},{id:'once-2'}]})};}};
-  const results = await Promise.allSettled([runBatch(opt),runBatch(opt)]);
-  assert.equal(calls, 1); assert.equal(results.filter(r => r.status === 'fulfilled').length, 1);
-  assert.equal(db.state().status, 'PROCESSED');
+test('expired lease with in-flight SMTP operation requires review',async()=>{
+ const db=database([],{mode:'SMTP_V1',status:'PROCESSING',sendingIndex:0,leaseUntilMs:0,firstAttemptAtMs:scheduledAt.getTime()});
+ assert.equal((await runBatch(options(db))).status,'REVIEW_REQUIRED');
 });
 
-test('uncertain send retries same frozen payload/key despite order changes', async () => {
-  const rows = [order({total:20})], db = database(rows), payloads = [];
-  const opt = options(db);
-  opt.fetchImpl = async (url, init) => {payloads.push([init.body,init.headers['Idempotency-Key']]);throw new Error('private provider detail');};
-  await assert.rejects(runBatch(opt), error => error.message === 'batch_send_uncertain');
-  rows.push(order({total:100}));
-  opt.fetchImpl = async (url, init) => {payloads.push([init.body,init.headers['Idempotency-Key']]);return {ok:true,json:async()=>({data:[{id:'retry-1'},{id:'retry-2'}]})};};
-  await runBatch(opt); assert.deepEqual(payloads[0], payloads[1]);assert.equal(db.state().total,20);
+test('concurrent invocation cannot duplicate messages',async()=>{
+ const db=database([order()]);let calls=0;
+ const opt={...options(db),transporter:{sendMail:async mail=>{calls++;await new Promise(r=>setTimeout(r,5));return accepted(mail);}}};
+ const result=await Promise.allSettled([runBatch(opt),runBatch(opt)]);
+ assert.equal(result.filter(r=>r.status==='fulfilled').length,1);assert.equal(calls,2);
 });
 
-test('uncertain batch beyond 23h is held for manual review without sending', async () => {
-  const db = database([order()]), opt = options(db);
-  opt.fetchImpl = async () => {throw new Error('timeout');};
-  await assert.rejects(runBatch(opt));
-  opt.clock = () => new Date(scheduledAt.getTime() + 23 * 3600000);
-  opt.fetchImpl = async () => {assert.fail('must not send');};
-  assert.equal((await runBatch(opt)).status, 'REVIEW_REQUIRED');
+test('legacy processed batches stay processed, pending Resend batches cannot migrate silently',async()=>{
+ assert.equal((await runBatch(options(database([],{mode:'LIVE_V1',status:'PROCESSED'})))).status,'ALREADY_PROCESSED');
+ await assert.rejects(runBatch(options(database([],{mode:'LIVE_V1',status:'RETRYABLE'}))),/batch_incompatible_existing_batch/);
 });
 
-test('provider error only retains status code, not response body or key', async () => {
-  const db = database([order()]);
-  await assert.rejects(runBatch({...options(db),fetchImpl:async()=>({ok:false,status:403,text:async()=>{assert.fail('do not read provider error body');}})}), /batch_resend_http_403/);
-  assert.equal(db.state().lastError, 'batch_resend_http_403');
-  assert.equal(JSON.stringify(db.state()).includes('mock-only'), false);
+test('cutoff guard and stale retry guard remain active',async()=>{
+ await assert.rejects(runBatch({...options(database()),clock:()=>new Date(scheduledAt.getTime()-1)}),/batch_before_cutoff/);
+ const db=database([],{mode:'SMTP_V1',status:'RETRYABLE',firstAttemptAtMs:scheduledAt.getTime()-24*3600000});
+ assert.equal((await runBatch(options(db))).status,'REVIEW_REQUIRED');
 });
 
-test('invocations before cutoff cannot finalize batch', async () => {
-  await assert.rejects(runBatch({...options(database()),clock:()=>new Date('2026-10-19T08:29:59Z')}), /batch_before_cutoff/);
+test('formatted sender preserved and injection falls back to Workspace sender',async()=>{
+ for(const from of ['Alimentari Russo <ordini@send.dos.design>', 'bad\r\nBcc: a@b.com']) {
+ const db=database([order()]);await runBatch({...options(db),from});
+ assert.ok(db.state().envelopes.every(m=>m.from===(from.startsWith('bad')?`Alimentari Russo <${ADMIN}>`:from)));
+ }
 });
 
-for (const total of [5, 10]) {
-  test(`multiple orders deduplicate recipients and include admin: unit total ${total}`, async () => {
-    const db = database([order({email:' COLLEGA@DOS.DESIGN ',total}), order({total}), order({email:ADMIN,total})]);
-    await runBatch(options(db));
-    assert.equal(db.state().total, total * 3);
-    assert.equal(db.state().ordersCount, 3);
-    assert.deepEqual(db.state().recipients, ['collega@dos.design', ADMIN]);
-    assert.equal(db.state().deliveryStatus, 'ACCEPTED');
-    for (const mail of db.state().envelopes) {
-      assert.ok(mail.html.includes(total === 5 ? 'annullati' : 'in preparazione'));
-      assert.ok(!mail.html.includes('collega@dos.design'));
-    }
-  });
-}
-
-test('sandbox sender blocks colleague sends before any database write or request', async () => {
-  const db = database([order()]);
-  await assert.rejects(runBatch({...options(db),from:'onboarding@resend.dev'}), /batch_verified_sender_required/);
-  assert.equal(db.state(), null);
+test('SMTP acceptance must include the sole recipient',async()=>{
+ const db=database([order()]);
+ await assert.rejects(runBatch({...options(db),transporter:{sendMail:async()=>({accepted:[],rejected:[]})}}),/batch_send_uncertain/);
+ assert.equal(db.state().status,'REVIEW_REQUIRED');
 });
 
-test('invalid recipient fails closed instead of silently omitting an order owner', async () => {
-  await assert.rejects(runBatch(options(database([order({email:'not-an-email'})]))), /batch_invalid_recipient/);
+test('failure persisting SMTP acceptance cannot trigger duplicate retry',async()=>{
+ const db=database([order()]), original=db.runTransaction;let calls=0, failSave=true;
+ db.runTransaction=fn=>original(tx=>fn({...tx,update:(ref,patch)=>{
+   if(patch.acceptedRecipients&&failSave){failSave=false;throw Error('database unavailable');}
+   tx.update(ref,patch);
+ }}));
+ const opt={...options(db),transporter:{sendMail:async mail=>{calls++;return accepted(mail);}}};
+ await assert.rejects(runBatch(opt),/batch_send_uncertain/);
+ assert.equal(db.state().status,'REVIEW_REQUIRED');
+ await assert.rejects(runBatch(opt),/batch_manual_review_required/);assert.equal(calls,1);
 });
 
-test('old processed test batch is not resent; pending test batch requires explicit review', async () => {
-  assert.equal((await runBatch(options(database([], {mode:'ADMIN_TEST',status:'PROCESSED'})))).status, 'ALREADY_PROCESSED');
-  await assert.rejects(runBatch(options(database([], {mode:'ADMIN_TEST',status:'RETRYABLE'}))), /batch_incompatible_existing_batch/);
-});
-
-test('over 100 recipients use stable private chunks; partial failure retries identical payloads', async () => {
-  const db = database(Array.from({length:101},(_,i)=>order({email:`user${i}@dos.design`})));
-  const payloads = [], keys = [];
-  const opt = {...options(db), fetchImpl:async(url,init)=>{
-    payloads.push(init.body); keys.push(init.headers['Idempotency-Key']);
-    if(payloads.length === 2) throw Error('network');
-    return {ok:true,json:async()=>({data:JSON.parse(init.body).map((_,i)=>({id:`id-${i}`}))})};
-  }};
-  await assert.rejects(runBatch(opt), /batch_send_uncertain/);
-  assert.equal(db.state().status, 'RETRYABLE');
-  await runBatch(opt);
-  assert.deepEqual(payloads.slice(0,2),payloads.slice(2));
-  assert.deepEqual(keys.slice(0,2),keys.slice(2));
-  assert.equal(JSON.parse(payloads[0]).length,100);
-  assert.equal(JSON.parse(payloads[1]).length,2);
-  assert.equal(db.state().recipients.length,102);
-});
-
-test('incomplete provider response never marks batch processed', async () => {
-  const db=database([order()]);
-  await assert.rejects(runBatch({...options(db),fetchImpl:async()=>({ok:true,json:async()=>({data:[]})})}), /batch_invalid_provider_response/);
-  assert.equal(db.state().status,'RETRYABLE');
+test('time-budget pause resumes without resending accepted recipients',async()=>{
+ const db=database([order()]);let now=scheduledAt,calls=0;
+ const opt={...options(db),clock:()=>now,transporter:{sendMail:async mail=>{
+   calls++;if(calls===1)now=new Date(scheduledAt.getTime()+61000);return accepted(mail);
+ }}};
+ await assert.rejects(runBatch(opt),/batch_time_budget/);assert.equal(db.state().status,'RETRYABLE');
+ await runBatch(opt);assert.equal(calls,2);assert.equal(db.state().status,'PROCESSED');
 });

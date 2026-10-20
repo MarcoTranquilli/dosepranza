@@ -1,0 +1,63 @@
+import {test,after} from 'node:test';
+import {readFileSync} from 'node:fs';
+import {initializeTestEnvironment,assertSucceeds,assertFails} from '@firebase/rules-unit-testing';
+import {doc,setDoc,updateDoc,getDoc,deleteDoc,serverTimestamp} from 'firebase/firestore';
+const env=await initializeTestEnvironment({projectId:'demo-dose-drafts',firestore:{host:'127.0.0.1',port:8089,rules:readFileSync('FIRESTORE_RULES_ENTERPRISE.txt','utf8')}});
+after(()=>env.cleanup());
+const user=env.authenticatedContext('user_123',{email:'user@dos.design',email_verified:true}).firestore();
+const other=env.authenticatedContext('user_456',{email:'other@dos.design',email_verified:true}).firestore();
+const path='drafts/russo_user_123_2026-10-20';
+const data=()=>({userId:'user_123',userEmail:'user@dos.design',supplierId:'russo',day:'2026-10-20',items:[{name:'test',qty:1}],totalCents:400,status:'DRAFT',reminderSent:false,updatedAt:serverTimestamp()});
+test('draft ownership and server field protections',async()=>{
+ await assertSucceeds(getDoc(doc(user,path)));
+ await assertSucceeds(setDoc(doc(user,path),data()));
+ await assertSucceeds(updateDoc(doc(user,path),{totalCents:800,updatedAt:serverTimestamp()}));
+ await assertFails(updateDoc(doc(user,path),{userId:'user_456',updatedAt:serverTimestamp()}));
+ await assertFails(updateDoc(doc(user,path),{reminderSent:true,updatedAt:serverTimestamp()}));
+ await assertFails(updateDoc(doc(user,path),{reminderSentAt:serverTimestamp(),updatedAt:serverTimestamp()}));
+ await assertFails(getDoc(doc(other,path)));
+ await assertFails(setDoc(doc(other,path),data()));
+ await assertFails(setDoc(doc(user,'drafts/russo_user_456_2026-10-20'),data()));
+ await assertSucceeds(setDoc(doc(user,'drafts/pagnottella_user_123_2026-10-20'),{...data(),supplierId:'pagnottella'}));
+ await env.withSecurityRulesDisabled(c=>updateDoc(doc(c.firestore(),path),{reminderSent:true}));
+ await assertFails(deleteDoc(doc(user,path)));
+ await assertSucceeds(updateDoc(doc(user,path),{status:'CANCELLED',updatedAt:serverTimestamp()}));
+ await assertSucceeds(updateDoc(doc(user,path),{status:'CONFIRMED',updatedAt:serverTimestamp()}));
+ await assertFails(updateDoc(doc(user,path),{status:'DRAFT',updatedAt:serverTimestamp()}));
+});
+
+test('cart-sync debounce, cancellation, confirmation and account switch against emulator',async()=>{
+ const {default:vm}=await import('node:vm');
+ const sdk=await import('firebase/firestore');
+ const uid='cart_user', email='cart@dos.design';
+ const db=env.authenticatedContext(uid,{email,email_verified:true}).firestore();
+ const auth={currentUser:{uid,email,emailVerified:true,isAnonymous:false}};
+ let writes=0;
+ const mockedSdk={...sdk,runTransaction:(...args)=>{writes++;return sdk.runTransaction(...args);}};
+ const source=readFileSync('shared/cart-sync.js','utf8');
+ const begin=source.indexOf('  async function context()'),end=source.indexOf('  function sync(',begin);
+ const executable=source.slice(0,begin)+'  async function context(){return testContext();}\n'+source.slice(end);
+ const window={dispatchEvent(){throw Error('unexpected draft sync error');}};
+ const sandbox={window,console,Intl,Date,Map,Set,Promise,setTimeout,clearTimeout,Event,
+   testContext:()=>({sdk:mockedSdk,db,auth,user:auth.currentUser})};
+ new Function(...Object.keys(sandbox),executable)(...Object.values(sandbox));
+ const day=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+ const ref=doc(db,`drafts/russo_${uid}_${day}`);
+ const wait=()=>new Promise(r=>setTimeout(r,1300));
+ window.DoseCartSync.sync('russo',[{name:'one'}],400);
+ window.DoseCartSync.sync('russo',[{name:'one'},{name:'two'}],800);
+ await wait();
+ let draft=(await getDoc(ref)).data();
+ if(writes!==1||draft.status!=='DRAFT'||draft.totalCents!==800||draft.reminderSent!==false)throw Error('debounce failed');
+ window.DoseCartSync.sync('russo',[],0);await wait();
+ if((await getDoc(ref)).data().status!=='CANCELLED')throw Error('empty cart failed');
+ window.DoseCartSync.sync('pagnottella',[{name:'panino'}],700);await wait();
+ const pg=doc(db,`drafts/pagnottella_${uid}_${day}`);
+ if((await getDoc(pg)).data().status!=='DRAFT')throw Error('draft failed');
+ // WhatsApp opening performs no confirm call; explicit confirmation does.
+ await window.DoseCartSync.confirm('pagnottella');
+ window.DoseCartSync.sync('pagnottella',[],0);await wait();
+ if((await getDoc(pg)).data().status!=='CONFIRMED')throw Error('confirmation overwritten');
+ window.DoseCartSync.sync('russo',[{name:'new'}],500);auth.currentUser=null;await wait();
+ if((await getDoc(ref)).data().status!=='CANCELLED')throw Error('account switch leaked write');
+});
