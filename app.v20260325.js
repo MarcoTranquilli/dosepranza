@@ -606,6 +606,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             const det = select ? `Porz: ${select.options[select.selectedIndex].text.split('-')[0]}` : "";
             state.cart.push({ ...item, price, details: det, cartId: Date.now() });
             document.getElementById('cart-count').textContent = state.cart.length;
+            window.DoseCartSync?.sync('russo',state.cart,Math.round(state.cart.reduce((s,i)=>s+i.price,0)*100));
             window.toast("Aggiunto!");
         };
 
@@ -638,6 +639,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             if(!c.subtype || c.ings.length === 0) return window.toast("Scegli gli ingredienti!");
             state.cart.push({ name: `${c.base} (${c.subtype})`, price: c.total, cat: 'Personalizzati', details: c.ings.map(i=>i.name).join(', '), cartId: Date.now() });
             document.getElementById('cart-count').textContent = state.cart.length;
+            window.DoseCartSync?.sync('russo',state.cart,Math.round(state.cart.reduce((s,i)=>s+i.price,0)*100));
             const saveToggle = document.getElementById('custom-save-toggle');
             const publishToggle = document.getElementById('custom-publish-toggle');
             const customName = (document.getElementById('custom-name-input')?.value || '').trim();
@@ -925,6 +927,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
         window.removeFromCart = (id) => {
             state.cart = state.cart.filter(i => i.cartId !== id);
             document.getElementById('cart-count').textContent = state.cart.length;
+            window.DoseCartSync?.sync('russo',state.cart,Math.round(state.cart.reduce((s,i)=>s+i.price,0)*100));
             renderCart();
         };
 
@@ -1335,6 +1338,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             }
             try {
                 const docRef = await createRussoOrder(payload);
+                await window.DoseCartSync?.confirm('russo');
                 closeSendConfirm();
                 const summary = buildOrderConfirmSummary(docRef.id, payload.items, payload.total);
                 showOrderConfirm(summary);
@@ -2037,6 +2041,11 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
         }
 
         function renderCart() {
+            if(!document.getElementById('russo-threshold-disclaimer')) {
+              const banner=document.createElement('p'); banner.id='russo-threshold-disclaimer';
+              banner.textContent="L'ordine parte solo al raggiungimento della soglia minima di 20 euro";
+              document.getElementById('cart-count')?.parentElement?.append(banner);
+            }
             const wrap = document.getElementById('cart-items-list');
             const opts = document.getElementById('cart-options');
             if(state.cart.length === 0) {

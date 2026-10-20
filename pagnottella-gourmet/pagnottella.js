@@ -71,7 +71,7 @@ const discountLabel = () => {
 };
 const ORDER_LOG_KEY = 'pg_order_logs';
 const CHECKOUT_STATE_KEY = 'pg_checkout_state_v1';
-const deliveryCopy = () => DATA?.copy?.delivery || 'Ordini e pagamenti entro le 12:00, consegna gratuita alle 12:30';
+const deliveryCopy = () => DATA?.copy?.delivery || 'Ordini e pagamenti entro le 11:00, consegna gratuita alle 12:30';
 const paymentStatusCopy = () => `${DATA.payment.model}. ${DATA.payment.pickup}.`;
 const getStoredDoseUser = () => {
   try {
@@ -89,7 +89,11 @@ const paymentIban = () => DATA?.payment?.iban || '';
 const paymentNoteCopy = () => 'Satispay è il metodo principale; in alternativa è disponibile il bonifico bancario. PayPal e Nexi saranno attivati da settembre.';
 const finalizeOrderLabel = () => 'Rivedi e conferma ordine';
 const reopenOrderLabel = 'Riapri il riepilogo su WhatsApp';
-const orderCutoffCopy = '12:00';
+const orderCutoffCopy = '11:00';
+function pagnottellaOrdersClosed(){
+  const time = new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Rome',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date());
+  return time >= orderCutoffCopy;
+}
 const deliveryTimeCopy = '12:30';
 const appliedDiscountRate = () => {
   const cfg = DATA?.discount;
@@ -259,7 +263,7 @@ function renderPaymentDetails(){
 function hydrateStatic(){
   byId('brand-subtitle').textContent = `Suite DOSepranza · ${DATA.copy.eyebrow} · ordine in pochi tap`;
   byId('heroTitle').textContent = DATA.copy.headline;
-  byId('heroText').textContent = `Menu dedicato con prezzi originali e scontati sempre visibili. Ordina e paga entro le ${orderCutoffCopy}, poi ricevi la consegna gratuita alle ${deliveryTimeCopy}.`;
+  byId('heroText').textContent = `Ordine individuale senza soglia minima di gruppo. Chiusura ordini ore 11:00. Menu dedicato con prezzi originali e scontati sempre visibili. Ordina e paga entro le ${orderCutoffCopy}, poi ricevi la consegna gratuita alle ${deliveryTimeCopy}.`;
   byId('contact-address').textContent = DATA.contact.address;
   byId('contact-hours').textContent = DATA.contact.hours;
   byId('contact-whatsapp').href = whatsappUrl('Buongiorno, desidero informazioni sul servizio DOSepranza.');
@@ -909,6 +913,8 @@ function totals(){ const items = Object.values(state.cart); const orig = items.r
 window.DoseCanReload = () => Boolean(DATA) && !authState.loading && !state.sending && totals().count === 0
   && !byId('paymentConfirmModal')?.classList.contains('show') && !byId('checkoutCompleteModal')?.classList.contains('show');
 function renderCart(){
+  const draftTotals = totals();
+  window.DoseCartSync?.sync('pagnottella',draftTotals.items,Math.round(draftTotals.total*100));
   const t = totals();
   byId('cartCount').textContent = t.count;
   byId('cartPrimaryAction')?.classList.toggle('hidden', t.count === 0);
@@ -1120,6 +1126,7 @@ function configureConfirmation(action){
   (isSubmit ? consent : accept)?.focus();
 }
 async function sendWA(){
+  if(pagnottellaOrdersClosed()) return toast('Ordini Pagnottella chiusi alle 11:00.');
   const button = byId('sendOrderBtn');
   if(totals().count === 0){
     if(button) button.dataset.checkoutStatus = 'empty';
@@ -1177,6 +1184,7 @@ function copyWhatsAppMessage(){
 function completeWhatsappOrder(){
   const t = totals();
   const orderId = state.lastOrderId;
+  window.DoseCartSync?.confirm('pagnottella');
   persistCheckoutState('user_confirmed_sent');
   byId('checkoutCompleteSummary').textContent = `${orderId ? `Ordine ${orderId} · ` : ''}${t.count} ${t.count === 1 ? 'prodotto' : 'prodotti'} · Totale ${money(t.total)}`;
   state.cart = {};
@@ -1190,6 +1198,7 @@ function closeCheckoutComplete(){
   closeCart();
 }
 async function confirmPaymentAndSend(){
+  if(state.confirmationAction === 'submit' && pagnottellaOrdersClosed()) return toast('Ordini Pagnottella chiusi alle 11:00.');
   if(totals().count === 0 || state.sending) return;
   if(state.confirmationAction === 'submit' && !byId('paymentConfirmConsent')?.checked) return;
   if(state.confirmationAction === 'reopen'){
