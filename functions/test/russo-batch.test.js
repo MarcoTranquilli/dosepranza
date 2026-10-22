@@ -5,12 +5,12 @@ const scheduledAt = new Date('2026-10-19T08:30:00Z');
 const order = (overrides = {}) => ({supplierId:'russo', total:10, email:'collega@dos.design',
   createdAt:new Date('2026-10-19T08:00:00Z'), ...overrides});
 
-function database(rows = [], initial = null) {
+function database(rows = [], initial = null, supplierId = 'russo') {
   let batch = initial, queue = Promise.resolve();
   const conditions = [];
   const query = {where(...args) {conditions.push(args); return this;}, orderBy() {return this;}, limit() {return this;}};
   return {
-    doc:path => {assert.equal(path, 'daily_batches/2026-10-19_russo'); return {path};},
+    doc:path => {assert.equal(path, `daily_batches/2026-10-19_${supplierId}`); return {path};},
     collection:name => {assert.equal(name, 'orders'); return query;},
     runTransaction(fn) {
       const work = queue.then(async () => {
@@ -32,6 +32,26 @@ function database(rows = [], initial = null) {
 
 const accepted = async mail => ({accepted:[...mail.to], rejected:[], messageId:mail.messageId});
 const options = db => ({db,scheduledAt,clock:()=>scheduledAt,transporter:{sendMail:accepted},serverTimestamp:()=>scheduledAt});
+
+for (const rows of [[], [order({supplierId:'pagnottella',status:'cancelled'})]]) {
+ test('Pagnottella with no eligible orders skips email and batch writes, including retries',async()=>{
+  const db=database(rows,null,'pagnottella');
+  const time=new Date('2026-10-19T09:00:00Z');
+  const opt={...options(db),supplierId:'pagnottella',scheduledAt:time,clock:()=>time,
+   transporter:{sendMail:async()=>assert.fail('No email expected')}};
+  for(let i=0;i<2;i++) assert.equal((await runBatch(opt)).status,'SKIPPED_NO_ORDERS');
+  assert.equal(db.state(),null);
+ });
+}
+test('Pagnottella with one eligible order still sends individual confirmations',async()=>{
+ const db=database([order({supplierId:'pagnottella',total:5})],null,'pagnottella'), mails=[];
+ const time=new Date('2026-10-19T09:00:00Z');
+ await runBatch({...options(db),supplierId:'pagnottella',scheduledAt:time,clock:()=>time,
+  transporter:{sendMail:async mail=>{mails.push(mail);return accepted(mail);}}});
+ assert.equal(mails.length,2);
+ assert.equal(db.state().status,'PROCESSED');
+ assert.equal(db.state().ordersCount,1);
+});
 
 test('Rome cutoff handles DST and winter',()=>{
  assert.equal(windowFor(scheduledAt).cutoff.toISOString(),'2026-10-19T08:30:00.000Z');

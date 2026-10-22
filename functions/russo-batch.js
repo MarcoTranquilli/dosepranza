@@ -100,6 +100,7 @@ async function runBatch({db, transporter, from, scheduledAt, supplierId = 'russo
       const orders = await tx.get(query);
       if (orders.docs.length > 1000) throw fail('batch_too_many_orders');
       const summary = summarize(orders.docs, window, supplier);
+      if (supplier.id === 'pagnottella' && summary.orderCount === 0) return {skipped:true};
       batch = {...summary, mode:'SMTP_V1', acceptedRecipients:[], messageIds:[], sendingIndex:null, day:window.day, supplierId:supplier.id,
         decision:summary.totalCents >= 2000 ? 'CONFIRMED' : 'NOT_CONFIRMED',
         envelopes:[...new Set([...summary.recipients, ADMIN])].sort().map(email => envelope(summary, window.day, from, email, supplier)), firstAttemptAtMs:now,
@@ -120,6 +121,7 @@ async function runBatch({db, transporter, from, scheduledAt, supplierId = 'russo
     return batch;
   });
   if (!claim) return {status:'ALREADY_PROCESSED', day:window.day};
+  if (claim.skipped) return {status:'SKIPPED_NO_ORDERS', day:window.day, orderCount:0};
   if (claim.review) return {status:'REVIEW_REQUIRED', day:window.day};
   try {
     const accepted = [...(claim.acceptedRecipients || [])], messageIds = [...(claim.messageIds || [])];
