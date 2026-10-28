@@ -77,3 +77,27 @@ exports.pagnottellaDailyConfirmation = onSchedule({
       serverTimestamp:()=>FieldValue.serverTimestamp()});
   } catch { throw new Error('batch_pagnottella_failed'); }
 });
+
+// Opt-in only: no email until explicitly configured and deployed.
+const ADMIN_DIGEST_ENABLED = defineBoolean('ADMIN_DIGEST_ENABLED', {default:false});
+const ADMIN_REPORT_EMAIL = defineString('ADMIN_REPORT_EMAIL', {default:'marco.tranquilli@dos.design'});
+const ADMIN_DIGEST_PERIOD = defineString('ADMIN_DIGEST_PERIOD', {default:'30days'});
+exports.adminAnalyticsDigest = onSchedule({
+  schedule:'0 8 * * 1', timeZone:'Europe/Rome', region:'europe-west1',
+  serviceAccount:'dosepranza-russo-email@app-ordini-pranzo-alimentari.iam.gserviceaccount.com',
+  secrets:[SMTP_PASS], timeoutSeconds:540, maxInstances:1, concurrency:1, retryCount:0
+}, async event => {
+  if (!ADMIN_DIGEST_ENABLED.value()) return;
+  if (!getApps().length) initializeApp();
+  try {
+    const {runDigest} = require('./analytics/admin-digest');
+    const result = await runDigest({db:getFirestore(),
+      transporter:createSmtpTransport({user:SMTP_USER.value(),pass:SMTP_PASS.value()}),
+      from:ORDER_CONFIRM_FROM.value(),recipient:ADMIN_REPORT_EMAIL.value(),
+      mode:ADMIN_DIGEST_PERIOD.value(),now:new Date(event.scheduleTime),logger});
+    logger.info('Admin digest',result);
+  } catch {
+    logger.error('Admin digest failed; inspect admin_digest_runs without automatic resend');
+    throw new Error('admin_digest_failed');
+  }
+});
