@@ -1,0 +1,49 @@
+name: Publish integrated release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dosepranza-pages-release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm ci --prefix functions
+      - name: Test integrated release
+        run: |
+          node --test tests/pagnottella-cutoff-payment.test.cjs
+          npm test --prefix functions
+          node --test tests/customer-core.test.mjs tests/order-analytics.test.mjs
+      - name: Build complete suite and production catalog
+        run: |
+          bash scripts/netlify_publish_pdf.sh
+          npm run build:pagnottella-production
+          cp -R dist-production/. dist/
+          touch dist/.nojekyll
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: pages
+      - name: Publish without rewriting history
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          cp -R dist/. pages/
+          cd pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Publish integrated release ${SOURCE_SHA}"
+          git push origin HEAD:gh-pages
