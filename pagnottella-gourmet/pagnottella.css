@@ -102,3 +102,15 @@
   .authGateActions{align-items:stretch;flex-direction:column}
   .authGateActions .primary.gold{width:100%}
 }
+.paymentConfirmModal{display:none;position:fixed;inset:0;z-index:120;padding:16px;background:rgba(18,24,19,.58);place-items:center}
+.paymentConfirmModal.show{display:grid}
+.paymentConfirmSheet{width:min(520px,100%);max-height:calc(100vh - 32px);overflow:auto;padding:24px;border-radius:24px;background:#fff;color:#30372c}
+.paymentConfirmSheet h2{margin:0 0 16px}
+.paymentConfirmSheet button{width:100%;margin-top:12px}
+.drawer.show{background:rgba(18,24,19,.58)}
+.drawer .sheet{position:absolute;right:16px;top:16px;bottom:16px;width:min(480px,calc(100vw - 32px));display:flex;flex-direction:column;overflow:hidden;border-radius:24px;background:#fff}
+.drawer .sheetImg{position:relative;flex:0 0 180px;min-height:0}
+.drawer .sheetImg img{width:100%;height:180px;object-fit:cover}
+.drawer .sheetImg .close{position:absolute;top:12px;right:12px}
+.drawer .sheetBody{flex:1;min-height:0;overflow:auto;padding:20px}
+.drawer .sheetFoot{position:sticky;bottom:0;display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:16px;background:#fff}

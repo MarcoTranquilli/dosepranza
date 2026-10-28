@@ -1,0 +1,13 @@
+{
+  "total": 87,
+  "mapping_type": {
+    "fallback_categoria": 50,
+    "foto_specifica_o_quasi_specifica": 14,
+    "riuso_affine_per_ingrediente": 23
+  },
+  "confidence": {
+    "bassa": 57,
+    "media": 19,
+    "alta": 11
+  }
+}
