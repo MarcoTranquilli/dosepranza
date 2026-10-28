@@ -1,0 +1,13 @@
+import {test,after} from 'node:test';
+import {readFileSync} from 'node:fs';
+import {initializeTestEnvironment,assertSucceeds,assertFails} from '@firebase/rules-unit-testing';
+import {doc,setDoc,getDoc,updateDoc,deleteDoc,collection,query,where,getDocs,Timestamp} from 'firebase/firestore';
+const env=await initializeTestEnvironment({projectId:'demo-dose-custom',firestore:{host:'127.0.0.1',port:8194,rules:readFileSync('FIRESTORE_RULES_ENTERPRISE.txt','utf8')}});
+after(()=>env.cleanup());
+const db=(uid,email)=>env.authenticatedContext(uid,{email,email_verified:true,firebase:{sign_in_provider:'google.com'}}).firestore();
+await env.withSecurityRulesDisabled(async c=>{for(const id of ['russo','pagnottella'])await setDoc(doc(c.firestore(),'orders',id),{uid:'owner',supplierId:id,createdAt:Timestamp.fromDate(new Date('2025-01-01')),total:5,confirmationStatus:'CONFIRMED'});});
+for(const email of ['marta.diamantini@dos.design','luca.pacella@dos.design'])test(email+' historical reads only',async()=>{const d=db('delegate',email);for(const id of ['russo','pagnottella']){const ref=doc(d,'orders',id);await assertSucceeds(getDoc(ref));await assertFails(updateDoc(ref,{orderStatus:'done'}));await assertFails(deleteDoc(ref));}await assertSucceeds(getDocs(collection(d,'orders')));});
+test('outsider and ordinary DOS cannot read other historical orders',async()=>{for(const email of ['external@gmail.com','other@dos.design','marta.diamantini@dos.design.fake'])await assertFails(getDoc(doc(db('x',email),'orders','pagnottella')));});
+test('supplier segregation',async()=>{const d=db('supplier','isidorovagnozzi@gmail.com');await assertSucceeds(getDoc(doc(d,'orders','pagnottella')));await assertFails(getDoc(doc(d,'orders','russo')));});
+test('favorites ownership and escalation blocked',async()=>{const d=db('fav','other@dos.design'),ref=doc(d,'users','fav');await assertSucceeds(setDoc(ref,{favorites:{russo:['a'],pagnottella:[]}}));await assertSucceeds(updateDoc(ref,{'favorites.russo':['b']}));await assertFails(updateDoc(ref,{role:'admin'}));await assertFails(getDoc(doc(db('different','x@dos.design'),'users','fav')));});
+test('backend fields protected including added fields for admin',async()=>{const admin=db('admin','marco.tranquilli@dos.design');await assertFails(updateDoc(doc(admin,'orders','russo'),{confirmationUpdatedAt:Timestamp.now()}));await assertSucceeds(updateDoc(doc(admin,'orders','russo'),{orderStatus:'submitted'}));const own=db('owner','owner@dos.design');await assertFails(setDoc(doc(own,'orders','forged'),{uid:'owner',supplierId:'russo',confirmationStatus:'CONFIRMED'}));});

@@ -42,6 +42,17 @@ service cloud.firestore {
         && authenticatedEmail() == 'marco.tranquilli@dos.design';
     }
 
+    function isOrderManager() {
+      return isGoogleProvider() && request.auth.token.get('email_verified', false)
+        && authenticatedEmail() in ['marco.tranquilli@dos.design',
+          'marta.diamantini@dos.design', 'luca.pacella@dos.design'];
+    }
+
+    function hasNoConfirmationFields() {
+      return !request.resource.data.keys().hasAny([
+        'confirmationStatus', 'confirmationBatchId', 'confirmationUpdatedAt']);
+    }
+
     function isDosUser() {
       return isGoogleProvider()
         && authenticatedEmail().matches('^[^@]+@dos[.]design$');
@@ -117,21 +128,35 @@ service cloud.firestore {
         && resource.data.createdAt >= start && resource.data.createdAt < cutoff;
     }
 
+    match /users/{uid} {
+      function ownProfile() { return isDosUser() && request.auth.uid == uid; }
+      function validFavorites() {
+        let f = request.resource.data.favorites;
+        return f is map && f.keys().hasOnly(['russo', 'pagnottella'])
+          && f.get('russo', []) is list && f.get('russo', []).size() <= 100
+          && f.get('pagnottella', []) is list && f.get('pagnottella', []).size() <= 100;
+      }
+      allow read: if ownProfile();
+      allow create: if ownProfile() && request.resource.data.keys().hasOnly(['favorites']) && validFavorites();
+      allow update: if ownProfile() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['favorites']) && validFavorites();
+    }
+
     match /orders/{doc} {
-      allow read: if isAdminEmail()
+      allow read: if isOrderManager()
         || (isDosUser() && isOwnerByUid())
         || isSharedRussoToday()
         || (isPagnottellaSupplier() && isPagnottellaOrder())
         || (isRussoSupplier() && isRussoOrder());
 
       allow create: if isDosUser()
+        && hasNoConfirmationFields()
         && isCreateOwnerByUid()
         && request.resource.data.supplierId in ['russo', 'pagnottella'];
 
       allow update: if isAdminEmail()
         && request.resource.data.uid == resource.data.uid
         && request.resource.data.get('supplierId', null) == resource.data.get('supplierId', null)
-        && request.resource.data.diff(resource.data).changedKeys()
+        && request.resource.data.diff(resource.data).affectedKeys()
           .hasOnly([
             'paymentStatus',
             'reconciled',

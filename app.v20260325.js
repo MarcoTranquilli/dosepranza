@@ -597,6 +597,25 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             if(v === 'menu') renderMenuAdmin();
         };
 
+        window.DoseCustomerCatalog = {
+            list: () => buildMenuList().map(p => ({...p, available: !state.disabledProducts.has(p.id)})),
+            choose: id => { const p=buildMenuList().find(p=>String(p.id)===id); if(p) window.addStdToCart(p.id); },
+            reorder: plan => {
+                if(!ensureOrderWindow()) throw Error('Ordini chiusi');
+                const ready=plan.map(({item,product,qty})=>{
+                    const p=buildMenuList().find(p=>p.id===product.id);
+                    if(!p || state.disabledProducts.has(p.id) || item.details || p.sizes || p.variants)
+                        throw Error('Verifica porzioni e personalizzazioni dal catalogo');
+                    return {p,qty};
+                });
+                for(const {p,qty} of ready) for(let i=0;i<qty;i++)
+                    state.cart.push({...p,cartId:Math.max(Date.now(),...state.cart.map(i=>Number(i.cartId)||0))+1,details:''});
+                document.getElementById('cart-count').textContent=state.cart.length;
+                window.DoseCartSync?.sync('russo',state.cart,Math.round(state.cart.reduce((s,i)=>s+i.price,0)*100));
+                renderCart();
+            }
+        };
+
         window.addStdToCart = (id) => {
             if(!ensureOrderWindow()) return;
             if(state.disabledProducts.has(id)) return window.toast("Prodotto non disponibile");

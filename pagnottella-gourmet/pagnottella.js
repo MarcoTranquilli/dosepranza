@@ -1357,3 +1357,18 @@ bootstrap().catch(err => {
   console.error(err);
   document.body.innerHTML = `<div style="max-width:720px;margin:48px auto;padding:24px;border-radius:24px;background:#fff;border:1px solid #eadfce;font-family:Manrope,sans-serif"><h1 style="margin-top:0">Errore caricamento catalogo Pagnottella</h1><p>${esc(err.message || 'Errore sconosciuto')}</p><p>Verifica il file <code>assets/pagnottella/data/menu.json</code> e gli asset locali.</p></div>`;
 });
+
+window.DoseCustomerCatalog={
+ list:()=>PRODUCTS.filter(p=>p.isActive!==false).map(p=>({...p,available:p.isActive!==false})),
+ choose:id=>{const p=PRODUCTS.find(p=>String(p.id)===id&&p.isActive!==false);if(p)openDetails(p.id);},
+ reorder:plan=>{
+  if(!window.DoseCustomerCore.open('pagnottella')||isOrderingClosed())throw Error('Ordini chiusi');
+  const ready=plan.map(({item,product,qty})=>{
+   const current=PRODUCTS.find(p=>p.id===product.id&&p.isActive!==false);if(!current)throw Error('Prodotto non disponibile');
+   const option=optionList(current).find(o=>o.label===(item.option||'Standard'));if(!option)throw Error('Opzione cambiata: selezionala dal catalogo');
+   const extras=(item.extras||[]).map(e=>{const x=(DATA.extras||[]).find(x=>x.name===e.name);if(!x||current.supportsExtras!==true)throw Error('Extra non disponibile');return x;});
+   return {current,option,extras,qty};
+  });
+  for(const x of ready)for(let i=0;i<x.qty;i++)addToCart(x.current,x.option,x.extras);
+ }
+};

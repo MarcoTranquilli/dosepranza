@@ -36,3 +36,6 @@ test -s "${DIST_DIR}/sw-killer.js"
 test -s "${DIST_DIR}/assets/pagnottella/data/menu.json"
 test -s "${DIST_DIR}/assets/pagnottella/payment/satispay-qr-pagnottella.png"
 echo "--- Build completata: ${DIST_DIR} ---"
+
+mkdir -p "${DIST_ROOT}/shared"
+cp "${ROOT_DIR}/shared/customer-core.js" "${ROOT_DIR}/shared/customer-panel.js" "${ROOT_DIR}/shared/customer-panel.css" "${DIST_ROOT}/shared/"
