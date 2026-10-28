@@ -71,8 +71,8 @@ const discountLabel = () => {
 };
 const ORDER_LOG_KEY = 'pg_order_logs';
 const CHECKOUT_STATE_KEY = 'pg_checkout_state_v1';
-const deliveryCopy = () => DATA?.copy?.delivery || 'Ordini e pagamenti entro le 11:00, consegna gratuita alle 12:30';
-const paymentStatusCopy = () => `${DATA.payment.model}. ${DATA.payment.pickup}.`;
+const deliveryCopy = () => `Ordini e pagamenti entro le ${orderCutoffCopy}, consegna gratuita alle ${deliveryTimeCopy}`;
+const paymentStatusCopy = () => `${DATA.payment.model}. Pagamento entro le ${orderCutoffCopy}.`;
 const getStoredDoseUser = () => {
   try {
     return JSON.parse(localStorage.getItem('dose_user') || 'null');
@@ -90,6 +90,7 @@ const paymentNoteCopy = () => 'Satispay è il metodo principale; in alternativa 
 const finalizeOrderLabel = () => 'Rivedi e conferma ordine';
 const reopenOrderLabel = 'Riapri il riepilogo su WhatsApp';
 const orderCutoffCopy = '11:00';
+const cutoffClosedCopy = () => `Ordini Pagnottella chiusi alle ${orderCutoffCopy}. Non effettuare il pagamento.`;
 function pagnottellaOrdersClosed(){
   const time = new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Rome',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date());
   return time >= orderCutoffCopy;
@@ -234,6 +235,10 @@ function renderPaymentOptions(){
 function renderPaymentDetails(){
   const container = byId('paymentDetails');
   if(!container) return;
+  if(pagnottellaOrdersClosed()){
+    container.textContent = cutoffClosedCopy();
+    return;
+  }
   const method = selectedPaymentMethod();
   if(method === 'Bonifico bancario'){
     container.innerHTML = `<div class="paymentInstruction">
@@ -306,7 +311,7 @@ function hydrateStatic(){
   const deliveryCardText = byId('deliveryCardText');
   if(deliveryCardText) deliveryCardText.textContent = `${deliveryCopy()}.`;
   byId('paymentCardTitle').textContent = DATA.payment.model;
-  byId('paymentCardText').textContent = `${DATA.payment.pickup}.`;
+  byId('paymentCardText').textContent = `Satispay o bonifico istantaneo entro le ${orderCutoffCopy}. Il pagamento non trasmette automaticamente l'ordine: invia anche il messaggio WhatsApp.`;
   const customerInput = byId('customer');
   const recognizedName = authenticatedCustomerName();
   if(customerInput && recognizedName){
@@ -322,13 +327,13 @@ function updateSendButtonState(){
   const label = byId('sendOrderLabel');
   const hasPreparedOrder = Boolean(state.lastOrderId && state.lastWhatsAppUrl);
   if(button){
-    button.disabled = state.sending || isOrderingClosed();
+    button.disabled = state.sending || isOrderingClosed() || pagnottellaOrdersClosed();
     button.classList.toggle('isBusy', state.sending);
     button.classList.toggle('isWhatsAppOpened', hasPreparedOrder);
     button.setAttribute('aria-label', state.sending ? 'Apertura di WhatsApp in corso' : (hasPreparedOrder ? reopenOrderLabel : finalizeOrderLabel()));
   }
   if(label){
-    label.textContent = isOrderingClosed()
+    label.textContent = pagnottellaOrdersClosed() ? cutoffClosedCopy() : isOrderingClosed()
       ? 'Ordini sospesi durante la chiusura'
       : (state.sending ? 'Apertura di WhatsApp in corso…' : (hasPreparedOrder ? reopenOrderLabel : finalizeOrderLabel()));
   }
@@ -346,6 +351,19 @@ function resetCurrentTransmissionState(){
 }
 
 function bind(){
+  let lastCutoffState;
+  const refreshCutoff = () => {
+    const closed = pagnottellaOrdersClosed();
+    if(closed === lastCutoffState) return;
+    lastCutoffState = closed;
+    updateSendButtonState();
+    renderPaymentDetails();
+    const accept = byId('paymentConfirmAccept');
+    if(accept && state.confirmationAction === 'submit') accept.disabled = pagnottellaOrdersClosed() || !byId('paymentConfirmConsent')?.checked;
+  };
+  setInterval(refreshCutoff, 1000);
+  window.addEventListener('focus', refreshCutoff);
+  document.addEventListener('visibilitychange', refreshCutoff);
   byId('search').addEventListener('input', e => { state.query = e.target.value.trim().toLowerCase(); renderCatalog(); });
   byId('sort').addEventListener('change', e => { state.sort = e.target.value; renderCatalog(); });
   byId('filterIngredientSearch')?.addEventListener('input', renderIngredientFilters);
@@ -366,7 +384,7 @@ function bind(){
   byId('paymentConfirmCancel')?.addEventListener('click', closePaymentConfirmation);
   byId('paymentConfirmAccept')?.addEventListener('click', confirmPaymentAndSend);
   byId('paymentConfirmConsent')?.addEventListener('change', event => {
-    if(state.confirmationAction === 'submit') byId('paymentConfirmAccept').disabled = !event.target.checked;
+    if(state.confirmationAction === 'submit') byId('paymentConfirmAccept').disabled = pagnottellaOrdersClosed() || !event.target.checked;
   });
   byId('checkoutCompleteClose')?.addEventListener('click', closeCheckoutComplete);
   byId('sendOrderBtn')?.addEventListener('click', sendWA);
@@ -1126,7 +1144,7 @@ function configureConfirmation(action){
   (isSubmit ? consent : accept)?.focus();
 }
 async function sendWA(){
-  if(pagnottellaOrdersClosed()) return toast('Ordini Pagnottella chiusi alle 11:00.');
+  if(pagnottellaOrdersClosed()) return toast(cutoffClosedCopy());
   const button = byId('sendOrderBtn');
   if(totals().count === 0){
     if(button) button.dataset.checkoutStatus = 'empty';
@@ -1198,7 +1216,7 @@ function closeCheckoutComplete(){
   closeCart();
 }
 async function confirmPaymentAndSend(){
-  if(state.confirmationAction === 'submit' && pagnottellaOrdersClosed()) return toast('Ordini Pagnottella chiusi alle 11:00.');
+  if(state.confirmationAction === 'submit' && pagnottellaOrdersClosed()) return toast(cutoffClosedCopy());
   if(totals().count === 0 || state.sending) return;
   if(state.confirmationAction === 'submit' && !byId('paymentConfirmConsent')?.checked) return;
   if(state.confirmationAction === 'reopen'){
@@ -1246,6 +1264,7 @@ async function confirmPaymentAndSend(){
   }
 }
 function copyPaymentIban(){
+  if(pagnottellaOrdersClosed()) return toast(cutoffClosedCopy());
   const iban = paymentIban();
   if(!iban) return;
   navigator.clipboard?.writeText(iban).then(() => toast('IBAN copiato')).catch(() => toast(`IBAN: ${iban}`));
