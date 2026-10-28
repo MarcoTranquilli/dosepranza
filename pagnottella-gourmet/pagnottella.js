@@ -234,34 +234,49 @@ function renderPaymentOptions(){
 }
 
 function renderPaymentDetails(){
-  const container = byId('paymentDetails');
+  const container = typeof byId === 'function' ? byId('paymentDetails') : null;
   if(!container) return;
-  // Checkout e istruzioni di pagamento restano sempre disponibili
-  const method = selectedPaymentMethod();
+  const method = typeof selectedPaymentMethod === 'function' ? selectedPaymentMethod() : 'Satispay';
   if(method === 'Bonifico bancario'){
-    container.innerHTML = `<div class="paymentInstruction">
-      <strong>Bonifico bancario</strong>
-      <p>Effettua un bonifico istantaneo entro le ${orderCutoffCopy}, indica il tuo nome nella causale e conserva la ricevuta.</p>
-      <div class="paymentDetailRow"><span class="paymentDetailLabel">Intestatario</span><span class="paymentDetailValue">${esc(paymentBeneficiary())}</span></div>
-      <div class="paymentDetailRow"><span class="paymentDetailLabel">IBAN</span><span class="paymentDetailValue">${esc(paymentIban())}</span></div>
-      <button type="button" class="paymentActionBtn" onclick="copyPaymentIban()">Copia IBAN</button>
-    </div>`;
+    const iban = (typeof paymentIban === 'function' ? paymentIban() : null) || (typeof DATA !== 'undefined' && DATA.payment?.iban) || 'IT35B0832703249000000002986';
+    const beneficiary = (typeof paymentBeneficiary === 'function' ? paymentBeneficiary() : null) || (typeof DATA !== 'undefined' && DATA.payment?.beneficiary) || '3M Società a Responsabilità Limitata';
+    container.innerHTML = '<div class="paymentInstruction bonificoInstruction" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px;margin-top:10px;font-size:13px;line-height:1.5;">' +
+      '<div style="font-weight:700;color:#1e293b;margin-bottom:4px;">Bonifico bancario istantaneo</div>' +
+      '<div style="color:#475569;margin-bottom:6px;">Intestatario: <strong>' + beneficiary + '</strong></div>' +
+      '<div style="font-family:monospace;background:#e2e8f0;padding:6px 10px;border-radius:6px;font-size:12px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">' +
+        '<span>' + iban + '</span>' +
+        '<button type="button" onclick="copyPaymentIban()" class="ghost" style="padding:2px 8px;font-size:11px;">Copia IBAN</button>' +
+      '</div>' +
+      '<div style="font-size:11px;color:#64748b;">Effettua il bonifico prima o contestualmente all\'invio dell\'ordine.</div>' +
+    '</div>';
     return;
   }
-  if(method === 'Satispay'){
-    const qrImage = DATA.payment.qrImage || '';
-    container.innerHTML = `<div class="paymentQrCard">
-      <img src="${esc(qrImage)}" alt="QR code Satispay La Pagnottella Gourmet" loading="lazy">
-      <div class="paymentQrBody">
-        <strong>Satispay</strong>
-        <p>Scansiona il QR e completa il pagamento entro le ${orderCutoffCopy}.</p>
-        <div class="paymentQrActions"><a class="paymentActionBtn" href="${esc(qrImage)}" target="_blank" rel="noopener">Apri QR</a></div>
-      </div>
-    </div>`;
-    return;
-  }
-  container.innerHTML = '';
+  const shopUrl = 'https://www.satispay.com/app/pay/shops/5683f7f2-a4f8-4e0d-b8f9-f00af32b8ecb';
+  const qrImgSrc = './assets/pagnottella/payment/satispay-qr-pagnottella.png';
+  const qrFallbackUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=0&data=' + encodeURIComponent(shopUrl);
+  container.innerHTML = '<div class="paymentInstruction satispayInstruction" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:14px;margin-top:10px;color:#166534;font-size:13px;line-height:1.5;">' +
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">' +
+      '<span style="background:#e11d48;color:#ffffff;font-weight:700;font-size:11px;padding:2px 8px;border-radius:9999px;text-transform:uppercase;letter-spacing:0.5px;">Satispay Business</span>' +
+      '<span style="font-size:11px;color:#15803d;font-weight:600;">Profilo Aziendale</span>' +
+    '</div>' +
+    '<div style="font-size:15px;font-weight:700;color:#14532d;margin-bottom:2px;">La Pagnottella Gourmet</div>' +
+    '<div style="font-size:12px;color:#166534;margin-bottom:12px;">Intestatario: <strong>3M Società a Responsabilità Limitata</strong></div>' +
+    '<div style="text-align:center;margin:12px 0;">' +
+      '<a href="' + shopUrl + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;box-sizing:border-box;background:#e11d48;color:#ffffff;text-decoration:none;font-weight:700;font-size:14px;padding:12px 16px;border-radius:10px;box-shadow:0 2px 6px rgba(225,29,72,0.3);">' +
+        '<span>📱</span> Paga con Satispay (apri app)' +
+      '</a>' +
+    '</div>' +
+    '<div style="text-align:center;margin:14px auto 8px auto;padding:10px;background:#ffffff;border-radius:8px;border:1px solid #dcfce7;max-width:170px;">' +
+      '<img src="' + qrImgSrc + '" alt="QR Code Satispay Pagnottella" style="width:150px;height:150px;display:block;margin:0 auto;object-fit:contain;" onerror="this.onerror=null;this.src=\'' + qrFallbackUrl + '\';" />' +
+      '<span style="display:block;font-size:10px;color:#6b7280;margin-top:6px;font-weight:500;">Inquadra da PC con l\'app Satispay</span>' +
+    '</div>' +
+    '<div style="background:#fffbeb;border:1px solid #fef3c7;border-radius:8px;padding:8px 10px;margin-top:10px;font-size:11px;color:#92400e;line-height:1.4;">' +
+      '⚠️ <strong>Attenzione:</strong> Non inviare denaro al numero telefonico (+39 392 151 2515). Quel numero serve unicamente per trasmettere il riepilogo dell\'ordine tramite WhatsApp.' +
+    '</div>' +
+  '</div>';
 }
+
+
 
 function hydrateStatic(){
   byId('brand-subtitle').textContent = `Suite DOSepranza · ${DATA.copy.eyebrow} · ordine in pochi tap`;
