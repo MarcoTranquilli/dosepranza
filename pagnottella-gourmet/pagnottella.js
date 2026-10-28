@@ -90,7 +90,8 @@ const paymentNoteCopy = () => 'Satispay è il metodo principale; in alternativa 
 const finalizeOrderLabel = () => 'Rivedi e conferma ordine';
 const reopenOrderLabel = 'Riapri il riepilogo su WhatsApp';
 const orderCutoffCopy = '11:00';
-const cutoffClosedCopy = () => `Ordini Pagnottella chiusi alle ${orderCutoffCopy}. Non effettuare il pagamento.`;
+const cutoffClosedCopy = () => 'Gli ordini inviati a Pagnottella successivi alle 11:00 non hanno garanzia di essere consegnati entro le 13:00';
+const cutoffNoticeCopy = cutoffClosedCopy;
 function pagnottellaOrdersClosed(){
   const time = new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Rome',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date());
   return time >= orderCutoffCopy;
@@ -235,10 +236,7 @@ function renderPaymentOptions(){
 function renderPaymentDetails(){
   const container = byId('paymentDetails');
   if(!container) return;
-  if(pagnottellaOrdersClosed()){
-    container.textContent = cutoffClosedCopy();
-    return;
-  }
+  // Checkout e istruzioni di pagamento restano sempre disponibili
   const method = selectedPaymentMethod();
   if(method === 'Bonifico bancario'){
     container.innerHTML = `<div class="paymentInstruction">
@@ -327,15 +325,27 @@ function updateSendButtonState(){
   const label = byId('sendOrderLabel');
   const hasPreparedOrder = Boolean(state.lastOrderId && state.lastWhatsAppUrl);
   if(button){
-    button.disabled = state.sending || isOrderingClosed() || pagnottellaOrdersClosed();
+    button.disabled = state.sending || isOrderingClosed();
     button.classList.toggle('isBusy', state.sending);
     button.classList.toggle('isWhatsAppOpened', hasPreparedOrder);
     button.setAttribute('aria-label', state.sending ? 'Apertura di WhatsApp in corso' : (hasPreparedOrder ? reopenOrderLabel : finalizeOrderLabel()));
   }
   if(label){
-    label.textContent = pagnottellaOrdersClosed() ? cutoffClosedCopy() : isOrderingClosed()
+    label.textContent = isOrderingClosed()
       ? 'Ordini sospesi durante la chiusura'
       : (state.sending ? 'Apertura di WhatsApp in corso…' : (hasPreparedOrder ? reopenOrderLabel : finalizeOrderLabel()));
+  const noticeEl = byId('whatsappRecipientCopy');
+  if(noticeEl){
+    if(pagnottellaOrdersClosed()){
+      noticeEl.textContent = '⚠️ ' + cutoffNoticeCopy();
+      noticeEl.style.color = '#b45309';
+      noticeEl.style.fontWeight = '600';
+    } else {
+      noticeEl.textContent = 'Conferma ordine e destinatario prima di procedere.';
+      noticeEl.style.color = '';
+      noticeEl.style.fontWeight = '';
+    }
+  }
   }
 }
 
@@ -359,7 +369,7 @@ function bind(){
     updateSendButtonState();
     renderPaymentDetails();
     const accept = byId('paymentConfirmAccept');
-    if(accept && state.confirmationAction === 'submit') accept.disabled = pagnottellaOrdersClosed() || !byId('paymentConfirmConsent')?.checked;
+    if(accept && state.confirmationAction === 'submit') accept.disabled = !byId('paymentConfirmConsent')?.checked;
   };
   setInterval(refreshCutoff, 1000);
   window.addEventListener('focus', refreshCutoff);
@@ -384,7 +394,7 @@ function bind(){
   byId('paymentConfirmCancel')?.addEventListener('click', closePaymentConfirmation);
   byId('paymentConfirmAccept')?.addEventListener('click', confirmPaymentAndSend);
   byId('paymentConfirmConsent')?.addEventListener('change', event => {
-    if(state.confirmationAction === 'submit') byId('paymentConfirmAccept').disabled = pagnottellaOrdersClosed() || !event.target.checked;
+    if(state.confirmationAction === 'submit') byId('paymentConfirmAccept').disabled = !event.target.checked;
   });
   byId('checkoutCompleteClose')?.addEventListener('click', closeCheckoutComplete);
   byId('sendOrderBtn')?.addEventListener('click', sendWA);
@@ -1144,7 +1154,7 @@ function configureConfirmation(action){
   (isSubmit ? consent : accept)?.focus();
 }
 async function sendWA(){
-  if(pagnottellaOrdersClosed()) return toast(cutoffClosedCopy());
+  if(pagnottellaOrdersClosed()) toast(cutoffNoticeCopy());
   const button = byId('sendOrderBtn');
   if(totals().count === 0){
     if(button) button.dataset.checkoutStatus = 'empty';
@@ -1216,7 +1226,7 @@ function closeCheckoutComplete(){
   closeCart();
 }
 async function confirmPaymentAndSend(){
-  if(state.confirmationAction === 'submit' && pagnottellaOrdersClosed()) return toast(cutoffClosedCopy());
+  if(state.confirmationAction === 'submit' && pagnottellaOrdersClosed()) toast(cutoffNoticeCopy());
   if(totals().count === 0 || state.sending) return;
   if(state.confirmationAction === 'submit' && !byId('paymentConfirmConsent')?.checked) return;
   if(state.confirmationAction === 'reopen'){
@@ -1264,7 +1274,6 @@ async function confirmPaymentAndSend(){
   }
 }
 function copyPaymentIban(){
-  if(pagnottellaOrdersClosed()) return toast(cutoffClosedCopy());
   const iban = paymentIban();
   if(!iban) return;
   navigator.clipboard?.writeText(iban).then(() => toast('IBAN copiato')).catch(() => toast(`IBAN: ${iban}`));
