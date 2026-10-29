@@ -38,4 +38,4 @@ test -s "${DIST_DIR}/assets/pagnottella/payment/satispay-qr-pagnottella.png"
 echo "--- Build completata: ${DIST_DIR} ---"
 
 mkdir -p "${DIST_ROOT}/shared"
-cp "${ROOT_DIR}/shared/customer-core.js" "${ROOT_DIR}/shared/customer-panel.js" "${ROOT_DIR}/shared/customer-panel.css" "${DIST_ROOT}/shared/"
+cp -R "${ROOT_DIR}/shared/." "${DIST_ROOT}/shared/"
