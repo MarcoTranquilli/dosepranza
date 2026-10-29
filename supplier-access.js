@@ -402,7 +402,6 @@
     provider.addScope('email');
     provider.addScope('profile');
     provider.setCustomParameters({ prompt: 'select_account' });
-    if (isGitHubPages()) return startGoogleRedirect(auth, authSdk, provider);
     try {
       let result;
       try {
