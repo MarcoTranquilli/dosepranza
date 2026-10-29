@@ -1,7 +1,42 @@
 (async()=>{
  const C=window.DoseCustomerCore;
  const host=document.createElement('section');host.className='dose-personal';host.hidden=true;
- (document.getElementById('personal-lunch-card-container') || document.body).prepend(host);
+ 
+  function mountHost() {
+    if (host.parentElement) return true;
+    const path = location.pathname.toLowerCase();
+    const isRusso = path.includes("/russo/");
+    const isPagnottella = path.includes("pagnottella");
+    if (!isRusso && !isPagnottella) return false;
+
+    if (isRusso) {
+      const slot = document.getElementById("personal-lunch-card-container");
+      if (slot) { slot.appendChild(host); return true; }
+    } else if (isPagnottella) {
+      const catalogTop = document.getElementById("catalogTop");
+      if (catalogTop) {
+        let slot = document.getElementById("personal-lunch-card-container");
+        if (!slot) {
+          slot = document.createElement("div");
+          slot.id = "personal-lunch-card-container";
+          slot.className = "dose-personal-container pagnottella-personal-slot";
+          const head = catalogTop.querySelector(".sectionHead") || document.getElementById("grid");
+          if (head) catalogTop.insertBefore(slot, head);
+          else catalogTop.prepend(slot);
+        }
+        slot.appendChild(host);
+        return true;
+      }
+    }
+    return false;
+  }
+  if (!mountHost()) {
+    const mountTimer = setInterval(() => {
+      if (mountHost()) clearInterval(mountTimer);
+    }, 200);
+    setTimeout(() => clearInterval(mountTimer), 12000);
+  }
+
  const [{getApps},{getAuth,onAuthStateChanged},sdk]=await Promise.all([
  import('https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js'),import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js'),import('https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js')]);
  let epoch=0;
@@ -11,7 +46,7 @@
  function attach(app){const auth=getAuth(app),db=sdk.getFirestore(app);
  onAuthStateChanged(auth,async user=>{
  const generation=++epoch;host.replaceChildren();host.hidden=true;
- if(!user||user.isAnonymous||!user.emailVerified||!user.providerData.some(p=>p.providerId==='google.com')||!user.email?.toLowerCase().endsWith('@dos.design'))return;
+ if(!user||user.isAnonymous||!user.emailVerified||!user.providerData.some(p=>p.providerId==='google.com')||(!user.email?.toLowerCase().endsWith('@dos.design') && !['marcotranquilli@gmail.com', 'marco.tranquilli@gmail.com'].includes(user.email?.toLowerCase().trim())))return;
  const valid=()=>epoch===generation&&auth.currentUser?.uid===user.uid;
  host.hidden=false;const header=node('header');header.className='dose-personal-header';const refresh=button('Aggiorna catalogo',showFavorites);refresh.className='dose-personal-refresh';header.append(node('h2','Il tuo pranzo'),refresh);host.append(header,status);status.textContent='';
  const supplier=location.pathname.includes('/russo/')?'russo':'pagnottella';
