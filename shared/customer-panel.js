@@ -1,7 +1,7 @@
 (async()=>{
  const C=window.DoseCustomerCore;
  const host=document.createElement('section');host.className='dose-personal';host.hidden=true;
- document.body.prepend(host);
+ (document.getElementById('personal-lunch-card-container') || document.body).prepend(host);
  const [{getApps},{getAuth,onAuthStateChanged},sdk]=await Promise.all([
  import('https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js'),import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js'),import('https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js')]);
  let epoch=0;

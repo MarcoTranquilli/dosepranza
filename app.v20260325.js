@@ -580,7 +580,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             document.querySelectorAll('.view').forEach(e => e.classList.remove('active'));
             document.getElementById(`${v}-view`).classList.add('active');
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.id === `btn-${v}`));
-            if(v === 'cart') renderCart();
+            if(v === 'cart' || (v === 'menu' && document.getElementById('order-workspace'))) renderCart();
             if(v === 'history') {
                 if(isAdmin() || isRistoratore()) {
                     renderOrdersPayments();
@@ -2060,6 +2060,8 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
         }
 
         function renderCart() {
+            const dock = document.getElementById('russo-cart-dock-summary');
+            if (dock) dock.textContent = state.cart.length + ' articoli · ' + formatCurrency(state.cart.reduce((sum, item) => sum + item.price, 0));
             if(!document.getElementById('russo-threshold-disclaimer')) {
               const banner=document.createElement('p'); banner.id='russo-threshold-disclaimer';
               banner.textContent="L'ordine parte solo al raggiungimento della soglia minima di 20 euro";
