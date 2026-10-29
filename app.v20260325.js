@@ -294,7 +294,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
         };
 
         const ROLE_EMAILS = {
-            admin: ['marco.tranquilli@dos.design'],
+            admin: ['marco.tranquilli@dos.design', 'marcotranquilli@gmail.com', 'marco.tranquilli@gmail.com'],
             ristoratore: ['lorenzo.russo@alimentarirusso', 'russolorenzo11@gmail.com'],
             facility: ['beatrice.binini@dos.design', 'monica.porta@dos.design']
         };
@@ -3826,7 +3826,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
                 }
 
                 // 2) Fallback: mapped staff emails (recovery mode)
-                if(role === 'user' && state.authzSource !== 'claims' && googleSession) {
+                if ((role === 'user' || state.authzSource === 'unverified') && (googleSession || isLocalE2E)) {
                     if(ROLE_EMAILS.admin.includes(e)) {
                         role = 'admin';
                         state.authzSource = 'email-map-fallback';
