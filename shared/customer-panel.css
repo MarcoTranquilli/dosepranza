@@ -1,1 +1,29 @@
-.dose-personal{max-width:1100px;margin:16px auto;padding:20px;background:#fffaf2;border:1px solid #dcccb7;border-radius:18px;color:#24352e;font-family:inherit}.dose-personal[hidden]{display:none}.dose-personal h2,.dose-personal h3{margin:12px 0;font-family:Georgia,serif}.dose-personal button,.dose-personal select,.dose-personal input{padding:10px;margin:5px;border:1px solid #c4b49c;border-radius:8px;background:white;color:#24352e;max-width:100%}.dose-personal button{cursor:pointer}.dose-personal button:disabled{opacity:.5;cursor:not-allowed}.dose-personal table{width:100%;border-collapse:collapse;table-layout:fixed}.dose-personal td,.dose-personal th{padding:8px;border-bottom:1px solid #ddd;overflow-wrap:anywhere;text-align:left}.dose-favorite-row{display:flex;gap:12px;overflow-x:auto}.dose-favorite-row>div{min-width:190px;padding:12px;background:#f0e8db;border-radius:12px}.dose-favorite-row strong{display:block}@media(max-width:600px){.dose-personal{margin:8px;padding:12px}.dose-personal table{font-size:12px}.dose-personal td,.dose-personal th{padding:5px}}
+.dose-personal{--dp-ink:#203b30;--dp-orange:#ad4c24;--dp-line:#e9e2da;max-width:1100px;margin:20px auto;padding:24px;background:linear-gradient(145deg,#fff 65%,#fcf8f2);border:1px solid var(--dp-line);border-radius:20px;box-shadow:0 8px 28px #203b300a;color:var(--dp-ink);font-family:inherit;box-sizing:border-box}
+.dose-personal [hidden],.dose-personal[hidden]{display:none!important}
+.dose-personal *, .dose-personal *::before,.dose-personal *::after{box-sizing:border-box}
+.dose-personal-header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}
+.dose-personal h2{margin:0;font-family:Georgia,serif;font-size:1.6rem;line-height:1.2}
+.dose-personal h3{margin:20px 0 12px;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:#655b51}
+.dose-personal button,.dose-personal select,.dose-personal input{font:inherit;color:var(--dp-ink);border:1px solid #cfc5ba;border-radius:12px;background:#fff;min-height:44px;padding:10px 14px;max-width:100%;margin:0}
+.dose-personal button{cursor:pointer;font-size:.9rem;font-weight:600;white-space:normal;line-height:1.35}
+.dose-personal button:hover:not(:disabled){background:#f6f2eb;border-color:var(--dp-ink)}
+.dose-personal button:disabled{opacity:.5;cursor:not-allowed}
+.dose-personal :is(button,select,input):focus-visible{outline:3px solid var(--dp-orange);outline-offset:3px}
+.dose-personal .dose-personal-refresh{border:0;background:transparent;color:#655b51;font-size:.82rem;font-weight:500}
+.dose-personal-selector{display:flex;align-items:stretch;gap:10px;padding-bottom:20px;border-bottom:1px solid var(--dp-line)}
+.dose-personal select{flex:1;min-width:0;background-color:#faf8f5;padding-right:32px}
+.dose-personal .dose-favorite-save{color:var(--dp-orange);background:#fff3eb;border-color:#e9c6ae}
+.dose-favorite-row{display:flex;flex-wrap:wrap;gap:10px;padding-bottom:20px}
+.dose-favorite-chip{display:flex;align-items:center;gap:8px;max-width:100%;padding:4px 6px 4px 14px;background:#fbf7f2;border:1px solid #e8d9c8;border-radius:24px}
+.dose-favorite-chip strong{font-size:.9rem;font-weight:500;overflow-wrap:anywhere;min-width:0}
+.dose-personal .dose-favorite-chip button{border:0;background:transparent;color:var(--dp-orange);padding:8px;flex-shrink:0}
+.dose-personal .dose-favorite-chip .dose-favorite-remove{min-width:44px;color:#685c51;font-size:1.3rem}
+.dose-personal .dose-favorite-remove:hover:not(:disabled){color:#a52b25;background:#fbe8e3}
+.dose-favorites-empty{margin:0;color:#655b51;font-size:.9rem;line-height:1.5}
+.dose-personal-shortcuts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding-top:18px;border-top:1px solid var(--dp-line)}
+.dose-personal-shortcuts>button:only-child{grid-column:1/-1}
+.dose-personal [role=status]:empty{display:none}
+.dose-personal [role=status]{font-size:.9rem;line-height:1.5}
+.dose-personal table{width:100%;border-collapse:collapse;table-layout:fixed}
+.dose-personal td,.dose-personal th{padding:8px;border-bottom:1px solid var(--dp-line);overflow-wrap:anywhere;text-align:left}
+@media(max-width:600px){.dose-personal{margin:12px 8px;padding:18px}.dose-personal-header{align-items:flex-start;gap:8px}.dose-personal h2{font-size:1.35rem}.dose-personal-selector{flex-direction:column}.dose-personal select{width:100%;flex:auto}.dose-personal table{font-size:12px}.dose-personal td,.dose-personal th{padding:5px}.dose-personal-shortcuts{grid-template-columns:1fr}}
