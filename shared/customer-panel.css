@@ -1,50 +1,121 @@
-.dose-personal{--dp-ink:#203b30;--dp-orange:#ad4c24;--dp-line:#e9e2da;max-width:1100px;margin:20px auto;padding:24px;background:linear-gradient(145deg,#fff 65%,#fcf8f2);border:1px solid var(--dp-line);border-radius:20px;box-shadow:0 8px 28px #203b300a;color:var(--dp-ink);font-family:inherit;box-sizing:border-box}
-.dose-personal [hidden],.dose-personal[hidden]{display:none!important}
-.dose-personal *, .dose-personal *::before,.dose-personal *::after{box-sizing:border-box}
-.dose-personal-header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}
-.dose-personal h2{margin:0;font-family:Georgia,serif;font-size:1.6rem;line-height:1.2}
-.dose-personal h3{margin:20px 0 12px;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:#655b51}
-.dose-personal button,.dose-personal select,.dose-personal input{font:inherit;color:var(--dp-ink);border:1px solid #cfc5ba;border-radius:12px;background:#fff;min-height:44px;padding:10px 14px;max-width:100%;margin:0}
-.dose-personal button{cursor:pointer;font-size:.9rem;font-weight:600;white-space:normal;line-height:1.35}
-.dose-personal button:hover:not(:disabled){background:#f6f2eb;border-color:var(--dp-ink)}
-.dose-personal button:disabled{opacity:.5;cursor:not-allowed}
-.dose-personal :is(button,select,input):focus-visible{outline:3px solid var(--dp-orange);outline-offset:3px}
-.dose-personal .dose-personal-refresh{border:0;background:transparent;color:#655b51;font-size:.82rem;font-weight:500}
-.dose-personal-selector{display:flex;align-items:stretch;gap:10px;padding-bottom:20px;border-bottom:1px solid var(--dp-line)}
-.dose-personal select{flex:1;min-width:0;background-color:#faf8f5;padding-right:32px}
-.dose-personal .dose-favorite-save{color:var(--dp-orange);background:#fff3eb;border-color:#e9c6ae}
-.dose-favorite-row{display:flex;flex-wrap:wrap;gap:10px;padding-bottom:20px}
-.dose-favorite-chip{display:flex;align-items:center;gap:8px;max-width:100%;padding:4px 6px 4px 14px;background:#fbf7f2;border:1px solid #e8d9c8;border-radius:24px}
-.dose-favorite-chip strong{font-size:.9rem;font-weight:500;overflow-wrap:anywhere;min-width:0}
-.dose-personal .dose-favorite-chip button{border:0;background:transparent;color:var(--dp-orange);padding:8px;flex-shrink:0}
-.dose-personal .dose-favorite-chip .dose-favorite-remove{min-width:44px;color:#685c51;font-size:1.3rem}
-.dose-personal .dose-favorite-remove:hover:not(:disabled){color:#a52b25;background:#fbe8e3}
-.dose-favorites-empty{margin:0;color:#655b51;font-size:.9rem;line-height:1.5}
-.dose-personal-shortcuts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding-top:18px;border-top:1px solid var(--dp-line)}
-.dose-personal-shortcuts>button:only-child{grid-column:1/-1}
-.dose-personal [role=status]:empty{display:none}
-.dose-personal [role=status]{font-size:.9rem;line-height:1.5}
-.dose-personal table{width:100%;border-collapse:collapse;table-layout:fixed}
-.dose-personal td,.dose-personal th{padding:8px;border-bottom:1px solid var(--dp-line);overflow-wrap:anywhere;text-align:left}
-@media(max-width:600px){.dose-personal{margin:12px 8px;padding:18px}.dose-personal-header{align-items:flex-start;gap:8px}.dose-personal h2{font-size:1.35rem}.dose-personal-selector{flex-direction:column}.dose-personal select{width:100%;flex:auto}.dose-personal table{font-size:12px}.dose-personal td,.dose-personal th{padding:5px}.dose-personal-shortcuts{grid-template-columns:1fr}}
-/* Russo only: keep navigation, checkout and administrative views intact. */
-#order-workspace{display:none;min-width:0}
-#order-workspace.is-ordering{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:24px;align-items:start}
-#order-workspace.is-ordering>.view{display:block;min-width:0;animation:none}
-#order-workspace .cart-column{position:sticky;top:20px;max-height:calc(100dvh - 40px);overflow-y:auto;border:1px solid #e9e2da;border-radius:18px;background:#fff;padding:16px}
-#order-workspace #menu-container{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-#order-workspace .dose-personal{margin:0 0 20px}
-#order-workspace .cart-mobile-toggle{display:none}
-#order-workspace [hidden]{display:none!important}
-#order-workspace #cart-content-wrapper{padding:12px;box-shadow:none}
-#order-workspace button{min-height:44px}
-#order-workspace #cart-items-list button{min-width:44px}
-.russo-workspace-shell{max-width:1200px!important}
-@media(max-width:899px){
- #order-workspace.is-ordering{grid-template-columns:minmax(0,1fr);padding-bottom:calc(100px + env(safe-area-inset-bottom))}
- #order-workspace .cart-column{position:fixed;inset:auto 0 0;z-index:50;max-height:85dvh;overflow-y:auto;border-radius:18px 18px 0 0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));box-shadow:0 -6px 24px #203b3020}
- #order-workspace .cart-mobile-toggle{display:flex;width:100%;justify-content:space-between;align-items:center;gap:12px;min-height:48px;border:1px solid #cfc5ba;border-radius:12px;background:#faf8f5;padding:10px 14px;color:#203b30;font:inherit}
- #order-workspace .cart-mobile-toggle:focus-visible{outline:3px solid #ad4c24;outline-offset:2px}
- #order-workspace #russo-cart-details{padding-top:16px}
+/* DOSepranza Customer Panel & Workspace Design System */
+
+.order-workspace {
+  width: 100%;
 }
-@media(max-width:540px){#order-workspace #menu-container{grid-template-columns:minmax(0,1fr)}}
+
+.russo-cart-scrim {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  .russo-cart-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 28, 22, 0.45);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 40;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .russo-cart-scrim.is-active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .russo-cart-handle {
+    width: 44px;
+    height: 4px;
+    background: #cfc5ba;
+    border-radius: 9999px;
+    margin: 2px auto 10px;
+    transition: background 0.2s ease;
+  }
+  .cart-column.is-expanded .russo-cart-handle {
+    background: #ad4c24;
+  }
+
+  #order-workspace .cart-column {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 50;
+    max-height: 88dvh;
+    overflow-y: auto;
+    border-radius: 24px 24px 0 0;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: saturate(180%) blur(16px);
+    -webkit-backdrop-filter: saturate(180%) blur(16px);
+    border-top: 1px solid rgba(233, 226, 218, 0.95);
+    padding: 10px 18px calc(14px + env(safe-area-inset-bottom));
+    box-shadow: 0 -8px 32px rgba(15, 28, 22, 0.14);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  #order-workspace .cart-mobile-toggle {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    min-height: 48px;
+    border: 1px solid #d5cbc0;
+    border-radius: 16px;
+    background: #faf8f5;
+    padding: 10px 16px;
+    color: #183026;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  #order-workspace .cart-mobile-toggle:hover {
+    background: #f4efe9;
+    border-color: #baa999;
+  }
+  #order-workspace .cart-mobile-toggle:focus-visible {
+    outline: 3px solid #ad4c24;
+    outline-offset: 2px;
+  }
+
+  #order-workspace #russo-cart-dock-summary {
+    font-variant-numeric: tabular-nums;
+    color: #ad4c24;
+    font-weight: 800;
+  }
+}
+
+@media (min-width: 900px) {
+  .russo-cart-handle {
+    display: none;
+  }
+  .order-workspace.is-ordering {
+    display: grid;
+    grid-template-columns: minmax(0, 1.65fr) minmax(340px, 1fr);
+    gap: 28px;
+    align-items: start;
+  }
+  #order-workspace .cart-mobile-toggle {
+    display: none;
+  }
+  #order-workspace .cart-column {
+    display: block !important;
+    position: sticky;
+    top: 24px;
+    max-height: calc(100dvh - 48px);
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: #cfc5ba transparent;
+    border: 1px solid #e5ded6;
+    border-radius: 24px;
+    background: #ffffff;
+    padding: 22px;
+    box-shadow: 0 10px 30px -5px rgba(32, 59, 48, 0.07);
+  }
+  #order-workspace #russo-cart-dock-summary {
+    font-variant-numeric: tabular-nums;
+  }
+}

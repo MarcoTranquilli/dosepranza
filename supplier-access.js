@@ -8,7 +8,7 @@
     appId: '1:553169964686:web:7f8ca6f32a301949e4c3df'
   };
 
-  const ADMIN_EMAIL = 'marco.tranquilli@dos.design';
+  const ADMIN_EMAILS = Object.freeze(['marco.tranquilli@dos.design', 'marcotranquilli@gmail.com', 'marco.tranquilli@gmail.com']);
   const PAGNOTTELLA_SUPPLIER_EMAILS = Object.freeze([
     'commerciale@lapagnottellagourmet.it',
     'isidorovagnozzi@gmail.com'
@@ -40,7 +40,7 @@
   const normalizeEmail = (value) => String(value || '').trim().toLowerCase();
   const roleForEmail = (value) => {
     const email = normalizeEmail(value);
-    if (email === ADMIN_EMAIL) return 'admin';
+    if (ADMIN_EMAILS.includes(email)) return 'admin';
     if (PAGNOTTELLA_SUPPLIER_EMAILS.includes(email)) return 'supplier';
     if (RUSSO_SUPPLIER_EMAILS.includes(email)) return 'supplier';
     if (email.endsWith('@dos.design')) return 'dos_user';
