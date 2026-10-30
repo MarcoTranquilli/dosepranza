@@ -64,3 +64,17 @@ test('CSV uses same selected perimeter, quantities, BOM and formula protection',
   assert.ok(csv.startsWith('\uFEFF')); assert.match(csv,/'=HYPERLINK/); assert.match(csv,/2x Panino/);
   assert.equal(csv.split('\r\n').length,2); assert.doesNotMatch(csv,/Alimentari Russo/);
 });
+
+test('quality excludes cancellations and test flags but retains failed payments',()=>{
+ for(const field of ['status','orderStatus'])for(const value of ['cancelled','canceled','annullato','void','draft','bozza'])assert.equal(selected([order({[field]:value})]).exclusions.excludedStatus,1);
+ for(const value of ['cancelled','refunded','stornato'])assert.equal(selected([order({paymentStatus:value})]).exclusions.excludedPaymentStatus,1);
+ for(const flags of [{isTest:true},{test:true},{e2e:true},{environment:'test'},{orderType:'test'}])assert.equal(selected([order(flags)]).exclusions.testOrder,1);
+ const r=selected([order({orderStatus:'CONFIRMED',paymentStatus:'failed'})]);assert.equal(r.rows.length,1);assert.equal(a.aggregate(r.rows).cents,1000);
+});
+test('CSV source is optional and controlled by snapshot, not document fields',()=>{
+ const rows=[order({source:'server',fromCache:false,user:' =SUM(1,2)'})];
+ assert.ok(!a.csv(rows).includes('fonte_dati'));
+ const cached=a.csv(rows,{fromCache:true});assert.ok(cached.startsWith('\uFEFF'));assert.match(cached,/fonte_dati/);assert.match(cached,/cache_locale/);assert.match(cached,/' =SUM/);
+ assert.match(a.csv(rows,{fromCache:false}),/"server"/);
+ assert.match(a.csv(rows,{includeSource:true}),/non_verificata/);
+});
