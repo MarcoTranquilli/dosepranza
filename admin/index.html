@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>DOSepranza · Cruscotto Ordini</title>
+  <link rel="icon" href="../favicondosepranza.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./admin.css?v=admin-suite-2">
+</head>
+<body class="admin-shell">
+  <div id="auth-guard" class="auth-guard">
+    <div class="auth-guard-card">
+      <img src="../assets/branding/dosepranza-suite-logo.png" alt="DOSepranza" class="guard-logo">
+      <h1>Area Riservata Coordinamento</h1>
+      <p>Questa sezione è accessibile a Marco, Luca e Marta per la verifica e il controllo degli ordini aziendali.</p>
+      <div id="auth-actions">
+        <button id="btn-admin-login" type="button" class="btn-primary">Accedi con account Google DOS</button>
+        <p id="auth-guard-status" class="auth-status" role="status">Verifica account richiesta.</p>
+      </div>
+      <a href="../" class="btn-link">← Torna alla home</a>
+    </div>
+  </div>
+
+  <div id="admin-app" class="admin-app" hidden>
+    <header class="admin-topbar">
+      <div class="topbar-brand">
+        <a href="../" class="back-link" title="Torna all hub">← Fornitori</a>
+        <div>
+          <span class="eyebrow">DOSepranza Suite</span>
+          <h1>Controllo & Riepilogo Ordini</h1>
+        </div>
+      </div>
+      <div class="topbar-user">
+        <span id="current-admin-email" class="admin-badge">Coordinatore</span>
+        <button id="btn-admin-logout" type="button" class="btn-ghost">Esci</button>
+      </div>
+    </header>
+
+    <main class="admin-main">
+      <section class="admin-controls" aria-label="Filtri dashboard">
+        <div class="filter-group">
+          <label class="control-label">Fornitore:</label>
+          <div class="segmented-control" id="supplier-tabs" role="group">
+            <button type="button" aria-pressed="false" class="segment active" data-supplier="all">Tutti (Totale)</button>
+            <button type="button" aria-pressed="false" class="segment" data-supplier="russo">Alimentari Russo</button>
+            <button type="button" aria-pressed="false" class="segment" data-supplier="pagnottella">La Pagnottella</button>
+          </div>
+        </div>
+
+        <div class="filter-group date-filters">
+          <label class="control-label" for="date-select">Data (Roma):</label>
+          <input type="date" id="date-select" class="date-input">
+          <button type="button" id="btn-date-today" class="btn-chip">Oggi</button>
+          <button type="button" id="btn-date-yesterday" class="btn-chip">Ieri</button>
+        </div>
+
+        <div class="filter-actions">
+          <button type="button" id="btn-refresh" class="btn-secondary">Aggiorna</button>
+          <button type="button" id="btn-export-csv" class="btn-secondary">Export CSV</button>
+          <button type="button" id="btn-copy-summary" class="btn-primary">Copia riepilogo</button>
+        </div>
+      </section>
+
+      <section class="kpi-grid" aria-label="Indicatori chiave">
+        <article class="kpi-card">
+          <span class="kpi-title">Valore Ordinato</span>
+          <strong id="kpi-revenue" class="kpi-value">€0,00</strong>
+          <span id="kpi-revenue-sub" class="kpi-sub">0 ordini validi</span>
+        </article>
+        <article class="kpi-card">
+          <span class="kpi-title">Ordini Registrati</span>
+          <strong id="kpi-orders-count" class="kpi-value">0</strong>
+          <span id="kpi-users-count" class="kpi-sub">0 colleghi</span>
+        </article>
+        <article class="kpi-card">
+          <span class="kpi-title">Ticket Medio</span>
+          <strong id="kpi-avg-ticket" class="kpi-value">€0,00</strong>
+          <span class="kpi-sub">Per ordine</span>
+        </article>
+        <article class="kpi-card">
+          <span class="kpi-title">Orari Servizio</span>
+          <strong class="kpi-value" style="font-size:1.15rem;margin-top:14px;">Russo cutoff 10:30</strong>
+          <span class="kpi-sub">Pagnottella sempre ordinabile (avviso &gt;11:00)</span>
+        </article>
+      </section>
+
+      <section class="supplier-split-section">
+        <h2>Riepilogo Fornitori</h2>
+        <div class="supplier-cards-grid">
+          <div class="supplier-summary-card">
+            <div class="supp-head">
+              <h3>Alimentari Russo</h3>
+              <span class="cutoff-tag">Cutoff ore 10:30</span>
+            </div>
+            <div class="supp-body">
+              <div><span>Totale:</span> <strong id="russo-tot">€0,00</strong></div>
+              <div><span>Ordini:</span> <strong id="russo-count">0</strong></div>
+              <div><span>Pezzi ordinati:</span> <strong id="russo-items">0</strong></div>
+            </div>
+          </div>
+          <div class="supplier-summary-card">
+            <div class="supp-head">
+              <h3>La Pagnottella Gourmet</h3>
+              <span class="cutoff-tag">Sempre ordinabile · Avviso &gt;11:00</span>
+            </div>
+            <div class="supp-body">
+              <div><span>Totale:</span> <strong id="pagnottella-tot">€0,00</strong></div>
+              <div><span>Ordini:</span> <strong id="pagnottella-count">0</strong></div>
+              <div><span>Panini & Insalate:</span> <strong id="pagnottella-items">0</strong></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="orders-table-section"><h2>Lista di ritiro</h2><ul id="packing-list"></ul></section>
+      <p id="data-status" role="status"></p>
+      <section class="orders-table-section">
+        <div class="section-title-row">
+          <h2>Dettaglio Ordini Colleghi</h2>
+          <span id="orders-found-count" class="badge-total">0 ordini</span>
+        </div>
+        <div class="table-container">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Ora</th>
+                <th>Collega</th>
+                <th>Fornitore</th>
+                <th>Piatti e Dettagli</th>
+                <th class="num-col">Importo</th>
+                <th>Stato</th>
+              </tr>
+            </thead>
+            <tbody id="orders-tbody">
+              <tr><td colspan="6" class="empty-cell">Caricamento ordini in corso...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast" class="admin-toast" role="status" aria-live="polite"></div>
+
+  <script src="../supplier-access.js?v=admin-2"></script>
+  <script src="../pagnottella-gourmet/order-analytics.js?v=admin-11"></script>
+  <script src="../shared/customer-core.js?v=admin-11"></script>
+  <script type="module" src="./admin.js?v=admin-suite-2"></script>
+</body>
+</html>

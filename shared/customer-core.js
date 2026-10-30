@@ -5,7 +5,7 @@
  function day(d=new Date()){const p=parts(d);return `${p.year}-${p.month}-${p.day}`;}
  function midnight(s){const target=Date.parse(s+'T00:00:00Z');if(!/^\d{4}-\d{2}-\d{2}$/.test(s)||!Number.isFinite(target)||new Date(target).toISOString().slice(0,10)!==s)throw Error('Data non valida');let t=target;for(let i=0;i<5;i++){const p=parts(new Date(t)),r=Date.UTC(+p.year,+p.month-1,+p.day,+p.hour,+p.minute,+p.second);if(r===target)return new Date(t);t+=target-r;}throw Error('Data non valida');}
  function range(s){const next=new Date(Date.parse(s+'T12:00:00Z')+86400000).toISOString().slice(0,10);return {start:midnight(s),end:midnight(next)};}
- function open(supplier,now=new Date()){const p=parts(now);return `${p.hour}:${p.minute}`<(supplier==='russo'?'10:30':'11:00');}
+ function open(supplier,now=new Date()){if(supplier==='pagnottella')return true;if(supplier!=='russo')return false;const p=parts(now);return `${p.hour}:${p.minute}`<'10:30';}
  function manager(email){return managers.includes(String(email||'').toLowerCase());}
  function reconcile(items,catalog){
   if(!Array.isArray(items)||!items.length)throw Error('Ordine senza prodotti');

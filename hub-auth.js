@@ -7,11 +7,12 @@ let redirecting = false;
 
 function getNextTarget() {
   const target = new URLSearchParams(window.location.search).get('next') || '';
-  return ['russo', 'pagnottella'].includes(target) ? target : '';
+  return ['russo', 'pagnottella', 'admin'].includes(target) ? target : '';
 }
 
 function resolveTargetHref(target) {
   if (target === 'pagnottella') return './pagnottella/?store=pagnottella';
+  if (target === 'admin') return './admin/';
   return './russo/';
 }
 
@@ -87,8 +88,14 @@ async function activateSession(session, honorNext = true) {
     return;
   }
 
-  if (!session.isAdmin) {
-    redirectTo('russo');
+  const isCoordinator = session.role === "coordinator";
+  if (!session.isAdmin && !isCoordinator) {
+    redirectTo("russo");
+    return;
+  }
+  if (isCoordinator) {
+    const next = getNextTarget();
+    redirectTo(next || "admin");
     return;
   }
 

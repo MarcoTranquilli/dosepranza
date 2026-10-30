@@ -96,7 +96,7 @@
       group.count++; group.cents += cents; if (state === 'reconciled') group.reconciledCents += cents;
       if (id !== 'unclassified') {
         const p = parts(order.createdAt), seconds = Number(p.hour) * 3600 + Number(p.minute) * 60 + Number(p.second);
-        const compliant = id === 'russo' ? seconds < 10.5 * 3600 : seconds <= 12 * 3600;
+        const compliant = id === 'russo' ? seconds < 10.5 * 3600 : seconds < 11 * 3600;
         group.cutoffEligible++; result.cutoffEligible++;
         if (compliant) { group.cutoffCount++; result.cutoffCount++; }
       }
