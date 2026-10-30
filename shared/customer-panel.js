@@ -68,7 +68,7 @@
  if(!valid())return;add?favorites.add(id):favorites.delete(id);await showFavorites();}
  try{const snap=await sdk.getDoc(sdk.doc(db,'users',user.uid));if(!valid())return;for(const id of snap.data()?.favorites?.[supplier]||[])if(typeof id==='string')favorites.add(id);await showFavorites();}catch{if(valid())status.textContent='Preferiti non disponibili: verificare le regole del profilo.';}
  if(!valid())return;
- const shortcuts=node('nav');shortcuts.className='dose-personal-shortcuts';shortcuts.setAttribute('aria-label','Scorciatoie personali');const history=node('div');host.append(shortcuts,history);shortcuts.append(button('Ultimo ordine',async()=>{
+ host.querySelectorAll('.dose-personal-shortcuts').forEach(e=>e.remove());const shortcuts=node('nav');shortcuts.className='dose-personal-shortcuts';shortcuts.setAttribute('aria-label','Scorciatoie personali');host.querySelectorAll('.dose-personal-history').forEach(e=>e.remove());const history=node('div');history.className='dose-personal-history';host.append(shortcuts,history);shortcuts.append(button('Ultimo ordine',async()=>{
  history.replaceChildren();
  // Owner filter is enforced server-side. No reading of colleagues for personalization.
  const q=sdk.query(sdk.collection(db,'orders'),sdk.where('uid','==',user.uid),sdk.where('supplierId','==',supplier),sdk.where('confirmationStatus','==','CONFIRMED'),sdk.orderBy('createdAt','desc'),sdk.limit(1));
@@ -80,7 +80,7 @@
  repeat.disabled=!C.open(supplier);history.append(repeat,node('p','Prezzi e disponibilità vengono verificati al click. Nessun invio o pagamento automatico.'));
  }));
  if(!C.manager(user.email))return;
- const panel=node('div'),date=node('input');date.type='date';date.value=C.day();date.setAttribute('aria-label','Data degli ordini ufficio');
+ host.querySelectorAll('.dose-personal-admin').forEach(e=>e.remove());const panel=node('div');panel.className='dose-personal-admin';const date=node('input');date.type='date';date.value=C.day();date.setAttribute('aria-label','Data degli ordini ufficio');
  const result=node('div');let request=0;
  async function load(){const ticket=++request;result.replaceChildren(node('p','Caricamento...'));const {start,end}=C.range(date.value);let cursor;const rows=[];
  for(;;){let q=sdk.query(sdk.collection(db,'orders'),sdk.where('createdAt','>=',start),sdk.where('createdAt','<',end),sdk.orderBy('createdAt'),sdk.limit(250));if(cursor)q=sdk.query(q,sdk.startAfter(cursor));const snap=await sdk.getDocs(q);if(!valid()||ticket!==request)return;rows.push(...snap.docs.map(d=>d.data()));if(rows.length>5000)throw Error('Troppi ordini');if(snap.size<250)break;cursor=snap.docs.at(-1);}

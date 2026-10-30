@@ -39,6 +39,7 @@ echo "--- Build completata: ${DIST_DIR} ---"
 
 mkdir -p "${DIST_ROOT}/shared"
 cp -R "${ROOT_DIR}/shared/." "${DIST_ROOT}/shared/"
+cp "${ROOT_DIR}/shared/customer-panel.css" "${DIST_ROOT}/shared/" 2>/dev/null || true
 
 mkdir -p "${DIST_ROOT}/admin"
 cp -R "${ROOT_DIR}/admin/." "${DIST_ROOT}/admin/"
