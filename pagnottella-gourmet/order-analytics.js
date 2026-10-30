@@ -49,10 +49,12 @@
     return order.paymentStatus === 'declared_paid' ? 'declared' : 'unverified';
   }
   function invalidReason(order, now) {
+    if (order.isTest === true || order.test === true || order.e2e === true || order.environment === 'test' || order.orderType === 'test') return 'testOrder';
     const date = toDate(order.createdAt);
     if (!date) return 'missingDate';
     if (date.getTime() > now.getTime() + 1000) return 'futureDate';
-    if (/^(cancelled|canceled|annullato|draft|bozza|void)$/i.test(order.status || '') || (order.orderType && order.orderType !== 'order')) return 'excludedStatus';
+    if ([order.status, order.orderStatus].some(value => /^(cancelled|canceled|annullato|draft|bozza|void)$/i.test(String(value || '').trim())) || (order.orderType && order.orderType !== 'order')) return 'excludedStatus';
+    if (/^(cancelled|canceled|annullato|refunded|rimborsato|stornato|void)$/i.test(String(order.paymentStatus || '').trim())) return 'excludedPaymentStatus';
     if (typeof order.total !== 'number' || !Number.isFinite(order.total) || order.total <= 0 || !Number.isSafeInteger(Math.round(order.total * 100))) return 'invalidTotal';
     if (!Array.isArray(order.items) || !order.items.length || order.items.some(item => !item || !String(item.name || '').trim() || !Number.isSafeInteger(quantity(item)) || quantity(item) <= 0)) return 'invalidItems';
     return '';
@@ -116,10 +118,14 @@
       days: [...days].sort(([a], [b]) => a.localeCompare(b)),
       suppliers: [...suppliers.values()].sort((a, b) => b.cents - a.cents || a.id.localeCompare(b.id)) };
   }
-  function csv(rows) {
+  function csv(rows, options = {}) {
     const safe = value => { const text = String(value ?? ''); return `"${(/^[\s]*[=+@-]/.test(text) ? "'" + text : text).replace(/"/g, '""')}"`; };
     const data = [['id', 'data_ora_utc', 'giorno_roma', 'fornitore', 'cliente', 'email', 'prodotti_quantita', 'metodo_pagamento', 'stato_pagamento', 'ordinato_eur']];
     for (const order of rows) data.push([order.id, toDate(order.createdAt).toISOString(), day(order.createdAt), SUPPLIERS[supplier(order)], order.user, order.email, order.items.map(item => `${quantity(item)}x ${item.name}`).join(' | '), order.paymentMethod, payment(order), (Math.round(order.total * 100) / 100).toFixed(2)]);
+    if (options.includeSource || options.fromCache !== undefined) {
+      data[0].push('fonte_dati');
+      for (const row of data.slice(1)) row.push(options.fromCache === true ? 'cache_locale' : options.fromCache === false ? 'server' : 'non_verificata');
+    }
     return '\uFEFF' + data.map(row => row.map(safe).join(',')).join('\r\n');
   }
   function russoThreshold(orders, {now = new Date()} = {}) {
