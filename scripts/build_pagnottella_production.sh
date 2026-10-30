@@ -39,3 +39,10 @@ echo "--- Build completata: ${DIST_DIR} ---"
 
 mkdir -p "${DIST_ROOT}/shared"
 cp -R "${ROOT_DIR}/shared/." "${DIST_ROOT}/shared/"
+
+mkdir -p "${DIST_ROOT}/admin"
+cp -R "${ROOT_DIR}/admin/." "${DIST_ROOT}/admin/"
+cp "${ROOT_DIR}/supplier-access.js" "${DIST_ROOT}/supplier-access.js"
+mkdir -p "${DIST_ROOT}/assets/branding"
+cp "${ROOT_DIR}/assets/branding/dosepranza-suite-logo.png" "${DIST_ROOT}/assets/branding/"
+cp "${ROOT_DIR}/favicondosepranza.png" "${DIST_ROOT}/"

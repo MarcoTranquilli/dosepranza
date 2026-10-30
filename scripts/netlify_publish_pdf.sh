@@ -35,3 +35,5 @@ cp -R reports "$DIST_DIR/" 2>/dev/null || echo "No reports folder"
 cp -R feedback "$DIST_DIR/" 2>/dev/null || echo "No feedback folder"
 
 echo "--- Build completata con successo nella cartella /$DIST_DIR ---"
+
+cp -R admin "$DIST_DIR/"

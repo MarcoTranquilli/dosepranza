@@ -294,7 +294,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
         };
 
         const ROLE_EMAILS = {
-            admin: ['marco.tranquilli@dos.design', 'marcotranquilli@gmail.com', 'marco.tranquilli@gmail.com'],
+            admin: ['marco.tranquilli@dos.design'],
             ristoratore: ['lorenzo.russo@alimentarirusso', 'russolorenzo11@gmail.com'],
             facility: ['beatrice.binini@dos.design', 'monica.porta@dos.design']
         };

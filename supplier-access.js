@@ -8,7 +8,9 @@
     appId: '1:553169964686:web:7f8ca6f32a301949e4c3df'
   };
 
-  const ADMIN_EMAILS = Object.freeze(['marco.tranquilli@dos.design', 'marcotranquilli@gmail.com', 'marco.tranquilli@gmail.com']);
+  const ADMIN_EMAILS = Object.freeze(['marco.tranquilli@dos.design']);
+  const ADMIN_EMAIL = ADMIN_EMAILS[0];
+  const COORDINATOR_EMAILS = Object.freeze(['luca.pacella@dos.design', 'marta.diamantini@dos.design']);
   const PAGNOTTELLA_SUPPLIER_EMAILS = Object.freeze([
     'commerciale@lapagnottellagourmet.it',
     'isidorovagnozzi@gmail.com'
@@ -41,6 +43,7 @@
   const roleForEmail = (value) => {
     const email = normalizeEmail(value);
     if (ADMIN_EMAILS.includes(email)) return 'admin';
+    if (COORDINATOR_EMAILS.includes(email)) return 'coordinator';
     if (PAGNOTTELLA_SUPPLIER_EMAILS.includes(email)) return 'supplier';
     if (RUSSO_SUPPLIER_EMAILS.includes(email)) return 'supplier';
     if (email.endsWith('@dos.design')) return 'dos_user';
@@ -49,13 +52,14 @@
   const supplierIdsForIdentity = (emailValue, role) => {
     const email = normalizeEmail(emailValue);
     const resolvedRole = roleForEmail(email);
-    if (resolvedRole === 'admin' || resolvedRole === 'dos_user') return ['russo', 'pagnottella'];
+    if (resolvedRole === 'admin' || resolvedRole === 'coordinator' || resolvedRole === 'dos_user') return ['russo', 'pagnottella'];
     if (PAGNOTTELLA_SUPPLIER_EMAILS.includes(email)) return ['pagnottella'];
     if (RUSSO_SUPPLIER_EMAILS.includes(email)) return ['russo'];
     return [];
   };
   const roleLabel = (role) => ({
     admin: 'Amministratore',
+    coordinator: 'Coordinatore (sola lettura)',
     dos_user: 'Utente DOS',
     supplier: 'Ristoratore / Fornitore',
     user: 'Non autorizzato'
@@ -628,6 +632,8 @@
     getSupplierSettings,
     setSupplierEnabled,
     canAccessSupplier,
+    FIREBASE_CONFIG,
+    ensureFirebase: loadFirebaseCore,
     createPagnottellaOrder
   });
 })();

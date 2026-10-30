@@ -45,7 +45,7 @@ test('quality excludes malformed, future, cancelled and duplicate documents with
 });
 
 test('per-supplier cutoffs use Rome exact seconds; legacy has no implied cutoff', () => {
-  const rows = [order({supplierId:'russo',createdAt:'2026-10-09T08:29:59Z'}),order({id:'2',supplierId:'russo',createdAt:'2026-10-09T08:30:00Z'}),order({id:'3',createdAt:'2026-10-09T10:00:00Z'}),order({id:'4',createdAt:'2026-10-09T10:00:01Z'}),order({id:'5',supplierId:undefined})];
+  const rows = [order({supplierId:'russo',createdAt:'2026-10-09T08:29:59Z'}),order({id:'2',supplierId:'russo',createdAt:'2026-10-09T08:30:00Z'}),order({id:'3',createdAt:'2026-10-09T08:59:59Z'}),order({id:'4',createdAt:'2026-10-09T09:00:00Z'}),order({id:'5',supplierId:undefined})];
   const r = a.aggregate(selected(rows).rows);
   assert.equal(r.cutoffCount,2); assert.equal(r.cutoffEligible,4); assert.equal(r.cutoffRate,.5); assert.equal(r.unclassified,1);
   for (const group of r.suppliers.filter(g=>g.id!=='unclassified')) assert.equal(group.cutoffCount/group.cutoffEligible,.5);
