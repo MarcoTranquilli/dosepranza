@@ -36,8 +36,9 @@
           <p id="authGateCopy">L’account determina automaticamente nome, email e autorizzazioni.</p>
           <p id="authGateStatus" class="authGateStatus" role="status" aria-live="polite">Nessun utente riconosciuto</p>
           <div class="authGateActions">
-            <button id="authGateGoogle" class="primary gold" type="button" onclick="signInWithGoogleGate()">Accedi con Google</button>
+            <button id="authGateGoogle" class="primary gold" type="button" data-action="login-google" data-login-context="pagnottella" data-login-status="authGateStatus">Accedi con Google</button>
           </div>
+          <button id="browseAnonymous" type="button">Consulta il menu senza accedere</button>
           <small id="authGateEnvironment">Accesso riservato tramite account Google autorizzato.</small>
         </div>
       </section>
@@ -87,9 +88,10 @@
 <div id="paymentConfirmModal" class="paymentConfirmModal" role="dialog" aria-modal="true" aria-labelledby="paymentConfirmTitle"><div class="paymentConfirmCard orderConfirmCard"><div class="paymentConfirmIcon">✓</div><span>Conferma ordine</span><h2 id="paymentConfirmTitle">Controlla prima di procedere</h2><p id="paymentConfirmCopy">Verifica prodotti, totale e pagamento prima di aprire WhatsApp.</p><div id="paymentConfirmSummary" class="orderConfirmSummary"></div><strong id="paymentConfirmMethod">Metodo selezionato: Satispay</strong><label id="paymentConfirmConsentWrap" class="orderConfirmConsent"><input id="paymentConfirmConsent" type="checkbox"><span>Confermo di voler procedere con l’ordine.</span></label><div class="paymentConfirmActions"><button id="paymentConfirmCancel" type="button" class="ghost">Torna al carrello</button><button id="paymentConfirmAccept" type="button" class="primary gold" disabled>Apri WhatsApp con Pagnottella Gourmet ›</button></div></div></div>
 <div id="checkoutCompleteModal" class="paymentConfirmModal" role="dialog" aria-modal="true" aria-labelledby="checkoutCompleteTitle"><div class="paymentConfirmCard checkoutCompleteCard"><div class="paymentConfirmIcon">✓</div><span>Conferma registrata</span><h2 id="checkoutCompleteTitle">Ordine completato</h2><p>Hai confermato di aver inviato il messaggio WhatsApp a Pagnottella Gourmet.</p><strong id="checkoutCompleteSummary"></strong><div class="paymentConfirmActions single"><button id="checkoutCompleteClose" type="button" class="primary gold">Chiudi</button></div></div></div>
 <div id="toast" class="toast"></div>
-<script src="./supplier-access.js?v=auth-record-refresh-1" onerror="window.DoseCacheRecovery?.recover('supplier-access')"></script>
+<script src="./supplier-access.js?v=20261103-fix1" onerror="window.DoseCacheRecovery?.recover('supplier-access')"></script>
 <script src="./assets/pagnottella/data/menu.inline.js?v=mobile-cache-recovery-1"></script>
-<script src="./pagnottella.js?v=release-1.1-cutoff-delegates" onerror="window.DoseCacheRecovery?.recover('catalog-script')"></script>
+<script src="../shared/google-login-ui.js?v=20261103-fix1"></script>
+<script src="./pagnottella.js?v=20261103-fix1" onerror="window.DoseCacheRecovery?.recover('catalog-script')"></script>
 <script src="./production-polish.js?v=prod-4"></script>
 <link rel="stylesheet" href="../russo/threshold-status.css?v=russo-threshold-1">
 <script src="../russo/threshold-status.js?v=russo-threshold-client-1"></script>

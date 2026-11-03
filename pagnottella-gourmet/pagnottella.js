@@ -24,6 +24,7 @@ const state = {
   whatsappOpened:false,
   confirmationAction:'submit'
 };
+let browsingAnonymous = false;
 const authState = { loading:false, user:null, message:'' };
 let supplierAccess = window.DoseSupplierAccess;
 const byId = id => document.getElementById(id);
@@ -462,6 +463,7 @@ function roleLabelForEmail(email){
   return supplierAccess?.roleLabel?.(role) || role;
 }
 function googleRecoveryMessage(code){
+  if(code === 'auth/popup-blocked' || code === 'auth/popup-closed-by-user') return window.DoseGoogleLoginUI?.message({ code }) || 'Consenti i popup e riprova.';
   const embeddedBrowser = /Teams|Slack|Instagram|FBAN|FBAV/i.test(navigator.userAgent);
   if(embeddedBrowser) return 'Apri DOSepranza da Chrome o Safari. Il browser integrato potrebbe non completare l’accesso Google.';
   if(code === 'auth/internal-error') return 'Accesso Google non completato. Apri il link da Chrome o Safari e riprova. Se il problema persiste usa il link di reset cache.';
@@ -482,7 +484,7 @@ async function initializeEntryFlow(){
     else await showSupplierSelection();
     return;
   }
-  showRecognition();
+  if (!browsingAnonymous) showRecognition();
 }
 function showRecognition(){
   byId('landing')?.classList.remove('hidden');
@@ -607,14 +609,12 @@ async function signInWithGoogleGate(){
   syncAuthGate(true);
   let redirectStarted = false;
   try{
-    const payload = await supplierAccess.signInWithGoogle();
-    if(payload === null){
-      redirectStarted = true;
-      authState.message = '';
-      authState.loading = true;
-      syncAuthGate(true);
-      return;
-    }
+    const { auth, authSdk } = await supplierAccess.ensureFirebase();
+    const provider = new authSdk.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+    await authSdk.signInWithPopup(auth, provider);
+    const payload = await supplierAccess.resolveSession();
+    if(payload === null) throw new Error('Sessione Google non disponibile');
     if(payload?.email){
       const supplierAccesses = await Promise.all([
         supplierAccess.canAccessSupplier('russo', payload),
@@ -1169,6 +1169,7 @@ function configureConfirmation(action){
   (isSubmit ? consent : accept)?.focus();
 }
 async function sendWA(){
+  if(!ensureAuthenticated()){ showRecognition(); return; }
   if(pagnottellaOrdersClosed()) toast(cutoffNoticeCopy());
   const button = byId('sendOrderBtn');
   if(totals().count === 0){
@@ -1241,6 +1242,7 @@ function closeCheckoutComplete(){
   closeCart();
 }
 async function confirmPaymentAndSend(){
+  if(!ensureAuthenticated()){ closePaymentConfirmation(); showRecognition(); return; }
   if(state.confirmationAction === 'submit' && pagnottellaOrdersClosed()) toast(cutoffNoticeCopy());
   if(totals().count === 0 || state.sending) return;
   if(state.confirmationAction === 'submit' && !byId('paymentConfirmConsent')?.checked) return;
@@ -1396,3 +1398,12 @@ window.DoseCustomerCatalog={
   for(const x of ready)for(let i=0;i<x.qty;i++)addToCart(x.current,x.option,x.extras);
  }
 };
+
+window.DoseGoogleLoginUI?.register('pagnottella', signInWithGoogleGate);
+byId('browseAnonymous')?.addEventListener('click', () => {
+  browsingAnonymous = true;
+  state.screen = 'shop';
+  byId('landing')?.classList.add('hidden');
+  byId('shop')?.classList.add('show');
+  renderCart();
+});
