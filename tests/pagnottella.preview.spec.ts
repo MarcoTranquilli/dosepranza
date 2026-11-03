@@ -20,7 +20,7 @@ test.describe('Preview multi-fornitore', () => {
     await page.goto(previewHubUrl);
 
     await expect(page.getByRole('heading', { name: /accedi a dosepranza/i })).toBeVisible();
-    await expect(page.locator('#hub-auth-status')).toContainText('Accesso amministratore completato');
+    await expect(page.locator('#hub-auth-status')).toContainText('Scegli il fornitore per ordinare.');
     await expect(page.getByRole('link', { name: /apri alimentari russo/i })).toBeVisible();
     await expect(page.getByRole('link', { name: /apri pagnottella gourmet/i })).toBeVisible();
     await expect(page.locator('#supplier-control-panel')).toBeVisible();
@@ -30,7 +30,7 @@ test.describe('Preview multi-fornitore', () => {
     await expect(page.locator('#pagnottella-visibility-status')).toHaveText('Attiva per gli utenti');
   });
 
-  test('Hub: un utente standard viene instradato direttamente ad Alimentari Russo', async ({ page }) => {
+  test('Hub: un utente standard resta sull’hub e può scegliere entrambi i fornitori', async ({ page }) => {
     await page.addInitScript(() => {
       window.localStorage.setItem('dose_e2e', '1');
       window.localStorage.setItem('dose_user', JSON.stringify({
@@ -41,7 +41,9 @@ test.describe('Preview multi-fornitore', () => {
     });
     await page.goto(previewHubUrl);
 
-    await expect(page).toHaveURL(/\/russo\/(?:\?.*)?$/);
+    await expect(page.getByRole('link', { name: /apri alimentari russo/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /apri pagnottella gourmet/i })).toBeVisible();
+    await expect(page.locator('#supplier-control-panel')).not.toBeVisible();
   });
 
   test('Supplier guard: senza sessione rimanda all’hub', async ({ page }) => {
