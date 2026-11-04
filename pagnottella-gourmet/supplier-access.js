@@ -590,6 +590,7 @@
   }
 
   window.DoseSupplierAccess = Object.freeze({
+    ensureFirebase: loadFirebaseCore,
     ADMIN_EMAIL,
     AUTH_VERSION,
     roleForEmail,

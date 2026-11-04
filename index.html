@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>DOSepranza | Accesso</title>
   <link rel="icon" href="./favicondosepranza.png">
-  <link rel="stylesheet" href="./preview-hub.css?v=auth-cache-5">
+  <link rel="stylesheet" href="./preview-hub.css?v=hub-choice-1">
 </head>
 <body class="access-pending auth-locked">
   <div class="page-shell">
@@ -19,35 +19,38 @@
           <div>
             <p class="auth-label">Accesso Google</p>
             <h2 class="auth-title">Entra con il tuo account</h2>
-            <p class="auth-copy">Dopo il riconoscimento apriremo automaticamente il percorso corretto.</p>
+            <p class="auth-copy">Dopo il login scegli il fornitore da cui ordinare.</p>
           </div>
           <div class="auth-actions">
-            <button id="hub-google-login" class="btn btn-primary" type="button">Continua con Google</button>
+            <button id="hub-google-login" data-action="login-google" data-login-context="hub" data-login-status="hub-auth-status" class="btn btn-primary" type="button">Continua con Google</button>
             <button id="hub-local-login" class="btn btn-secondary auth-local-btn" type="button">Usa accesso locale</button>
-            <span id="hub-auth-status" class="auth-status">Nessuna sessione Google attiva.</span>
+            <span id="hub-auth-status" class="auth-status" role="status" aria-live="polite">Nessuna sessione Google attiva.</span>
           </div>
         </div>
+      <div id="coordinator-admin-link-wrapper" class="hub-actions" hidden><a id="admin-hub-link" class="btn btn-secondary" href="./admin/">Riepilogo ordini ufficio</a></div>
+        <p id="hub-browser-hint" class="auth-copy"></p>
         <div class="hero-pills"><span>Accesso sicuro</span><span>Profilo riconosciuto</span><span>Servizio pranzo</span></div>
       </div>
-      <aside class="hero-panel"><p class="panel-label">DOSepranza</p><ul><li>usa il tuo account autorizzato</li><li>dopo il login il servizio si apre automaticamente</li><li>i dati restano collegati al tuo profilo</li></ul></aside>
+      <aside class="hero-panel"><p class="panel-label">DOSepranza</p><ul><li>usa il tuo account autorizzato</li><li>scegli liberamente il tuo fornitore</li><li>i dati restano collegati al tuo profilo</li></ul></aside>
     </header>
     <main>
-      <section class="section-head supplier-admin-only"><div><p class="eyebrow">Area amministratore</p><h2>Gestisci e apri i fornitori.</h2></div><p class="section-note">Questa area e visibile solo all amministratore.</p></section>
+      <section class="section-head"><h2>Scegli il tuo fornitore</h2></section>
       <section id="supplier-control-panel" class="control-panel supplier-admin-only" aria-labelledby="supplier-control-title">
         <div><p class="eyebrow">Controllo pubblicazione</p><h2 id="supplier-control-title">Disponibilita La Pagnottella Gourmet</h2><p id="supplier-control-copy">Il fornitore e visibile solo all amministratore.</p></div>
         <label class="supplier-toggle" for="pagnottella-enabled"><input id="pagnottella-enabled" type="checkbox" role="switch" aria-describedby="supplier-control-copy"><span class="supplier-toggle-track" aria-hidden="true"><span></span></span><span id="pagnottella-toggle-label">Solo amministratore</span></label>
         <p id="supplier-control-status" class="control-status" role="status" aria-live="polite"></p>
       </section>
-      <section class="suppliers-grid auth-locked supplier-admin-only" id="suppliers-grid">
+      <section class="suppliers-grid auth-locked" id="suppliers-grid" hidden>
         <article class="supplier-card supplier-card--russo"><div class="supplier-top"><span class="supplier-badge">Alimentari</span><span class="supplier-icon">AR</span></div><h3>Alimentari Russo</h3><p>Servizio DOSepranza per ordini giornalieri.</p><dl><div><dt>Disponibilita</dt><dd id="russo-visibility-status">Attivo per gli utenti</dd></div><div><dt>Uso</dt><dd>Flusso completo</dd></div><div><dt>Accesso</dt><dd>Login condiviso</dd></div></dl><div class="card-actions"><a class="btn btn-primary protected-link" data-target="russo" href="./russo/">Apri Alimentari Russo</a><a class="btn btn-secondary protected-link" data-target="russo" href="./russo/?swreset=1">Apri con reset cache</a></div></article>
-        <article class="supplier-card supplier-card--pagnottella"><div class="supplier-top"><span class="supplier-badge">Gourmet</span><span class="supplier-icon">PG</span></div><h3>La Pagnottella Gourmet</h3><p>Catalogo dedicato Pagnottella.</p><dl><div><dt>Disponibilita</dt><dd id="pagnottella-visibility-status">Solo amministratore</dd></div><div><dt>Uso</dt><dd>Catalogo dedicato</dd></div><div><dt>Accesso</dt><dd>Login condiviso</dd></div></dl><div class="card-actions"><a class="btn btn-primary protected-link" data-target="pagnottella" href="./pagnottella/">Apri Pagnottella Gourmet</a><a class="btn btn-secondary protected-link" data-target="pagnottella" href="./pagnottella/?store=pagnottella">Apri direttamente lo shop</a></div></article>
+        <article class="supplier-card supplier-card--pagnottella"><div class="supplier-top"><span class="supplier-badge">Gourmet</span><span class="supplier-icon">PG</span></div><h3>La Pagnottella Gourmet</h3><p>Catalogo dedicato Pagnottella.</p><dl><div><dt>Disponibilita</dt><dd id="pagnottella-visibility-status">Accesso aziendale</dd></div><div><dt>Uso</dt><dd>Catalogo dedicato</dd></div><div><dt>Accesso</dt><dd>Login condiviso</dd></div></dl><div class="card-actions"><a class="btn btn-primary protected-link" data-target="pagnottella" href="./pagnottella/">Apri Pagnottella Gourmet</a><a class="btn btn-secondary protected-link" data-target="pagnottella" href="./pagnottella/?store=pagnottella">Apri direttamente lo shop</a></div></article>
       </section>
     </main>
   </div>
-  <script src="./supplier-access.js?v=auth-cache-8"></script>
-  <script src="./supplier-access-pages-hotfix.js?v=auth-cache-6"></script>
-  <script src="./supplier-access-pages-storage-hotfix.js?v=auth-cache-6"></script>
-  <script src="./pages-admin-unlock.js?v=auth-cache-6"></script>
-  <script type="module" src="./hub-auth.js?v=auth-cache-6"></script>
+  <script src="./supplier-access.js?v=20261103-fix1"></script>
+  <script src="./supplier-access-pages-hotfix.js?v=20261103-fix1"></script>
+  <script src="./supplier-access-pages-storage-hotfix.js?v=20261103-fix1"></script>
+  <script src="./pages-admin-unlock.js?v=20261103-fix1"></script>
+  <script src="./shared/google-login-ui.js?v=20261103-fix1"></script>
+  <script type="module" src="./hub-auth.js?v=20261103-fix1"></script>
 </body>
 </html>

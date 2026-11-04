@@ -4,6 +4,18 @@ const byId = (id) => document.getElementById(id);
 let currentSession = null;
 let currentSettings = null;
 let redirecting = false;
+let loginPending = false;
+let firebaseCore = null;
+let authEpoch = 0;
+
+const corporateSession = session => /^[^\s@]+@dos\.design$/i.test(String(session?.email || '').trim());
+const adminSession = session => corporateSession(session) && session.isAdmin === true && session.email.trim().toLowerCase() === 'marco.tranquilli@dos.design';
+const coordinatorSession = session => corporateSession(session) && session.role === 'coordinator';
+const officeSession = session => adminSession(session) || coordinatorSession(session);
+const webviewHint = () => /Slack|Teams|FBAN|FBAV|Instagram|WhatsApp|; wv\)|GSA\//i.test(window.navigator?.userAgent || '')
+  ? 'Apri il link direttamente nel browser di sistema (Safari/Chrome) per completare il login con Google.'
+  : '';
+
 
 function getNextTarget() {
   const target = new URLSearchParams(window.location.search).get('next') || '';
@@ -24,13 +36,22 @@ function setAuthButtonsDisabled(disabled) {
 }
 
 function setAuthState(session, message = '') {
-  const authenticated = !!session?.email;
-  const isAdmin = !!session?.isAdmin;
+  const authenticated = corporateSession(session);
+  const isAdmin = adminSession(session);
+  const canChooseSupplier = authenticated;
+  if (byId('suppliers-grid')) byId('suppliers-grid').hidden = !canChooseSupplier;
+  if (byId('coordinator-admin-link-wrapper')) byId('coordinator-admin-link-wrapper').hidden = !officeSession(session);
+  if (byId('supplier-control-panel')) byId('supplier-control-panel').hidden = !isAdmin;
+  byId('suppliers-grid')?.classList?.toggle('auth-locked', !authenticated);
+  document.body.classList.toggle('auth-authenticated', authenticated);
+  document.body.classList.toggle('role-admin', isAdmin);
+  document.body.classList.toggle('role-coordinator', coordinatorSession(session));
+  document.body.classList.toggle('role-user', authenticated && !officeSession(session));
   document.body.classList.remove('access-pending');
   document.body.classList.toggle('auth-locked', !authenticated);
   document.body.classList.toggle('auth-resolved', authenticated);
   document.body.classList.toggle('is-admin', isAdmin);
-  document.body.classList.toggle('is-local-preview', access.isFilePreview());
+  document.body.classList.toggle('is-local-preview', access?.isFilePreview?.());
 
   const status = byId('hub-auth-status');
   if (!status) return;
@@ -51,14 +72,6 @@ function redirectTo(target) {
   const status = byId('hub-auth-status');
   if (status) status.textContent = 'Accesso completato. Apertura del servizio...';
   window.location.replace(resolveTargetHref(target));
-}
-
-function scrollAdminPanelIntoView() {
-  const panel = byId('supplier-control-panel') || byId('suppliers-grid');
-  if (!panel) return;
-  window.setTimeout(() => {
-    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 80);
 }
 
 function renderSupplierSettings(settings) {
@@ -88,57 +101,54 @@ async function activateSession(session, honorNext = true) {
     return;
   }
 
-  const isCoordinator = session.role === "coordinator";
-  if (!session.isAdmin && !isCoordinator) {
-    redirectTo("russo");
-    return;
-  }
-  if (isCoordinator) {
-    const next = getNextTarget();
-    redirectTo(next || "admin");
+  if (!corporateSession(session)) {
+    setAuthState(session, 'Accedi con un account aziendale @dos.design per scegliere il fornitore.');
     return;
   }
 
-  let settings = access.DEFAULT_SETTINGS;
-  let settingsWarning = '';
+  const next = honorNext ? getNextTarget() : '';
+  if (next && (next !== 'admin' || officeSession(session))) {
+    redirectTo(next);
+    return;
+  }
+  setAuthState(session, 'Scegli il fornitore per ordinare.');
+  if (!adminSession(session)) return;
   try {
-    settings = await access.getSupplierSettings();
-  } catch (error) {
-    console.warn('Supplier settings unavailable; admin defaults applied.', error);
-    settingsWarning = ' Configurazione fornitori non disponibile: uso impostazioni sicure di default.';
+    renderSupplierSettings(await access.getSupplierSettings());
+  } catch {
+    if (byId('supplier-control-status')) byId('supplier-control-status').textContent = 'Configurazione non disponibile. Riprova piu tardi.';
   }
-
-  renderSupplierSettings(settings);
-  setAuthState(session, `Accesso amministratore completato. Puoi gestire i fornitori qui sotto.${settingsWarning}`);
-
-  if (honorNext) {
-    const next = getNextTarget();
-    if (next) {
-      redirectTo(next);
-      return;
-    }
-  }
-
-  scrollAdminPanelIntoView();
 }
 
 function friendlyAuthError(error) {
   const code = error?.code || '';
+  if (code === 'auth/popup-blocked') return 'Popup Google bloccato. Consenti i popup per questo sito e riprova. Se usi Slack, Mail o Teams, apri il link in Safari/Chrome.';
+  if (code === 'auth/operation-not-supported-in-this-environment') return 'Apri il link direttamente nel browser di sistema (Safari/Chrome) per completare il login con Google.';
   if (code === 'auth/popup-closed-by-user') return 'Accesso annullato: popup Google chiuso prima del completamento.';
   if (code === 'auth/cancelled-popup-request') return 'Accesso Google già in corso in un altro popup.';
   if (code === 'auth/unauthorized-domain') return `Dominio non autorizzato su Firebase Auth: ${window.location.hostname}.`;
-  return `Accesso Google non riuscito${code ? ` (${code})` : ''}. Riprova.`;
+  return `Accesso Google non riuscito${code ? ` (${code})` : ''}. Riprova o ricarica la pagina.`;
 }
 
 async function signInWithGoogleHub() {
+  if (loginPending) return;
+  loginPending = true;
+  authEpoch++;
   setAuthButtonsDisabled(true);
-  setAuthState(null, 'Accesso Google in corso...');
+  setAuthState(null, webviewHint() || 'Accesso Google in corso...');
   try {
-    const session = await access.signInWithGoogle();
+    if (!access?.ensureFirebase) throw new Error('Modulo di accesso non disponibile. Ricarica la pagina.');
+    const { auth, authSdk } = firebaseCore || await access.ensureFirebase();
+    const provider = new authSdk.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+    await authSdk.signInWithPopup(auth, provider);
+    const session = await access.resolveSession();
+    if (!session) throw new Error('Sessione Google non disponibile. Riprova.');
     await activateSession(session, true);
   } catch (error) {
     setAuthState(null, friendlyAuthError(error));
   } finally {
+    loginPending = false;
     setAuthButtonsDisabled(false);
   }
 }
@@ -158,7 +168,7 @@ async function activateLocalPreviewAccess() {
 }
 
 async function updatePagnottellaVisibility(event) {
-  if (!currentSession?.isAdmin) return;
+  if (!adminSession(currentSession)) return;
   const toggle = event.currentTarget;
   const requested = !!toggle.checked;
   const status = byId('supplier-control-status');
@@ -181,25 +191,32 @@ async function updatePagnottellaVisibility(event) {
 function protectLinks() {
   document.querySelectorAll('.protected-link').forEach((link) => {
     link.addEventListener('click', (event) => {
-      if (currentSession?.isAdmin) return;
+      if (corporateSession(currentSession)) return;
       event.preventDefault();
-      setAuthState(currentSession, 'Questa scelta è riservata all’amministratore.');
+      setAuthState(currentSession, 'Accedi con Google usando il tuo account aziendale @dos.design per ordinare.');
     });
   });
 }
 
 async function init() {
-  if (!access) throw new Error('Modulo di accesso fornitori non disponibile.');
-  byId('hub-google-login')?.addEventListener('click', signInWithGoogleHub);
+
+  if (window.DoseGoogleLoginUI) window.DoseGoogleLoginUI.register('hub', signInWithGoogleHub);
+  else byId('hub-google-login')?.addEventListener('click', signInWithGoogleHub);
   byId('hub-local-login')?.addEventListener('click', activateLocalPreviewAccess);
   byId('pagnottella-enabled')?.addEventListener('change', updatePagnottellaVisibility);
   protectLinks();
   setAuthState(null);
+  const hint = byId('hub-browser-hint');
+  if (hint) { hint.textContent = webviewHint() || 'Se il login non si apre da Slack, Teams, Mail o WhatsApp, apri questa pagina in Safari o Chrome.'; }
+  const epoch = authEpoch;
   try {
+    if (!access) throw new Error('auth-unavailable');
+    if (access.ensureFirebase) firebaseCore = await access.ensureFirebase();
     const session = await access.resolveSession();
+    if (epoch !== authEpoch) return;
     if (session) await activateSession(session, true);
   } catch (error) {
-    setAuthState(null, 'Impossibile verificare la sessione Google. Riprova.');
+    if (epoch === authEpoch) setAuthState(null, 'Impossibile verificare la sessione Google. Riprova con il pulsante o ricarica la pagina.');
   }
 }
 

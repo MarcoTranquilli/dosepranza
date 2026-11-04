@@ -24,6 +24,49 @@ const state = {
   whatsappOpened:false,
   confirmationAction:'submit'
 };
+let browsingAnonymous = false;
+const DRAFT_CART_KEY = 'pg_draft_cart';
+function persistDraftCart(){
+  try{
+    localStorage.setItem(DRAFT_CART_KEY, JSON.stringify(state.cart));
+  }catch(error){
+    console.warn('draft_cart_storage_unavailable');
+    toast('Carrello mantenuto in questa pagina. Salvataggio locale non disponibile: non ricaricare.');
+  }
+}
+function clearDraftCart(){
+  try{ localStorage.removeItem(DRAFT_CART_KEY); }
+  catch(error){ console.warn('draft_cart_clear_failed'); }
+}
+function restoreDraftCart(){
+  try{
+    const saved = JSON.parse(localStorage.getItem(DRAFT_CART_KEY) || '{}');
+    if(!saved || typeof saved !== 'object' || Array.isArray(saved)) throw new Error('invalid_cart');
+    const restored = {};
+    let skipped = 0;
+    for(const item of Object.values(saved)){
+      const product = PRODUCTS.find(p => p.id === item?.id && p.isActive !== false);
+      const option = product && optionList(product).find(o => o.label === item.opt);
+      if(!product || !option || !Number.isSafeInteger(item.qty) || item.qty <= 0 || !Array.isArray(item.extras)){
+        skipped++; continue;
+      }
+      const extras = item.extras.map(e => (DATA.extras || []).find(x => x.name === e?.name));
+      if(extras.some(e => !e) || (extras.length && product.supportsExtras !== true)){
+        skipped++; continue;
+      }
+      const normalizedExtras = extras.map(e => ({name:e.name,price:Number(e.price || 0)})).sort((a,b) => a.name.localeCompare(b.name));
+      const extrasTotal = normalizedExtras.reduce((sum,e) => sum + e.price, 0);
+      const originalUnit = Math.round((product.price + option.extra + extrasTotal) * 100) / 100;
+      if(!Number.isFinite(originalUnit) || originalUnit < 0){ skipped++; continue; }
+      const key = [product.id, option.label, ...normalizedExtras.map(e => e.name)].join('|');
+      restored[key] = {...product,cartKey:key,opt:option.label,optExtra:option.extra,extras:normalizedExtras,extrasTotal,originalUnit,qty:item.qty};
+    }
+    state.cart = restored;
+    if(skipped) toast('Alcuni articoli salvati non sono piu disponibili. Ricontrolla il carrello.');
+  }catch(error){
+    console.warn('draft_cart_restore_failed');
+  }
+}
 const authState = { loading:false, user:null, message:'' };
 let supplierAccess = window.DoseSupplierAccess;
 const byId = id => document.getElementById(id);
@@ -120,6 +163,7 @@ async function bootstrap(){
   PRODUCTS = DATA.products;
   CATS = DATA.cats;
   FILTER_TAXONOMY = DATA.filterTaxonomy || { clusters:[], diets:[] };
+  restoreDraftCart();
   hydrateStatic();
   bind();
   renderTabs();
@@ -462,6 +506,7 @@ function roleLabelForEmail(email){
   return supplierAccess?.roleLabel?.(role) || role;
 }
 function googleRecoveryMessage(code){
+  if(code === 'auth/popup-blocked' || code === 'auth/popup-closed-by-user') return window.DoseGoogleLoginUI?.message({ code }) || 'Consenti i popup e riprova.';
   const embeddedBrowser = /Teams|Slack|Instagram|FBAN|FBAV/i.test(navigator.userAgent);
   if(embeddedBrowser) return 'Apri DOSepranza da Chrome o Safari. Il browser integrato potrebbe non completare l’accesso Google.';
   if(code === 'auth/internal-error') return 'Accesso Google non completato. Apri il link da Chrome o Safari e riprova. Se il problema persiste usa il link di reset cache.';
@@ -482,7 +527,7 @@ async function initializeEntryFlow(){
     else await showSupplierSelection();
     return;
   }
-  showRecognition();
+  if (!browsingAnonymous) showRecognition();
 }
 function showRecognition(){
   byId('landing')?.classList.remove('hidden');
@@ -607,14 +652,12 @@ async function signInWithGoogleGate(){
   syncAuthGate(true);
   let redirectStarted = false;
   try{
-    const payload = await supplierAccess.signInWithGoogle();
-    if(payload === null){
-      redirectStarted = true;
-      authState.message = '';
-      authState.loading = true;
-      syncAuthGate(true);
-      return;
-    }
+    const { auth, authSdk } = await supplierAccess.ensureFirebase();
+    const provider = new authSdk.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+    await authSdk.signInWithPopup(auth, provider);
+    const payload = await supplierAccess.resolveSession();
+    if(payload === null) throw new Error('Sessione Google non disponibile');
     if(payload?.email){
       const supplierAccesses = await Promise.all([
         supplierAccess.canAccessSupplier('russo', payload),
@@ -946,12 +989,13 @@ function addToCart(p,o,extras=[]){
   const key = [p.id, o.label, ...normalizedExtras.map(extra => extra.name)].join('|');
   if(!state.cart[key]) state.cart[key] = {...p,cartKey:key,opt:o.label,optExtra:o.extra,extras:normalizedExtras,extrasTotal,originalUnit,qty:0};
   state.cart[key].qty++;
+  persistDraftCart();
   resetCurrentTransmissionState();
   toast(`${p.name} aggiunto al carrello`);
   renderCart();
   return true;
 }
-function changeQty(key,delta){ if(!state.cart[key]) return; state.cart[key].qty += delta; if(state.cart[key].qty <= 0) delete state.cart[key]; resetCurrentTransmissionState(); renderCart(); }
+function changeQty(key,delta){ if(!state.cart[key]) return; state.cart[key].qty += delta; if(state.cart[key].qty <= 0) delete state.cart[key]; persistDraftCart(); resetCurrentTransmissionState(); renderCart(); }
 function totals(){ const items = Object.values(state.cart); const orig = items.reduce((a,i)=>a+i.originalUnit*i.qty,0); const total = discountedPrice(orig); return {items, count:items.reduce((a,i)=>a+i.qty,0), orig, total, saving:orig-total}; }
 window.DoseCanReload = () => Boolean(DATA) && !authState.loading && !state.sending && totals().count === 0
   && !byId('paymentConfirmModal')?.classList.contains('show') && !byId('checkoutCompleteModal')?.classList.contains('show');
@@ -1169,6 +1213,7 @@ function configureConfirmation(action){
   (isSubmit ? consent : accept)?.focus();
 }
 async function sendWA(){
+  if(!ensureAuthenticated()){ showRecognition(); return; }
   if(pagnottellaOrdersClosed()) toast(cutoffNoticeCopy());
   const button = byId('sendOrderBtn');
   if(totals().count === 0){
@@ -1231,6 +1276,7 @@ function completeWhatsappOrder(){
   persistCheckoutState('user_confirmed_sent');
   byId('checkoutCompleteSummary').textContent = `${orderId ? `Ordine ${orderId} · ` : ''}${t.count} ${t.count === 1 ? 'prodotto' : 'prodotti'} · Totale ${money(t.total)}`;
   state.cart = {};
+  clearDraftCart();
   byId('notes').value = '';
   resetCurrentTransmissionState();
   renderCart();
@@ -1241,6 +1287,7 @@ function closeCheckoutComplete(){
   closeCart();
 }
 async function confirmPaymentAndSend(){
+  if(!ensureAuthenticated()){ closePaymentConfirmation(); showRecognition(); return; }
   if(state.confirmationAction === 'submit' && pagnottellaOrdersClosed()) toast(cutoffNoticeCopy());
   if(totals().count === 0 || state.sending) return;
   if(state.confirmationAction === 'submit' && !byId('paymentConfirmConsent')?.checked) return;
@@ -1266,7 +1313,8 @@ async function confirmPaymentAndSend(){
   try{
     const payload = buildOrderPayload();
     const result = await supplierAccess.createPagnottellaOrder(payload);
-    logOrder(result.id, { firebaseSaved: !result.local });
+    try{ logOrder(result.id, { firebaseSaved: !result.local }); }
+    catch(error){ console.warn('order_local_log_failed'); }
     state.lastSubmittedMessage = message;
     state.lastSubmittedFingerprint = fingerprint;
     state.lastOrderId = result.id;
@@ -1317,7 +1365,8 @@ function readSafeOrderLogs(){
     raw = [];
   }
   const safeLogs = raw.map(sanitizeOrderLog).slice(0,25);
-  localStorage.setItem(ORDER_LOG_KEY, JSON.stringify(safeLogs));
+  try{ localStorage.setItem(ORDER_LOG_KEY, JSON.stringify(safeLogs)); }
+  catch(error){ console.warn('order_local_log_storage_unavailable'); }
   return safeLogs;
 }
 function logOrder(orderId, payload){
@@ -1341,6 +1390,7 @@ function logOrder(orderId, payload){
 }
 function newOrder(){
   state.cart = {};
+  clearDraftCart();
   resetCurrentTransmissionState();
   try{ localStorage.removeItem(CHECKOUT_STATE_KEY); }catch(error){}
   byId('notes').value = '';
@@ -1396,3 +1446,12 @@ window.DoseCustomerCatalog={
   for(const x of ready)for(let i=0;i<x.qty;i++)addToCart(x.current,x.option,x.extras);
  }
 };
+
+window.DoseGoogleLoginUI?.register('pagnottella', signInWithGoogleGate);
+byId('browseAnonymous')?.addEventListener('click', () => {
+  browsingAnonymous = true;
+  state.screen = 'shop';
+  byId('landing')?.classList.add('hidden');
+  byId('shop')?.classList.add('show');
+  renderCart();
+});
