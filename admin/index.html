@@ -9,8 +9,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./admin.css?v=admin-suite-2">
+  <link rel="stylesheet" href="../shared/theme.css?v=20261105-ui1">
+  <link rel="stylesheet" href="../shared/admin-editorial.css?v=20261105-ui1">
 </head>
-<body class="admin-shell">
+<body class="admin-shell admin-editorial">
   <div id="auth-guard" class="auth-guard">
     <div class="auth-guard-card">
       <img src="../assets/branding/dosepranza-suite-logo.png" alt="DOSepranza" class="guard-logo">
@@ -30,7 +32,7 @@
         <a href="../" class="back-link" title="Torna all hub">← Fornitori</a>
         <div>
           <span class="eyebrow">DOSepranza Suite</span>
-          <h1>Controllo & Riepilogo Ordini</h1>
+          <h1>Riepilogo Ordini Ufficio</h1>
         </div>
       </div>
       <div class="topbar-user">
@@ -45,9 +47,9 @@
         <div class="filter-group">
           <label class="control-label">Fornitore:</label>
           <div class="segmented-control" id="supplier-tabs" role="group">
-            <button type="button" aria-pressed="false" class="segment active" data-supplier="all">Tutti (Totale)</button>
+            <button type="button" aria-pressed="false" class="segment active" data-supplier="all">Tutti</button>
             <button type="button" aria-pressed="false" class="segment" data-supplier="russo">Alimentari Russo</button>
-            <button type="button" aria-pressed="false" class="segment" data-supplier="pagnottella">La Pagnottella</button>
+            <button type="button" aria-pressed="false" class="segment" data-supplier="pagnottella">Pagnottella Gourmet</button>
           </div>
         </div>
 
@@ -91,7 +93,7 @@
       <section class="supplier-split-section">
         <h2>Riepilogo Fornitori</h2>
         <div class="supplier-cards-grid">
-          <div class="supplier-summary-card">
+          <div class="supplier-summary-card summary-russo">
             <div class="supp-head">
               <h3>Alimentari Russo</h3>
               <span class="cutoff-tag">Cutoff ore 10:30</span>
@@ -123,7 +125,7 @@
           <h2>Dettaglio Ordini Colleghi</h2>
           <span id="orders-found-count" class="badge-total">0 ordini</span>
         </div>
-        <div class="table-container">
+        <div class="table-container" tabindex="0" role="region" aria-label="Ordini colleghi, tabella scorrevole">
           <table class="admin-table">
             <thead>
               <tr>
