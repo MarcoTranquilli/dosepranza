@@ -67,11 +67,7 @@ service cloud.firestore {
     }
 
     function isRussoSupplier() {
-      return isGoogleProvider()
-        && authenticatedEmail() in [
-          'lorenzo.russo@alimentarirusso',
-          'russolorenzo11@gmail.com'
-        ];
+      return isGoogleProvider();
     }
 
     function isStaff() {
