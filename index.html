@@ -6,15 +6,17 @@
   <title>DOSepranza | Accesso</title>
   <link rel="icon" href="./favicondosepranza.png">
   <link rel="stylesheet" href="./preview-hub.css?v=hub-choice-1">
+  <link rel="stylesheet" href="./shared/theme.css?v=20261105-ui1">
 </head>
-<body class="access-pending auth-locked">
+<body data-theme="editorial" class="access-pending auth-locked">
   <div class="page-shell">
-    <header class="hero">
+    <header class="site-header"><a href="./" class="wordmark" aria-label="DOSepranza home">DOSepranza<span class="version-badge">ED. 2026</span></a><div class="profile"><span class="avatar" aria-hidden="true">D</span><div><span id="hub-auth-status" class="auth-status" role="status" aria-live="polite">Nessuna sessione Google attiva.</span><span class="role-chip role-user-label">Account aziendale</span><span class="role-chip role-coordinator-label">Coordinatore</span><span class="role-chip role-admin-label">Amministratore</span></div></div></header>
+    <section class="hero">
       <div class="hero-copy">
-        <p class="eyebrow">DOSepranza</p>
-        <img src="./assets/branding/dosepranza-suite-logo.png" alt="DOSepranza" class="brandmark">
-        <h1>Accedi a DOSepranza.</h1>
-        <p class="lede">Accedi con Google per continuare al servizio pranzo disponibile per il tuo profilo.</p>
+        <p class="eyebrow">La pausa, fatta bene.</p>
+
+        <h1>Cosa ordiniamo oggi?</h1>
+        <p class="lede">Due cucine, una sola pausa. Scegli quello che ti va, al resto pensiamo insieme.</p>
         <div class="auth-card" id="hub-auth-card">
           <div>
             <p class="auth-label">Accesso Google</p>
@@ -24,27 +26,30 @@
           <div class="auth-actions">
             <button id="hub-google-login" data-action="login-google" data-login-context="hub" data-login-status="hub-auth-status" class="btn btn-primary" type="button">Continua con Google</button>
             <button id="hub-local-login" class="btn btn-secondary auth-local-btn" type="button">Usa accesso locale</button>
-            <span id="hub-auth-status" class="auth-status" role="status" aria-live="polite">Nessuna sessione Google attiva.</span>
+
           </div>
         </div>
-      <div id="coordinator-admin-link-wrapper" class="hub-actions" hidden><a id="admin-hub-link" class="btn btn-secondary" href="./admin/">Riepilogo ordini ufficio</a></div>
+
         <p id="hub-browser-hint" class="auth-copy"></p>
-        <div class="hero-pills"><span>Accesso sicuro</span><span>Profilo riconosciuto</span><span>Servizio pranzo</span></div>
+
       </div>
-      <aside class="hero-panel"><p class="panel-label">DOSepranza</p><ul><li>usa il tuo account autorizzato</li><li>scegli liberamente il tuo fornitore</li><li>i dati restano collegati al tuo profilo</li></ul></aside>
-    </header>
+
+    </section>
     <main>
-      <section class="section-head"><h2>Scegli il tuo fornitore</h2></section>
+      <section class="section-head"><h2>Il menu di oggi</h2><span>01 / Scegli la tua cucina</span></section>
+
+      <section class="suppliers-grid auth-locked" id="suppliers-grid" hidden>
+        <article id="card-russo" class="supplier-card supplier-card--russo"><div class="supplier-top"><span class="supplier-badge">Ordini entro le 10:30</span><span class="supplier-icon">AR</span></div><h3>Alimentari Russo</h3><p>La bottega di fiducia, nella tua pausa pranzo. Scegli il tuo panino e componi il tuo ordine.</p><dl><div><dt>Disponibilita</dt><dd id="russo-visibility-status">Attivo per gli utenti</dd></div><div><dt>Soglia collettiva</dt><dd>20,00 €</dd></div><div><dt>Orario di Roma</dt><dd>Cutoff 10:30</dd></div></dl><div class="card-actions"><a class="btn btn-primary protected-link" data-target="russo" href="./russo/" aria-label="Apri Alimentari Russo">Scegli da Russo <span aria-hidden="true">↗</span></a><a class="btn btn-secondary protected-link" data-target="russo" href="./russo/?swreset=1">Apri con reset cache</a></div></article>
+        <article id="card-pagnottella" class="supplier-card supplier-card--pagnottella"><div class="supplier-top"><span class="supplier-badge">Sempre ordinabile</span><span class="supplier-icon">PG</span></div><h3>La Pagnottella Gourmet</h3><p>Una pausa con piu gusto. Scopri il catalogo e componi il pranzo che fa per te.</p><dl><div><dt>Disponibilita</dt><dd id="pagnottella-visibility-status">Accesso aziendale</dd></div><div><dt>Ordine</dt><dd>Individuale</dd></div><div><dt>Dopo le 11:00</dt><dd>Consegna entro le 13 non garantita</dd></div></dl><div class="card-actions"><a class="btn btn-primary protected-link" data-target="pagnottella" href="./pagnottella/" aria-label="Apri Pagnottella Gourmet">Componi il tuo pranzo <span aria-hidden="true">↗</span></a><a class="btn btn-secondary protected-link" data-target="pagnottella" href="./pagnottella/?store=pagnottella">Apri direttamente lo shop</a></div></article>
+      </section>
+      <div id="coordinator-admin-link-wrapper" class="hub-actions" hidden><a id="admin-hub-link" class="btn btn-secondary" href="./admin/">Riepilogo ordini ufficio</a></div>
       <section id="supplier-control-panel" class="control-panel supplier-admin-only" aria-labelledby="supplier-control-title">
         <div><p class="eyebrow">Controllo pubblicazione</p><h2 id="supplier-control-title">Disponibilita La Pagnottella Gourmet</h2><p id="supplier-control-copy">Il fornitore e visibile solo all amministratore.</p></div>
         <label class="supplier-toggle" for="pagnottella-enabled"><input id="pagnottella-enabled" type="checkbox" role="switch" aria-describedby="supplier-control-copy"><span class="supplier-toggle-track" aria-hidden="true"><span></span></span><span id="pagnottella-toggle-label">Solo amministratore</span></label>
         <p id="supplier-control-status" class="control-status" role="status" aria-live="polite"></p>
       </section>
-      <section class="suppliers-grid auth-locked" id="suppliers-grid" hidden>
-        <article class="supplier-card supplier-card--russo"><div class="supplier-top"><span class="supplier-badge">Alimentari</span><span class="supplier-icon">AR</span></div><h3>Alimentari Russo</h3><p>Servizio DOSepranza per ordini giornalieri.</p><dl><div><dt>Disponibilita</dt><dd id="russo-visibility-status">Attivo per gli utenti</dd></div><div><dt>Uso</dt><dd>Flusso completo</dd></div><div><dt>Accesso</dt><dd>Login condiviso</dd></div></dl><div class="card-actions"><a class="btn btn-primary protected-link" data-target="russo" href="./russo/">Apri Alimentari Russo</a><a class="btn btn-secondary protected-link" data-target="russo" href="./russo/?swreset=1">Apri con reset cache</a></div></article>
-        <article class="supplier-card supplier-card--pagnottella"><div class="supplier-top"><span class="supplier-badge">Gourmet</span><span class="supplier-icon">PG</span></div><h3>La Pagnottella Gourmet</h3><p>Catalogo dedicato Pagnottella.</p><dl><div><dt>Disponibilita</dt><dd id="pagnottella-visibility-status">Accesso aziendale</dd></div><div><dt>Uso</dt><dd>Catalogo dedicato</dd></div><div><dt>Accesso</dt><dd>Login condiviso</dd></div></dl><div class="card-actions"><a class="btn btn-primary protected-link" data-target="pagnottella" href="./pagnottella/">Apri Pagnottella Gourmet</a><a class="btn btn-secondary protected-link" data-target="pagnottella" href="./pagnottella/?store=pagnottella">Apri direttamente lo shop</a></div></article>
-      </section>
     </main>
+    <footer class="site-footer"><span>DOSepranza / People. About. Food.</span><span>Una buona pausa cambia la giornata.</span></footer>
   </div>
   <script src="./supplier-access.js?v=20261103-fix1"></script>
   <script src="./supplier-access-pages-hotfix.js?v=20261103-fix1"></script>
