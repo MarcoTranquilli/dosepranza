@@ -83,7 +83,7 @@
         </div>
 
         <main>
-            <section id="menu-view" class="view active">
+            <section id="menu-view" class="view active"><aside id="russo-usual" hidden style="padding:16px;border:1px solid var(--border,#ddd);border-radius:16px;margin-bottom:16px"><p id="russo-usual-summary"></p><button id="russo-usual-repeat" type="button" style="min-height:44px">Ripeti questo ordine</button></aside><p id="russo-usual-status" role="status"></p>
                 <div class="card qr-payment-card p-5 rounded-3xl mb-4 flex items-center gap-4">
                     <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&amp;data=https%3A%2F%2Fweb.satispay.com%2Fapp%2Fopen%2Fshops%2F986e3af6-8a54-4c3d-9c23-b741ca0f8cc0" class="w-20 h-20 rounded-2xl shadow-sm border border-gray-100" alt="QR pagamento Alimentari Russo">
                     <div class="min-w-0">
@@ -890,7 +890,7 @@
     <script type="module" src="sw-killer.js?v=pages-recovery-2"></script>
     <script src="shared/google-login-ui.js?v=20261103-fix1"></script>
     <script src="shared/russo-login-ui.js?v=20261103-fix1"></script>
-    <script type="module" src="app.v20260325.js?v=20261103-fix1"></script>
+    <script type="module" src="app.v20260325.js?v=20261110-usual1"></script>
     <script src="feedback/vendor/html2canvas.min.js?v=feedback-1"></script>
     <script src="feedback/logger.js?v=feedback-1"></script>
     <script src="feedback/diagnostics.js?v=feedback-1"></script>
@@ -900,5 +900,6 @@
 <link rel="stylesheet" href="shared/customer-panel.css?v=workspace-2">
 <script src="shared/customer-core.js?v=custom-home-1"></script>
 <script src="shared/customer-panel.js?v=workspace-2"></script>
+<script src="shared/russo-usual.js?v=20261110-1"></script>
 </body>
 </html>

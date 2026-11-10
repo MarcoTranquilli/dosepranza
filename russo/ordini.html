@@ -301,6 +301,11 @@
       .table th, .table td { padding: 4pt 6pt; }
     }
   </style>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Ordini Russo">
+<meta name="mobile-web-app-capable" content="yes">
+<style>.user-panel{flex-wrap:wrap}#supplier-audio-toggle,#supplier-audio-test{min-height:44px;max-width:100%}</style>
 </head>
 <body>
   <div id="toast" class="toast">Riepilogo copiato negli appunti!</div>
@@ -328,7 +333,7 @@
         <p>Riepilogo e Distinta Ordini del Giorno</p>
         <span class="live-badge"><span class="live-dot"></span> In ascolto in tempo reale</span>
       </div>
-      <div class="user-panel">
+      <div class="user-panel"><button id="supplier-audio-toggle" type="button" aria-pressed="false">🔕 Audio muto</button><button id="supplier-audio-test" type="button">Prova audio</button>
         <span id="user-email-display" class="user-email">—</span>
         <button id="btn-logout" class="btn-secondary">Esci</button>
       </div>
@@ -403,7 +408,8 @@
     </div>
   </div>
 
-  <script type="module">
+  <script src="../shared/supplier-audio.js?v=20261110-1"></script>
+<script type="module">
     import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
     import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
     import { getFirestore, collection, query, where, onSnapshot } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
@@ -421,6 +427,7 @@
     const db = getFirestore(app);
 
     const el = id => document.getElementById(id);
+    const audio = window.DoseSupplierAudio.mount('russo');
     let currentOrders = [];
     let unsubscribeOrders = null;
 
@@ -537,8 +544,10 @@
       // Query con filtro supplierId == 'russo' (conforme alla regola isRussoOrder)
       const q = query(collection(db, 'orders'), where('supplierId', '==', 'russo'));
       
-      unsubscribeOrders = onSnapshot(q, snapshot => {
+      audio.reset();
+      unsubscribeOrders = onSnapshot(q, {includeMetadataChanges:true}, snapshot => {
         currentOrders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        audio.observe(currentOrders.map(o=>({id:o.id,day:getOrderDay(o)})),el('order-date').value,snapshot.metadata.fromCache,snapshot.metadata.hasPendingWrites);
         renderView();
       }, err => {
         console.error("Errore listener ordini Russo:", err);
