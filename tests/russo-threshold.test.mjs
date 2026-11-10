@@ -39,6 +39,6 @@ test('winter, summer and transition Sundays resolve Rome cutoff independently of
 test('Pagnottella analytics remains independent and unchanged by Russo threshold', () => {
   const pg = {id:'pg', supplierId:'pagnottella', total:5, createdAt:'2026-10-19T09:59:00Z', items:[{name:'Panino', quantity:1}]};
   const selected = a.select([pg], {now:new Date('2026-10-19T10:01:00Z'), range:a.rangeFor('today', now)});
-  const summary = a.aggregate(selected.rows); assert.equal(summary.cents,500); assert.equal(summary.cutoffCount,1);
+  const summary = a.aggregate(selected.rows); assert.equal(summary.cents,500); assert.equal(summary.cutoffCount,0); // 09:59 UTC is 11:59 in Rome, after the 11:00 indicator.
   assert.equal(a.russoThreshold([pg], {now:new Date('2026-10-19T10:01:00Z')}).totalCents,0);
 });

@@ -869,6 +869,12 @@ function optionList(p){
   return [{label:'Standard',extra:0}];
 }
 function defaultOption(p){ return optionList(p)[0]; }
+let foodTag = 'all';
+window.addEventListener('dose:food-filter', event => {
+  if(event.detail?.supplier !== 'pagnottella') return;
+  foodTag = event.detail.tag;
+  renderCatalog();
+});
 function filtered(){
   let arr = PRODUCTS.filter(p => p.isActive !== false && (() => {
     const searchable = `${p.name} ${p.desc} ${(p.tags||[]).join(' ')} ${clusterLabel(p.categoryGroup)}`.toLowerCase();
@@ -882,7 +888,7 @@ function filtered(){
       if(value === 'Pesce') return !/(acciughe|baccalà|gamberetti|salmone|spada|tonno)/i.test(searchable);
       return true;
     });
-    return (state.cat === 'all' || p.categoryGroup === state.cat)
+    return (!window.DosePreferences || window.DosePreferences.matches(p,foodTag)) && (state.cat === 'all' || p.categoryGroup === state.cat)
       && dietMatch && typeMatch && ingredientMatch && exclusionMatch
       && (!state.query || searchable.includes(state.query));
   })());
@@ -905,7 +911,7 @@ function renderCatalog(){
 }
 function card(p){
   const badges = [];
-  badges.push(...(p.tags || []).slice(0,2));
+  badges.push(...(window.DosePreferences?.tags(p) || []).map(tag=>window.DosePreferences.labels[tag]), ...(p.tags || []).slice(0,2));
   const hasSpecificImage = p.imageMeta?.specific === true;
   const alt = hasSpecificImage ? p.name : `La Pagnottella Gourmet - foto specifica non disponibile per ${p.name}`;
   const addLabel = isOrderingClosed() ? 'Ordini sospesi' : `Aggiungi ${p.name}`;
@@ -913,7 +919,7 @@ function card(p){
   const srcset = responsive?.mobile && responsive?.desktop
     ? ` srcset="${esc(responsive.mobile)} 640w, ${esc(responsive.desktop)} 1200w" sizes="(max-width:640px) 92vw, (max-width:1100px) 46vw, 360px"`
     : '';
-  return `<article class="card ${hasSpecificImage ? '' : 'imageFallback'}"><div class="pic"><img src="${esc(p.img)}"${srcset} alt="${esc(alt)}" loading="lazy" decoding="async"><div class="badges">${badges.map(t=>`<span class="badge">${esc(t)}</span>`).join('')}</div>${hasSpecificImage ? '' : '<span class="imageNotice">Foto specifica non disponibile</span>'}</div><div class="body"><div class="nameRow"><h4>${esc(p.name)}</h4><div class="price">${appliedDiscountRate() ? `<span class="old">${money(p.price)}</span>` : ''}${money(discountedPrice(p.price))}</div></div><p class="desc">${esc(p.desc)}</p><div class="meta"><span class="tag">${esc(clusterLabel(p.categoryGroup))}</span>${(p.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div><div class="actions"><button class="details" onclick="openDetails('${p.id}')">Dettagli</button><button class="add" aria-label="${esc(addLabel)}" onclick="quickAdd('${p.id}')" ${isOrderingClosed() ? 'disabled' : ''}>${isOrderingClosed() ? 'Chiuso' : '+'}</button></div></div></article>`;
+  return `<article data-food-tags="${(window.DosePreferences?.tags(p) || []).join(' ')}" class="card ${hasSpecificImage ? '' : 'imageFallback'}"><div class="pic"><img src="${esc(p.img)}"${srcset} alt="${esc(alt)}" loading="lazy" decoding="async"><div class="badges">${badges.map(t=>`<span class="badge">${esc(t)}</span>`).join('')}</div>${hasSpecificImage ? '' : '<span class="imageNotice">Foto specifica non disponibile</span>'}</div><div class="body"><div class="nameRow"><h4>${esc(p.name)}</h4><div class="price">${appliedDiscountRate() ? `<span class="old">${money(p.price)}</span>` : ''}${money(discountedPrice(p.price))}</div></div><p class="desc">${esc(p.desc)}</p><div class="meta"><span class="tag">${esc(clusterLabel(p.categoryGroup))}</span>${(p.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div><div class="actions"><button class="details" onclick="openDetails('${p.id}')">Dettagli</button><button class="add" aria-label="${esc(addLabel)}" onclick="quickAdd('${p.id}')" ${isOrderingClosed() ? 'disabled' : ''}>${isOrderingClosed() ? 'Chiuso' : '+'}</button></div></div></article>`;
 }
 function openDetails(id){
   const p = PRODUCTS.find(x => x.id === id);
@@ -1276,6 +1282,7 @@ function completeWhatsappOrder(){
   const orderId = state.lastOrderId;
   window.DoseCartSync?.confirm('pagnottella');
   persistCheckoutState('user_confirmed_sent');
+  window.DosePreferences?.confirmReceipt(window.DoseSupplierAccess?.getStoredUser?.()?.uid, orderId);
   byId('checkoutCompleteSummary').textContent = `${orderId ? `Ordine ${orderId} · ` : ''}${t.count} ${t.count === 1 ? 'prodotto' : 'prodotti'} · Totale ${money(t.total)}`;
   state.cart = {};
   clearDraftCart();
@@ -1314,7 +1321,9 @@ async function confirmPaymentAndSend(){
   byId('confirm').classList.remove('show', 'isError');
   try{
     const payload = buildOrderPayload();
+    const receiptUid = supplierAccess.getStoredUser?.()?.uid;
     const result = await supplierAccess.createPagnottellaOrder(payload);
+    if(!result.local) window.DosePreferences?.receipt(receiptUid, 'pagnottella', result.id, payload, false);
     if(!result.local) window.DoseUsualOrder?.save(payload);
     try{ logOrder(result.id, { firebaseSaved: !result.local }); }
     catch(error){ console.warn('order_local_log_failed'); }
@@ -1472,3 +1481,10 @@ window.DoseUsualCart = {
     openCart();
   }
 };
+
+window.DosePreferenceCart = {
+  empty: () => totals().count === 0,
+  snapshot: () => {const payload=buildOrderPayload();return {items:payload.items,notes:payload.allergies};},
+  repeat: saved => window.DoseUsualCart.repeat(saved)
+};
+window.dispatchEvent(new Event('dose:preferences-ready'));
