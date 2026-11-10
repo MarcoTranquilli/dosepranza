@@ -49,8 +49,8 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
         const RAW_MENU = {
             "Gastronomia": [
                 { name: "Melanzane alla parmigiana (grigliate, 250-300g)", price: 6.0, desc: "Grigliate (250-300g)", diet: ["vegetariano"] },
-                { name: "Lasagna classica al ragù (250-300g)", price: 6.0, desc: "Sfoglia all'uovo (250-300g)", diet: ["carne/pesce"] },
-                { name: "Lasagna bianca vegetariana ai carciofi (250-300g)", price: 6.0, desc: "Sfoglia all'uovo (250-300g)", diet: ["vegetariano"] },
+                { name: "Lasagna classica al ragù (250-300g)", foodTags: ["hot"], price: 6.0, desc: "Sfoglia all'uovo (250-300g)", diet: ["carne/pesce"] },
+                { name: "Lasagna bianca vegetariana ai carciofi (250-300g)", foodTags: ["hot"], price: 6.0, desc: "Sfoglia all'uovo (250-300g)", diet: ["vegetariano"] },
                 { name: "Lasagna funghi salsiccia", price: 6.0, desc: "Besciamella e salsiccia (250-300g)", diet: ["carne/pesce"] },
                 { name: "Cous cous vegetale con pollo", price: 4.0, diet: ["carne/pesce"] },
                 { name: "Cous cous vegetale", price: 4.0, diet: ["vegano"] },
@@ -597,6 +597,22 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             if(v === 'menu') renderMenuAdmin();
         };
 
+        let foodTag = 'all';
+        window.addEventListener('dose:food-filter', event => {
+            if(event.detail?.supplier !== 'russo') return;
+            foodTag = event.detail.tag;
+            renderMenu();
+        });
+        window.DosePreferenceCart = {
+            empty: () => state.cart.length === 0,
+            snapshot: () => ({items: state.cart, notes: document.getElementById('allergies-input')?.value || ''}),
+            repeat: saved => {
+                if(state.cart.length) throw Error('Il carrello contiene gia prodotti.');
+                const plan = window.DoseRussoUsual.plan(saved.items, window.DoseCustomerCatalog.list());
+                if(plan.accepted.length) window.DoseRussoUsualCart.repeat(plan.accepted, saved.notes);
+                return plan.skipped.length ? 'Da ricomporre dal catalogo: ' + plan.skipped.join(', ') : '';
+            }
+        };
         window.DoseRussoUsualCart = {
             uid: () => auth_fb.currentUser?.isAnonymous ? null : auth_fb.currentUser?.uid,
             empty: () => state.cart.length === 0,
@@ -1332,12 +1348,14 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             try {
                 const result = await addDoc(ordersCol, order);
                 window.DoseRussoUsual?.save(authenticatedUser.uid, payload);
+                window.DosePreferences?.receipt(authenticatedUser.uid, 'russo', result.id, payload);
                 return result;
             } catch(error) {
                 if(!isFirestorePermissionDenied(error)) throw error;
                 await authenticatedUser.getIdToken(true);
                 const result = await addDoc(ordersCol, order);
                 window.DoseRussoUsual?.save(authenticatedUser.uid, payload);
+                window.DosePreferences?.receipt(authenticatedUser.uid, 'russo', result.id, payload);
                 return result;
             }
         }
@@ -2031,8 +2049,12 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
                 const s = i.name.toLowerCase().includes(state.search.toLowerCase());
                 const c = state.cat === 'all' || i.cat === state.cat;
                 const d = state.diet === 'all' || (i.diet && i.diet.includes(state.diet));
-                return s && c && d;
+                return s && c && d && (!window.DosePreferences || window.DosePreferences.matches(i, foodTag));
             });
+            if(!filtered.length) {
+                document.getElementById('menu-container').innerHTML = '<p class="dose-food-help">Nessun prodotto con i filtri selezionati. Torna a Tutti per consultare il catalogo.</p>';
+                return;
+            }
             let cur = "";
             document.getElementById('menu-container').innerHTML = filtered.map(i => {
                 let html = "";
@@ -2046,9 +2068,9 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
                     isDisabled ? `<span class="badge badge-red">Non disponibile</span>` : ''
                 ].filter(Boolean).join('');
                 const creatorMeta = i.creatorName ? `<p class="text-[10px] text-gray-500 font-bold mt-1">Creato da ${esc(i.creatorName)}</p>` : '';
-                html += `<div class="card p-5 rounded-[2rem] flex flex-col justify-between ${disabled}">
+                html += `<div data-food-tags="${(window.DosePreferences?.tags(i) || []).join(' ')}" class="card p-5 rounded-[2rem] flex flex-col justify-between ${disabled}">
                     <div class="flex items-start justify-between gap-2">
-                        <div><h4 data-action="toggle-product-title" class="font-bold text-sm product-title expandable leading-tight mb-1" title="Tocca per espandere o ridurre">${esc(i.name)}</h4><p class="text-[9px] text-gray-300 italic">${esc(i.cat)}</p>${creatorMeta}</div>
+                        <div><h4 data-action="toggle-product-title" class="font-bold text-sm product-title expandable leading-tight mb-1" title="Tocca per espandere o ridurre">${esc(i.name)}</h4><p class="text-[9px] text-gray-300 italic">${esc(i.cat)}</p>${creatorMeta}<p class="dose-food-tags">${(window.DosePreferences?.tags(i) || []).map(tag => window.DosePreferences.labels[tag]).join(' · ')}</p></div>
                         ${badges ? `<div class="flex flex-col items-end gap-1">${badges}</div>` : ''}
                     </div>
                     <div class="mt-4 flex justify-between items-center gap-2">${pricing}<button data-action="add-std" data-id="${i.id}" class="bg-primary text-white h-10 w-10 rounded-2xl shadow-lg flex items-center justify-center flex-shrink-0 active:scale-90" ${(!orderOpen || isDisabled) ? 'disabled' : ''}><i class="fas fa-plus"></i></button></div>
