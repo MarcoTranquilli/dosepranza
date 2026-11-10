@@ -1000,6 +1000,7 @@ function totals(){ const items = Object.values(state.cart); const orig = items.r
 window.DoseCanReload = () => Boolean(DATA) && !authState.loading && !state.sending && totals().count === 0
   && !byId('paymentConfirmModal')?.classList.contains('show') && !byId('checkoutCompleteModal')?.classList.contains('show');
 function renderCart(){
+  window.DoseUsualOrder?.refresh();
   const draftTotals = totals();
   window.DoseCartSync?.sync('pagnottella',draftTotals.items,Math.round(draftTotals.total*100));
   const t = totals();
@@ -1097,6 +1098,7 @@ function buildOrderPayload(){
   const items = t.items.flatMap(item => Array.from({ length:item.qty }, () => ({
     id: item.id,
     name: item.name,
+    baseDescription: item.desc || '',
     cat: clusterLabel(item.categoryGroup),
     details: `${item.opt}${item.extras?.length ? ` · Extra: ${item.extras.map(extra => extra.name).join(', ')}` : ''}`,
     option: item.opt,
@@ -1313,6 +1315,7 @@ async function confirmPaymentAndSend(){
   try{
     const payload = buildOrderPayload();
     const result = await supplierAccess.createPagnottellaOrder(payload);
+    if(!result.local) window.DoseUsualOrder?.save(payload);
     try{ logOrder(result.id, { firebaseSaved: !result.local }); }
     catch(error){ console.warn('order_local_log_failed'); }
     state.lastSubmittedMessage = message;
@@ -1455,3 +1458,17 @@ byId('browseAnonymous')?.addEventListener('click', () => {
   byId('shop')?.classList.add('show');
   renderCart();
 });
+
+window.DoseUsualCart = {
+  empty: () => totals().count === 0,
+  repeat: saved => {
+    if(totals().count) throw Error('Il carrello contiene gia prodotti.');
+    if(isOrderingClosed()) throw Error('Punto vendita temporaneamente chiuso.');
+    const plan = window.DosePagnottellaOrders.plan(saved, PRODUCTS, optionList, DATA.extras || []);
+    for(const item of plan) for(let n=0;n<item.qty;n++) addToCart(item.product,item.option,item.extras);
+    if(byId('notes')) byId('notes').value = saved.notes || '';
+    persistDraftCart();
+    renderCart();
+    openCart();
+  }
+};

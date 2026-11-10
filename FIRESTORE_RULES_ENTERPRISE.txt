@@ -60,6 +60,7 @@ service cloud.firestore {
 
     function isPagnottellaSupplier() {
       return isGoogleProvider()
+        && request.auth.token.get('email_verified', false)
         && authenticatedEmail() in [
           'commerciale@lapagnottellagourmet.it',
           'isidorovagnozzi@gmail.com'

@@ -47,3 +47,6 @@ cp "${ROOT_DIR}/supplier-access.js" "${DIST_ROOT}/supplier-access.js"
 mkdir -p "${DIST_ROOT}/assets/branding"
 cp "${ROOT_DIR}/assets/branding/dosepranza-suite-logo.png" "${DIST_ROOT}/assets/branding/"
 cp "${ROOT_DIR}/favicondosepranza.png" "${DIST_ROOT}/"
+
+cp "${ROOT_DIR}/pagnottella-gourmet/ordini.html" "${DIST_DIR}/"
+cp "${ROOT_DIR}/pagnottella-gourmet/ordini.js" "${DIST_DIR}/"
