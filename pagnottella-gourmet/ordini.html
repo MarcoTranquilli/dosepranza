@@ -302,6 +302,11 @@
     }
   *{box-sizing:border-box}button{min-height:44px}.header,.controls-left,.actions-bar,.supp-head{flex-wrap:wrap}.user-email{overflow-wrap:anywhere}.card{overflow-x:auto}.table{min-width:520px}button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #09090b;outline-offset:3px}@media(max-width:480px){.container{padding:16px 12px}.login-container{margin:24px 12px}.controls-card{padding:12px}.header{display:block}.user-panel{text-align:left;margin-top:12px}}@media print{@page{size:A4;margin:12mm}.card{overflow:visible;break-inside:auto}.table{min-width:0;table-layout:fixed}.table td{overflow-wrap:anywhere}thead{display:table-header-group}tr{break-inside:avoid}#btn-blocked-logout,#access-status{display:none}}
 </style>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Ordini Pagnottella">
+<meta name="mobile-web-app-capable" content="yes">
+<style>.user-panel{flex-wrap:wrap}#supplier-audio-toggle,#supplier-audio-test{min-height:44px;max-width:100%}</style>
 </head>
 <body>
   <p id="access-status" role="status" style="padding:16px"></p><button id="btn-blocked-logout" class="btn-secondary" hidden>Disconnetti account</button>
@@ -330,7 +335,7 @@
         <p>Riepilogo e Distinta Ordini del Giorno</p>
         <span class="live-badge"><span class="live-dot"></span> <span id="sync-status">In attesa di sincronizzazione</span></span>
       </div>
-      <div class="user-panel">
+      <div class="user-panel"><button id="supplier-audio-toggle" type="button" aria-pressed="false">🔕 Audio muto</button><button id="supplier-audio-test" type="button">Prova audio</button>
         <span id="user-email-display" class="user-email">—</span>
         <button id="btn-logout" class="btn-secondary">Esci</button>
       </div>
@@ -408,5 +413,6 @@
   <script src="./supplier-access.js?v=20261110-orders1"></script>
   <script src="../shared/pagnottella-orders-core.js?v=20261110-orders1"></script>
   <script src="./order-analytics.js?v=20261110-orders1"></script>
-  <script type="module" src="./ordini.js?v=20261110-orders1"></script>
+  <script src="../shared/supplier-audio.js?v=20261110-1"></script>
+<script type="module" src="./ordini.js?v=20261110-audio1"></script>
 </body></html>

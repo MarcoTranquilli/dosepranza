@@ -597,6 +597,15 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             if(v === 'menu') renderMenuAdmin();
         };
 
+        window.DoseRussoUsualCart = {
+            uid: () => auth_fb.currentUser?.isAnonymous ? null : auth_fb.currentUser?.uid,
+            empty: () => state.cart.length === 0,
+            repeat: (plan, notes) => {
+                window.DoseCustomerCatalog.reorder(plan);
+                const input = document.getElementById('allergies-input');
+                if(input) input.value = notes || '';
+            }
+        };
         window.DoseCustomerCatalog = {
             list: () => buildMenuList().map(p => ({...p, available: !state.disabledProducts.has(p.id)})),
             choose: id => { const p=buildMenuList().find(p=>String(p.id)===id); if(p) window.addStdToCart(p.id); },
@@ -626,6 +635,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             state.cart.push({ ...item, price, details: det, cartId: Date.now() });
             document.getElementById('cart-count').textContent = state.cart.length;
             window.DoseCartSync?.sync('russo',state.cart,Math.round(state.cart.reduce((s,i)=>s+i.price,0)*100));
+            window.DoseRussoUsual?.refresh();
             window.toast("Aggiunto!");
         };
 
@@ -898,6 +908,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             state.menuAdminOpen = !state.menuAdminOpen;
             localStorage.setItem('menu_admin_open', JSON.stringify(state.menuAdminOpen));
             renderMenuAdmin();
+            window.DoseRussoUsual?.refresh();
             renderMenuAdminToggle();
         };
 
@@ -1319,11 +1330,15 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
                 createdAt: serverTimestamp()
             };
             try {
-                return await addDoc(ordersCol, order);
+                const result = await addDoc(ordersCol, order);
+                window.DoseRussoUsual?.save(authenticatedUser.uid, payload);
+                return result;
             } catch(error) {
                 if(!isFirestorePermissionDenied(error)) throw error;
                 await authenticatedUser.getIdToken(true);
-                return addDoc(ordersCol, order);
+                const result = await addDoc(ordersCol, order);
+                window.DoseRussoUsual?.save(authenticatedUser.uid, payload);
+                return result;
             }
         }
 
@@ -2010,6 +2025,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
 
         // --- INTERNAL LOGIC ---
         function renderMenu() {
+            window.DoseRussoUsual?.refresh();
             const orderOpen = isOrderWindowOpen();
             const filtered = buildMenuList().filter(i => {
                 const s = i.name.toLowerCase().includes(state.search.toLowerCase());
@@ -2060,6 +2076,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
         }
 
         function renderCart() {
+            window.DoseRussoUsual?.refresh();
             const dock = document.getElementById('russo-cart-dock-summary');
             if (dock) dock.textContent = state.cart.length + ' articoli · ' + formatCurrency(state.cart.reduce((sum, item) => sum + item.price, 0));
             if(!document.getElementById('russo-threshold-disclaimer')) {
@@ -3945,7 +3962,8 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
         }
 
         // --- INIT ---
-        onAuthStateChanged(auth_fb, async (u) => { 
+        onAuthStateChanged(auth_fb, async (u) => {
+            window.DoseRussoUsual?.refresh();
             resetStaffSubscriptions();
             resetMyOrdersSubscription();
             if(u) {

@@ -1,6 +1,7 @@
 import {signInWithPopup,GoogleAuthProvider,onAuthStateChanged,signOut} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
 import {getFirestore,collection,query,where,onSnapshot} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 const C=window.DosePagnottellaOrders,A=window.DoseOrderAnalytics,el=id=>document.getElementById(id);
+const audio=window.DoseSupplierAudio?.mount('pagnottella');
 let auth,db,stop,epoch=0,orders=[],report='';
 const money=n=>new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(n);
 const status=message=>{el('access-status').textContent=message;};
@@ -34,9 +35,11 @@ try{
   el('login-view').style.display=ok?'none':'block';el('main-view').style.display=ok?'block':'none';el('btn-blocked-logout').hidden=!user||ok;
   if(!ok){status(user?'Account non autorizzato. Usa un account fornitore o coordinatore abilitato.':'Accedi con Google per consultare gli ordini.');return;}
   status('');el('user-email-display').textContent=user.email;
+  audio?.reset();
   stop=onSnapshot(query(collection(db,'orders'),where('supplierId','==','pagnottella')),{includeMetadataChanges:true},snap=>{
    if(ticket!==epoch||!C.allowed(auth.currentUser))return;
    orders=snap.docs.map(d=>({...d.data(),id:d.id}));el('sync-status').textContent=snap.metadata.fromCache?'Cache locale: dati non verificati':'Sincronizzato dal server';
+   audio?.observe(orders.map(o=>({id:o.id,day:A.toDate(o.createdAt)?window.DoseSupplierAudio.day(A.toDate(o.createdAt)):''})),el('order-date').value,snap.metadata.fromCache,snap.metadata.hasPendingWrites);
    try{render();}catch{clear();status('Impossibile elaborare i dati. Verifica la data.');}
   },()=>{if(ticket!==epoch)return;clear();status('Lettura non disponibile. Verifica permessi e connessione.');});
  });
