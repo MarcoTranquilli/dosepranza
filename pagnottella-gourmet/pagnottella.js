@@ -129,8 +129,8 @@ const companyCopy = () => DATA?.orderContext?.company || 'DOS Design S.p.a.';
 const deliverySiteCopy = () => DATA?.orderContext?.deliverySite || 'Via Arno, 52, 00198 Roma RM';
 const paymentBeneficiary = () => DATA?.payment?.beneficiary || '';
 const paymentIban = () => DATA?.payment?.iban || '';
-const paymentNoteCopy = () => 'Satispay è il metodo principale; in alternativa è disponibile il bonifico bancario. PayPal e Nexi saranno attivati da settembre.';
-const finalizeOrderLabel = () => 'Rivedi e conferma ordine';
+const paymentNoteCopy = () => 'Satispay è il metodo principale; in alternativa puoi pagare in contanti al ritiro.';
+const finalizeOrderLabel = () => 'Invia Ordine su WhatsApp al Laboratorio';
 const reopenOrderLabel = 'Riapri il riepilogo su WhatsApp';
 const orderCutoffCopy = '11:00';
 const cutoffClosedCopy = () => 'Gli ordini inviati a Pagnottella successivi alle 11:00 non hanno garanzia di essere consegnati entro le 13:00';
@@ -235,6 +235,7 @@ function paymentMethodLabel(method){
 function paymentMethodMeta(label){
   const methods = {
     'Bonifico bancario': { icon:'↗', description:`Bonifico istantaneo entro le ${orderCutoffCopy}` },
+    'Contanti al ritiro': { icon:'€', description:'Da saldare al ritiro, non ancora pagato' },
     'Satispay': { icon:'S', description:`Metodo principale · entro le ${orderCutoffCopy}` },
     'PayPal': { icon:'P', description:'Disponibile da settembre' },
     'Nexi': { icon:'N', description:'Disponibile da settembre' }
@@ -243,13 +244,14 @@ function paymentMethodMeta(label){
 }
 
 function renderPaymentOptions(){
-  const activeMethods = (DATA.payment.methods || []).map(paymentMethodLabel).filter(Boolean);
+  const activeMethods = ['Satispay','Contanti al ritiro'];
   const futureMethods = (DATA.payment.futureMethods || []).map(method => ({
     label: paymentMethodLabel(method),
     availableFrom: method.availableFrom || 'settembre',
     enabled: method.enabled === true
   })).filter(method => method.label);
-  const selected = document.querySelector('input[name="paymentMethod"]:checked')?.value || activeMethods[0] || '';
+  const previous = document.querySelector('input[name="paymentMethod"]:checked')?.value;
+  const selected = activeMethods.includes(previous) ? previous : activeMethods[0];
   const options = byId('paymentOptions');
   if(options){
     const renderOption = (method, index) => {
@@ -281,6 +283,7 @@ function renderPaymentDetails(){
   const container = typeof byId === 'function' ? byId('paymentDetails') : null;
   if(!container) return;
   const method = typeof selectedPaymentMethod === 'function' ? selectedPaymentMethod() : 'Satispay';
+  if(method === 'Contanti al ritiro'){container.textContent='Pagamento in contanti al ritiro. Nessun pagamento digitale richiesto; invia comunque il riepilogo su WhatsApp.';return;}
   if(method === 'Bonifico bancario'){
     const iban = (typeof paymentIban === 'function' ? paymentIban() : null) || (typeof DATA !== 'undefined' && DATA.payment?.iban) || 'IT35B0832703249000000002986';
     const beneficiary = (typeof paymentBeneficiary === 'function' ? paymentBeneficiary() : null) || (typeof DATA !== 'undefined' && DATA.payment?.beneficiary) || '3M Società a Responsabilità Limitata';
@@ -368,7 +371,7 @@ function hydrateStatic(){
   const deliveryCardText = byId('deliveryCardText');
   if(deliveryCardText) deliveryCardText.textContent = `${deliveryCopy()}.`;
   byId('paymentCardTitle').textContent = DATA.payment.model;
-  byId('paymentCardText').textContent = `Satispay o bonifico istantaneo entro le ${orderCutoffCopy}. Il pagamento non trasmette automaticamente l'ordine: invia anche il messaggio WhatsApp.`;
+  byId('paymentCardText').textContent = `${paymentNoteCopy()} Il pagamento non trasmette automaticamente l'ordine: invia anche il messaggio WhatsApp.`;
   const customerInput = byId('customer');
   const recognizedName = authenticatedCustomerName();
   if(customerInput && recognizedName){
@@ -1046,8 +1049,8 @@ function buildMessage(){
   const notes = (byId('notes')?.value || '').trim();
   const paymentMethod = selectedPaymentMethod();
   const now = currentDate();
-  const date = now.toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  const time = now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+  const date = now.toLocaleDateString('it-IT',{timeZone:'Europe/Rome',weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const time = now.toLocaleTimeString('it-IT',{timeZone:'Europe/Rome',hourCycle:'h23',hour:'2-digit',minute:'2-digit'});
   let msg = 'Ordine tramite DOSepranza';
   msg += `\n\n\u{1F464} Cliente`;
   msg += `\n${name} – ${company}`;
@@ -1130,8 +1133,8 @@ function buildOrderPayload(){
     discountAmount: t.saving,
     total: t.total,
     paymentMethod: selectedPaymentMethod(),
-    paymentStatus: 'declared_paid',
-    paymentConfirmedAt: new Date().toISOString(),
+    paymentStatus: selectedPaymentMethod() === 'Contanti al ritiro' ? 'pending' : 'declared_paid',
+    paymentConfirmedAt: selectedPaymentMethod() === 'Contanti al ritiro' ? null : new Date().toISOString(),
     orderStatus: 'submitted',
     orderType: 'order',
     reconciled: false,
@@ -1160,6 +1163,7 @@ function showWhatsAppStatus(opened){
   const copy = byId('whatsappStatusCopy');
   if(!panel || !title || !copy) return;
   panel.classList.remove('hidden');
+  if(byId('whatsappCompleteBtn'))byId('whatsappCompleteBtn').disabled=!opened;
   const recipient = whatsappConfig();
   title.textContent = opened ? `WhatsApp aperto con ${recipient.supplierName}` : 'Apertura automatica bloccata';
   copy.textContent = opened
@@ -1216,7 +1220,7 @@ function configureConfirmation(action){
       : `Il riepilogo verrà aperto nella chat WhatsApp di ${recipient.supplierName} al numero ${recipient.displayNumber}.`;
     method.textContent = `Metodo selezionato: ${paymentMethod} · Destinatario: ${recipient.displayNumber}`;
     if(summary) summary.innerHTML = orderConfirmationSummaryHtml();
-    accept.textContent = `Apri WhatsApp con ${recipient.supplierName} ›`;
+    accept.textContent = 'Invia Ordine su WhatsApp al Laboratorio';
   }
   byId('paymentConfirmModal')?.classList.add('show');
   (isSubmit ? consent : accept)?.focus();
@@ -1257,7 +1261,7 @@ function requestReopenWhatsapp(){
   configureConfirmation('reopen');
 }
 function requestCompleteWhatsappOrder(){
-  if(!state.lastOrderId) return;
+  if(!state.lastOrderId || !state.whatsappOpened) return;
   configureConfirmation('complete');
 }
 function reopenWhatsapp(){
@@ -1279,6 +1283,7 @@ function copyWhatsAppMessage(){
     .catch(() => toast('Copia non disponibile: seleziona il testo del riepilogo'));
 }
 function completeWhatsappOrder(){
+  if(!state.lastOrderId || !state.whatsappOpened){toast('Apri prima il riepilogo su WhatsApp e invia il messaggio.');return;}
   const t = totals();
   const orderId = state.lastOrderId;
   window.DoseCartSync?.confirm('pagnottella');
