@@ -12,7 +12,7 @@
   const dialog=node('dialog');dialog.className='dose-receipt-dialog';dialog.setAttribute('aria-label','Dettagli ricevuta locale');document.body.append(dialog);
   const names={russo:'Alimentari Russo',pagnottella:'Pagnottella Gourmet'};
   const euros=value=>new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(value);
-  let noteInput, noteChip, filters;
+  let noteInput, noteChip, filters, noteOwner, noteAutofill;
   function adapter(){return window.DosePreferenceCart;}
   function mount() {
     const main=document.querySelector('main');
@@ -32,17 +32,19 @@
     }
     const input=document.getElementById(supplier==='russo'?'allergies-input':'notes');
     if(input&&input!==noteInput){
-      noteInput=input;noteChip=button('',()=>{if(!uid||noteInput.value.trim())return;noteInput.value=P.note(uid,supplier);noteInput.dispatchEvent(new Event('input',{bubbles:true}));});noteChip.className='dose-note-chip';input.after(noteChip);
-      input.addEventListener('input',()=>{if(uid&&!P.saveNote(uid,supplier,input.value))status.textContent='Nota non memorizzata: memoria locale non disponibile.';refreshNote();});
+      noteInput=input;noteChip=button('',()=>{if(!uid||noteInput.value.trim())return;const saved=P.profile(uid,supplier);noteInput.value=saved.allergies||saved.notes;noteInput.dispatchEvent(new Event('input',{bubbles:true}));});noteChip.className='dose-note-chip';input.after(noteChip);
+      input.addEventListener('input',refreshNote);
       const saveBox=node('div');saveBox.className='dose-ux';const label=node('input');label.placeholder='Nome della combinazione';label.maxLength=60;label.setAttribute('aria-label','Nome del nuovo preferito');
       saveBox.append(label,button('Salva combinazione nei preferiti',()=>{if(!uid)throw Error('Accedi per salvare i preferiti.');const cart=adapter()?.snapshot();P.saveFavorite(uid,supplier,cart,label.value);label.value='';signature='';refresh();status.textContent='Preferito salvato su questo browser.';}));noteChip.after(saveBox);
     }
   }
-  function refreshNote(){if(!noteInput)return;const last=P.note(uid,supplier);noteChip.hidden=!uid||!!noteInput.value.trim()||!last;noteChip.textContent=`Usa nota precedente: "${last}"`;}
+  function refreshNote(){if(!noteInput)return;
+    const owner=uid||'guest';if(noteOwner!==owner){if(noteOwner!==undefined&&(noteOwner!=='guest'||noteInput.value===noteAutofill))noteInput.value='';noteOwner=owner;const saved=P.profile(uid,supplier);if(!noteInput.value.trim()){noteInput.value=saved.allergies||saved.notes;noteAutofill=noteInput.value;}}
+    const saved=P.profile(uid,supplier),last=saved.allergies||saved.notes;noteChip.hidden=!uid||!!noteInput.value.trim()||!last;noteChip.textContent=`Usa nota precedente: "${last}"`;}
   function showReceipt(record) {
     dialog.replaceChildren(node('h2',names[record.supplier]),node('p',`Ordine ${record.id} · ${record.day}`));
     for(const item of record.items)dialog.append(node('p',`${item.quantity??item.qty??1} × ${item.name}${item.details?' · '+item.details:''}`));
-    dialog.append(node('p',record.notes||''),node('strong',`Totale ${euros(record.total)}`),node('p','Riepilogo locale della conferma utente. Non attesta pagamento, accettazione del fornitore o raggiungimento della soglia Russo.'),button('Chiudi',()=>dialog.close()));dialog.showModal();
+    dialog.append(node('p',record.notes||''),node('strong',`Totale ${euros(record.total)}`),node('p','Riepilogo locale della conferma utente. Non attesta pagamento, accettazione del fornitore o raggiungimento della soglia Russo.'),button('Copia riepilogo per colleghi',()=>{const b=dialog.querySelector('[data-copy-receipt]');window.DoseCheckout?.copy(b,record);}),button('Chiudi',()=>dialog.close()));const copy=dialog.querySelectorAll('button')[0];copy.dataset.copyReceipt='';dialog.insertBefore(node('p',window.DoseCheckout?.summary(record)||''),copy);dialog.showModal();
   }
   function refreshReceipts(){
     const records=P.today(uid);receipts.hidden=!records.length;receipts.replaceChildren();
@@ -73,6 +75,7 @@
   }
   window.DoseUX={refresh};
   window.addEventListener('dose:preferences-ready',refresh);
+  window.addEventListener('dose:order-recorded',()=>setTimeout(refreshReceipts,0));
   window.addEventListener('storage',()=>{signature='';refresh();});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});
   refresh();

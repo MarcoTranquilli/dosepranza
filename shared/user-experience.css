@@ -43,3 +43,6 @@
 /* Actual dietary filter strip; remove masking during keyboard focus. */
 .dose-food-filters { padding-inline:8px; mask-image:linear-gradient(to right,transparent,#000 8px,#000 calc(100% - 8px),transparent); -webkit-mask-image:linear-gradient(to right,transparent,#000 8px,#000 calc(100% - 8px),transparent); }
 .dose-food-filters:focus-within { mask-image:none; -webkit-mask-image:none; }
+.dose-cutoff-banner { position:sticky;top:0;z-index:20;padding:12px 16px;margin:12px 0;border:1px solid #e4e4e7;border-radius:12px;background:#ffffffeb;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);font-variant-numeric:tabular-nums;line-height:1.5; }
+.dose-cutoff-banner[hidden] { display:none; }
+@media print { .dose-cutoff-banner { display:none; } }

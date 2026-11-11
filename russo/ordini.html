@@ -334,7 +334,7 @@
       <div class="brand">
         <h1>Alimentari Russo</h1>
         <p>Riepilogo e Distinta Ordini del Giorno</p>
-        <span class="live-badge"><span class="live-dot"></span> In ascolto in tempo reale</span>
+        <span class="live-badge"><span class="live-dot"></span> <span id="sync-status">In ascolto in tempo reale</span></span>
       </div>
       <div class="user-panel"><button id="supplier-audio-toggle" type="button" aria-pressed="false">🔕 Audio muto</button><button id="supplier-audio-test" type="button">Prova audio</button>
         <span id="user-email-display" class="user-email">—</span>
@@ -413,7 +413,7 @@
 
   <script src="../supplier-access.js?v=20261111-mobile1"></script>
 <script src="../shared/supplier-login-guide.js?v=20261111-mobile1"></script>
-<script src="../shared/supplier-audio.js?v=20261110-1"></script>
+<script src="../shared/supplier-audio.js?v=20261111-phase2"></script>
 <script type="module">
     import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
     import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut, getRedirectResult, signInWithRedirect } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
@@ -434,7 +434,7 @@
     const el = id => document.getElementById(id);
     const audio = window.DoseSupplierAudio.mount('russo');
     let currentOrders = [];
-    let unsubscribeOrders = null;
+    let unsubscribeOrders = null, network;
 
     // Helper fuso orario Roma (YYYY-MM-DD)
     function getRomeTodayStr() {
@@ -552,9 +552,11 @@
       audio.reset();
       unsubscribeOrders = onSnapshot(q, {includeMetadataChanges:true}, snapshot => {
         currentOrders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        network?.snapshot(snapshot.metadata.fromCache);
         audio.observe(currentOrders.map(o=>({id:o.id,day:getOrderDay(o)})),el('order-date').value,snapshot.metadata.fromCache,snapshot.metadata.hasPendingWrites);
         renderView();
       }, err => {
+        network?.error();
         console.error("Errore listener ordini Russo:", err);
         alert("Errore durante la lettura degli ordini: " + err.message);
       });
@@ -578,6 +580,7 @@
       if(allowed){status('');el('user-email-display').textContent=user.email;startFirestoreListener();}
       else status(user ? 'Accesso negato per '+String(user.email||'email non disponibile').trim().toLowerCase()+'. Questo account Google non è abilitato per Alimentari Russo. Accedi con l’account concordato.' : 'Accedi con Google per consultare gli ordini.');
     };
+    network=window.DoseSupplierAudio?.connection?.({retry:startFirestoreListener,allowed:()=>allowedSupplier(auth.currentUser),element:el('sync-status')});
     onAuthStateChanged(auth,adoptUser);
     const recovered=await flow.recover();
     if(recovered.user&&!unsubscribeOrders)adoptUser(recovered.user);
