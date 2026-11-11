@@ -17,8 +17,8 @@ body.admin-editorial {
 .admin-editorial .segmented-control { padding:4px; background:var(--surface-alt); max-width:100%; }
 .admin-editorial .segment { min-height:44px; font-size:12px; font-weight:550; padding:8px 12px; border:1px solid transparent; }
 .admin-editorial .segment.active { border:1px solid var(--text-main); box-shadow:none; }
-.admin-editorial [data-supplier="russo"].active { background:#f0fdf4; color:#166534; }
-.admin-editorial [data-supplier="pagnottella"].active { background:#fff7ed; color:#9a3412; }
+.admin-editorial [data-supplier="russo"].active { background:#fff7ed; color:#92400e; }
+.admin-editorial [data-supplier="pagnottella"].active { background:#f4f7ed; color:#3f6212; }
 .admin-editorial :is(.btn-primary,.btn-secondary,.btn-ghost,.btn-chip,.date-input) { border-radius:var(--radius-btn); font-size:12px; font-weight:500; min-height:44px; }
 .admin-editorial .date-input { max-width:100%; min-width:0; }
 .admin-editorial .kpi-grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; }
@@ -29,8 +29,8 @@ body.admin-editorial {
 .admin-editorial .supplier-cards-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
 .admin-editorial .supp-head { flex-wrap:wrap; gap:12px; }
 .admin-editorial .supp-head h3 { font-size:14px; font-weight:550; padding:6px 10px; border-radius:999px; }
-.admin-editorial .summary-russo h3 { color:#166534; background:#f0fdf4; border:1px solid #bbf7d0; }
-.admin-editorial .summary-pagnottella h3 { color:#9a3412; background:#fff7ed; border:1px solid #fed7aa; }
+.admin-editorial .summary-russo h3 { color:#92400e; background:#fff7ed; border:1px solid #bbf7d0; }
+.admin-editorial .summary-pagnottella h3 { color:#3f6212; background:#fff7ed; border:1px solid #fed7aa; }
 .admin-editorial .cutoff-tag { background:transparent; color:var(--text-muted); font-size:10px; font-weight:400; }
 .admin-editorial .supp-body strong { font-size:22px; font-weight:550; }
 .admin-editorial .badge-total { background:var(--surface-alt); color:var(--text-main); font-size:11px; font-weight:500; white-space:nowrap; }
@@ -78,3 +78,8 @@ body.admin-editorial {
   .admin-editorial .kpi-value { font-size:20px; }
   .admin-editorial .supplier-cards-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
 }
+
+.admin-editorial :is(.admin-cache-status,.admin-badge) { line-height:1.6; }
+.admin-editorial td { padding-block:16px; }
+.admin-editorial tbody tr:hover { background:var(--bg); }
+@media(max-width:640px) { .admin-editorial .admin-topbar { padding:20px 16px; } .admin-editorial .filter-group { gap:8px; } }
