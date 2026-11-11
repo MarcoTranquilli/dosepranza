@@ -143,6 +143,66 @@ service cloud.firestore {
       allow update: if ownProfile() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['favorites']) && validFavorites();
     }
 
+    
+    // Presence is an append-only, identity-bound declaration; never an order projection.
+    function isBoardStaff() {
+      return isDosUser() && request.auth.token.get("email_verified", false);
+    }
+    function romeDayId(time) {
+      let local = time + duration.value(romeOffset(time), "h");
+      return string(local.year()) + "-" + (local.month() < 10 ? "0" : "") + string(local.month())
+        + "-" + (local.day() < 10 ? "0" : "") + string(local.day());
+    }
+
+    match /daily_summaries/{dateId} {
+      function validEntry(p) {
+        let order = get(/databases/$(database)/documents/orders/$(p.orderId)).data;
+        return p is map && p.keys().hasAll(["uid","name","email","supplierId","timestamp","orderId"])
+          && p.keys().hasOnly(["uid","name","email","supplierId","timestamp","orderId"])
+          && p.uid == request.auth.uid && p.email == authenticatedEmail()
+          && p.name == request.auth.token.get("name", authenticatedEmail().split("@")[0])
+          && p.name is string && p.name.size() <= 120
+          && p.supplierId in ["russo","pagnottella"]
+          && p.orderId is string && p.orderId.size() > 0 && p.orderId.size() <= 150 && p.orderId.matches("^[^/]+$")
+          && p.timestamp is timestamp && p.timestamp <= request.time
+          && p.timestamp >= request.time - duration.value(5, "m")
+          && order.uid == request.auth.uid && order.supplierId == p.supplierId
+          && order.createdAt is timestamp && romeDayId(order.createdAt) == dateId
+          && !(order.get("orderStatus","") in ["cancelled","canceled","annullato","draft"])
+          && !(order.get("paymentStatus","") in ["refunded","stornato","cancelled"])
+          && order.get("isTest",false) == false && order.get("test",false) == false;
+      }
+      function validDocument() {
+        return isBoardStaff() && dateId == romeDayId(request.time)
+          && request.resource.data.keys().hasOnly(["participants","lastUpdated"])
+          && request.resource.data.participants is list
+          && request.resource.data.participants.size() <= 300
+          && request.resource.data.lastUpdated == request.time;
+      }
+      allow get: if isBoardStaff() && dateId == romeDayId(request.time);
+      allow list, delete: if false;
+      allow create: if validDocument() && request.resource.data.participants.size() == 1
+        && validEntry(request.resource.data.participants[0]);
+      allow update: if validDocument()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["participants","lastUpdated"])
+        && request.resource.data.participants.size() == resource.data.participants.size() + 1
+        && request.resource.data.participants == resource.data.participants.concat([request.resource.data.participants[resource.data.participants.size()]])
+        && validEntry(request.resource.data.participants[resource.data.participants.size()]);
+    }
+
+    match /users/{uid} {
+      function ownProfile() { return isDosUser() && request.auth.uid == uid; }
+      function validFavorites() {
+        let f = request.resource.data.favorites;
+        return f is map && f.keys().hasOnly(["russo", "pagnottella"])
+          && f.get("russo", []) is list && f.get("russo", []).size() <= 100
+          && f.get("pagnottella", []) is list && f.get("pagnottella", []).size() <= 100;
+      }
+      allow read: if ownProfile();
+      allow create: if ownProfile() && request.resource.data.keys().hasOnly(["favorites"]) && validFavorites();
+      allow update: if ownProfile() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["favorites"]) && validFavorites();
+    }
+
     match /orders/{doc} {
       allow read: if isOrderManager()
         || (isDosUser() && isOwnerByUid())

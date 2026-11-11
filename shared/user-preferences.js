@@ -52,6 +52,8 @@
     const valid=combination(payload);
     if(!uid||!id||!valid||!Number.isFinite(payload.total)||payload.total<=0) return false;
     const record={...valid,uid,supplier,id,total:payload.total,timestamp:new Date().toISOString(),day:romeDay(),confirmed};
+    root.DoseExpenses?.invalidate(uid);
+    if(typeof root.dispatchEvent==='function' && typeof CustomEvent==='function') root.dispatchEvent(new CustomEvent('dose:order-recorded',{detail:{uid,supplier,id,confirmed,day:record.day}}));
     const suffix=confirmed?'receipts':'pending';
     const records=read(key(uid,suffix),[]);
     return write(key(uid,suffix),[...(Array.isArray(records)?records:[]).filter(r=>r&&r.day===record.day&&r.id!==id),record].slice(-30));
