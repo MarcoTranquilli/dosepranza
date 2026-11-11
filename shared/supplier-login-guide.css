@@ -1,3 +1,43 @@
 .supplier-browser-warning{position:sticky;top:0;z-index:100;padding:16px 20px;background:#fff7ed;border-bottom:2px solid #ea580c;color:#7c2d12;font-weight:600;line-height:1.6;overflow-wrap:anywhere}.supplier-browser-warning[hidden],.supplier-access-card[hidden]{display:none!important}.supplier-access-card{max-width:700px;margin:20px auto;padding:16px 20px;border:1px solid #fed7aa;border-radius:16px;background:#fffaf5;overflow-wrap:anywhere}.supplier-access-card p{line-height:1.6}#access-status{overflow-wrap:anywhere}#btn-blocked-logout{min-height:44px;white-space:normal}#btn-login:disabled{opacity:.6;cursor:wait}@media(max-width:480px){.supplier-access-card{margin:12px}.supplier-browser-warning{padding:12px;font-size:14px}}@media print{.supplier-browser-warning,.supplier-access-card,#access-status{display:none!important}}
 
 .supplier-access-card:has(#btn-blocked-logout:not([hidden])){background:#fff1f2;border-color:#fecdd3;color:#9f1239}
+
+/* Dashboard styling is scoped away from customer and admin authentication. */
+body.supplier-dashboard { --russo-green:#b45309; --russo-green-dark:#92400e; --russo-surface:#fff7ed; --russo-border:#fed7aa; font-family:var(--font-ui); background:var(--bg); }
+body.supplier-dashboard--pagnottella { --russo-green:#3f6212; --russo-green-dark:#365314; --russo-surface:#f4f7ed; --russo-border:#d9e4c7; }
+.supplier-dashboard :is(.card,.controls-card,.login-container) { border:1px solid var(--border); border-radius:12px; box-shadow:var(--shadow-soft); }
+.supplier-dashboard .header { gap:20px; }
+.supplier-dashboard .user-panel { flex-wrap:wrap; gap:8px; }
+.supplier-dashboard :is(button,.date-input) { min-height:44px; min-width:44px; border-radius:10px; }
+.supplier-dashboard .live-badge { font-size:13px; line-height:1.5; padding:8px 12px; white-space:normal; }
+.supplier-dashboard .user-email { overflow-wrap:anywhere; max-width:100%; }
+.supplier-dashboard .table th { font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-muted); }
+.supplier-dashboard .table td { padding:16px; line-height:1.6; overflow-wrap:anywhere; }
+.supplier-dashboard .order-note { background:#fffbeb; color:#78350f; padding:6px 8px; border-radius:8px; }
+@media screen and (max-width:640px) {
+  .supplier-dashboard .container { padding:16px 12px calc(24px + env(safe-area-inset-bottom)); }
+  .supplier-dashboard :is(.header,.controls-card,.actions-bar) { flex-wrap:wrap; gap:12px; }
+  .supplier-dashboard .user-panel { width:100%; align-items:flex-start; }
+  .supplier-dashboard .kpi-group { flex-wrap:wrap; gap:16px; }
+  .supplier-dashboard .table { width:100%; table-layout:fixed; }
+  .supplier-dashboard .table:has(#orders-tbody) thead { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+  .supplier-dashboard .table:has(#orders-tbody),.supplier-dashboard #orders-tbody { display:block; }
+  .supplier-dashboard #orders-tbody tr { display:grid; grid-template-columns:minmax(0,1fr) auto; padding:16px; margin:12px; border:1px solid var(--border); border-radius:12px; gap:8px 12px; }
+  .supplier-dashboard #orders-tbody td { display:block; padding:0; border:0; min-width:0; }
+  .supplier-dashboard #orders-tbody td:nth-child(1) { color:var(--text-muted); font-size:12px; }
+  .supplier-dashboard #orders-tbody td:nth-child(2) { grid-row:2; grid-column:1 / -1; font-weight:650; }
+  .supplier-dashboard #orders-tbody td:nth-child(3) { grid-row:3; grid-column:1 / -1; }
+  .supplier-dashboard #orders-tbody td:nth-child(4) { grid-row:1; grid-column:2; font-weight:650; }
+  .supplier-dashboard #orders-tbody td[colspan] { grid-column:1 / -1; }
+  .supplier-dashboard #packing-tbody td:first-child { width:54px; }
+}
+@media print {
+  .supplier-dashboard { background:#fff; color:#000; font-size:10pt; }
+  .supplier-dashboard :is(.header,.controls-card,.actions-bar,.supplier-access-card,.supplier-browser-warning,.toast) { display:none!important; }
+  .supplier-dashboard .container { max-width:none; padding:0; }
+  .supplier-dashboard .card { box-shadow:none; border:0; }
+  .supplier-dashboard .table { width:100%; border-collapse:collapse; }
+  .supplier-dashboard .table td { padding:6pt; border-bottom:1px solid #ddd; }
+  .supplier-dashboard tr { break-inside:avoid; }
+  .supplier-dashboard thead { display:table-header-group; }
+}

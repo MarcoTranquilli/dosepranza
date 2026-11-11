@@ -4,3 +4,14 @@
 .dose-note-chip{min-height:44px;padding:8px 12px;border:1px solid var(--border,#d4d4d8);border-radius:10px;background:var(--surface,#fff);font:inherit;color:inherit}.dose-note-chip[hidden]{display:none!important}.dose-ux input,.dose-ux button,.dose-food-filters button{font:inherit}
 
 .dose-expenses summary,.dose-board summary{cursor:pointer;min-height:44px;font-weight:600;overflow-wrap:anywhere}.dose-board ul{padding-left:20px}.dose-board li{padding:6px 0;overflow-wrap:anywhere}.dose-expenses small{display:block;line-height:1.6}
+
+/* Scroll is confined to filters, never the page. */
+.dose-food-filters { gap:8px; padding:10px 4px; scrollbar-width:none; scroll-padding-inline:4px; background:linear-gradient(90deg,#fcfcfcf5,#fcfcfce6); backdrop-filter:blur(12px); }
+.dose-food-filters::-webkit-scrollbar { display:none; }
+.dose-food-filters button { min-width:44px; min-height:44px; border-radius:999px; padding:10px 16px; font-size:13px; }
+.dose-ux { background:var(--surface,#fff); box-shadow:var(--shadow-soft,0 1px 3px #0000000d); border-radius:12px; padding:clamp(16px,3vw,24px); line-height:1.6; overflow-wrap:anywhere; }
+.dose-ux :is(button,a,input),.dose-note-chip { min-height:44px; min-width:44px; }
+.dose-expenses summary,.dose-board summary { padding-block:10px; }
+.dose-favorite-slot { align-items:center; }
+.dose-favorite-slot input { min-width:0; max-width:100%; }
+@media(max-width:640px) { .dose-ux { margin-block:12px; } .dose-favorite-slot input { flex-basis:100%; } }

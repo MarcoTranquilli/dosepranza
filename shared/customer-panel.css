@@ -161,3 +161,20 @@
   background-color: #9ca3af;
   cursor: not-allowed;
 }
+
+.dose-personal { background:var(--surface,#fff); border-color:var(--border,#e4e4e7); border-radius:12px; box-shadow:var(--shadow-soft,0 1px 3px #0000000d); }
+.dose-personal :is(button,select,input,a) { min-height:44px; min-width:44px; }
+.dose-personal :is(button,input,select):focus-visible { outline:2px solid #09090b; outline-offset:3px; }
+body.russo-editorial { --primary:#b45309; --primary-dark:#92400e; --border:#e4e4e7; --surface:#fff; font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif; background:#fcfcfc; }
+.russo-editorial :is(button,select,input:not([type=checkbox]),a.btn) { min-height:44px; }
+.russo-editorial button { min-width:44px; }
+.russo-editorial .card { border:1px solid var(--border); box-shadow:0 1px 3px #0000000d,0 8px 24px #00000008; }
+.russo-checkout-dock { display:grid; gap:12px; }
+@media(max-width:640px) {
+  .russo-editorial #cart-options { padding-bottom:calc(180px + env(safe-area-inset-bottom)); }
+  .russo-editorial .russo-checkout-dock { position:fixed; bottom:0; left:0; right:0; z-index:60; padding:12px 16px calc(16px + env(safe-area-inset-bottom)); background:#ffffffed; backdrop-filter:blur(12px); border-top:1px solid var(--border); }
+  .russo-checkout-dock > div { padding-top:0; border-top:0; }
+  .russo-checkout-dock [data-action=send-order] { min-height:48px; padding:12px; }
+  .russo-editorial :is(input,select,textarea) { font-size:16px; max-width:100%; }
+}
+@media print { .russo-editorial .russo-checkout-dock { position:static; } }
