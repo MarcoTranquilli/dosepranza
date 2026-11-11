@@ -15,3 +15,27 @@
 .dose-favorite-slot { align-items:center; }
 .dose-favorite-slot input { min-width:0; max-width:100%; }
 @media(max-width:640px) { .dose-ux { margin-block:12px; } .dose-favorite-slot input { flex-basis:100%; } }
+
+
+/* --- v2.5.2 Editorial Polish & Micro-Interactions --- */
+.attendance-board, .daily-card, .user-expense-summary {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.03);
+  border: 1px solid rgba(0,0,0,0.08);
+}
+
+.filter-pill, .badge-diet {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  transition: all 0.15s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.filter-pill:active {
+  transform: scale(0.95);
+}
+
+@media (max-width: 640px) {
+  .attendance-board .participant-row {
+    padding: 10px 12px;
+    font-size: 0.875rem;
+  }
+}

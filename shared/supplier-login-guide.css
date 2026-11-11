@@ -41,3 +41,57 @@ body.supplier-dashboard--pagnottella { --russo-green:#3f6212; --russo-green-dark
   .supplier-dashboard tr { break-inside:avoid; }
   .supplier-dashboard thead { display:table-header-group; }
 }
+
+
+/* --- v2.5.2 Supplier Dashboard Mobile Cards & Print Styles --- */
+@media (max-width: 640px) {
+  .orders-table, .orders-table tbody, .orders-table tr, .orders-table td {
+    display: block;
+    width: 100%;
+  }
+  .orders-table thead {
+    display: none;
+  }
+  .orders-table tr {
+    margin-bottom: 12px;
+    background: #ffffff;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 12px;
+    padding: 12px 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .orders-table td {
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+    text-align: left !important;
+  }
+  .orders-table td:last-child {
+    border-bottom: none;
+    padding-top: 8px;
+  }
+}
+
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt;
+  }
+  .header, .user-panel, #supplier-audio-toggle, #supplier-audio-test, #btn-logout, .live-badge, .controls-card {
+    display: none !important;
+  }
+  .card, .container {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+  .table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  .table th, .table td {
+    border: 1px solid #d1d5db !important;
+    padding: 6pt 8pt !important;
+  }
+}
