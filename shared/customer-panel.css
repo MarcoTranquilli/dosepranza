@@ -200,3 +200,6 @@ body.russo-editorial { --primary:#b45309; --primary-dark:#92400e; --border:#e4e4
 }
 @media(prefers-reduced-motion:reduce) { .russo-editorial button:active { transform:none; } }
 .russo-editorial :is(button,a,input,select,textarea,summary):focus-visible { transition:none; }
+.russo-hub-return { display:inline-flex;align-items:center;align-self:flex-start;min-height:44px;padding:10px 16px;margin-bottom:16px;border:1px solid #e4e4e7;border-radius:999px;color:#9a3412;background:#fff7ed;font-weight:600;text-decoration:none; }
+.russo-editorial .product-title { font-size:clamp(.78rem,2.2vw,.95rem);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;line-height:1.25;cursor:pointer;overflow-wrap:anywhere;min-height:44px; }
+.russo-editorial .product-title.is-expanded { display:block;-webkit-line-clamp:unset;overflow:visible; }

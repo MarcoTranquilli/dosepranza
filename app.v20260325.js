@@ -2073,7 +2073,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
                 const creatorMeta = i.creatorName ? `<p class="text-[10px] text-gray-500 font-bold mt-1">Creato da ${esc(i.creatorName)}</p>` : '';
                 html += `<div data-food-tags="${(window.DosePreferences?.tags(i) || []).join(' ')}" class="card p-5 rounded-[2rem] flex flex-col justify-between ${disabled}">
                     <div class="flex items-start justify-between gap-2">
-                        <div><h4 data-action="toggle-product-title" class="font-bold text-sm product-title expandable leading-tight mb-1" title="Tocca per espandere o ridurre">${esc(i.name)}</h4><p class="text-[9px] text-gray-300 italic">${esc(i.cat)}</p>${creatorMeta}<p class="dose-food-tags">${(window.DosePreferences?.tags(i) || []).map(tag => window.DosePreferences.labels[tag]).join(' · ')}</p></div>
+                        <div><h4 role="button" tabindex="0" aria-expanded="false" data-action="toggle-product-title" class="font-bold text-sm product-title expandable leading-tight mb-1" title="Tocca per espandere o ridurre">${esc(i.name)}</h4><p class="text-[9px] text-gray-300 italic">${esc(i.cat)}</p>${creatorMeta}<p class="dose-food-tags">${(window.DosePreferences?.tags(i) || []).map(tag => window.DosePreferences.labels[tag]).join(' · ')}</p></div>
                         ${badges ? `<div class="flex flex-col items-end gap-1">${badges}</div>` : ''}
                     </div>
                     <div class="mt-4 flex justify-between items-center gap-2">${pricing}<button data-action="add-std" aria-label="Aumenta quantità di ${esc(i.name)}" data-id="${i.id}" class="bg-primary text-white h-10 w-10 rounded-2xl shadow-lg flex items-center justify-center flex-shrink-0 active:scale-90" ${(!orderOpen || isDisabled) ? 'disabled' : ''}><i class="fas fa-plus"></i></button></div>
@@ -4081,7 +4081,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             'add-ing': (el) => window.addIng(el.dataset.id),
             'remove-ing': (el) => window.removeIng(parseInt(el.dataset.index, 10)),
             'add-custom': () => window.addCustomToCart(),
-            'toggle-product-title': (el) => el.classList.toggle('product-title-expanded'),
+            'toggle-product-title': (el) => {const expanded=el.classList.toggle('is-expanded');el.classList.toggle('product-title-expanded',expanded);el.setAttribute('aria-expanded',String(expanded));},
             'toggle-availability': (el) => window.toggleProductAvailability(el.dataset.id),
             'menu-upsert': () => window.upsertMenuProduct(),
             'menu-update-price': (el) => window.updateMenuPrice(el.dataset.key),
@@ -4141,6 +4141,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             'confirm-send-order': () => confirmSendOrder()
         };
 
+        document.addEventListener('keydown',event=>{const title=event.target.closest?.('[data-action="toggle-product-title"]');if(title&&(event.key==='Enter'||event.key===' ')){event.preventDefault();title.click();}});
         document.addEventListener('click', (event) => {
             const el = event.target.closest('[data-action]');
             if(!el) return;
