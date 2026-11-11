@@ -135,3 +135,41 @@ body.supplier-dashboard--pagnottella { --russo-green:#166534; --russo-green-dark
 .live-dot.is-offline { background:#6b7280!important; animation:none!important; }
 .live-dot.is-pending { background:#b45309!important; animation:none!important; }
 @media(prefers-reduced-motion:reduce) { .live-dot { animation:none!important; } }
+
+
+/* DosePranza v2.7.0 Kitchen Display & Ergonomics */
+.prep-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #374151;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: all 0.15s ease;
+}
+.prep-toggle-btn:active {
+  transform: scale(0.96);
+}
+tr.order-prepared, .order-card.order-prepared {
+  background-color: #f9fafb !important;
+  opacity: 0.65;
+}
+tr.order-prepared td, .order-card.order-prepared * {
+  color: #6b7280 !important;
+}
+tr.order-prepared .prep-toggle-btn {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #065f46;
+}
+@media print {
+  .prep-toggle-btn { display: none !important; }
+  tr.order-prepared { opacity: 1 !important; }
+}
