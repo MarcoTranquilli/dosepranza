@@ -1,14 +1,14 @@
 :root {
-  --bg: #fafafa;
+  --bg: #fcfcfc;
   --surface: #ffffff;
   --border: #e4e4e7;
   --text-main: #09090b;
-  --text-muted: #71717a;
-  --pagnottella: #ea580c;
-  --russo: #15803d;
-  --radius-card: 16px;
+  --text-muted: #62626c;
+  --pagnottella: #3f6212;
+  --russo: #b45309;
+  --radius-card: 12px;
   --radius-btn: 10px;
-  --shadow-soft: 0 1px 3px rgba(0,0,0,.05);
+  --shadow-soft: 0 1px 3px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.03);
 }
 body[data-theme="editorial"] {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -85,3 +85,23 @@ body[data-theme="editorial"] {
 [data-theme="editorial"]:not(.is-local-preview) .auth-local-btn { display:none; }
 [data-theme="editorial"].auth-authenticated .auth-card { display:none; }
 [data-theme="editorial"].auth-authenticated #hub-browser-hint { display:none; }
+
+/* v2.5: shared ergonomics without changing application visibility states. */
+:root { --surface-soft:#f4f4f5; --radius-dialog:16px; --font-ui:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif; }
+body { -webkit-tap-highlight-color:transparent; }
+button,input,select,textarea { font:inherit; }
+button,select,summary,input:not([type=checkbox]):not([type=radio]):not([type=hidden]) { min-height:44px; }
+button { min-width:44px; touch-action:manipulation; }
+:where(button,a,input,select,textarea,summary):focus-visible { outline:2px solid var(--text-main,#09090b); outline-offset:3px; }
+:where(dialog) { border-radius:var(--radius-dialog); }
+[data-theme="editorial"] .hero { padding-block:clamp(32px,6vw,64px) 32px; }
+[data-theme="editorial"] .supplier-card { padding:clamp(20px,3vw,32px); }
+[data-theme="editorial"] .supplier-card:hover { transform:translateY(-2px); box-shadow:var(--shadow-soft); }
+@media(max-width:640px) {
+  input,textarea,select { font-size:16px; }
+  [data-theme="editorial"] .site-footer { flex-wrap:wrap; }
+  [data-theme="editorial"] .profile { flex-wrap:wrap; }
+}
+@media(prefers-reduced-motion:reduce) {
+  *,*::before,*::after { scroll-behavior:auto!important; animation-duration:.01ms!important; transition-duration:.01ms!important; }
+}
