@@ -105,3 +105,29 @@ button { min-width:44px; touch-action:manipulation; }
 @media(prefers-reduced-motion:reduce) {
   *,*::before,*::after { scroll-behavior:auto!important; animation-duration:.01ms!important; transition-duration:.01ms!important; }
 }
+
+
+/* --- v2.5.2 Editorial Polish & WCAG AA --- */
+:root {
+  --text-muted: #4b5563; /* Contrasto elevato WCAG AA (min 4.5:1) */
+  --russo-accent: #9a3412;
+  --russo-badge-bg: #fff7ed;
+  --russo-badge-border: #ffedd5;
+  --pagnottella-accent: #166534;
+  --pagnottella-badge-bg: #f0fdf4;
+  --pagnottella-badge-border: #dcfce7;
+}
+
+:is(.total, .price, .badge, .counter, .time, .receipt-amount, [data-price], [data-total], .user-email) {
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 2px solid #111827 !important;
+  outline-offset: 3px !important;
+}
+
+button:active, .interactive-card:active, a.btn:active {
+  transform: scale(0.975);
+  transition: transform 0.08s ease;
+}
