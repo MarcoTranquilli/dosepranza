@@ -136,7 +136,7 @@ const orderCutoffCopy = '11:00';
 const cutoffClosedCopy = () => 'Gli ordini inviati a Pagnottella successivi alle 11:00 non hanno garanzia di essere consegnati entro le 13:00';
 const cutoffNoticeCopy = cutoffClosedCopy;
 function pagnottellaOrdersClosed(){
-  const time = new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Rome',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date());
+  const time = new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Rome',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format((globalThis.window?.DoseClock ? new Date(window.DoseClock.now()) : new Date()));
   return time >= orderCutoffCopy;
 }
 const deliveryTimeCopy = '12:30';
@@ -995,13 +995,14 @@ function addToCart(p,o,extras=[]){
   const key = [p.id, o.label, ...normalizedExtras.map(extra => extra.name)].join('|');
   if(!state.cart[key]) state.cart[key] = {...p,cartKey:key,opt:o.label,optExtra:o.extra,extras:normalizedExtras,extrasTotal,originalUnit,qty:0};
   state.cart[key].qty++;
+  globalThis.window?.DoseCartFeedback?.pulse();
   persistDraftCart();
   resetCurrentTransmissionState();
   toast(`${p.name} aggiunto al carrello`);
   renderCart();
   return true;
 }
-function changeQty(key,delta){ if(!state.cart[key]) return; state.cart[key].qty += delta; if(state.cart[key].qty <= 0) delete state.cart[key]; persistDraftCart(); resetCurrentTransmissionState(); renderCart(); }
+function changeQty(key,delta){ if(!state.cart[key]) return; globalThis.window?.DoseCartFeedback?.pulse(); state.cart[key].qty += delta; if(state.cart[key].qty <= 0) delete state.cart[key]; persistDraftCart(); resetCurrentTransmissionState(); renderCart(); }
 function totals(){ const items = Object.values(state.cart); const orig = items.reduce((a,i)=>a+i.originalUnit*i.qty,0); const total = discountedPrice(orig); return {items, count:items.reduce((a,i)=>a+i.qty,0), orig, total, saving:orig-total}; }
 window.DoseCanReload = () => Boolean(DATA) && !authState.loading && !state.sending && totals().count === 0
   && !byId('paymentConfirmModal')?.classList.contains('show') && !byId('checkoutCompleteModal')?.classList.contains('show');
@@ -1018,7 +1019,7 @@ function renderCart(){
   byId('mobileBar').classList.toggle('hidden', t.count === 0);
   const lines = t.items.map(i => {
     const extras = (i.extras || []).map(extra => `${extra.name} (+${money(extra.price)})`).join(', ');
-    return `<div class="cartItem checkoutItem"><img src="${i.img}" alt="${esc(i.name)}"><div class="ciMain"><div class="ciName">${esc(i.name)}</div><div class="ciMeta"><strong>${esc(i.opt)}</strong>${i.optExtra?` · +${money(i.optExtra)}`:''}${extras ? `<span class="ciExtras">Extra: ${esc(extras)}</span>` : ''}<span>${money(discountedPrice(i.originalUnit))} cad.</span></div><div class="qty stepper"><button aria-label="Diminuisci ${esc(i.name)}" onclick="changeQty('${escKey(i.cartKey)}',-1)">−</button><b>${i.qty}</b><button aria-label="Aumenta ${esc(i.name)}" onclick="changeQty('${escKey(i.cartKey)}',1)">+</button></div></div><div class="ciPrice">${money(discountedPrice(i.originalUnit)*i.qty)}</div></div>`;
+    return `<div class="cartItem checkoutItem"><img src="${i.img}" alt="${esc(i.name)}"><div class="ciMain"><div class="ciName">${esc(i.name)}</div><div class="ciMeta"><strong>${esc(i.opt)}</strong>${i.optExtra?` · +${money(i.optExtra)}`:''}${extras ? `<span class="ciExtras">Extra: ${esc(extras)}</span>` : ''}<span>${money(discountedPrice(i.originalUnit))} cad.</span></div><div class="qty stepper"><button aria-label="Riduci quantità di ${esc(i.name)}" onclick="changeQty('${escKey(i.cartKey)}',-1)">−</button><b>${i.qty}</b><button aria-label="Aumenta quantità di ${esc(i.name)}" onclick="changeQty('${escKey(i.cartKey)}',1)">+</button></div></div><div class="ciPrice">${money(discountedPrice(i.originalUnit)*i.qty)}</div></div>`;
   }).join('');
   byId('cartItems').innerHTML = t.count ? lines : `<div class="cartEmpty">Il carrello è vuoto. Aggiungi panini, insalate o bevande dal catalogo.</div>`;
   byId('summary').classList.toggle('hidden', !t.count);

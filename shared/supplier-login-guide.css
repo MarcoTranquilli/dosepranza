@@ -131,3 +131,7 @@ body.supplier-dashboard--pagnottella { --russo-green:#166534; --russo-green-dark
     padding-left: 12pt !important;
   }
 }
+.live-dot { animation-duration:1.5s; }
+.live-dot.is-offline { background:#6b7280!important; animation:none!important; }
+.live-dot.is-pending { background:#b45309!important; animation:none!important; }
+@media(prefers-reduced-motion:reduce) { .live-dot { animation:none!important; } }

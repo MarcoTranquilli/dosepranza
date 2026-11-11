@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>DOSepranza - Gestione Ordini</title>
     <link rel="icon" href="https://i.postimg.cc/L6H20zfp/logo-dosepranza-People-About-Food.png?v=20260209">
     <meta name="referrer" content="no-referrer">
@@ -24,7 +24,13 @@
     <script src="russo/threshold-status.js?v=russo-threshold-client-1" defer></script>
 <script src="shared/cart-sync.js?v=drafts-1"></script>
 <link rel="stylesheet" href="shared/user-experience.css?v=20261110-ux1">
-<script src="shared/user-preferences.js?v=20261110-board1"></script>
+<script src="shared/user-preferences.js?v=20261111-phase2"></script>
+<script src="shared/cart-feedback.js?v=20261111-ux26"></script>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#ffffff">
+<link rel="apple-touch-icon" href="/dosepranza/favicondosepranza.png">
+<script src="shared/checkout-utils.js?v=20261111-ux26"></script>
 </head>
 <body class="russo-editorial bg-background text-text-main pb-20 font-sans">
 
@@ -52,7 +58,7 @@
             </button>
             <button data-action="navigate" data-view="cart" id="btn-cart" class="nav-btn py-3 rounded-xl font-bold text-[10px] uppercase transition-all relative">
                 <i class="fas fa-shopping-basket block text-sm mb-1"></i>Ordine
-                <span id="cart-count" class="absolute top-1 right-1 bg-red-500 text-white text-[9px] h-4 w-4 rounded-full flex items-center justify-center border border-white">0</span>
+                <span id="cart-count" aria-live="polite" aria-atomic="true" class="absolute top-1 right-1 bg-red-500 text-white text-[9px] h-4 w-4 rounded-full flex items-center justify-center border border-white">0</span>
             </button>
             <button data-action="navigate" data-view="history" id="btn-history" class="nav-btn py-3 rounded-xl font-bold text-[10px] uppercase transition-all"><i class="fas fa-users block text-sm mb-1"></i>Tutti</button>
             <button data-action="navigate" data-view="analytics" id="btn-analytics" class="nav-btn py-3 rounded-xl font-bold text-[10px] uppercase transition-all"><i class="fas fa-chart-line block text-sm mb-1"></i>Analisi</button>
@@ -429,7 +435,7 @@
                         </div>
                         <div class="russo-checkout-dock"><div class="flex justify-between items-end border-t pt-6">
                             <span class="text-gray-400 font-bold text-xs uppercase">Totale</span>
-                            <span id="cart-total-display" class="text-4xl font-black text-primary">€0.00</span>
+                            <span id="cart-total-display" aria-live="polite" aria-atomic="true" class="text-4xl font-black text-primary">€0.00</span>
                         </div>
                         <button data-action="send-order" class="w-full btn btn-primary py-5 text-lg">Conferma ordine</button></div>
                     </div>
@@ -892,7 +898,7 @@
     <script type="module" src="sw-killer.js?v=pages-recovery-2"></script>
     <script src="shared/google-login-ui.js?v=20261103-fix1"></script>
     <script src="shared/russo-login-ui.js?v=20261103-fix1"></script>
-    <script type="module" src="app.v20260325.js?v=20261110-ux1"></script>
+    <script type="module" src="app.v20260325.js?v=20261111-ux26"></script>
     <script src="feedback/vendor/html2canvas.min.js?v=feedback-1"></script>
     <script src="feedback/logger.js?v=feedback-1"></script>
     <script src="feedback/diagnostics.js?v=feedback-1"></script>
@@ -900,10 +906,10 @@
 
 <script src="shared/russo-workspace.js?v=workspace-1"></script>
 <link rel="stylesheet" href="shared/customer-panel.css?v=workspace-2">
-<script src="shared/customer-core.js?v=custom-home-1"></script>
+<script src="shared/customer-core.js?v=20261111-phase2"></script>
 <script src="shared/customer-panel.js?v=workspace-2"></script>
 <script src="shared/russo-usual.js?v=20261110-ux1"></script>
-<script src="shared/user-experience.js?v=20261110-ux1"></script>
+<script src="shared/user-experience.js?v=20261111-phase2"></script>
 <script src="shared/user-expenses.js?v=20261110-board1"></script>
 <script src="shared/daily-board.js?v=20261110-board1"></script>
 <script src="shared/user-dashboard.js?v=20261110-board1"></script>
