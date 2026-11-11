@@ -1,6 +1,6 @@
 (() => {
-  const allowedEmails = new Set(['commerciale@lapagnottellagourmet.it','isidorovagnozzi@gmail.com','marco.tranquilli@dos.design','marta.diamantini@dos.design','luca.pacella@dos.design']);
-  const allowed = user => Boolean(user && !user.isAnonymous && user.emailVerified && user.providerData?.some(p=>p.providerId==='google.com') && allowedEmails.has(user.email));
+  const allowedEmails = new Set(['commerciale@lapagnottellagourmet.it','isidorovagnozzi@gmail.com', 'isidoro.vagnozzi@gmail.com','marco.tranquilli@dos.design','marta.diamantini@dos.design','luca.pacella@dos.design']);
+  const allowed = user => Boolean(user && !user.isAnonymous && user.emailVerified && user.providerData?.some(p=>p.providerId==='google.com') && allowedEmails.has(String(user.email || '').trim().toLowerCase()));
   const quantity = i => Number.isSafeInteger(i.quantity ?? i.qty) && (i.quantity ?? i.qty)>0 ? (i.quantity ?? i.qty) : 0;
   const composition = i => [i.name,i.baseDescription,i.option || i.details,...(i.extras||[]).map(e=>typeof e==='string'?e:e.name)].filter(Boolean).join(' · ');
   function packing(orders){

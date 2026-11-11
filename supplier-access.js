@@ -13,7 +13,7 @@
   const COORDINATOR_EMAILS = Object.freeze(['luca.pacella@dos.design', 'marta.diamantini@dos.design']);
   const PAGNOTTELLA_SUPPLIER_EMAILS = Object.freeze([
     'commerciale@lapagnottellagourmet.it',
-    'isidorovagnozzi@gmail.com'
+    'isidorovagnozzi@gmail.com', 'isidoro.vagnozzi@gmail.com'
   ]);
   const RUSSO_SUPPLIER_EMAILS = Object.freeze([
     'lorenzo.russo@alimentarirusso',
@@ -40,6 +40,7 @@
   let redirectResultProcessed = false;
 
   const normalizeEmail = (value) => String(value || '').trim().toLowerCase();
+  const isInAppBrowser = (agent = window.navigator?.userAgent || '') => /(FBAN|FBAV|Instagram|WhatsApp|Telegram|Line|MicroMessenger|musical_ly)/i.test(agent);
   const roleForEmail = (value) => {
     const email = normalizeEmail(value);
     if (ADMIN_EMAILS.includes(email)) return 'admin';
@@ -396,6 +397,11 @@
   }
 
   async function signInWithGoogle() {
+    if(isInAppBrowser()) {
+      const error = new Error('Apri questa pagina in Chrome o Safari, fuori dal browser interno dell’app.');
+      error.code = 'auth/disallowed-useragent';
+      throw error;
+    }
     if (isFilePreview()) throw new Error('Google Login richiede un indirizzo http o https.');
     const { auth, authSdk } = await loadFirebaseCore();
     clearAuthError();
@@ -427,7 +433,10 @@
         const credential = canRecoverCredential
           ? authSdk.GoogleAuthProvider.credentialFromError(error)
           : null;
-        if (!credential) return startGoogleRedirect(auth, authSdk, provider);
+        if (!credential) {
+          if(['auth/popup-blocked','auth/cancelled-popup-request'].includes(error?.code)) return startGoogleRedirect(auth, authSdk, provider);
+          throw error;
+        }
         result = await authSdk.signInWithCredential(auth, credential);
       }
       await result.user?.getIdToken?.(true);
@@ -616,6 +625,7 @@
   window.DoseSupplierAccess = Object.freeze({
     ADMIN_EMAIL,
     AUTH_VERSION,
+    isInAppBrowser,
     roleForEmail,
     roleLabel,
     supplierIdsForIdentity,
