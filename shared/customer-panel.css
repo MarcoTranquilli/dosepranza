@@ -178,3 +178,13 @@ body.russo-editorial { --primary:#b45309; --primary-dark:#92400e; --border:#e4e4
   .russo-editorial :is(input,select,textarea) { font-size:16px; max-width:100%; }
 }
 @media print { .russo-editorial .russo-checkout-dock { position:static; } }
+
+
+/* --- v2.5.2 Touch Targets & Smooth Masking --- */
+.filter-scroll, .categories-bar, [data-scroll-filters] {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  mask-image: linear-gradient(to right, black calc(100% - 24px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black calc(100% - 24px), transparent 100%);
+}
+.filter-scroll::-webkit-scrollbar, .categories-bar::-webkit-scrollbar { display: none; }
