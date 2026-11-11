@@ -39,3 +39,7 @@
     font-size: 0.875rem;
   }
 }
+
+/* Actual dietary filter strip; remove masking during keyboard focus. */
+.dose-food-filters { padding-inline:8px; mask-image:linear-gradient(to right,transparent,#000 8px,#000 calc(100% - 8px),transparent); -webkit-mask-image:linear-gradient(to right,transparent,#000 8px,#000 calc(100% - 8px),transparent); }
+.dose-food-filters:focus-within { mask-image:none; -webkit-mask-image:none; }

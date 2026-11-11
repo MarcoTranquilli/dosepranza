@@ -131,3 +131,13 @@ button:active, .interactive-card:active, a.btn:active {
   transform: scale(0.975);
   transition: transform 0.08s ease;
 }
+
+/* Audit v2.5.2: apply tokens to the actual counters and brand components. */
+:root { --russo:var(--russo-accent); --pagnottella:var(--pagnottella-accent); }
+:is(.kpi-value,.qty-badge,.ciPrice,.bigPrice,#cart-total-display,#mobileTotal,#finalTotal,#cart-count,#orders-tbody td:first-child,#orders-tbody td:last-child) { font-variant-numeric:tabular-nums; }
+.wordmark { min-height:44px; }
+[data-theme="editorial"] h1 { font-size:28px; letter-spacing:-.02em; }
+[data-theme="editorial"] :is(.auth-title,.section-head h2) { font-size:20px; letter-spacing:-.015em; }
+[data-theme="editorial"] :is(.eyebrow,.auth-label,.supplier-card dt) { font-size:11px; letter-spacing:.06em; font-weight:700; }
+[data-theme="editorial"] .supplier-card--russo .supplier-badge { color:var(--russo-accent); background:var(--russo-badge-bg); border-color:var(--russo-badge-border); }
+[data-theme="editorial"] .supplier-card--pagnottella .supplier-badge { color:var(--pagnottella-accent); background:var(--pagnottella-badge-bg); border-color:var(--pagnottella-badge-border); }

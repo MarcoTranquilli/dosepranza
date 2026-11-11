@@ -95,3 +95,39 @@ body.supplier-dashboard--pagnottella { --russo-green:#3f6212; --russo-green-dark
     padding: 6pt 8pt !important;
   }
 }
+
+/* Audit: undo the legacy 520px table minimum inside mobile cards. */
+body.supplier-dashboard { --russo-green:#9a3412; --russo-green-dark:#9a3412; --russo-border:#ffedd5; }
+body.supplier-dashboard--pagnottella { --russo-green:#166534; --russo-green-dark:#166534; --russo-surface:#f0fdf4; --russo-border:#dcfce7; }
+.supplier-dashboard h1 { font-size:28px; letter-spacing:-.02em; }
+.supplier-dashboard .section-title { font-size:20px; letter-spacing:-.015em; }
+.supplier-dashboard :is(#supplier-audio-toggle,#supplier-audio-test,.live-badge) { padding:10px 12px; font-weight:600; }
+.supplier-dashboard .user-panel { display:flex; align-items:center; }
+.supplier-dashboard .qty-badge { white-space:nowrap; }
+.supplier-dashboard .order-note { color:#991b1b; background:#fee2e2; border:1px solid #dc2626; }
+@media screen and (max-width:640px) {
+  .supplier-dashboard .table { min-width:0; }
+  .supplier-dashboard #orders-tbody tr { box-sizing:border-box; max-width:calc(100% - 24px); }
+  .supplier-dashboard #orders-tbody td { white-space:normal; overflow-wrap:anywhere; }
+  .supplier-dashboard #orders-tbody td:nth-child(3) { border-top:1px solid var(--border); padding-top:10px; }
+  .supplier-dashboard #packing-tbody td:first-child { padding-inline:8px; }
+}
+@media print {
+  .supplier-dashboard :is(.table th,.table td,.order-note,.qty-badge,.kpi-value,.section-title) { color:#000!important; background:#fff!important; box-shadow:none!important; }
+  .supplier-dashboard .order-note { border:1px solid #d1d5db; }
+  .supplier-dashboard button { display:none!important; }
+}
+
+
+/* Fix anti-spezzamento importo e allineamento print v2.5.2 */
+@media print {
+  .table th:last-child,
+  .table td:last-child,
+  .orders-table td:last-child {
+    white-space: nowrap !important;
+    text-align: right !important;
+    font-variant-numeric: tabular-nums !important;
+    width: 1%;
+    padding-left: 12pt !important;
+  }
+}
