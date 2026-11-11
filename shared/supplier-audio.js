@@ -52,5 +52,17 @@
     label();
     return { reset: watch.reset, observe(rows, selected, cached, pending) { if (watch.observe(rows, selected, cached, pending)) play(); } };
   }
-  root.DoseSupplierAudio = { tracker, mount, day };
+  function connection({retry,allowed=()=>true,element}) {
+    let failed=false,cached=true,offline=false;
+    try{offline=root.navigator?.onLine===false;}catch{}
+    function paint(){
+      if(element)element.textContent=offline?'Connessione assente. Riconnessione in corso...':cached?'Connessione disponibile. In attesa del server...':'Sincronizzato dal server';
+      document.querySelectorAll('.live-dot').forEach(dot=>{dot.classList.toggle('is-offline',offline);dot.classList.toggle('is-pending',!offline&&cached);});
+    }
+    const off=()=>{offline=true;paint();};
+    const on=()=>{offline=false;cached=true;paint();if(failed&&allowed()){failed=false;try{retry();}catch{failed=true;}}};
+    root.addEventListener?.('offline',off);root.addEventListener?.('online',on);paint();
+    return {snapshot(fromCache){cached=!!fromCache;failed=false;paint();},error(){failed=true;cached=true;paint();},dispose(){root.removeEventListener?.('offline',off);root.removeEventListener?.('online',on);}};
+  }
+  root.DoseSupplierAudio = { tracker, mount, day, connection };
 })(typeof window === 'undefined' ? globalThis : window);

@@ -543,7 +543,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
 
         const isOrderWindowOpen = () => {
             if(isLocalE2E) return true;
-            const now = new Date();
+            const now = new Date(window.DoseClock?.now() ?? Date.now());
             const parts = new Intl.DateTimeFormat('en-GB', {timeZone:'Europe/Rome', hour:'2-digit', minute:'2-digit', hourCycle:'h23'}).formatToParts(now);
             const h = Number(parts.find(part => part.type === 'hour').value);
             const m = Number(parts.find(part => part.type === 'minute').value);
@@ -649,6 +649,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             const price = select ? parseFloat(select.value) : item.price;
             const det = select ? `Porz: ${select.options[select.selectedIndex].text.split('-')[0]}` : "";
             state.cart.push({ ...item, price, details: det, cartId: Date.now() });
+            globalThis.window?.DoseCartFeedback?.pulse();
             document.getElementById('cart-count').textContent = state.cart.length;
             window.DoseCartSync?.sync('russo',state.cart,Math.round(state.cart.reduce((s,i)=>s+i.price,0)*100));
             window.DoseRussoUsual?.refresh();
@@ -683,6 +684,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             const c = state.custom;
             if(!c.subtype || c.ings.length === 0) return window.toast("Scegli gli ingredienti!");
             state.cart.push({ name: `${c.base} (${c.subtype})`, price: c.total, cat: 'Personalizzati', details: c.ings.map(i=>i.name).join(', '), cartId: Date.now() });
+            globalThis.window?.DoseCartFeedback?.pulse();
             document.getElementById('cart-count').textContent = state.cart.length;
             window.DoseCartSync?.sync('russo',state.cart,Math.round(state.cart.reduce((s,i)=>s+i.price,0)*100));
             const saveToggle = document.getElementById('custom-save-toggle');
@@ -971,6 +973,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
         };
 
         window.removeFromCart = (id) => {
+            if(state.cart.some(i => i.cartId === id)) globalThis.window?.DoseCartFeedback?.pulse();
             state.cart = state.cart.filter(i => i.cartId !== id);
             document.getElementById('cart-count').textContent = state.cart.length;
             window.DoseCartSync?.sync('russo',state.cart,Math.round(state.cart.reduce((s,i)=>s+i.price,0)*100));
@@ -2073,7 +2076,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
                         <div><h4 data-action="toggle-product-title" class="font-bold text-sm product-title expandable leading-tight mb-1" title="Tocca per espandere o ridurre">${esc(i.name)}</h4><p class="text-[9px] text-gray-300 italic">${esc(i.cat)}</p>${creatorMeta}<p class="dose-food-tags">${(window.DosePreferences?.tags(i) || []).map(tag => window.DosePreferences.labels[tag]).join(' · ')}</p></div>
                         ${badges ? `<div class="flex flex-col items-end gap-1">${badges}</div>` : ''}
                     </div>
-                    <div class="mt-4 flex justify-between items-center gap-2">${pricing}<button data-action="add-std" data-id="${i.id}" class="bg-primary text-white h-10 w-10 rounded-2xl shadow-lg flex items-center justify-center flex-shrink-0 active:scale-90" ${(!orderOpen || isDisabled) ? 'disabled' : ''}><i class="fas fa-plus"></i></button></div>
+                    <div class="mt-4 flex justify-between items-center gap-2">${pricing}<button data-action="add-std" aria-label="Aumenta quantità di ${esc(i.name)}" data-id="${i.id}" class="bg-primary text-white h-10 w-10 rounded-2xl shadow-lg flex items-center justify-center flex-shrink-0 active:scale-90" ${(!orderOpen || isDisabled) ? 'disabled' : ''}><i class="fas fa-plus"></i></button></div>
                     ${canManage ? `<button data-action="toggle-availability" data-id="${i.id}" class="mt-3 btn btn-ghost text-[10px] px-3 py-2">${isDisabled ? 'Riattiva' : 'Disattiva'}</button>` : ''}
                 </div>`;
                 return html;
@@ -2094,7 +2097,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             const s = state.custom;
             s.total = 3.5 + Math.max(0, s.ings.length - 3) * 1.0;
             document.getElementById('custom-price-display').textContent = formatCurrency(s.total);
-            document.getElementById('custom-summary-list').innerHTML = s.ings.map((n, idx) => `<li class="flex justify-between items-center bg-gray-50 p-2 rounded-xl mb-1 text-[9px]"><span>${esc(n.name)}</span><button data-action="remove-ing" data-index="${idx}" class="text-red-300"><i class="fas fa-times"></i></button></li>`).join('');
+            document.getElementById('custom-summary-list').innerHTML = s.ings.map((n, idx) => `<li class="flex justify-between items-center bg-gray-50 p-2 rounded-xl mb-1 text-[9px]"><span>${esc(n.name)}</span><button data-action="remove-ing" aria-label="Rimuovi ingrediente ${esc(n.name)}" data-index="${idx}" class="text-red-300"><i class="fas fa-times"></i></button></li>`).join('');
         }
 
         function renderCart() {
@@ -2125,7 +2128,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             const tot = state.cart.reduce((s,i) => s+i.price, 0);
             wrap.innerHTML = state.cart.map(i => `<div class="flex justify-between items-center py-4 border-b border-gray-50">
                 <div class="min-w-0 pr-4 text-left"><p class="font-black text-sm text-gray-800">${esc(i.name)}</p><p class="text-[9px] text-gray-300 truncate">${esc(i.details || '')}</p><p class="text-xs text-primary font-black">${formatCurrency(i.price)}</p></div>
-                <button data-action="remove-from-cart" data-id="${i.cartId}" class="text-red-300 p-2"><i class="fas fa-trash-alt"></i></button>
+                <button data-action="remove-from-cart" aria-label="Riduci quantità di ${esc(i.name)}" data-id="${i.cartId}" class="text-red-300 p-2"><i class="fas fa-trash-alt"></i></button>
             </div>`).join('');
             document.getElementById('cart-total-display').textContent = formatCurrency(tot);
             renderMyOrderStatus();

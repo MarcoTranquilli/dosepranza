@@ -41,6 +41,7 @@ clear();el('login-view').style.display='block';
 try{
  const core=await window.DoseSupplierAccess.ensureFirebase();auth=core.auth;db=getFirestore(core.app);
  flow=window.DoseSupplierLogin.createFlow({auth,sdk:{GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult},status,onIssue:()=>{el('btn-blocked-logout').hidden=false;}});
+ let network;
  const adoptUser=user=>{
   stop?.();stop=null;const ticket=++epoch;clear();const ok=C.allowed(user);
   el('login-view').style.display=ok?'none':'block';el('main-view').style.display=ok?'block':'none';el('btn-blocked-logout').hidden=!user||ok;
@@ -49,11 +50,12 @@ try{
   audio?.reset();
   stop=onSnapshot(query(collection(db,'orders'),where('supplierId','==','pagnottella')),{includeMetadataChanges:true},snap=>{
    if(ticket!==epoch||!C.allowed(auth.currentUser))return;
-   orders=snap.docs.map(d=>({...d.data(),id:d.id}));el('sync-status').textContent=snap.metadata.fromCache?'Cache locale: dati non verificati':'Sincronizzato dal server';
+   orders=snap.docs.map(d=>({...d.data(),id:d.id}));el('sync-status').textContent=snap.metadata.fromCache?'Cache locale: dati non verificati':'Sincronizzato dal server';network?.snapshot(snap.metadata.fromCache);
    audio?.observe(orders.map(o=>({id:o.id,day:A.toDate(o.createdAt)?window.DoseSupplierAudio.day(A.toDate(o.createdAt)):''})),el('order-date').value,snap.metadata.fromCache,snap.metadata.hasPendingWrites);
    try{render();}catch{clear();status('Impossibile elaborare i dati. Verifica la data.');}
-  },()=>{if(ticket!==epoch)return;clear();status('Lettura non disponibile. Verifica permessi e connessione.');});
+  },()=>{if(ticket!==epoch)return;network?.error();clear();status('Lettura non disponibile. Verifica permessi e connessione.');});
  };
+ network=window.DoseSupplierAudio?.connection?.({retry:()=>adoptUser(auth.currentUser),allowed:()=>C.allowed(auth.currentUser),element:el('sync-status')});
  onAuthStateChanged(auth,adoptUser);
  const recovered=await flow.recover();
  if(recovered.user&&!stop)adoptUser(recovered.user);

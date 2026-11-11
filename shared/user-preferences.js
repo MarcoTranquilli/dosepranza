@@ -47,11 +47,14 @@
   }
   const note = (uid,supplier) => {const value=uid?read(key(uid,`${supplier}:note`),''):'';return typeof value==='string'?value:'';};
   function saveNote(uid,supplier,text) {return !!uid && (!String(text).trim() || write(key(uid,`${supplier}:note`),String(text).trim().slice(0,2000)));}
+  function profile(uid,supplier){const value=read(key(uid||'guest',supplier+':profile'),{});return value&&typeof value==='object'?{notes:String(value.notes||'').slice(0,2000),allergies:String(value.allergies||'').slice(0,2000)}:{notes:'',allergies:''};}
+  function saveProfile(uid,supplier,value){return write(key(uid||'guest',supplier+':profile'),{notes:String(value.notes||'').slice(0,2000),allergies:String(value.allergies||'').slice(0,2000)});}
   function receipt(uid,supplier,id,payload,confirmed=true) {
     try {
     const valid=combination(payload);
     if(!uid||!id||!valid||!Number.isFinite(payload.total)||payload.total<=0) return false;
-    const record={...valid,uid,supplier,id,total:payload.total,timestamp:new Date().toISOString(),day:romeDay(),confirmed};
+    const record={...valid,uid,supplier,id,total:payload.total,timestamp:new Date().toISOString(),day:romeDay(),confirmed,allergies:String(payload.allergies||''),paymentMethod:String(payload.paymentMethod||payload.payment||'')};
+    if(confirmed)saveProfile(uid,supplier,{notes:record.notes,allergies:record.allergies});
     root.DoseExpenses?.invalidate(uid);
     if(typeof root.dispatchEvent==='function' && typeof CustomEvent==='function') root.dispatchEvent(new CustomEvent('dose:order-recorded',{detail:{uid,supplier,id,confirmed,day:record.day}}));
     const suffix=confirmed?'receipts':'pending';
@@ -71,5 +74,5 @@
     const records=uid?read(key(uid,'receipts'),[]):[];
     return Array.isArray(records)?records.filter(r=>r&&r.uid===uid&&r.confirmed===true&&r.day===romeDay(date)&&Number.isFinite(Date.parse(r.timestamp))&&romeDay(new Date(r.timestamp))===r.day&&['russo','pagnottella'].includes(r.supplier)&&combination(r)&&Number.isFinite(r.total)&&r.total>0):[];
   }
-  root.DosePreferences={labels,tags,matches,romeDay,combination,favorites,saveFavorite,removeFavorite,note,saveNote,receipt,confirmReceipt,today};
+  root.DosePreferences={profile,saveProfile,labels,tags,matches,romeDay,combination,favorites,saveFavorite,removeFavorite,note,saveNote,receipt,confirmReceipt,today};
 })(typeof window==='undefined'?globalThis:window);
