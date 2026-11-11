@@ -13,7 +13,7 @@
     for (const item of items) {
       const product = catalog.find(product => String(product.id) === String(item.id));
       const qty = item.quantity ?? item.qty ?? 1;
-      if (!product || product.available === false || item.details || product.sizes || product.variants || !Number.isFinite(product.price) || product.price < 0 || !Number.isInteger(qty) || qty < 1 || qty > 50) skipped.push(item.name || 'Prodotto');
+      if (!product || product.available === false || item.details || product.sizes || product.variants || product.hasPortions || product.isCustom || !Number.isFinite(product.price) || product.price < 0 || !Number.isInteger(qty) || qty < 1 || qty > 50) skipped.push(item.name || 'Prodotto');
       else accepted.push({ item, product, qty });
     }
     return { accepted, skipped };
@@ -24,6 +24,7 @@
     const saved = read(adapter.uid());
     card.hidden = !saved || !adapter.empty();
     if (!card.hidden) document.getElementById('russo-usual-summary').textContent = `Il tuo solito: ${saved.summary}`;
+    root.DoseUX?.refresh();
   }
   root.DoseRussoUsual = { save, read, plan, refresh };
   if (typeof document !== 'undefined') {
