@@ -84,3 +84,15 @@ body.pg-editorial {
   .pg-editorial .mobileBar:not(.hidden) { background:#ffffffed; backdrop-filter:blur(12px); }
   .pg-editorial :is(input,textarea,select) { font-size:16px; }
 }
+
+.pg-editorial :is(.filterSheetChip,.qty button,.iconBtn) { min-height:44px; min-width:44px; }
+.pg-editorial { --brand-strong:#166534; }
+.pg-editorial :is(.price,.bigPrice,.ciPrice,#finalTotal,#mobileTotal) { color:#166534; font-variant-numeric:tabular-nums; }
+.pg-editorial :is(.primary.gold,.whatsappMain,.mobileBar button) { border-color:#166534; }
+.pg-editorial :is(.opt.on,.drawerExtra.selected,.tab.active,.filter.active,[aria-pressed="true"]) { background:#f0fdf4; }
+.pg-editorial h1 { font-size:28px; letter-spacing:-.02em; }
+.pg-editorial h2 { font-size:20px; letter-spacing:-.015em; }
+.pg-editorial .mobileBar:not(.hidden) { -webkit-backdrop-filter:blur(12px); }
+
+/* Reserve three digits without truncating larger quantities. */
+.pg-editorial .qty b { min-width:3ch; text-align:center; font-variant-numeric:tabular-nums; }

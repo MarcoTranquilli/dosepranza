@@ -188,3 +188,15 @@ body.russo-editorial { --primary:#b45309; --primary-dark:#92400e; --border:#e4e4
   -webkit-mask-image: linear-gradient(to right, black calc(100% - 24px), transparent 100%);
 }
 .filter-scroll::-webkit-scrollbar, .categories-bar::-webkit-scrollbar { display: none; }
+
+/* Russo does not load theme.css: keep essential accessibility rules scoped here. */
+.russo-editorial :is(button,a,input,select,textarea,summary):focus-visible { outline:2px solid #111827!important; outline-offset:3px!important; }
+.russo-editorial :is(.price,.total,.counter,.badge,[data-price],#cart-total-display,#cart-count,.cart-mobile-toggle) { font-variant-numeric:tabular-nums; }
+.russo-editorial button:active { transform:scale(.975); }
+.russo-editorial { --primary:#9a3412; --text-muted:#4b5563; }
+.russo-editorial :is(h1,h2) { letter-spacing:-.02em; }
+@media(max-width:640px) {
+  .russo-editorial .russo-checkout-dock { backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border-top:1px solid rgba(0,0,0,.08); }
+}
+@media(prefers-reduced-motion:reduce) { .russo-editorial button:active { transform:none; } }
+.russo-editorial :is(button,a,input,select,textarea,summary):focus-visible { transition:none; }

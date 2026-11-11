@@ -83,3 +83,8 @@ body.admin-editorial {
 .admin-editorial td { padding-block:16px; }
 .admin-editorial tbody tr:hover { background:var(--bg); }
 @media(max-width:640px) { .admin-editorial .admin-topbar { padding:20px 16px; } .admin-editorial .filter-group { gap:8px; } }
+
+.admin-editorial .topbar-brand h1 { font-size:28px; letter-spacing:-.02em; }
+.admin-editorial h2 { font-size:20px; letter-spacing:-.015em; }
+.admin-editorial [data-supplier="russo"].active { color:#9a3412; background:#fff7ed; }
+.admin-editorial [data-supplier="pagnottella"].active { color:#166534; background:#f0fdf4; }
