@@ -23,7 +23,7 @@ service cloud.firestore {
       return request.auth.token.get(
         'email',
         request.auth.token.get('firebase', {}).get('identities', {}).get('google.com', [''])[0]
-      );
+      ).trim().lower();
     }
 
     function isStaffEmail() {
@@ -33,7 +33,7 @@ service cloud.firestore {
         'russolorenzo11@gmail.com',
         'beatrice.binini@dos.design',
         'commerciale@lapagnottellagourmet.it',
-        'isidorovagnozzi@gmail.com'
+        'isidorovagnozzi@gmail.com', 'isidoro.vagnozzi@gmail.com'
       ];
     }
 
@@ -63,7 +63,7 @@ service cloud.firestore {
         && request.auth.token.get('email_verified', false)
         && authenticatedEmail() in [
           'commerciale@lapagnottellagourmet.it',
-          'isidorovagnozzi@gmail.com'
+          'isidorovagnozzi@gmail.com', 'isidoro.vagnozzi@gmail.com'
         ];
     }
 
