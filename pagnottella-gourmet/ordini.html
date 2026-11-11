@@ -307,16 +307,18 @@
 <meta name="apple-mobile-web-app-title" content="Ordini Pagnottella">
 <meta name="mobile-web-app-capable" content="yes">
 <style>.user-panel{flex-wrap:wrap}#supplier-audio-toggle,#supplier-audio-test{min-height:44px;max-width:100%}</style>
+<link rel="stylesheet" href="../shared/supplier-login-guide.css?v=20261111-mobile1">
 </head>
 <body>
-  <p id="access-status" role="status" style="padding:16px"></p><button id="btn-blocked-logout" class="btn-secondary" hidden>Disconnetti account</button>
+<div id="supplier-browser-warning" class="supplier-browser-warning" role="alert" hidden></div>
+  <div class="supplier-access-card"><p id="access-status" role="status" aria-live="polite"></p><button id="btn-blocked-logout" class="btn-secondary" hidden>Disconnetti e usa un altro account</button></div>
   <div id="toast" class="toast">Riepilogo copiato negli appunti!</div>
 
   <!-- Vista Login (Non autenticato) -->
   <div id="login-view" class="login-container" style="display: none;">
     <h2>Pagnottella Gourmet</h2>
     <p>Accedi con il tuo account Google autorizzato per consultare gli ordini del giorno in tempo reale.</p>
-    <button id="btn-login" class="btn-google">
+    <button disabled id="btn-login" class="btn-google">
       <svg width="18" height="18" viewBox="0 0 24 24">
         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
         <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -410,9 +412,10 @@
     </div>
   </div>
 
-  <script src="./supplier-access.js?v=20261110-orders1"></script>
-  <script src="../shared/pagnottella-orders-core.js?v=20261110-orders1"></script>
+  <script src="./supplier-access.js?v=20261111-mobile1"></script>
+  <script src="../shared/pagnottella-orders-core.js?v=20261111-mobile1"></script>
   <script src="./order-analytics.js?v=20261110-orders1"></script>
-  <script src="../shared/supplier-audio.js?v=20261110-1"></script>
-<script type="module" src="./ordini.js?v=20261110-audio1"></script>
+  <script src="../shared/supplier-login-guide.js?v=20261111-mobile1"></script>
+<script src="../shared/supplier-audio.js?v=20261110-1"></script>
+<script type="module" src="./ordini.js?v=20261111-mobile1"></script>
 </body></html>

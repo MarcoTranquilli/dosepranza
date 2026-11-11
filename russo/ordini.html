@@ -306,15 +306,18 @@
 <meta name="apple-mobile-web-app-title" content="Ordini Russo">
 <meta name="mobile-web-app-capable" content="yes">
 <style>.user-panel{flex-wrap:wrap}#supplier-audio-toggle,#supplier-audio-test{min-height:44px;max-width:100%}</style>
+<link rel="stylesheet" href="../shared/supplier-login-guide.css?v=20261111-mobile1">
 </head>
 <body>
-  <div id="toast" class="toast">Riepilogo copiato negli appunti!</div>
+<div id="supplier-browser-warning" class="supplier-browser-warning" role="alert" hidden></div>
+  <div class="supplier-access-card"><p id="access-status" role="status" aria-live="polite"></p><button id="btn-blocked-logout" type="button" hidden>Disconnetti e usa un altro account</button></div>
+<div id="toast" class="toast">Riepilogo copiato negli appunti!</div>
 
   <!-- Vista Login (Non autenticato) -->
   <div id="login-view" class="login-container" style="display: none;">
     <h2>Alimentari Russo</h2>
     <p>Accedi con il tuo account Google personale per consultare gli ordini del giorno in tempo reale.</p>
-    <button id="btn-login" class="btn-google">
+    <button disabled id="btn-login" class="btn-google">
       <svg width="18" height="18" viewBox="0 0 24 24">
         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
         <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -408,10 +411,12 @@
     </div>
   </div>
 
-  <script src="../shared/supplier-audio.js?v=20261110-1"></script>
+  <script src="../supplier-access.js?v=20261111-mobile1"></script>
+<script src="../shared/supplier-login-guide.js?v=20261111-mobile1"></script>
+<script src="../shared/supplier-audio.js?v=20261110-1"></script>
 <script type="module">
     import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-    import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+    import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut, getRedirectResult, signInWithRedirect } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
     import { getFirestore, collection, query, where, onSnapshot } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
     const FIREBASE_CONFIG = {
@@ -555,31 +560,41 @@
       });
     }
 
-    // Gestione Autenticazione Google
-    onAuthStateChanged(auth, user => {
-      if (user && !user.isAnonymous) {
-        el('login-view').style.display = 'none';
-        el('main-view').style.display = 'block';
-        el('user-email-display').textContent = user.email;
-        startFirestoreListener();
-      } else {
-        if (unsubscribeOrders) { unsubscribeOrders(); unsubscribeOrders = null; }
-        el('main-view').style.display = 'none';
-        el('login-view').style.display = 'block';
-      }
+    // Identity is evaluated before starting the supplier listener.
+    const allowedSupplier = user => {
+      if(!user || user.isAnonymous || !user.emailVerified || !user.providerData?.some(p=>p.providerId==='google.com')) return false;
+      const access=window.DoseSupplierAccess, email=String(user.email||'').trim().toLowerCase(), role=access.roleForEmail(email);
+      return ['admin','coordinator'].includes(role) || (role==='supplier' && access.supplierIdsForIdentity(email).includes('russo'));
+    };
+    const status = message => {el('access-status').textContent=message;};
+    const flow = window.DoseSupplierLogin.createFlow({auth,sdk:{GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult},status,onIssue:()=>{el('btn-blocked-logout').hidden=false;}});
+    const adoptUser = user => {
+      if(unsubscribeOrders){unsubscribeOrders();unsubscribeOrders=null;}
+      currentOrders=[];renderView();
+      const allowed=allowedSupplier(user);
+      el('login-view').style.display=allowed?'none':'block';
+      el('main-view').style.display=allowed?'block':'none';
+      el('btn-blocked-logout').hidden=!user||allowed;
+      if(allowed){status('');el('user-email-display').textContent=user.email;startFirestoreListener();}
+      else status(user ? 'Accesso negato per '+String(user.email||'email non disponibile').trim().toLowerCase()+'. Questo account Google non è abilitato per Alimentari Russo. Accedi con l’account concordato.' : 'Accedi con Google per consultare gli ordini.');
+    };
+    onAuthStateChanged(auth,adoptUser);
+    const recovered=await flow.recover();
+    if(recovered.user&&!unsubscribeOrders)adoptUser(recovered.user);
+    el('btn-login').disabled=window.DoseSupplierLogin.embedded(navigator.userAgent);
+    el('btn-login').addEventListener('click',async()=>{
+      if(el('btn-login').disabled)return;
+      el('btn-login').disabled=true;
+      try{await flow.login();}finally{el('btn-login').disabled=window.DoseSupplierLogin.embedded(navigator.userAgent);}
     });
-
-    el('btn-login').addEventListener('click', async () => {
-      try {
-        const provider = new GoogleAuthProvider();
-        await signInWithPopup(auth, provider);
-      } catch (err) {
-        console.error("Errore Google login:", err);
-        alert("Accesso fallito: " + err.message);
-      }
-    });
-
-    el('btn-logout').addEventListener('click', () => signOut(auth));
+    async function logout(){
+      if(unsubscribeOrders){unsubscribeOrders();unsubscribeOrders=null;}
+      currentOrders=[];el('main-view').style.display='none';el('login-view').style.display='block';
+      try{await signOut(auth);flow.reset();status('Sessione rimossa. Premi Accedi con Google per scegliere un altro account.');el('btn-blocked-logout').hidden=true;}
+      catch{status('Disconnessione non riuscita. Riprova dal browser di sistema.');}
+    }
+    el('btn-logout').addEventListener('click',logout);
+    el('btn-blocked-logout').addEventListener('click',logout);
     el('order-date').addEventListener('change', renderView);
     el('btn-print').addEventListener('click', () => window.print());
 

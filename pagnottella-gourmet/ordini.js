@@ -1,8 +1,8 @@
-import {signInWithPopup,GoogleAuthProvider,onAuthStateChanged,signOut} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+import {signInWithPopup,GoogleAuthProvider,onAuthStateChanged,signOut,getRedirectResult,signInWithRedirect} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
 import {getFirestore,collection,query,where,onSnapshot} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 const C=window.DosePagnottellaOrders,A=window.DoseOrderAnalytics,el=id=>document.getElementById(id);
 const audio=window.DoseSupplierAudio?.mount('pagnottella');
-let auth,db,stop,epoch=0,orders=[],report='';
+let auth,db,stop,flow,epoch=0,orders=[],report='';
 const money=n=>new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(n);
 const status=message=>{el('access-status').textContent=message;};
 function clear(){orders=[];report='';for(const id of ['packing-tbody','orders-tbody'])el(id).replaceChildren();for(const id of ['kpi-orders','kpi-items','kpi-total'])el(id).textContent='—';el('btn-copy-wa').disabled=true;el('btn-print').disabled=true;}
@@ -22,18 +22,29 @@ function render(){
 }
 el('order-date').value=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());el('order-date').max=el('order-date').value;
 el('order-date').onchange=()=>{try{render();}catch{clear();status('Data non valida.');}};
-el('btn-login').onclick=async()=>{el('btn-login').disabled=true;try{await signInWithPopup(auth,new GoogleAuthProvider());}catch(e){status(e.code==='auth/popup-blocked'?'Consenti i popup e riprova.':'Accesso non completato. Puoi riprovare.');}finally{el('btn-login').disabled=false;}};
-async function logout(){stop?.();++epoch;clear();el('main-view').style.display='none';try{await signOut(auth);}catch{status('Disconnessione non riuscita. Riprova.');}}
+el('btn-login').onclick=async()=>{
+ if(!flow || el('btn-login').disabled)return;
+ el('btn-login').disabled=true;
+ try{await flow.login();}finally{el('btn-login').disabled=window.DoseSupplierLogin.embedded(navigator.userAgent);}
+};
+async function logout(){
+ stop?.();stop=null;++epoch;clear();el('main-view').style.display='none';el('login-view').style.display='block';
+ el('btn-blocked-logout').disabled=true;el('btn-login').disabled=true;
+ try{await signOut(auth);flow?.reset();status('Sessione rimossa. Premi Accedi con Google e scegli l’account concordato.');el('btn-blocked-logout').hidden=true;}
+ catch{status('Disconnessione non riuscita. Riprova oppure apri il link nel browser di sistema.');}
+ finally{el('btn-blocked-logout').disabled=false;el('btn-login').disabled=false;}
+}
 el('btn-logout').onclick=logout;el('btn-blocked-logout').onclick=logout;
 el('btn-print').onclick=()=>{if(C.allowed(auth?.currentUser)&&report)window.print();};
 el('btn-copy-wa').onclick=async()=>{if(!C.allowed(auth?.currentUser)||!report)return;try{await navigator.clipboard.writeText(report);status('Distinta copiata.');}catch{status('Copia non disponibile. Usa la stampa.');}};
 clear();el('login-view').style.display='block';
 try{
  const core=await window.DoseSupplierAccess.ensureFirebase();auth=core.auth;db=getFirestore(core.app);
- onAuthStateChanged(auth,user=>{
+ flow=window.DoseSupplierLogin.createFlow({auth,sdk:{GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult},status,onIssue:()=>{el('btn-blocked-logout').hidden=false;}});
+ const adoptUser=user=>{
   stop?.();stop=null;const ticket=++epoch;clear();const ok=C.allowed(user);
   el('login-view').style.display=ok?'none':'block';el('main-view').style.display=ok?'block':'none';el('btn-blocked-logout').hidden=!user||ok;
-  if(!ok){status(user?'Account non autorizzato. Usa un account fornitore o coordinatore abilitato.':'Accedi con Google per consultare gli ordini.');return;}
+  if(!ok){status(user?`Accesso negato (account non autorizzato) per ${String(user.email || '(email non disponibile)').trim().toLowerCase()}. Questo account Google non è abilitato per Pagnottella Gourmet. Accedi con isidorovagnozzi@gmail.com o con l’account Google concordato e verificato.`:'Accedi con Google per consultare gli ordini.');return;}
   status('');el('user-email-display').textContent=user.email;
   audio?.reset();
   stop=onSnapshot(query(collection(db,'orders'),where('supplierId','==','pagnottella')),{includeMetadataChanges:true},snap=>{
@@ -42,5 +53,9 @@ try{
    audio?.observe(orders.map(o=>({id:o.id,day:A.toDate(o.createdAt)?window.DoseSupplierAudio.day(A.toDate(o.createdAt)):''})),el('order-date').value,snap.metadata.fromCache,snap.metadata.hasPendingWrites);
    try{render();}catch{clear();status('Impossibile elaborare i dati. Verifica la data.');}
   },()=>{if(ticket!==epoch)return;clear();status('Lettura non disponibile. Verifica permessi e connessione.');});
- });
+ };
+ onAuthStateChanged(auth,adoptUser);
+ const recovered=await flow.recover();
+ if(recovered.user&&!stop)adoptUser(recovered.user);
+ el('btn-login').disabled=window.DoseSupplierLogin.embedded(navigator.userAgent);
 }catch{status('Autenticazione non disponibile. Ricarica la pagina per riprovare.');el('btn-login').disabled=true;}
