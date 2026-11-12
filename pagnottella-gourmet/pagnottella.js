@@ -25,6 +25,7 @@ const state = {
   confirmationAction:'submit'
 };
 let browsingAnonymous = false;
+window.DosePranzaClientUX?.bindBeforeUnloadCartGuard(() => Object.values(state.cart).some(item => item.qty > 0), window);
 const DRAFT_CART_KEY = 'pg_draft_cart';
 function persistDraftCart(){
   try{
