@@ -176,6 +176,13 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
         };
 
         const RUSSO_PENDING_CHECKOUT_KEY = 'dose_russo_pending_checkout';
+        let dailyRussoCart = null;
+        let russoOrderSaved = false;
+        function saveDailyRussoCart() {
+            russoOrderSaved = false;
+            if(state.cart.length) dailyRussoCart?.save(state.cart);
+            else dailyRussoCart?.clear();
+        }
         const restoredCheckout = (() => {
             try {
                 const value = JSON.parse(sessionStorage.getItem(RUSSO_PENDING_CHECKOUT_KEY) || 'null');
@@ -637,6 +644,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
                     state.cart.push({...p,cartId:Math.max(Date.now(),...state.cart.map(i=>Number(i.cartId)||0))+1,details:''});
                 document.getElementById('cart-count').textContent=state.cart.length;
                 window.DoseCartSync?.sync('russo',state.cart,Math.round(state.cart.reduce((s,i)=>s+i.price,0)*100));
+                saveDailyRussoCart();
                 renderCart();
             }
         };
@@ -652,6 +660,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             globalThis.window?.DoseCartFeedback?.pulse();
             document.getElementById('cart-count').textContent = state.cart.length;
             window.DoseCartSync?.sync('russo',state.cart,Math.round(state.cart.reduce((s,i)=>s+i.price,0)*100));
+            saveDailyRussoCart();
             window.DoseRussoUsual?.refresh();
             window.toast("Aggiunto!");
         };
@@ -687,6 +696,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             globalThis.window?.DoseCartFeedback?.pulse();
             document.getElementById('cart-count').textContent = state.cart.length;
             window.DoseCartSync?.sync('russo',state.cart,Math.round(state.cart.reduce((s,i)=>s+i.price,0)*100));
+            saveDailyRussoCart();
             const saveToggle = document.getElementById('custom-save-toggle');
             const publishToggle = document.getElementById('custom-publish-toggle');
             const customName = (document.getElementById('custom-name-input')?.value || '').trim();
@@ -977,6 +987,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             state.cart = state.cart.filter(i => i.cartId !== id);
             document.getElementById('cart-count').textContent = state.cart.length;
             window.DoseCartSync?.sync('russo',state.cart,Math.round(state.cart.reduce((s,i)=>s+i.price,0)*100));
+            saveDailyRussoCart();
             renderCart();
         };
 
@@ -1252,6 +1263,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             if(isLocalE2E && typeof window.__DOSE_E2E_SAVE_ORDER__ !== 'function') {
                 state.pendingOrder = null;
                 state.cart = [];
+                dailyRussoCart?.clear();
                 const cartCount = document.getElementById('cart-count');
                 if(cartCount) cartCount.textContent = '0';
                 window.toast("Inviato!");
@@ -1393,6 +1405,8 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             }
             try {
                 const docRef = await createRussoOrder(payload);
+                russoOrderSaved = true;
+                dailyRussoCart?.clear();
                 await window.DoseCartSync?.confirm('russo');
                 closeSendConfirm();
                 const summary = buildOrderConfirmSummary(docRef.id, payload.items, payload.total);
@@ -1443,11 +1457,13 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             modal.classList.add('hidden');
         }
 
-        function copyOrderConfirm() {
+        async function copyOrderConfirm() {
             const modal = document.getElementById('order-confirm-modal');
             const summary = modal.dataset.summary || '';
             if(!summary) return;
-            navigator.clipboard.writeText(summary).then(() => window.toast("Riepilogo copiato"));
+            const result = await window.DosePranzaClientUX?.shareOrCopyReceipt({title:'Ordine Alimentari Russo',text:summary});
+            if(result?.method === 'aborted') return;
+            window.toast(result?.ok ? (result.method === 'share' ? 'Riepilogo condiviso' : 'Riepilogo copiato') : 'Condivisione non disponibile: seleziona il riepilogo.');
         }
 
         // --- FUNZIONE RIEPILOGO AGGIORNATA ---
@@ -4170,6 +4186,21 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             }
             state.menuData = Object.entries(RAW_MENU).flatMap(([cat, items]) => items.map((it, idx) => ({ ...it, cat, id: cat.replace(/\s/g,'')+idx })));
             loadDisabledProducts();
+            dailyRussoCart = window.DosePranzaClientUX?.createDailyCartStorage('russo', {
+                now: () => window.DoseClock?.now() ?? Date.now(),
+                owner: () => state.user?.uid || state.user?.email || 'guest'
+            });
+            dailyRussoCart?.purgeStale();
+            if(!state.cart.length) {
+                const saved = dailyRussoCart?.load() || [];
+                const plan = window.DoseRussoUsual?.plan(saved, window.DoseCustomerCatalog.list());
+                if(plan) {
+                    state.cart = plan.accepted.flatMap(({product,qty},index) => Array.from({length:qty},(_,n) => ({...product,cartId:Date.now()+index*100+n,details:''})));
+                    if(plan.skipped.length) window.toast('Alcuni prodotti o personalizzazioni richiedono una nuova selezione dal catalogo.');
+                }
+            }
+            saveDailyRussoCart();
+            window.DosePranzaClientUX?.bindBeforeUnloadCartGuard(() => state.cart.length > 0 && !russoOrderSaved, window);
             renderRoleStatus();
             renderMenuAdminToggle();
             document.getElementById('category-select').innerHTML = `<option value="all">Tutte le Categorie</option>` + getVisibleMenuCategories().map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');

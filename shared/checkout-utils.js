@@ -32,7 +32,14 @@
   async function copy(button,record){
     if(button.disabled)return false;
     const label=button.textContent;button.disabled=true;
-    try{if(typeof root.navigator?.clipboard?.writeText!=='function')throw Error();await root.navigator.clipboard.writeText(summary(record));button.textContent='✓ Copiato negli appunti!';return true;}
+    try{
+      if(root.DosePranzaClientUX){
+        const result=await root.DosePranzaClientUX.shareOrCopyReceipt({title:'Ricevuta DOSepranza',text:summary(record)});
+        if(result.method==='aborted'){button.textContent=label;return false;}
+        if(!result.ok)throw Error();
+        button.textContent=result.method==='share'?'Riepilogo condiviso':'✓ Copiato negli appunti!';return true;
+      }
+      if(typeof root.navigator?.clipboard?.writeText!=='function')throw Error();await root.navigator.clipboard.writeText(summary(record));button.textContent='✓ Copiato negli appunti!';return true;}
     catch{button.textContent='Copia non disponibile. Seleziona il riepilogo.';return false;}
     finally{setTimeout(()=>{button.textContent=label;button.disabled=false;},2500);}
   }

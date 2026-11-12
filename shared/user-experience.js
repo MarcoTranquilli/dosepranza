@@ -3,6 +3,31 @@
   const P=window.DosePreferences;
   if(!P) return;
   const supplier=location.pathname.includes('/russo/')?'russo':location.pathname.includes('pagnottella')?'pagnottella':null;
+  if(!supplier) {
+    const badges = ['russo','pagnottella'].map(vendor => {
+      const card = document.getElementById(`card-${vendor}`);
+      if(!card)return null;
+      const badge = document.createElement('p');
+      badge.className='supplier-badge';badge.setAttribute('aria-live','polite');badge.setAttribute('aria-atomic','true');
+      badge.style.fontVariantNumeric='tabular-nums';card.querySelector('h3')?.after(badge);
+      return {vendor,badge};
+    }).filter(Boolean);
+    const tick = () => {
+      if(!window.DosePranzaCutoff)return;
+      for(const {vendor,badge} of badges){
+        const state=window.DosePranzaCutoff.evaluateCutoff(vendor,{nowMs:window.DoseClock?.now() ?? Date.now()});
+        const text=vendor==='russo'
+          ? state.isPassed?'Ordini chiusi alle 10:30':state.isCountdownActive?`Chiude tra ${state.formattedRemaining}`:'Aperto fino alle 10:30'
+          : state.isPassed?'Oltre le 11:00 (su disponibilità)':state.isCountdownActive?`Riferimento tra ${state.formattedRemaining}`:'Consigliato entro le 11:00';
+        if(badge.textContent!==text)badge.textContent=text;
+      }
+    };
+    let timer;
+    const start=()=>{clearInterval(timer);tick();timer=setInterval(tick,1000);};
+    window.addEventListener('pageshow',start);
+    window.addEventListener('pagehide',()=>clearInterval(timer));
+    start();
+  }
   let uid=null, signature='', activeFilter='all';
   const node=(tag,text)=>{const element=document.createElement(tag);if(text!==undefined)element.textContent=text;return element;};
   const button=(text,action)=>{const element=node('button',text);element.type='button';element.addEventListener('click',()=>{try{action();}catch(error){status.textContent=error.message;}});return element;};
@@ -44,7 +69,7 @@
   function showReceipt(record) {
     dialog.replaceChildren(node('h2',names[record.supplier]),node('p',`Ordine ${record.id} · ${record.day}`));
     for(const item of record.items)dialog.append(node('p',`${item.quantity??item.qty??1} × ${item.name}${item.details?' · '+item.details:''}`));
-    dialog.append(node('p',record.notes||''),node('strong',`Totale ${euros(record.total)}`),node('p','Riepilogo locale della conferma utente. Non attesta pagamento, accettazione del fornitore o raggiungimento della soglia Russo.'),button('Copia riepilogo per colleghi',()=>{const b=dialog.querySelector('[data-copy-receipt]');window.DoseCheckout?.copy(b,record);}),button('Chiudi',()=>dialog.close()));const copy=dialog.querySelectorAll('button')[0];copy.dataset.copyReceipt='';dialog.insertBefore(node('p',window.DoseCheckout?.summary(record)||''),copy);dialog.showModal();
+    dialog.append(node('p',record.notes||''),node('strong',`Totale ${euros(record.total)}`),node('p','Riepilogo locale della conferma utente. Non attesta pagamento, accettazione del fornitore o raggiungimento della soglia Russo.'),button('Condividi / copia riepilogo per colleghi',()=>{const b=dialog.querySelector('[data-copy-receipt]');window.DoseCheckout?.copy(b,record);}),button('Chiudi',()=>dialog.close()));const copy=dialog.querySelectorAll('button')[0];copy.dataset.copyReceipt='';copy.setAttribute('aria-live','polite');dialog.insertBefore(node('p',window.DoseCheckout?.summary(record)||''),copy);dialog.showModal();
   }
   function refreshReceipts(){
     const records=P.today(uid);receipts.hidden=!records.length;receipts.replaceChildren();
