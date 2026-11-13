@@ -16,7 +16,7 @@ body.pg-editorial {
 .pg-context small { display:block; margin-top:5px; color:var(--text-muted); font-weight:400; }
 .pg-context button { min-height:44px; border:1px solid var(--border); border-radius:var(--radius-btn); padding:10px 16px; background:white; }
 .pg-editorial :is(h1,h2,h3,h4) { font-family:var(--font-body); letter-spacing:-.035em; }
-.pg-editorial :is(.entryShell,.authGateCard,.briefCard,.supportBlock,.card,.cart,.sheet,.paymentConfirmCard,.supplierChoiceCard) { border:1px solid var(--border); border-radius:var(--radius-card); background:var(--surface); box-shadow:var(--shadow-soft); }
+.pg-editorial :is(.entryShell,.authGateCard,.briefCard,.supportBlock,.card,.cart,.sheet,.paymentConfirmCard) { border:1px solid var(--border); border-radius:var(--radius-card); background:var(--surface); box-shadow:var(--shadow-soft); }
 .pg-editorial .entryShell { max-width:1000px; }
 .pg-editorial .authGateCard { color:var(--text-main); }
 .pg-editorial .authGateCard :is(p,small) { color:var(--text-muted); }

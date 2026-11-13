@@ -504,7 +504,8 @@ async function initializeEntryFlow(){
   }
   syncAuthGate();
   if(authState.user?.name && authState.user?.email){
-    if(new URLSearchParams(location.search).get('store') === 'pagnottella') await openShop(false);
+    let directStore = ''; try { directStore = sessionStorage.getItem('dosepranza_direct_shop') || ''; if (directStore) sessionStorage.removeItem('dosepranza_direct_shop'); } catch {}
+    if(new URLSearchParams(location.search).get('store') === 'pagnottella' || directStore === 'pagnottella') await openShop(false);
     else await showSupplierSelection();
     return;
   }
