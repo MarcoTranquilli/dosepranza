@@ -1,0 +1,269 @@
+/* DosePranza v2.12.0 - Kitchen Display System (KDS) & Print Labels */
+.kds-wakelock-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.42rem 0.72rem;
+  border-radius: 999px;
+  border: 1px solid #d4d4d8;
+  background: #ffffff;
+  color: #18181b;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.kds-wakelock-btn:hover {
+  border-color: var(--russo-green, #15803d);
+}
+.kds-wakelock-btn.is-active,
+.kds-wakelock-btn[aria-pressed="true"] {
+  background: var(--russo-surface, #f0fdf4);
+  border-color: var(--russo-green, #15803d);
+  color: var(--russo-green-dark, #166534);
+}
+.kds-wakelock-btn[data-supported="false"] {
+  opacity: 0.72;
+}
+
+.kds-panel {
+  margin: 1rem 0 1.5rem 0;
+  padding: 1rem 1.15rem;
+  border-radius: 14px;
+  border: 1px solid var(--russo-border, #bbf7d0);
+  background: var(--russo-surface, #f0fdf4);
+}
+.kds-panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+.kds-panel-title-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+.kds-panel-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #09090b;
+}
+.kds-badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.kds-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.58rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: #ffffff;
+  border: 1px solid #e4e4e7;
+  color: #27272a;
+}
+.kds-badge--pending {
+  background: #fef3c7;
+  border-color: #fcd34d;
+  color: #92400e;
+}
+.kds-badge--ready {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #166534;
+}
+.kds-print-summary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: 10px;
+  border: 1px solid var(--russo-green, #15803d);
+  background: #ffffff;
+  color: var(--russo-green-dark, #166534);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.kds-print-summary-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.kds-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 0.55rem;
+}
+.kds-item-chip {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid #e4e4e7;
+  font-size: 0.85rem;
+}
+.kds-item-qty {
+  font-weight: 800;
+  color: var(--russo-green-dark, #166534);
+  white-space: nowrap;
+}
+.kds-item-name {
+  font-weight: 600;
+  color: #18181b;
+}
+.kds-item-variant {
+  display: block;
+  font-size: 0.75rem;
+  color: #52525b;
+}
+.kds-empty {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #52525b;
+}
+
+.kds-notes-box {
+  margin-top: 0.8rem;
+  padding: 0.65rem 0.8rem;
+  border-radius: 10px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  font-size: 0.8125rem;
+  color: #78350f;
+}
+.kds-notes-box strong {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: #92400e;
+}
+.kds-notes-list {
+  margin: 0;
+  padding-left: 1.15rem;
+}
+
+.kds-row-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
+.prep-toggle-btn,
+.kds-label-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.26rem 0.55rem;
+  border-radius: 8px;
+  border: 1px solid #d4d4d8;
+  background: #ffffff;
+  color: #18181b;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+tr.order-prepared {
+  background-color: #f0fdf4 !important;
+  opacity: 0.78;
+}
+tr.order-prepared .prep-toggle-btn {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #166534;
+}
+
+/* Foglio dedicato alla stampa etichetta sacchetto / riepilogo cucina */
+.kds-print-sheet {
+  display: none;
+}
+
+@media print {
+  body[data-kds-print-mode] > *:not(#kds-print-sheet) {
+    display: none !important;
+  }
+  body[data-kds-print-mode] #kds-print-sheet {
+    display: block !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #000000;
+    background: #ffffff;
+    padding: 8mm;
+  }
+  .kds-ticket {
+    max-width: 96mm;
+    border: 2px solid #000000;
+    border-radius: 6px;
+    padding: 6mm;
+  }
+  .kds-ticket-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    border-bottom: 1px solid #000000;
+    padding-bottom: 3mm;
+    margin-bottom: 3mm;
+  }
+  .kds-ticket-customer {
+    font-size: 16pt;
+    font-weight: 800;
+    margin: 0 0 4mm 0;
+  }
+  .kds-ticket-items {
+    list-style: none;
+    margin: 0 0 4mm 0;
+    padding: 0;
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+  .kds-ticket-items li {
+    padding: 1.5mm 0;
+    border-bottom: 1px dashed #666666;
+  }
+  .kds-ticket-notes {
+    border: 2px solid #000000;
+    padding: 3mm;
+    margin: 3mm 0;
+    font-size: 11pt;
+    font-weight: 700;
+  }
+  .kds-ticket-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10pt;
+    font-weight: 700;
+    padding-top: 2mm;
+  }
+  .kds-summary-print {
+    width: 100%;
+  }
+  .kds-summary-print h1 {
+    font-size: 16pt;
+    margin: 0 0 2mm 0;
+  }
+  .kds-summary-print p {
+    font-size: 10pt;
+    margin: 0 0 4mm 0;
+  }
+  .kds-summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11pt;
+  }
+  .kds-summary-table th,
+  .kds-summary-table td {
+    border: 1px solid #000000;
+    padding: 2.5mm 3mm;
+    text-align: left;
+  }
+}
