@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+node "$(dirname "$0")/build_russo_stock_catalog.mjs"
+
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DIST_ROOT="${ROOT_DIR}/dist-production"
 DIST_DIR="${DIST_ROOT}/pagnottella-gourmet"
@@ -50,3 +52,7 @@ cp "${ROOT_DIR}/favicondosepranza.png" "${DIST_ROOT}/"
 
 cp "${ROOT_DIR}/pagnottella-gourmet/ordini.html" "${DIST_DIR}/"
 cp "${ROOT_DIR}/pagnottella-gourmet/ordini.js" "${DIST_DIR}/"
+
+cp "${ROOT_DIR}/assets/russo-stock-menu.json" "${DIST_ROOT}/assets/"
+mkdir -p "${DIST_ROOT}/assets/pagnottella/data"
+cp "${ROOT_DIR}/assets/pagnottella/data/menu.json" "${DIST_ROOT}/assets/pagnottella/data/"

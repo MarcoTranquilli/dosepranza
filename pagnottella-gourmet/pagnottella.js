@@ -30,13 +30,14 @@ const DRAFT_CART_KEY = 'pg_draft_cart';
 function persistDraftCart(){
   try{
     localStorage.setItem(DRAFT_CART_KEY, JSON.stringify(state.cart));
+    globalThis.window?.DosePranzaClientUX?.createDailyCartStorage('pagnottella').save(Object.values(state.cart));
   }catch(error){
     console.warn('draft_cart_storage_unavailable');
     toast('Carrello mantenuto in questa pagina. Salvataggio locale non disponibile: non ricaricare.');
   }
 }
 function clearDraftCart(){
-  try{ localStorage.removeItem(DRAFT_CART_KEY); }
+  try{ localStorage.removeItem(DRAFT_CART_KEY); globalThis.window?.DosePranzaClientUX?.createDailyCartStorage('pagnottella').clear(); }
   catch(error){ console.warn('draft_cart_clear_failed'); }
 }
 function restoreDraftCart(){
@@ -235,7 +236,6 @@ function paymentMethodLabel(method){
 
 function paymentMethodMeta(label){
   const methods = {
-    'Bonifico bancario': { icon:'↗', description:`Bonifico istantaneo entro le ${orderCutoffCopy}` },
     'Contanti al ritiro': { icon:'€', description:'Da saldare al ritiro, non ancora pagato' },
     'Satispay': { icon:'S', description:`Metodo principale · entro le ${orderCutoffCopy}` },
     'PayPal': { icon:'P', description:'Disponibile da settembre' },
@@ -281,50 +281,27 @@ function renderPaymentOptions(){
 }
 
 function renderPaymentDetails(){
-  const container = typeof byId === 'function' ? byId('paymentDetails') : null;
-  if(!container) return;
-  const method = typeof selectedPaymentMethod === 'function' ? selectedPaymentMethod() : 'Satispay';
-  if(method === 'Contanti al ritiro'){container.textContent='Pagamento in contanti al ritiro. Nessun pagamento digitale richiesto; invia comunque il riepilogo su WhatsApp.';return;}
-  if(method === 'Bonifico bancario'){
-    const iban = (typeof paymentIban === 'function' ? paymentIban() : null) || (typeof DATA !== 'undefined' && DATA.payment?.iban) || 'IT35B0832703249000000002986';
-    const beneficiary = (typeof paymentBeneficiary === 'function' ? paymentBeneficiary() : null) || (typeof DATA !== 'undefined' && DATA.payment?.beneficiary) || '3M Società a Responsabilità Limitata';
-    container.innerHTML = '<div class="paymentInstruction bonificoInstruction" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px;margin-top:10px;font-size:13px;line-height:1.5;">' +
-      '<div style="font-weight:700;color:#1e293b;margin-bottom:4px;">Bonifico bancario istantaneo</div>' +
-      '<div style="color:#475569;margin-bottom:6px;">Intestatario: <strong>' + beneficiary + '</strong></div>' +
-      '<div style="font-family:monospace;background:#e2e8f0;padding:6px 10px;border-radius:6px;font-size:12px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">' +
-        '<span>' + iban + '</span>' +
-        '<button type="button" onclick="copyPaymentIban()" class="ghost" style="padding:2px 8px;font-size:11px;">Copia IBAN</button>' +
-      '</div>' +
-      '<div style="font-size:11px;color:#64748b;">Effettua il bonifico prima o contestualmente all\'invio dell\'ordine.</div>' +
-    '</div>';
-    return;
+  const container=byId('paymentDetails');if(!container)return;
+  if(selectedPaymentMethod()==='Contanti al ritiro'){
+    container.textContent='Pagamento in contanti al ritiro. Invia comunque il riepilogo su WhatsApp.';
+    delete container.dataset.paymentKey;return;
   }
-  const shopUrl = 'https://www.satispay.com/app/pay/shops/5683f7f2-a4f8-4e0d-b8f9-f00af32b8ecb';
-  const qrImgSrc = './assets/pagnottella/payment/satispay-qr-pagnottella.png';
-  const qrFallbackUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=0&data=' + encodeURIComponent(shopUrl);
-  container.innerHTML = '<div class="paymentInstruction satispayInstruction" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:14px;margin-top:10px;color:#166534;font-size:13px;line-height:1.5;">' +
-    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">' +
-      '<span style="background:#e11d48;color:#ffffff;font-weight:700;font-size:11px;padding:2px 8px;border-radius:9999px;text-transform:uppercase;letter-spacing:0.5px;">Satispay Business</span>' +
-      '<span style="font-size:11px;color:#15803d;font-weight:600;">Profilo Aziendale</span>' +
-    '</div>' +
-    '<div style="font-size:15px;font-weight:700;color:#14532d;margin-bottom:2px;">La Pagnottella Gourmet</div>' +
-    '<div style="font-size:12px;color:#166534;margin-bottom:12px;">Intestatario: <strong>3M Società a Responsabilità Limitata</strong></div>' +
-    '<div style="text-align:center;margin:12px 0;">' +
-      '<a href="' + shopUrl + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;box-sizing:border-box;background:#e11d48;color:#ffffff;text-decoration:none;font-weight:700;font-size:14px;padding:12px 16px;border-radius:10px;box-shadow:0 2px 6px rgba(225,29,72,0.3);">' +
-        '<span>📱</span> Paga con Satispay (apri app)' +
-      '</a>' +
-    '</div>' +
-    '<div style="text-align:center;margin:14px auto 8px auto;padding:10px;background:#ffffff;border-radius:8px;border:1px solid #dcfce7;max-width:170px;">' +
-      '<img src="' + qrImgSrc + '" alt="QR Code Satispay Pagnottella" style="width:150px;height:150px;display:block;margin:0 auto;object-fit:contain;" onerror="this.onerror=null;this.src=\'' + qrFallbackUrl + '\';" />' +
-      '<span style="display:block;font-size:10px;color:#6b7280;margin-top:6px;font-weight:500;">Inquadra da PC con l\'app Satispay</span>' +
-    '</div>' +
-    '<div style="background:#fffbeb;border:1px solid #fef3c7;border-radius:8px;padding:8px 10px;margin-top:10px;font-size:11px;color:#92400e;line-height:1.4;">' +
-      '⚠️ <strong>Attenzione:</strong> Non inviare denaro al numero telefonico (+39 392 151 2515). Quel numero serve unicamente per trasmettere il riepilogo dell\'ordine tramite WhatsApp.' +
-    '</div>' +
-  '</div>';
+  window.DoseSatispayUI?.mount(container,Math.round(totals().total*100));
 }
-
-
+function reconcileLiveStock(){
+  if(!window.DoseStock?.confirmed||state.sending||state.lastOrderId)return false;
+  const result=window.DosePranzaSatispayStock.reconcileCartWithStock(Object.values(state.cart),window.DoseStock.state);
+  if(!result.removedItems.length)return false;
+  for(const {item} of result.removedItems)delete state.cart[item.cartKey];
+  persistDraftCart();resetCurrentTransmissionState();closePaymentConfirmation();
+  const notice='Articoli esauriti rimossi: '+result.removedItems.map(r=>r.item.name).join(', ');
+  toast(notice);window.DoseStock?.announce(notice);
+  renderCart();return true;
+}
+window.addEventListener('dose-stock-change',event=>{
+  if(event.detail.vendor!=='pagnottella'||!DATA)return;
+  reconcileLiveStock();renderCatalog();
+});
 
 function hydrateStatic(){
   byId('brand-subtitle').textContent = `Suite DOSepranza · ${DATA.copy.eyebrow} · ordine in pochi tap`;
@@ -914,7 +891,8 @@ function renderCatalog(){
   byId('grid').innerHTML = arr.map(p => card(p)).join('');
 }
 function card(p){
-  const badges = [];
+  const soldOut=window.DoseStock?.check(p).soldOut;
+  const badges = soldOut ? ['Esaurito'] : [];
   badges.push(...(window.DosePreferences?.tags(p) || []).map(tag=>window.DosePreferences.labels[tag]), ...(p.tags || []).slice(0,2));
   const hasSpecificImage = p.imageMeta?.specific === true;
   const alt = hasSpecificImage ? p.name : `La Pagnottella Gourmet - foto specifica non disponibile per ${p.name}`;
@@ -923,7 +901,7 @@ function card(p){
   const srcset = responsive?.mobile && responsive?.desktop
     ? ` srcset="${esc(responsive.mobile)} 640w, ${esc(responsive.desktop)} 1200w" sizes="(max-width:640px) 92vw, (max-width:1100px) 46vw, 360px"`
     : '';
-  return `<article data-food-tags="${(window.DosePreferences?.tags(p) || []).join(' ')}" class="card ${hasSpecificImage ? '' : 'imageFallback'}"><div class="pic"><img src="${esc(p.img)}"${srcset} alt="${esc(alt)}" loading="lazy" decoding="async"><div class="badges">${badges.map(t=>`<span class="badge">${esc(t)}</span>`).join('')}</div>${hasSpecificImage ? '' : '<span class="imageNotice">Foto specifica non disponibile</span>'}</div><div class="body"><div class="nameRow"><h4>${esc(p.name)}</h4><div class="price">${appliedDiscountRate() ? `<span class="old">${money(p.price)}</span>` : ''}${money(discountedPrice(p.price))}</div></div><p class="desc">${esc(p.desc)}</p><div class="meta"><span class="tag">${esc(clusterLabel(p.categoryGroup))}</span>${(p.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div><div class="actions"><button class="details" onclick="openDetails('${p.id}')">Dettagli</button><button class="add" aria-label="${esc(addLabel)}" onclick="quickAdd('${p.id}')" ${isOrderingClosed() ? 'disabled' : ''}>${isOrderingClosed() ? 'Chiuso' : '+'}</button></div></div></article>`;
+  return `<article data-food-tags="${(window.DosePreferences?.tags(p) || []).join(' ')}" class="card ${hasSpecificImage ? '' : 'imageFallback'}"><div class="pic"><img src="${esc(p.img)}"${srcset} alt="${esc(alt)}" loading="lazy" decoding="async"><div class="badges">${badges.map(t=>`<span class="badge">${esc(t)}</span>`).join('')}</div>${hasSpecificImage ? '' : '<span class="imageNotice">Foto specifica non disponibile</span>'}</div><div class="body"><div class="nameRow"><h4>${esc(p.name)}</h4><div class="price">${appliedDiscountRate() ? `<span class="old">${money(p.price)}</span>` : ''}${money(discountedPrice(p.price))}</div></div><p class="desc">${esc(p.desc)}</p><div class="meta"><span class="tag">${esc(clusterLabel(p.categoryGroup))}</span>${(p.tags||[]).slice(0,3).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div><div class="actions"><button class="details" onclick="openDetails('${p.id}')">Dettagli</button><button class="add" aria-label="${esc(addLabel)}" onclick="quickAdd('${p.id}')" ${isOrderingClosed() || soldOut ? 'disabled' : ''}>${soldOut ? 'Esaurito' : isOrderingClosed() ? 'Chiuso' : '+'}</button></div></div></article>`;
 }
 function openDetails(id){
   const p = PRODUCTS.find(x => x.id === id);
@@ -989,6 +967,7 @@ function closeDrawer(){ byId('drawer').classList.remove('show'); }
 function quickAdd(id){ openDetails(id); }
 function drawerAdd(){ if(addToCart(state.current, state.option || defaultOption(state.current), selectedExtraObjects())) closeDrawer(); }
 function addToCart(p,o,extras=[]){
+  if(globalThis.window?.DoseStock?.check({...p,opt:o?.label,extras}).soldOut){toast('Prodotto o ingrediente esaurito');return false;}
   if(isOrderingClosed()){
     toast('Punto vendita chiuso: ordini temporaneamente sospesi');
     return false;
@@ -1011,6 +990,7 @@ function totals(){ const items = Object.values(state.cart); const orig = items.r
 window.DoseCanReload = () => Boolean(DATA) && !authState.loading && !state.sending && totals().count === 0
   && !byId('paymentConfirmModal')?.classList.contains('show') && !byId('checkoutCompleteModal')?.classList.contains('show');
 function renderCart(){
+  renderPaymentDetails();
   window.DoseUsualOrder?.refresh();
   const draftTotals = totals();
   window.DoseCartSync?.sync('pagnottella',draftTotals.items,Math.round(draftTotals.total*100));
@@ -1066,10 +1046,6 @@ function buildMessage(){
   msg += `\nTotale: ${money(t.total)}`;
   msg += `\n\n\u{1F4B3} Pagamento`;
   msg += `\nMetodo selezionato: ${paymentMethod || 'Non specificato'}`;
-  if(paymentMethod === 'Bonifico bancario'){
-    if(paymentBeneficiary()) msg += `\nIntestatario: ${paymentBeneficiary()}`;
-    if(paymentIban()) msg += `\nIBAN: ${paymentIban()}`;
-  }
   msg += `\n\n\u26A0\uFE0F Note / Allergie`;
   msg += `\n${notes || 'Nessuna'}`;
   return msg;
@@ -1216,9 +1192,7 @@ function configureConfirmation(action){
     const paymentMethod = selectedPaymentMethod();
     const recipient = whatsappConfig();
     title.textContent = 'Controlla prima di procedere';
-    copy.textContent = paymentMethod === 'Bonifico bancario'
-      ? `Hai selezionato Bonifico bancario. Il riepilogo verrà aperto nella chat WhatsApp di ${recipient.supplierName} al numero ${recipient.displayNumber}: allega la ricevuta prima dell’invio.`
-      : `Il riepilogo verrà aperto nella chat WhatsApp di ${recipient.supplierName} al numero ${recipient.displayNumber}.`;
+    copy.textContent = `Il riepilogo verrà aperto nella chat WhatsApp di ${recipient.supplierName} al numero ${recipient.displayNumber}.`;
     method.textContent = `Metodo selezionato: ${paymentMethod} · Destinatario: ${recipient.displayNumber}`;
     if(summary) summary.innerHTML = orderConfirmationSummaryHtml();
     accept.textContent = 'Invia Ordine su WhatsApp al Laboratorio';
@@ -1318,6 +1292,7 @@ async function confirmPaymentAndSend(){
     return;
   }
   closePaymentConfirmation();
+  if(window.DoseStock?.confirmed && reconcileLiveStock())return;
   const message = buildMessage();
   const fingerprint = checkoutFingerprint();
   const target = whatsappUrl(message);
