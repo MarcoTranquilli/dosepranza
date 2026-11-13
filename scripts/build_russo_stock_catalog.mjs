@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+import vm from 'node:vm';
+import {fileURLToPath} from 'node:url';
+import path from 'node:path';
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const source=fs.readFileSync(path.join(root,'app.v20260325.js'),'utf8');
+const start=source.indexOf('const DIETS_CONFIG');
+const end=source.indexOf('\n        };',source.indexOf('const RAW_MENU'))+12;
+if(start<0||end<12)throw Error('Catalogo Russo non trovato');
+const menu=vm.runInNewContext(source.slice(start,end)+'; RAW_MENU',{}, {timeout:1000});
+const products=Object.entries(menu).flatMap(([cat,items])=>items.map((item,index)=>({...item,cat,id:cat.replace(/\s/g,'')+index})));
+fs.writeFileSync(path.join(root,'assets/russo-stock-menu.json'),JSON.stringify({products},null,2)+'\n');

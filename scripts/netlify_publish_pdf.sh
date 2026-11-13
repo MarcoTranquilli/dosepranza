@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
+node "$(dirname "$0")/build_russo_stock_catalog.mjs"
+
 echo "--- Inizio Build DOSepranza ---"
 
 DIST_DIR="dist"
