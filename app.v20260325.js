@@ -178,6 +178,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
         const RUSSO_PENDING_CHECKOUT_KEY = 'dose_russo_pending_checkout';
         let dailyRussoCart = null;
         let russoOrderSaved = false;
+        let russoOrderSending = false;
         function saveDailyRussoCart() {
             russoOrderSaved = false;
             if(state.cart.length) dailyRussoCart?.save(state.cart);
@@ -334,6 +335,8 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
         };
         await purgeLegacyFirestorePersistence();
         const db_fb = initializeFirestore(app_fb, { experimentalForceLongPolling: true, localCache: memoryLocalCache() });
+        window.DoseRussoStockDatabase = db_fb;
+        window.dispatchEvent(new Event('dose-russo-db-ready'));
         const ordersCol = collection(db_fb, "orders");
         const ordersAuditCol = collection(db_fb, "orders_audit");
         const frigeProductsCol = collection(db_fb, "frige_products");
@@ -630,13 +633,13 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             }
         };
         window.DoseCustomerCatalog = {
-            list: () => buildMenuList().map(p => ({...p, available: !state.disabledProducts.has(p.id)})),
+            list: () => buildMenuList().map(p => ({...p, available: !state.disabledProducts.has(p.id) && !window.DoseStock?.check(p).soldOut})),
             choose: id => { const p=buildMenuList().find(p=>String(p.id)===id); if(p) window.addStdToCart(p.id); },
             reorder: plan => {
                 if(!ensureOrderWindow()) throw Error('Ordini chiusi');
                 const ready=plan.map(({item,product,qty})=>{
                     const p=buildMenuList().find(p=>p.id===product.id);
-                    if(!p || state.disabledProducts.has(p.id) || item.details || p.sizes || p.variants)
+                    if(!p || state.disabledProducts.has(p.id) || window.DoseStock?.check(p).soldOut || item.details || p.sizes || p.variants)
                         throw Error('Verifica porzioni e personalizzazioni dal catalogo');
                     return {p,qty};
                 });
@@ -653,6 +656,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
             if(!ensureOrderWindow()) return;
             if(state.disabledProducts.has(id)) return window.toast("Prodotto non disponibile");
             const item = buildMenuList().find(i => i.id === id);
+            if(window.DoseStock?.check(item).soldOut)return window.toast('Prodotto esaurito');
             const select = document.querySelector(`select[data-pid="${id}"]`);
             const price = select ? parseFloat(select.value) : item.price;
             const det = select ? `Porz: ${select.options[select.selectedIndex].text.split('-')[0]}` : "";
@@ -679,7 +683,9 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
         };
 
         window.addIng = (id) => {
-            state.custom.ings.push(INGREDIENTS_DATA.find(i => i.id === id));
+            const ingredient=INGREDIENTS_DATA.find(i => i.id === id);
+            if(!ingredient || window.DoseStock?.check({ingredients:[ingredient]}).soldOut)return window.toast('Ingrediente esaurito');
+            state.custom.ings.push(ingredient);
             renderCustomIngs(); updateCustomSummary();
         };
 
@@ -691,6 +697,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
         window.addCustomToCart = () => {
             if(!ensureOrderWindow()) return;
             const c = state.custom;
+            if(window.DoseStock?.check({ingredients:c.ings}).soldOut)return window.toast('Ingrediente esaurito');
             if(!c.subtype || c.ings.length === 0) return window.toast("Scegli gli ingredienti!");
             state.cart.push({ name: `${c.base} (${c.subtype})`, price: c.total, cat: 'Personalizzati', details: c.ings.map(i=>i.name).join(', '), cartId: Date.now() });
             globalThis.window?.DoseCartFeedback?.pulse();
@@ -1404,9 +1411,12 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
                 submit.textContent = 'Invio ordine in corso…';
             }
             try {
+                if(window.DoseStock?.confirmed && window.DosePranzaSatispayStock.reconcileCartWithStock(payload.items,window.DoseStock.state).removedItems.length)throw new Error('Un articolo è esaurito: aggiorna il carrello prima di inviare.');
+                russoOrderSending = true;
                 const docRef = await createRussoOrder(payload);
                 russoOrderSaved = true;
                 dailyRussoCart?.clear();
+                russoOrderSending = false;
                 await window.DoseCartSync?.confirm('russo');
                 closeSendConfirm();
                 const summary = buildOrderConfirmSummary(docRef.id, payload.items, payload.total);
@@ -1423,6 +1433,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
                 sessionStorage.removeItem(RUSSO_PENDING_CHECKOUT_KEY);
                 state.cart = []; document.getElementById('cart-count').textContent='0'; window.navigate('history'); window.toast("Inviato!");
             } catch(e) {
+                russoOrderSending = false;
                 console.warn('order save failed', orderSaveDiagnostics(e, 'firestore-create'));
                 const message = orderSaveErrorMessage(e);
                 const needsGoogleReconnect = ['auth/session-missing', 'auth/provider-mismatch'].includes(String(e?.code || ''));
@@ -2079,7 +2090,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
                 let html = "";
                 if(i.cat !== cur) { cur = i.cat; html += `<div class="col-span-full mt-6 mb-2 font-black text-[10px] uppercase text-primary/60 border-b border-primary/10 tracking-widest">${esc(cur)}</div>`; }
                 const pricing = i.hasPortions ? `<select data-pid="${i.id}" class="text-[9px] p-2 border rounded-xl w-full font-bold outline-none bg-gray-50">${i.portions.map(o=>`<option value="${o.v}">${esc(o.t)}</option>`).join('')}</select>` : `<span class="font-black text-primary text-lg">${formatCurrency(i.price)}</span>`;
-                const isDisabled = state.disabledProducts.has(i.id);
+                const isDisabled = state.disabledProducts.has(i.id) || window.DoseStock?.check(i).soldOut;
                 const disabled = (!orderOpen || isDisabled) ? 'opacity-50 pointer-events-none' : '';
                 const canManage = isAdmin() || isRistoratore();
                 const badges = [
@@ -2117,6 +2128,7 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
         }
 
         function renderCart() {
+            window.DoseSatispayUI?.mount(document.getElementById('russo-satispay-actions'),Math.round(state.cart.reduce((sum,item)=>sum+item.price,0)*100));
             window.DoseRussoUsual?.refresh();
             const dock = document.getElementById('russo-cart-dock-summary');
             if (dock) dock.textContent = state.cart.length + ' articoli · ' + formatCurrency(state.cart.reduce((sum, item) => sum + item.price, 0));
@@ -4231,3 +4243,19 @@ import { initializeFirestore, memoryLocalCache, collection, onSnapshot, addDoc, 
         };
 
         init();
+
+window.addEventListener('dose-stock-change',event=>{
+  if(event.detail.vendor!=='russo'||!window.DoseStock?.confirmed||russoOrderSending)return;
+  if(russoOrderSaved){renderMenu();return;}
+  const result=window.DosePranzaSatispayStock.reconcileCartWithStock(state.cart,window.DoseStock.state);
+  if(result.removedItems.length){
+    state.cart=result.availableItems;state.pendingOrder=null;
+    try{sessionStorage.removeItem(RUSSO_PENDING_CHECKOUT_KEY);}catch{}
+    closeSendConfirm();saveDailyRussoCart();
+    window.DoseCartSync?.sync('russo',state.cart,Math.round(state.cart.reduce((s,i)=>s+i.price,0)*100));
+    document.getElementById('cart-count').textContent=state.cart.length;
+    const notice='Articoli esauriti rimossi: '+result.removedItems.map(r=>r.item.name).join(', ');
+    window.toast(notice);window.DoseStock?.announce(notice);
+  }
+  renderMenu();renderCart();
+});
