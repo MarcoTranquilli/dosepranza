@@ -5,7 +5,7 @@ const audio=window.DoseSupplierAudio?.mount('pagnottella');
 let auth,db,stop,flow,epoch=0,orders=[],report='';
 const money=n=>new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(n);
 const status=message=>{el('access-status').textContent=message;};
-function clear(){orders=[];report='';for(const id of ['packing-tbody','orders-tbody'])el(id).replaceChildren();for(const id of ['kpi-orders','kpi-items','kpi-total'])el(id).textContent='—';el('btn-copy-wa').disabled=true;el('btn-print').disabled=true;}
+function clear(){orders=[];report='';for(const id of ['packing-tbody','orders-tbody'])el(id).replaceChildren();for(const id of ['kpi-orders','kpi-items','kpi-total'])el(id).textContent='—';el('btn-copy-wa').disabled=true;el('btn-print').disabled=true;const kdsPayload={supplier:'pagnottella',vendorLabel:'La Pagnottella Gourmet',day:el('order-date')?.value||'',orders:[]};window.DoseKitchenDisplay?.syncOrders?.(kdsPayload);}
 function cell(tr,text){const td=document.createElement('td');td.textContent=text;tr.append(td);return td;}
 function render(){
   const range=A.rangeFor('custom',new Date(),el('order-date').value,el('order-date').value);
@@ -16,9 +16,12 @@ function render(){
   const packing=el('packing-tbody');packing.replaceChildren();
   for(const [key,label] of [['bread','Pane / base'],['recipes','Ricette'],['extras','Extra']]){report+=`\n${label}\n`;for(const [name,n] of groups[key]){const tr=document.createElement('tr');cell(tr,`${n} ×`);cell(tr,`${label}: ${name}`);packing.append(tr);report+=`${n} × ${name}\n`;}}
   const body=el('orders-tbody');body.replaceChildren();
-  for(const o of selected){const tr=document.createElement('tr');const time=new Intl.DateTimeFormat('it-IT',{timeZone:'Europe/Rome',hour:'2-digit',minute:'2-digit'}).format(A.toDate(o.createdAt));const name=o.user||o.userName||o.email||'Collega';const description=o.items.map(i=>`${C.quantity(i)} × ${C.composition(i)}`).join('; ');cell(tr,time);cell(tr,name);const detail=cell(tr,description);const notes=[o.notes,o.allergies].filter(Boolean).join(' · ');if(notes){const note=document.createElement('span');note.className='order-note';note.textContent=notes;detail.append(note);}cell(tr,money(o.total));body.append(tr);report+=`\n${time} ${name}: ${description}${notes?' — '+notes:''} · ${money(o.total)}\n`;}
+  for(const o of selected){const tr=document.createElement('tr');if(o.id)tr.dataset.orderId=o.id;const time=new Intl.DateTimeFormat('it-IT',{timeZone:'Europe/Rome',hour:'2-digit',minute:'2-digit'}).format(A.toDate(o.createdAt));const name=o.user||o.userName||o.email||'Collega';const description=o.items.map(i=>`${C.quantity(i)} × ${C.composition(i)}`).join('; ');cell(tr,time);cell(tr,name);const detail=cell(tr,description);const notes=[o.notes,o.allergies].filter(Boolean).join(' · ');if(notes){const note=document.createElement('span');note.className='order-note';note.textContent=notes;detail.append(note);}cell(tr,money(o.total));body.append(tr);report+=`\n${time} ${name}: ${description}${notes?' — '+notes:''} · ${money(o.total)}\n`;}
   if(!selected.length){for(const target of [packing,body]){const tr=document.createElement('tr');const td=cell(tr,'Nessun ordine valido per questa data.');td.colSpan=target===body?4:2;target.append(tr);}}
   el('btn-copy-wa').disabled=!selected.length;el('btn-print').disabled=!selected.length;
+ const kdsPayload={supplier:'pagnottella',vendorLabel:'La Pagnottella Gourmet',day:el('order-date').value,orders:selected};
+ window.DoseKitchenDisplay?.syncOrders?.(kdsPayload);
+ window.dispatchEvent(new CustomEvent('dosepranza:orders-rendered',{detail:kdsPayload}));
 }
 el('order-date').value=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());el('order-date').max=el('order-date').value;
 el('order-date').onchange=()=>{try{render();}catch{clear();status('Data non valida.');}};

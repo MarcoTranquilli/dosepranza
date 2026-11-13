@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Alimentari Russo · Riepilogo Ordini</title>
   <link rel="stylesheet" href="../shared/theme.css">
+  <link rel="stylesheet" href="../shared/kitchen-display.css?v=20261113-v212">
   <style>
     :root {
       --russo-green: #15803d;
@@ -534,6 +535,7 @@
       } else {
         for (const ord of filtered) {
           const tr = document.createElement('tr');
+          if (ord.id) tr.dataset.orderId = ord.id;
           const itemsDesc = (ord.items || []).map(i => `${i.quantity || 1}× ${i.name}${i.details ? ' (' + i.details + ')' : ''}`).join(', ');
           const noteHtml = (ord.notes || ord.allergies) 
             ? `<span class="order-note">Nota: ${ord.notes || ''} ${ord.allergies ? '· Allergie: ' + ord.allergies : ''}</span>` 
@@ -548,6 +550,9 @@
           ordersTbody.appendChild(tr);
         }
       }
+      const kdsPayload = { supplier: 'russo', vendorLabel: 'Alimentari Russo', day: selectedDay, orders: filtered };
+      window.DoseKitchenDisplay?.syncOrders?.(kdsPayload);
+      window.dispatchEvent(new CustomEvent('dosepranza:orders-rendered', { detail: kdsPayload }));
     }
 
     function startFirestoreListener() {
